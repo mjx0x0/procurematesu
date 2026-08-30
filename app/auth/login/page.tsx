@@ -1,12 +1,8 @@
 "use client";
 
-// ✅ Force dynamic rendering
-export const dynamic = 'force-dynamic';
-
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase/client";
 import { FileText, Mail, Lock, ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
@@ -20,6 +16,9 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    // ✅ Import Supabase dynamically (only on client side)
+    const { supabase } = await import("@/lib/supabase/client");
 
     const { error } = await supabase.auth.signInWithPassword({
       email,

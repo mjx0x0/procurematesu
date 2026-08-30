@@ -1,10 +1,6 @@
 "use client";
 
-// ✅ Force dynamic rendering
-export const dynamic = 'force-dynamic';
-
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { FileText, LogOut, User, PlusCircle } from "lucide-react";
 
@@ -15,6 +11,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const getUser = async () => {
+      // ✅ Import Supabase dynamically (only on client side)
+      const { supabase } = await import("@/lib/supabase/client");
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push("/auth/login");
@@ -27,6 +26,7 @@ export default function DashboardPage() {
   }, [router]);
 
   const handleLogout = async () => {
+    const { supabase } = await import("@/lib/supabase/client");
     await supabase.auth.signOut();
     router.push("/");
   };

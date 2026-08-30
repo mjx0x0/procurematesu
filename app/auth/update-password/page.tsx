@@ -1,11 +1,7 @@
 "use client";
 
-// ✅ Force dynamic rendering
-export const dynamic = 'force-dynamic';
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
 import { FileText, Lock, ArrowRight } from "lucide-react";
 
 export default function UpdatePasswordPage() {
@@ -31,6 +27,9 @@ export default function UpdatePasswordPage() {
 
     setLoading(true);
     setError(null);
+
+    // ✅ Import Supabase dynamically (only on client side)
+    const { supabase } = await import("@/lib/supabase/client");
 
     const { error } = await supabase.auth.updateUser({
       password: password,

@@ -1,10 +1,7 @@
 "use client";
 
-// ✅ Force dynamic rendering
-export const dynamic = 'force-dynamic';
-
-import { ForgotPasswordForm } from "@/components/forgot-password-form";
 import { FileText } from "lucide-react";
+import { ForgotPasswordForm } from "@/components/forgot-password-form";
 
 export default function ForgotPasswordPage() {
   return (
@@ -20,8 +17,6 @@ export default function ForgotPasswordPage() {
             </div>
             <span className="text-2xl font-bold text-gray-900">ProcuremateSU</span>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Forgot Password</h2>
-          <p className="text-gray-600 mt-2">Enter your email to reset your password</p>
         </div>
         <ForgotPasswordForm />
       </div>
