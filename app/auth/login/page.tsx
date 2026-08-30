@@ -1,5 +1,8 @@
 "use client";
 
+// ✅ Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -33,12 +36,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50/50 px-4">
-      {/* Background Effects */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-200/30 rounded-full blur-3xl -z-10" />
       
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-xl">
@@ -50,13 +51,10 @@ export default function LoginPage() {
           <p className="text-gray-600 mt-2">Sign in to manage your procurement requests</p>
         </div>
 
-        {/* Login Form */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-100">
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
@@ -71,9 +69,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
@@ -87,18 +83,14 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm">
-                {error}
-              </div>
-            )}
+            {error && <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm">{error}</div>}
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+              <Link href="/auth/forgot-password" className="text-blue-600 hover:text-blue-700 font-medium">
                 Forgot password?
               </Link>
             </div>
