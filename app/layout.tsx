@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from "next-themes";
+import "./globals.css";
+
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -8,23 +15,29 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "ProcuremateSU | Digital Procurement Logbook for MSU-GenSan",
+  description: "AI-powered procurement system for Mindanao State University - General Santos. Streamline purchase requests, track status, and ensure RA 12009 compliance.",
+  keywords: "procurement, MSU-GenSan, RA 12009, digital logbook, AI assistant, purchase request",
+  authors: [{ name: "ProcuremateSU Team" }],
+  openGraph: {
+    title: "ProcuremateSU | Digital Procurement Logbook for MSU-GenSan",
+    description: "Streamline your procurement process with AI-powered assistance at MSU-GenSan.",
+    type: "website",
+    url: "https://procurematesu.vercel.app",
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
-
-const inter = Inter({ 
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
+      <body className="font-sans antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
