@@ -37,7 +37,6 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
     }
 
     const result = await response.json();
-    // The API returns a 2D array [[...]] for feature extraction
     if (Array.isArray(result) && result.length > 0 && Array.isArray(result[0])) {
       return result[0];
     }
@@ -50,7 +49,6 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
 
 // Helper: Fallback to full-text search if embedding fails
 async function searchDocuments(query: string): Promise<string> {
-  // Try vector search first (using the embedding for similarity)
   const embedding = await generateEmbedding(query);
   
   if (embedding) {
@@ -90,11 +88,11 @@ export async function POST(req: NextRequest) {
 
     console.log(`📨 Received: "${message}"`);
 
-    // 1. Retrieve relevant context from documents
+    // 1. Retrieve relevant context
     const context = await searchDocuments(message);
     console.log(`📚 Context length: ${context.length} chars`);
 
-    // 2. Prepare the system prompt with context
+    // 2. Prepare system prompt
     const systemPrompt = `
 You are Isko BidDo, a procurement assistant for Mindanao State University - General Santos.
 Answer questions based ONLY on the provided context from the official procurement documents (RA 12009, IRR, Procurement Manual).
@@ -109,7 +107,7 @@ ${context || 'No relevant documents found. Please ask about procurement procedur
     if (!GROQ_API_KEY) {
       console.error('❌ GROQ_API_KEY is not set');
       return NextResponse.json(
-        { error: 'Groq API key is not configured. Please contact admin.' },
+        { error: 'Groq API key is not configured' },
         { status: 500 }
       );
     }
@@ -143,7 +141,7 @@ ${context || 'No relevant documents found. Please ask about procurement procedur
     const data = await response.json();
     const reply = data.choices?.[0]?.message?.content || 'No response from AI.';
 
-    // 4. Log inquiry to monitor_inquiries
+    // 4. Log inquiry
     if (userId) {
       await supabase.from('monitor_inquiries').insert({
         user_id: userId,
