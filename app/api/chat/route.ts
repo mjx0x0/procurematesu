@@ -6,7 +6,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Simplified search – just ILIKE (most reliable)
+// Simplified search – ILIKE (most reliable)
 async function searchDocuments(query: string): Promise<string> {
   console.log(`🔍 Searching for: "${query}"`);
   const { data, error } = await supabase
@@ -53,32 +53,41 @@ Context:
 ${context || 'No relevant documents found.'}
 `;
 
-    const GROQ_API_KEY = process.env.GROQ_API_KEY;
-    if (!GROQ_API_KEY) {
-      return NextResponse.json({ error: 'Groq API key missing' }, { status: 500 });
+    // 🔥 Use Gemini API instead of Groq
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+      return NextResponse.json(
+        { error: 'Gemini API key missing. Please set GEMINI_API_KEY.' },
+        { status: 500 }
+      );
     }
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${GROQ_API_KEY.trim()}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'qwen/qwen3.6-27b',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message },
-        ],
-        temperature: 0.1,
-        max_tokens: 150,
-        stop: ['\n\n', ' response:'],
-      }),
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `System: ${systemPrompt}\n\nUser: ${message}`,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 150,
+          },
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`❌ Groq error: ${response.status} ${errorText}`);
+      console.error(`❌ Gemini error: ${response.status} ${errorText}`);
       return NextResponse.json(
         { error: 'AI service unavailable. Please try again later.' },
         { status: 503 }
@@ -86,11 +95,17 @@ ${context || 'No relevant documents found.'}
     }
 
     const data = await response.json();
-    let reply = data.choices?.[0]?.message?.content || 'No response received.';
-    reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+    const reply =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
+      'No response received.';
 
-    if (!reply || reply.length < 5) {
-      reply = 'I cannot find that in the procurement documents.';
+    // Clean the reply (remove any stray tags)
+    const cleanReply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
+    if (!cleanReply || cleanReply.length < 5) {
+      return NextResponse.json({
+        response: 'I cannot find that in the procurement documents.',
+      });
     }
 
     // Log (non‑blocking)
@@ -100,7 +115,7 @@ ${context || 'No relevant documents found.'}
         .insert({
           user_id: userId,
           user_message: message,
-          bot_response: reply,
+          bot_response: cleanReply,
           inquiry_type: 'general',
           created_at: new Date().toISOString(),
         })
@@ -110,8 +125,7 @@ ${context || 'No relevant documents found.'}
         );
     }
 
-    return NextResponse.json({ response: reply });
-
+    return NextResponse.json({ response: cleanReply });
   } catch (error: any) {
     console.error('❌ Chat API fatal error:', error);
     return NextResponse.json(
