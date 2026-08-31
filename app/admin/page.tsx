@@ -25,7 +25,7 @@ export default function AdminPage() {
         .single();
 
       if (userData?.role !== "admin") {
-        router.push("/dashboard");
+        router.push("/admin");
         return;
       }
 
