@@ -121,7 +121,7 @@ ${context || 'No relevant documents found. Please ask about procurement procedur
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.2-90b-vision-preview',
+        model: 'llama-3.3-70b-versatile',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message },
