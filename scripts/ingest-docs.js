@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const pdfParse = require('pdf-parse');
 const { createClient } = require('@supabase/supabase-js');
-const { pipeline } = require('@xenova/transformers');
 require('dotenv').config({ path: '.env.local' });
+
+// ✅ Fixed pdf-parse import for v1.x
+const pdfParse = require('pdf-parse');
 
 // Supabase client (use service role key for bypassing RLS)
 const supabase = createClient(
@@ -11,11 +12,14 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Load embedding model (runs locally using Transformers.js)
+// Embedding model – we'll use Transformers.js
 let embedder = null;
 async function getEmbedder() {
   if (!embedder) {
+    console.log('Loading embedding model (first time may take a few minutes)...');
+    const { pipeline } = await import('@xenova/transformers');
     embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+    console.log('Model loaded!');
   }
   return embedder;
 }
@@ -34,54 +38,93 @@ function chunkText(text, chunkSize = 1000, overlap = 200) {
 
 // Convert PDF buffer to text
 async function pdfToText(pdfBuffer) {
-  const data = await pdfParse(pdfBuffer);
-  return data.text;
+  try {
+    const data = await pdfParse(pdfBuffer);
+    return data.text;
+  } catch (err) {
+    console.error('PDF parsing error:', err);
+    return '';
+  }
 }
 
 // Ingest a single document
 async function ingestDocument(filePath, docType, docName) {
-  console.log(`Processing ${docName}...`);
-  const fileBuffer = fs.readFileSync(filePath);
-  const text = await pdfToText(fileBuffer);
-  const chunks = chunkText(text);
-  console.log(`  → ${chunks.length} chunks`);
+  try {
+    console.log(`Processing ${docName}...`);
 
-  const embedder = await getEmbedder();
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-    // Generate embedding (returns a 384-dim vector)
-    const embedding = await embedder(chunk, { pooling: 'mean', normalize: true });
-    const embeddingArray = Array.from(embedding.data);
-
-    // Insert into Supabase
-    const { error } = await supabase
-      .from('document_chunks')
-      .insert({
-        document_name: docName,
-        document_type: docType,
-        chunk_text: chunk,
-        embedding: embeddingArray,
-        metadata: { chunk_index: i }
-      });
-
-    if (error) {
-      console.error(`  ❌ Error inserting chunk ${i}:`, error);
-    } else {
-      console.log(`  ✅ Inserted chunk ${i + 1}/${chunks.length}`);
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      console.log(`  ⚠️ File not found: ${filePath}. Skipping.`);
+      return;
     }
+
+    const fileBuffer = fs.readFileSync(filePath);
+    const text = await pdfToText(fileBuffer);
+
+    if (!text || text.trim().length === 0) {
+      console.log(`  ⚠️ No text extracted from ${docName}. Skipping.`);
+      return;
+    }
+
+    const chunks = chunkText(text);
+    console.log(`  → ${chunks.length} chunks`);
+
+    const embedder = await getEmbedder();
+
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      // Generate embedding (returns a 384-dim vector)
+      const embedding = await embedder(chunk, { pooling: 'mean', normalize: true });
+      const embeddingArray = Array.from(embedding.data);
+
+      // Insert into Supabase
+      const { error } = await supabase
+        .from('document_chunks')
+        .insert({
+          document_name: docName,
+          document_type: docType,
+          chunk_text: chunk,
+          embedding: embeddingArray,
+          metadata: { chunk_index: i }
+        });
+
+      if (error) {
+        console.error(`  ❌ Error inserting chunk ${i + 1}:`, error.message);
+      } else {
+        console.log(`  ✅ Inserted chunk ${i + 1}/${chunks.length}`);
+      }
+    }
+    console.log(`✅ Finished ${docName}\n`);
+  } catch (err) {
+    console.error(`❌ Error processing ${docName}:`, err.message);
   }
-  console.log(`✅ Finished ${docName}\n`);
 }
 
 // ===== RUN =====
 (async () => {
   try {
-    // Make sure the vector column is 384-dim (since MiniLM outputs 384)
-    // If you haven't changed it, run this SQL once:
+    console.log('🔍 Checking vector dimension...');
+
+    // Check if we need to alter the table
+    // Note: We need to make sure the embedding column is vector(384)
+    // If you haven't changed it, run this SQL in Supabase once:
     //   ALTER TABLE document_chunks ALTER COLUMN embedding TYPE vector(384);
-    // Then run this script.
+    // But we'll try to insert and catch the error.
 
     const dataDir = path.join(__dirname, '../data');
+    console.log(`📂 Looking for files in: ${dataDir}`);
+
+    // Create data folder if it doesn't exist
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+      console.log(`📁 Created data folder at ${dataDir}`);
+      console.log('⚠️ Please place your PDF files in the data/ folder.');
+      console.log('   - ra12009.pdf');
+      console.log('   - irr.pdf');
+      console.log('   - procurement_manual.pdf');
+      return;
+    }
+
     const files = [
       { name: 'RA 12009', file: 'ra12009.pdf', type: 'ra_12009' },
       { name: 'IRR', file: 'irr.pdf', type: 'irr' },
@@ -92,12 +135,25 @@ async function ingestDocument(filePath, docType, docName) {
       const filePath = path.join(dataDir, f.file);
       if (!fs.existsSync(filePath)) {
         console.warn(`⚠️  File not found: ${filePath}. Skipping.`);
+        console.log(`   Download from: Official Gazette or GPPB website.`);
         continue;
       }
       await ingestDocument(filePath, f.type, f.name);
     }
-    console.log('🎉 All documents ingested!');
+
+    console.log('🎉 All documents processed!');
+    console.log('Check your Supabase document_chunks table for the inserted data.');
+
+    // Verify the count
+    const { count, error } = await supabase
+      .from('document_chunks')
+      .select('*', { count: 'exact', head: true });
+
+    if (!error) {
+      console.log(`📊 Total chunks in database: ${count}`);
+    }
+
   } catch (err) {
-    console.error('Error:', err);
+    console.error('❌ Script error:', err);
   }
 })();
