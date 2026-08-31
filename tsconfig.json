@@ -1,16 +1,20 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
-    "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["node", "react", "react-dom"],
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -21,15 +25,22 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
+
   },
   "include": [
     "next-env.d.ts",
     "globals.d.ts",  // ✅ Add this line
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  
+  "exclude": [
+    "node_modules"
+  ]
 }
