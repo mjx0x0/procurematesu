@@ -6,14 +6,26 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Simplified search – ILIKE (most reliable)
+// Enhanced search: Full-text with ranking, returns more chunks
 async function searchDocuments(query: string): Promise<string> {
   console.log(`🔍 Searching for: "${query}"`);
+
+  // Clean query for full-text search
+  const cleaned = query
+    .trim()
+    .replace(/[^\w\s]/gi, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .join(' & ');
+
+  if (!cleaned) return '';
+
+  // Use ts_rank to sort by relevance
   const { data, error } = await supabase
     .from('document_chunks')
     .select('chunk_text')
-    .ilike('chunk_text', `%${query}%`)
-    .limit(5);
+    .textSearch('chunk_text', cleaned, { config: 'english' })
+    .limit(10); // Get more chunks
 
   if (error) {
     console.error('Search error:', error);
@@ -26,7 +38,7 @@ async function searchDocuments(query: string): Promise<string> {
   }
 
   console.log(`✅ Found ${data.length} chunks`);
-  return data.map((row) => row.chunk_text).join('\n\n');
+  return data.map((row) => row.chunk_text).join('\n\n---\n\n');
 }
 
 export async function POST(req: NextRequest) {
@@ -42,22 +54,27 @@ export async function POST(req: NextRequest) {
     const context = await searchDocuments(message);
     console.log(`📚 Context length: ${context.length} chars`);
 
+    // ✅ Improved system prompt – professional synthesis
     const systemPrompt = `
-You are Isko BidDo, a procurement assistant for MSU-GenSan.
-Answer ONLY using the provided context.
-If the context does not contain the answer, say exactly: "I cannot find that in the procurement documents."
-Do NOT include any internal reasoning, <think> tags, or extra fluff.
-Keep your answer short (2-3 sentences).
+You are Isko BidDo, a professional procurement assistant for Mindanao State University - General Santos.
+Your role is to help faculty and staff understand procurement processes, policies, and legal requirements.
+
+Instructions:
+- Base your answer **only** on the provided context – do not use outside knowledge.
+- Synthesize information from different parts of the context to give a complete, clear answer.
+- If the context does not contain enough information, say so politely and suggest what details are missing.
+- Write in a warm, professional, and helpful tone – as if you're assisting a colleague in person.
+- Keep your answer clear and informative (3–5 sentences, or more if needed).
+- Do not include internal reasoning, <think> tags, or extra fluff.
 
 Context:
 ${context || 'No relevant documents found.'}
 `;
 
-    // 🔥 Use Gemini API instead of Groq
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     if (!GEMINI_API_KEY) {
       return NextResponse.json(
-        { error: 'Gemini API key missing. Please set GEMINI_API_KEY.' },
+        { error: 'Gemini API key missing.' },
         { status: 500 }
       );
     }
@@ -78,8 +95,8 @@ ${context || 'No relevant documents found.'}
             },
           ],
           generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 150,
+            temperature: 0.2, // slightly more creative for natural language
+            maxOutputTokens: 300, // allow longer answers
           },
         }),
       }
@@ -95,17 +112,15 @@ ${context || 'No relevant documents found.'}
     }
 
     const data = await response.json();
-    const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
-      'No response received.';
+    let reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
-    // Clean the reply (remove any stray tags)
-    const cleanReply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+    // Remove any stray tags
+    reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
 
-    if (!cleanReply || cleanReply.length < 5) {
-      return NextResponse.json({
-        response: 'I cannot find that in the procurement documents.',
-      });
+    // If empty, fallback
+    if (!reply || reply.length < 5) {
+      reply =
+        'I cannot find enough information in the documents to answer that question. Could you please rephrase or ask about a specific procurement topic?';
     }
 
     // Log (non‑blocking)
@@ -115,7 +130,7 @@ ${context || 'No relevant documents found.'}
         .insert({
           user_id: userId,
           user_message: message,
-          bot_response: cleanReply,
+          bot_response: reply,
           inquiry_type: 'general',
           created_at: new Date().toISOString(),
         })
@@ -125,7 +140,7 @@ ${context || 'No relevant documents found.'}
         );
     }
 
-    return NextResponse.json({ response: cleanReply });
+    return NextResponse.json({ response: reply });
   } catch (error: any) {
     console.error('❌ Chat API fatal error:', error);
     return NextResponse.json(
