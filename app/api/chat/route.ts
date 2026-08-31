@@ -14,7 +14,6 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
   }
 
   try {
-    // HuggingFace serverless router URL
     const response = await fetch(
       'https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2',
       {
@@ -23,11 +22,8 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
           'Content-Type': 'application/json',
         },
         method: 'POST',
-        body: JSON.stringify({
-          inputs: text,
-          options: { wait_for_model: true },
-        }),
-        signal: AbortSignal.timeout(15000), // 15-second timeout for model cold starts
+        body: JSON.stringify({ inputs: text }), // Clean payload without options parameter causing 400
+        signal: AbortSignal.timeout(10000),
       }
     );
 
@@ -118,11 +114,11 @@ ${context || 'No relevant documents found.'}
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${GROQ_API_KEY}`,
+        Authorization: `Bearer ${GROQ_API_KEY.trim()}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant', // High-availability production model
+        model: 'mixtral-8x7b-32768',  // ✅ Fixed model
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message },
