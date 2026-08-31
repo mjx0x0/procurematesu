@@ -62,60 +62,68 @@ export default function LoginPage() {
       return;
     }
 
-    // 2. Get user role via RPC (bypasses RLS)
-    const { data: user } = await supabase.auth.getUser();
-    if (user?.user) {
-      const { data: role, error: rpcError } = await supabase
-        .rpc("get_user_role", { user_id: user.user.id });
+    // 2. Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setError("User not found. Please try again.");
+      setLoading(false);
+      return;
+    }
 
-      // If RPC fails or returns null, the user record is missing.
-      // Insert a default record if it doesn't exist.
-      if (rpcError || role === null) {
-        // Insert a default user profile (fallback)
-        const { error: insertError } = await supabase
-          .from("users")
-          .insert({
-            id: user.user.id,
-            email: user.user.email,
-            full_name: user.user.user_metadata?.full_name || user.user.email,
-            department: user.user.user_metadata?.department || "",
-            role: "end_user",
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
+    // 3. Get role via RPC
+    const { data: role, error: rpcError } = await supabase
+      .rpc("get_user_role", { user_id: user.id });
 
-        if (insertError) {
-          console.error("Insert error:", insertError);
-          setError("Failed to set up your account. Please contact the admin.");
-          setLoading(false);
-          return;
-        }
+    // Debug: log the role (remove this after testing)
+    console.log("Role from RPC:", role, "Error:", rpcError);
 
-        // After insert, re‑fetch role
-        const { data: newRole } = await supabase
-          .rpc("get_user_role", { user_id: user.user.id });
-        
-        if (newRole === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/dashboard");
-        }
+    // If RPC fails or role is null, try direct select (if RLS allows)
+    if (rpcError || role === null) {
+      // Attempt to insert default profile (in case user record is missing)
+      const { error: insertError } = await supabase
+        .from("users")
+        .upsert({
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || user.email,
+          department: user.user_metadata?.department || "",
+          role: "end_user",
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "id" });
+
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        setError("Failed to set up your account. Please contact the admin.");
         setLoading(false);
         return;
       }
 
-      // 3. Check role and redirect
-      if (role === "admin") {
+      // Re-fetch role after insert
+      const { data: newRole } = await supabase
+        .rpc("get_user_role", { user_id: user.id });
+      const finalRole = newRole || "end_user";
+
+      // Redirect based on final role
+      if (finalRole === "admin") {
         router.push("/admin");
-      } else if (role === "pending") {
-        await supabase.auth.signOut();
-        setError("Your account is pending admin approval. Please wait.");
-        setLoading(false);
-        return;
       } else {
         router.push("/dashboard");
       }
+      setLoading(false);
+      return;
+    }
+
+    // 4. Use the role from RPC
+    if (role === "admin") {
+      router.push("/admin");
+    } else if (role === "pending") {
+      await supabase.auth.signOut();
+      setError("Your account is pending admin approval. Please wait.");
+      setLoading(false);
+    } else {
+      router.push("/dashboard");
     }
     setLoading(false);
   };
@@ -123,7 +131,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
       <div className="w-full max-w-md animate-fade-in-up">
-        {/* Logo & Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-200">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-1.5 rounded-lg">
@@ -135,7 +142,6 @@ export default function LoginPage() {
           <p className="text-gray-600 mt-2">Sign in with your MSU‑GenSan credentials</p>
         </div>
 
-        {/* Login Card */}
         <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/30">
           <form onSubmit={handleLogin} className="space-y-6">
             {successMessage && (
@@ -145,7 +151,6 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
               <div className="relative">
@@ -166,7 +171,6 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <div className="relative">
