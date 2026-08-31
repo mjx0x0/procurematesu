@@ -75,17 +75,11 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up delay-300">
             <Link
-              href="/auth/sign-up"
-              className="group gradient-bg text-white px-8 py-4 rounded-xl text-lg font-medium hover:shadow-2xl hover:shadow-blue-600/30 transition-all hover:scale-105 flex items-center justify-center gap-2"
-            >
-              Start Your First Request
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
               href="/auth/login"
-              className="bg-white text-gray-700 px-8 py-4 rounded-xl text-lg font-medium border-2 border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all hover:scale-105"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-medium hover:shadow-2xl hover:shadow-blue-600/30 transition-all hover:scale-105 flex items-center justify-center gap-2"
             >
               Sign In
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -187,7 +181,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {[
-              { step: "1", title: "Sign Up", desc: "Create your account using your MSU-GenSan email" },
+              { step: "1", title: "Log in", desc: "Create your account using your MSU-GenSan email" },
               { step: "2", title: "Draft Request", desc: "Fill out the Purchase Request form with AI assistance" },
               { step: "3", title: "Track Progress", desc: "Monitor your request status in real-time" },
               { step: "4", title: "Get Approved", desc: "Receive notifications when your request is processed" }

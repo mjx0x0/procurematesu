@@ -131,11 +131,8 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-gray-600 mt-6">
-            Don't have an account?{" "}
-            <Link href="/auth/sign-up" className="text-blue-600 hover:text-blue-700 font-medium">
-              Sign up
-            </Link>
+          <p className="text-center text-gray-500 text-sm mt-6">
+            Use your MSU-GenSan credentials to sign in.
           </p>
         </div>
       </div>
