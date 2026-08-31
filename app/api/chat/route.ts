@@ -7,7 +7,7 @@ const supabase = createClient(
 );
 
 // ------------------------------------------------------------------
-// 1. Embedding generation (optional)
+// 1. Embedding generation
 // ------------------------------------------------------------------
 async function generateEmbedding(text: string): Promise<number[] | null> {
   const HF_TOKEN = process.env.HF_TOKEN;
@@ -178,19 +178,21 @@ ${context || 'No relevant documents found.'}
       reply = 'I cannot find that in the procurement documents.';
     }
 
-    // Log inquiry (non-blocking)
+    // ✅ Fixed logging – uses .then(success, error) instead of .catch
     if (userId) {
       supabase
         .from('monitor_inquiries')
         .insert({
-        user_id: userId,
-        user_message: message,
-        bot_response: reply,
-        inquiry_type: 'general',
-        created_at: new Date().toISOString(),
+          user_id: userId,
+          user_message: message,
+          bot_response: reply,
+          inquiry_type: 'general',
+          created_at: new Date().toISOString(),
         })
-        .then(() => {})
-        .catch((err) => console.error('❌ Logging failed:', err));
+        .then(
+          () => {},
+          (err) => console.error('❌ Logging failed:', err)
+        );
     }
 
     return NextResponse.json({ response: reply });
