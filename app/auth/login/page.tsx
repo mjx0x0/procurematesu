@@ -18,15 +18,31 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      router.push("/dashboard");
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+      return;
+    }
+
+    // After login, fetch user role
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: userData } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (userData?.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
     }
     setLoading(false);
   };
@@ -81,7 +97,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm">
+              <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
                 {error}
               </div>
             )}
@@ -99,7 +115,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full gradient-bg text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? (
                 <>

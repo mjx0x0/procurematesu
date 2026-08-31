@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FileText, Mail, Lock, User, ArrowRight, Building2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
+import { FileText, Mail, Lock, User, ArrowRight, Building2, CheckCircle } from "lucide-react";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -21,53 +21,23 @@ export default function SignUpPage() {
     setLoading(true);
     setError(null);
 
-    try {
-      // 1. Create user in Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            department: department,
-          },
+    const { error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          department: department,
         },
-      });
+      },
+    });
 
-      if (authError) {
-        setError(authError.message);
-        setLoading(false);
-        return;
-      }
-
-      if (authData.user) {
-        // 2. Insert user into your users table
-        const { error: insertError } = await supabase
-          .from("users")
-          .insert({
-            id: authData.user.id,
-            email: email,
-            full_name: fullName,
-            role: "end_user",
-            department: department,
-            is_active: true,
-          });
-
-        if (insertError) {
-          console.error("Error saving user to database:", insertError);
-          setError("Account created but profile save failed. Please contact support.");
-        } else {
-          setSuccess(true);
-          setTimeout(() => {
-            router.push("/auth/login");
-          }, 3000);
-        }
-      }
-    } catch (err) {
-      console.error("Sign up error:", err);
-      setError("An unexpected error occurred. Please try again.");
+    if (authError) {
+      setError(authError.message);
+    } else {
+      setSuccess(true);
+      setTimeout(() => router.push("/auth/login"), 3000);
     }
-
     setLoading(false);
   };
 
@@ -75,10 +45,11 @@ export default function SignUpPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50/50 px-4">
         <div className="w-full max-w-md text-center">
-          <div className="bg-green-50 text-green-600 p-6 rounded-xl mb-4">
+          <div className="bg-green-50 border border-green-200 text-green-700 p-8 rounded-2xl">
+            <CheckCircle className="h-16 w-16 mx-auto text-green-500 mb-4" />
             <h2 className="text-2xl font-bold mb-2">Registration Successful! 🎉</h2>
             <p>Please check your email to confirm your account.</p>
-            <p className="text-sm mt-4">Redirecting to login...</p>
+            <p className="text-sm text-green-600 mt-4">Redirecting to login...</p>
           </div>
         </div>
       </div>
@@ -174,7 +145,7 @@ export default function SignUpPage() {
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm">
+              <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
                 {error}
               </div>
             )}
@@ -182,7 +153,7 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full gradient-bg text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? (
                 <>
