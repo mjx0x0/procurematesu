@@ -6,7 +6,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Simplified embedding – skips if HF fails
 async function generateEmbedding(text: string): Promise<number[] | null> {
   const HF_TOKEN = process.env.HF_TOKEN;
   if (!HF_TOKEN) {
@@ -16,7 +15,7 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
 
   try {
     const response = await fetch(
-      'https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2',
+      'https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2',
       {
         headers: {
           Authorization: `Bearer ${HF_TOKEN}`,
@@ -27,14 +26,17 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
           inputs: text,
           options: { wait_for_model: true },
         }),
-        signal: AbortSignal.timeout(5000), // 5-second timeout
+        signal: AbortSignal.timeout(15000), // Increased to 15s for cold starts
       }
     );
 
     if (!response.ok) return null;
     const result = await response.json();
-    if (Array.isArray(result) && result.length > 0 && Array.isArray(result[0])) {
-      return result[0];
+
+    // Handles both 1D [0.1, 0.2] and 2D [[0.1, 0.2]] response shapes
+    if (Array.isArray(result) && result.length > 0) {
+      if (typeof result[0] === 'number') return result as number[];
+      if (Array.isArray(result[0])) return result[0] as number[];
     }
     return null;
   } catch (err) {
@@ -57,12 +59,14 @@ async function searchDocuments(query: string): Promise<string> {
     }
   }
 
-  // 2. Fallback: simple full-text search
+  // 2. Fallback: full-text search on individual keywords instead of exact string
   console.log('🔄 Using fallback text search...');
+  const formattedQuery = query.trim().split(/\s+/).join(' & ');
+  
   const { data: chunks, error } = await supabase
     .from('document_chunks')
     .select('chunk_text')
-    .ilike('chunk_text', `%${query}%`)
+    .textSearch('chunk_text', formattedQuery, { config: 'english' })
     .limit(5);
 
   if (!error && chunks && chunks.length > 0) {
@@ -106,7 +110,7 @@ ${context || 'No relevant documents found.'}
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-70b-versatile', // ✅ Valid model
+        model: 'llama-3.3-70b-versatile', // Updated to current active model
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message },
