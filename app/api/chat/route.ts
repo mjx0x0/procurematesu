@@ -6,11 +6,9 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Enhanced search: Full-text with ranking, returns more chunks
 async function searchDocuments(query: string): Promise<string> {
   console.log(`🔍 Searching for: "${query}"`);
 
-  // Clean query for full-text search
   const cleaned = query
     .trim()
     .replace(/[^\w\s]/gi, '')
@@ -20,12 +18,11 @@ async function searchDocuments(query: string): Promise<string> {
 
   if (!cleaned) return '';
 
-  // Use ts_rank to sort by relevance
   const { data, error } = await supabase
     .from('document_chunks')
     .select('chunk_text')
     .textSearch('chunk_text', cleaned, { config: 'english' })
-    .limit(10); // Get more chunks
+    .limit(10);
 
   if (error) {
     console.error('Search error:', error);
@@ -38,7 +35,8 @@ async function searchDocuments(query: string): Promise<string> {
   }
 
   console.log(`✅ Found ${data.length} chunks`);
-  return data.map((row) => row.chunk_text).join('\n\n---\n\n');
+  // Take only top 3 to save tokens
+  return data.slice(0, 3).map((row) => row.chunk_text).join('\n\n');
 }
 
 export async function POST(req: NextRequest) {
@@ -54,9 +52,8 @@ export async function POST(req: NextRequest) {
     const context = await searchDocuments(message);
     console.log(`📚 Context length: ${context.length} chars`);
 
-    // ✅ Improved system prompt – professional synthesis
     const systemPrompt = `
-You are Isko BidDo, a professional procurement assistant for Mindanao State University - General Santos.
+You are Isko BidDo, a professional procurement assistant for MSU-GenSan.
 Your role is to help faculty and staff understand procurement processes, policies, and legal requirements.
 
 Instructions:
@@ -64,8 +61,7 @@ Instructions:
 - Synthesize information from different parts of the context to give a complete, clear answer.
 - If the context does not contain enough information, say so politely and suggest what details are missing.
 - Write in a warm, professional, and helpful tone – as if you're assisting a colleague in person.
-- Keep your answer clear and informative (3–5 sentences, or more if needed).
-- Do not include internal reasoning, <think> tags, or extra fluff.
+- Keep your answer clear and informative.
 
 Context:
 ${context || 'No relevant documents found.'}
@@ -95,8 +91,8 @@ ${context || 'No relevant documents found.'}
             },
           ],
           generationConfig: {
-            temperature: 0.2, // slightly more creative for natural language
-            maxOutputTokens: 1000, // allow longer answers
+            temperature: 0.2,
+            maxOutputTokens: 800, // ✅ Increased for full answers
           },
         }),
       }
@@ -114,10 +110,8 @@ ${context || 'No relevant documents found.'}
     const data = await response.json();
     let reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
-    // Remove any stray tags
     reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
 
-    // If empty, fallback
     if (!reply || reply.length < 5) {
       reply =
         'I cannot find enough information in the documents to answer that question. Could you please rephrase or ask about a specific procurement topic?';
