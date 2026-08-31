@@ -96,7 +96,7 @@ ${context || 'No relevant documents found.'}
           ],
           generationConfig: {
             temperature: 0.2, // slightly more creative for natural language
-            maxOutputTokens: 300, // allow longer answers
+            maxOutputTokens: 1000, // allow longer answers
           },
         }),
       }
