@@ -118,7 +118,7 @@ ${context || 'No relevant documents found.'}
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mixtral-8x7b-32768',  // ✅ Fixed model
+        model: 'qwen/qwen3.6-27b',  // ✅ Fixed model
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message },
