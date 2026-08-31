@@ -18,13 +18,10 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Check for success query param (e.g., after sign-up)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const success = params.get("success");
-    if (success) {
-      setSuccessMessage(success);
-    }
+    if (success) setSuccessMessage(success);
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -33,27 +30,25 @@ export default function LoginPage() {
     setError(null);
     setSuccessMessage(null);
 
-    // Basic validation
     if (!email || !password) {
       setError("Please fill in all fields.");
       setLoading(false);
       return;
     }
 
-    // Domain validation (optional – you can keep or remove)
     if (!email.endsWith("@msugensan.edu.ph")) {
       setError("Only @msugensan.edu.ph email addresses are allowed.");
       setLoading(false);
       return;
     }
 
+    // 1. Authenticate
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (authError) {
-      // Customize error messages
       let msg = authError.message;
       if (msg.includes("Email not confirmed")) {
         msg = "Your email address has not been confirmed. Please check your inbox or contact the admin.";
@@ -67,35 +62,55 @@ export default function LoginPage() {
       return;
     }
 
-    // Success – get user role and redirect
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("role, full_name, is_active")
-        .eq("id", user.id)
-        .single();
+    // 2. Get user role via RPC (bypasses RLS)
+    const { data: user } = await supabase.auth.getUser();
+    if (user?.user) {
+      const { data: role, error: rpcError } = await supabase
+        .rpc("get_user_role", { user_id: user.user.id });
 
-      // Check if user record exists
-      if (userError || !userData) {
-        setError("Your account is not fully set up. Please contact the admin.");
+      // If RPC fails or returns null, the user record is missing.
+      // Insert a default record if it doesn't exist.
+      if (rpcError || role === null) {
+        // Insert a default user profile (fallback)
+        const { error: insertError } = await supabase
+          .from("users")
+          .insert({
+            id: user.user.id,
+            email: user.user.email,
+            full_name: user.user.user_metadata?.full_name || user.user.email,
+            department: user.user.user_metadata?.department || "",
+            role: "end_user",
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+
+        if (insertError) {
+          console.error("Insert error:", insertError);
+          setError("Failed to set up your account. Please contact the admin.");
+          setLoading(false);
+          return;
+        }
+
+        // After insert, re‑fetch role
+        const { data: newRole } = await supabase
+          .rpc("get_user_role", { user_id: user.user.id });
+        
+        if (newRole === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
         setLoading(false);
         return;
       }
 
-      // Check if account is active
-      if (userData.is_active === false) {
-        setError("Your account has been deactivated. Please contact the admin.");
-        setLoading(false);
-        return;
-      }
-
-      // Redirect based on role
-      if (userData.role === "admin") {
+      // 3. Check role and redirect
+      if (role === "admin") {
         router.push("/admin");
-      } else if (userData.role === "pending") {
+      } else if (role === "pending") {
         await supabase.auth.signOut();
-        setError("Your account is pending admin approval. Please wait for confirmation.");
+        setError("Your account is pending admin approval. Please wait.");
         setLoading(false);
         return;
       } else {
@@ -117,13 +132,12 @@ export default function LoginPage() {
             <span className="font-bold text-xl text-gray-900">ProcuremateSU</span>
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mt-4">Welcome Back</h2>
-          <p className="text-gray-600 mt-2">Sign in with your MSU-GenSan credentials</p>
+          <p className="text-gray-600 mt-2">Sign in with your MSU‑GenSan credentials</p>
         </div>
 
         {/* Login Card */}
         <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/30">
           <form onSubmit={handleLogin} className="space-y-6">
-            {/* Success Message */}
             {successMessage && (
               <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-xl text-sm flex items-start gap-2">
                 <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
@@ -131,7 +145,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Email Field */}
+            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
               <div className="relative">
@@ -152,7 +166,7 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* Password Field */}
+            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <div className="relative">
@@ -169,7 +183,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   disabled={loading}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -177,7 +191,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Error Message */}
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm flex items-start gap-2">
                 <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
@@ -185,28 +198,20 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Options */}
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
+                <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <Link
-                href="/auth/forgot-password"
-                className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
-              >
+              <Link href="/auth/forgot-password" className="text-blue-600 hover:text-blue-800 font-medium">
                 Forgot password?
               </Link>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
             >
               {loading ? (
                 <>
@@ -222,10 +227,9 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Footer */}
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="text-center text-gray-500 text-sm">
-              Use your official MSU-GenSan email and password.
+              Use your official MSU‑GenSan email and password.
             </p>
             <p className="text-center text-xs text-gray-400 mt-2">
               By signing in, you agree to the university's data privacy policy.
