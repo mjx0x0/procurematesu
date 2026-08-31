@@ -3,9 +3,6 @@ const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config({ path: '.env.local' });
 
-// ✅ Correct import for pdf-parse (v1.x)
-const pdfParse = require('pdf-parse');
-
 // Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -36,27 +33,7 @@ function chunkText(text, chunkSize = 1000, overlap = 200) {
   return chunks;
 }
 
-// Try PDF, fallback to .txt
-async function extractText(filePath) {
-  // If .txt version exists, use it
-  const txtPath = filePath.replace(/\.pdf$/i, '.txt');
-  if (fs.existsSync(txtPath)) {
-    console.log(`  📄 Using text file: ${path.basename(txtPath)}`);
-    return fs.readFileSync(txtPath, 'utf-8');
-  }
-
-  // Otherwise parse PDF
-  try {
-    const buffer = fs.readFileSync(filePath);
-    const data = await pdfParse(buffer);
-    return data.text;
-  } catch (err) {
-    console.error(`  ❌ PDF parsing failed: ${err.message}`);
-    return null;
-  }
-}
-
-// Ingest a single document
+// Ingest a single text file
 async function ingestDocument(filePath, docType, docName) {
   try {
     if (!fs.existsSync(filePath)) {
@@ -65,10 +42,10 @@ async function ingestDocument(filePath, docType, docName) {
     }
 
     console.log(`📄 Processing ${docName}...`);
-    const text = await extractText(filePath);
+    const text = fs.readFileSync(filePath, 'utf-8');
 
     if (!text || text.trim().length === 0) {
-      console.log(`  ⚠️ No text extracted. Skipping.`);
+      console.log(`  ⚠️ No text content. Skipping.`);
       return;
     }
 
@@ -110,14 +87,15 @@ async function ingestDocument(filePath, docType, docName) {
     const dataDir = path.join(__dirname, '../data');
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
-      console.log(`📁 Created ${dataDir}. Place your PDF or TXT files there.`);
+      console.log(`📁 Created ${dataDir}. Place your .txt files there.`);
+      console.log('Expected files: ra12009.txt, irr.txt, procurement_manual.txt');
       return;
     }
 
     const files = [
-      { name: 'RA 12009', file: 'ra12009.pdf', type: 'ra_12009' },
-      { name: 'IRR', file: 'irr.pdf', type: 'irr' },
-      { name: 'Procurement Manual', file: 'procurement_manual.pdf', type: 'procurement_manual' },
+      { name: 'RA 12009', file: 'ra12009.txt', type: 'ra_12009' },
+      { name: 'IRR', file: 'irr.txt', type: 'irr' },
+      { name: 'Procurement Manual', file: 'procurement_manual.txt', type: 'procurement_manual' },
     ];
 
     for (const f of files) {

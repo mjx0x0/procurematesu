@@ -1,0 +1,587 @@
+TABLE OF CONTENTS
+
+
+I. LEGAL BASIS (OSSP)	Page 3
+Office Systems, Standards, and Policies (OSSP)
+
+II. OFFICE MANDATE, PURPOSE, OBJECTIVES, AND GOALS
+A. Office Mandate
+B. Purpose
+C. Objectives
+D. Goals
+
+III. PERSONNEL DUTIES AND RESPONSIBILITIES	Page 4
+A. Head of the Procurement Management Office (Procurement Director)
+A.1 Strategic Procurement Planning
+A.2 Policy Implementation and Compliance
+A.3 Oversight of Procurement Activities
+A.4 Coordination with the Bids and Awards Committee (BAC)
+A.5 Contract Management and Monitoring
+A.6 Risk Management and Internal Controls
+A.7 Capacity Building and Staff Development	Page 5
+A.8 Stakeholder Coordination and Advisory Role
+A.9 Documentation, Reporting, and Audit Support
+A.10 Continuous Improvement and Innovation
+A.11 Validation and Approval of Procurement Documents
+
+B. Procurement Officers / Staff	Page 6
+B.1 Procurement Management Control Officer
+B.2 Procurement Management Monitoring Section
+B.3 Procurement Management Documentation Officer
+B.3.1 Generation of Procurement Documents
+B.3.2 Preparation of Requests for Quotation (RFQs)	Page 7
+B.3.3 Preparation of Abstracts of Quotation (AOQs)
+B.3.4 Preparation of Purchase Orders (POs)
+B.3.5 Encoding of Procurement Documents
+B.3.6 Printing and Reproduction of Documents
+B.3.7 Document Control and Filing
+
+B.4 Procurement Management Evaluation Officer	Page 8
+
+C. Procurement Canvassing Officer	Page 9
+
+D. Procurement Compliance Officer	Page 10
+
+E. Administrative Support Staff -	Page 11
+
+F. Other Related Functions
+
+IV. PROCESS FLOW	Page 12-14
+Receipt and Verification of Purchase Requests Validation, Control, and Endorsement
+RFQ / SVP Generation and Posting Canvassing and Abstract of Quotations Purchase Order Preparation and Approval Release, Monitoring, and Documentation
+
+V. RISK MANAGEMENT AND ACTION PLAN - - - - - - - - - -	Page 15
+A. Identified Risks
+B. Risk Mitigation Measures
+C. Action Plan	Page 16
+
+VI. SCOPE
+
+VII. MATERIALS
+
+VIII. DEFINITION OF TERMS - - -	Page 17
+
+REFERENCE DOCUMENTS	Page 18
+
+ANNEX A. PROCESS OF PROCUREMENT (FLOW CHART) -=	Page 19
+
+I. LEGAL BASIS (OSSP)
+
+      This Office Operations Manual is anchored on the following legal bases and issuances, collectively referred to as the Office Systems, Standards, and Policies (OSSP):
+
+* Republic Act No. 9184 - Government Procurement Reform Act
+* Implementing Rules and Regulations (IRR) of RA 9184/12009
+* Relevant COA Circulars and GPPB Resolutions
+* Mindanao State University Policies and Issuances
+* Other applicable laws, rules, and regulations governing public procurement
+
+
+I. OFFICE MANDATE, PURPOSE, OBJECTIVES, AND GOALS
+
+A. Office Mandate
+
+The Procurement Management Office (PMO) is mandated to ensure that all procurement activities of the University are conducted in a transparent, efficient, economical, and lawful manner.
+
+B. Purpose
+
+To support the University's academic and administrative functions through timely and compliant procurement of goods, infrastructure projects, and consulting services.
+
+C. Objectives
+
+* To ensure compliance with procurement laws and regulations (RA9184/12009)
+* To promote transparency and accountability in procurement transactions.
+* To streamline procurement processes for efficiency and effectiveness.
+
+D. Goals
+
+* Timely completion of procurement activities
+* Strengthened internal controls and risk mitigation
+* Continuous improvement of procurement systems and practices
+
+
+
+II. PERSONNEL DUTIES AND RESPONSIBILITIES
+
+A. Head of the Procurement Management Office (Procurement Director)
+
+  The Head of the Procurement Management Office (PMO), also referred to as the Procurement Director, is responsible for planning, directing, and overseeing all procurement activities of the organization to ensure efficiency, transparency, economy, and full compliance with existing procurement laws, rules, and regulations.
+
+Specifically, the Procurement Director performs the following functions:
+
+a.1 Strategic Procurement Planning
+
+      Leads the preparation, consolidation, and implementation of the Annual Procurement Plan (APP) in coordination with end-user units, ensuring that procurement activities are aligned with institutional goals, budget allocations, and timelines.
+
+a.2 Policy Implementation and Compliance
+
+  Ensures strict compliance with applicable procurement laws, rules, and regulations (such as RA 9184/12009 and its IRR, if applicable), as well as internal procurement policies and guidelines.
+
+a.3 Oversight of Procurement Activities
+
+  Supervises and monitors all procurement processes, including bidding, alternative methods of procurement, contract preparation, and post-award activities, to ensure transparency, competitiveness, and value for money.
+
+a.4 Coordination with the Bids and Awards Committee (BAC)
+
+  Provides technical and administrative support to the BAC, facilitates procurement proceedings, and ensures timely submission of procurement documents and reports required by oversight agencies.
+
+a.5 Contract Management and Monitoring
+
+  Oversees contract implementation, monitors supplier performance, and ensures that deliveries, services, and project outputs comply with approved specifications, contract terms, and schedules.
+
+a.6 Risk Management and Internal Controls
+
+  Identifies procurement risks and implements internal control mechanisms to prevent delays, cost overruns, procurement irregularities, and audit findings.
+
+
+a.7. Capacity Building and Staff Development
+
+  Leads and supervises PMO personnel, ensures continuous training and professional development, and promotes ethical standards and accountability among procurement staff.
+
+a.8 Stakeholder Coordination and Advisory Role
+
+  Coordinates with end-user units, finance, planning, legal offices, and external suppliers to resolve procurement issues and provides expert advice to management on procurement strategies and decisions.
+
+a.9 Documentation, Reporting, and Audit Support
+
+  Ensures accurate documentation, records management, and timely submission of procurement-related reports; responds to audit observations and implements corrective actions when necessary.
+
+a.10 Continuous Improvement and Innovation
+
+  Recommends improvements in procurement systems and processes, including the adoption of electronic procurement platforms and best practices, to enhance efficiency and transparency.
+
+a.11 Validation and Approval of Procurement Documents
+
+  No procurement document shall proceed for approval, bidding, posting, award, or contract execution without the Procurement Director's signature as validation, except where otherwise provided by law or delegated authority.
+
+These documents include, but are not limited to:
+
+* Project Procurement Management Plan (PPMP)
+* Approved Annual Procurement Plan (APP) and APP Supplements
+* Purchase Requests (PRs)
+* Request for Quotations (RFQs)
+* Small Value Procurement (SVP)
+* Abstract of Quotations (AOQs)
+* Other procurement-related communications and certifications
+
+
+
+
+
+
+B. Procurement Officers/Staff
+
+B.1 Procurement Management Control Officer
+
+* Consolidate the Project Procurement Management Plan (PPMP) into Agency Procurement Plan (APP), shall coordinate with the end-users.
+* Endorse the APP-CSE to the SPMO for quarterly Common-Used Supplies and Equipment prior to the preparation of Agency Procurement Request (APR) to be submitted to the PS-DBM.
+* Review and validate the Purchase Request submitted by the end-user against the approved Project Procurement Management Plan (PPMP). The review shall include verification of the accuracy and completeness of entries in the Purchase Request, as well as compliance with the required specifications and other pertinent details.
+* Upon validation, forward the Purchase Request to the PMO Director for confirmation and signification of validation.
+
+B.2 Procurement Management Monitoring Section
+
+* Receive the funds-cleared and approved Purchase Request (PR) from the Office of the Chancellor. Verify the accuracy of date entries and formally assign a control or reference number for monitoring, tracking, and documentation purposes.
+* Process and release outgoing procurement documents, including Purchase Requests (PRs not subject to canvassing), Requests for Quotation (RFQs), Abstracts of Quotations (AOQs) for awarding, and Purchase Orders (POs) to the Budget Office and the Supply and Property Management Office (SPMO), as well as other procurement related documents.
+
+B.3 Procurement Management Documentation Officer
+
+b.3.1 Generation of Procurement Documents
+
+* Prepare and generate all required procurement documents, including Purchase Requests (PRs), Requests for Quotation (RFQs), Abstracts of Quotation (AOQs), and Purchase Orders (POs), in accordance with approved procurement plans, applicable laws, and institutional policies.
+
+b. 3.2 Preparation of Requests for Quotation (RFQs)
+
+* Draft and issue RFQs based on approved Purchase Requests, ensuring accurate item descriptions, specifications, quantities, and
+
+approved cost estimates, and facilitate their proper distribution to prospective suppliers. RFQs are controlled with its assigned number, attached with Acknowledgement Form.
+
+b.3.3 Preparation of Abstracts of Quotation (AOQs)
+
+* Consolidate supplier quotations and prepare the AOQ, ensuring completeness, accuracy, and consistency of pricing, specifications, and supplier information for evaluation and awarding purposes. Control number is based on the RFQ number.
+
+b. 3.4 Preparation of Purchase Orders (POs)
+
+* Prepare Purchase Orders for awarded procurements, ensuring correctness of supplier details, quantities, prices, delivery terms, and required approvals prior to routing and servicing. A series of controlled number is also assigned.
+
+b.3.5 Encoding of Procurement Documents
+
+* Encode all procurement-related data accurately into prescribed forms, tracking systems, and electronic spreadsheet to ensure data integrity, traceability, and ease of monitoring.
+
+b. 3.6 Printing and Reproduction of Documents
+
+* Print and reproduce procurement documents in accordance with document                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         control                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       requirements,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ensuring                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     clarity,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               completeness, rftpltP:tnrNnand proper distribution of controlled copies. (	ing,
+
+irfirvbandertuecmsdeoalpo ncumnhal
+
+ewd
+
+iedbytheProcurement
+
+tflithnewpavlpumadOcic,aonirenscer,tscoymErutcoea
+ulbqpiraulntmrcpeoceirements)
+
+b.3.7 Document Control and Filing
+
+* Ensure proper numbering, recording, filing, and safekeeping of all procurement documents to support audit, monitoring, and reference requirements.
+
+B. 4 Procurement Management Evaluation Officer
+
+  Responsible for ensuring accuracy, consistency, and compliance of all procurement documents by conducting thorough checks and validations at every stage of the procurement process. The position serves as a critical checks-and- balances mechanism to safeguard the integrity of procurement transactions.
+
+Specifically, the Procurement Evaluation Officer shall:
+
+b.4.1 Document Consistency and Entry Verification
+
+     Check and validate the proper and consistent transfer of entries from Purchase Requests (PRs) to Requests for Quotations (RFQs) and other procurement documents, ensuring that all details are accurately reflected.
+
+b.4.2 Review of Completeness and Correctness
+
+     Verify the correctness, completeness, and clarity of entries, including the identification of lacking, incorrect, duplicated, or superseding entries that may affect the procurement process.
+
+b.4.3 Technical and Financial Validation
+
+     Examine and evaluate technical details such as item descriptions, specifications, quantities, unit costs, total amounts, and approved budget ceilings (ABC) to ensure they are reasonable, accurate, and compliant with approved plans and requirements.
+
+b.4.4 Evaluation of Procurement Entries
+
+     Conduct a systematic evaluation of all procurement entries to confirm that they are properly awarded, justified, aligned with the approved APP, and compliant with procurement rules and procedures.
+
+b.4.5 Verification of Signatories and Dates
+
+     Check the presence, correctness, and appropriateness of required signatories, initials, and dates on all procurement documents prior to their endorsement for further processing.
+
+b.4.6 Compliance and Control Function
+
+     Ensure that procurement documents comply with applicable procurement laws, rules, and internal policies, and flag any discrepancies, irregularities, or deficiencies for correction before continuation of the process.
+
+b.4.7 Documentation and Reporting of Findings
+
+     Document findings, observations, and required corrections, and coordinate with concerned end-user units or procurement staff to rectify deficiencies prior to endorsement.
+
+b.4.8 Endorsement for Further Processing
+
+     Endorse procurement documents for the next stage of the procurement process only after all entries have been verified, validated, and found in order.
+
+
+
+C. Procurement Canvassing Officer
+
+  The Procurement Canvassing Officer is responsible for conducting market surveys and price canvassing to ensure that procurement activities are supported by accurate, reasonable, and competitive price information, in compliance with applicable procurement laws, rules, and internal policies.
+
+Specifically, the Procurement Canvassing Officer shall:
+
+c.1 Conduct Price Canvassing and Market Survey
+
+  Undertake price canvassing and market research by requesting quotations from qualified and legitimate suppliers to determine prevailing market prices for goods, services, and small-value procurements.
+
+c.2 Preparation and Issuance of RFQs
+
+  Prepare, issue, and distribute Requests for Quotation (RFQs) in accordance with approved Purchase Requests (PRs), technical specifications, and procurement timelines.
+
+c.3 Verification of Supplier Eligibility
+
+  Ensure that suppliers invited for canvassing are properly accredited, eligible, and not blacklisted, in accordance with procurement rules and internal accreditation requirements.
+
+c.4 Evaluation of Quotations
+
+  Review and evaluate quotations received for completeness, correctness, and conformity with required specifications, quantities, and terms.
+
+c.5 Price Reasonableness and Cost Comparison
+
+  Analyze and compare quoted prices to determine price reasonableness, prepare abstracts of canvass, and identify the most advantageous quotation based on price and compliance.
+
+c.6 Documentation and Record-Keeping
+
+  Ensure proper documentation, filing, and safekeeping of canvassing records, RFQs, supplier quotations, abstracts, and related procurement documents for audit and reference purposes.
+
+c.7 Coordination with End-User Units
+
+  Coordinate with end-user units to clarify technical specifications, quantities, and delivery requirements prior to and during the canvassing process.
+
+c.8 Compliance and Control Function
+
+  Ensure that all canvassing activities comply with applicable procurement laws, rules, and regulations, and observe transparency, fairness, and confidentiality throughout the process.
+
+c.9 Endorsement for Further Processing
+
+  Endorse canvassing results and abstracts for review and validation by the Procurement Evaluation Officer or appropriate approving authority prior to award or further processing.
+
+c.10 Market Intelligence and Price Database Maintenance
+
+      Maintain updated records of supplier information, historical prices, and market trends to support future procurement planning and cost estimation.
+
+D. Procurement Compliance Officer
+
+* Post to philgeps the RFQs with ABC total of fifty thousand (50,000) and above (RA9184).
+* Post to philgeps the SVPs with ABC total of two hundred thousand (200,000) and above (RA12009).
+* Check and Print Closed postings.
+* Shall observed and monitor the submission deadline of the GPPB agency mandatory reports (PMR, APCPI and others.)
+
+E. Administrative Support Staff
+
+      The Administrative Support Staff provides essential clerical, documentation, and coordination support to the Procurement Management Office to ensure the smooth, timely, and organized processing of all procurement-related activities. The position supports compliance, record integrity, and operational efficiency across the entire procurement cycle.
+
+Specifically, the Administrative Support Staff shall:
+
+* Document Processing and Control
+
+     Receive, log, record, and track all incoming and outgoing procurement documents, including Purchase Requests (PRs), RFQs, BAC documents, contracts, and related communications.
+
+
+
+* Records Management and Filing
+
+     Maintain systematic and secure filing of procurement records (both physical and electronic), ensuring completeness, accessibility, and audit readiness at all times.
+
+* Routing and Monitoring of Documents
+
+     Facilitate the proper routing of procurement documents to concerned offices, officers, and approving authorities, and monitor timelines to prevent delays in processing.
+
+* Preparation of Administrative Documents
+
+     Prepare transmittal letters, routing slips, certifications, notices, and other administrative documents in support of procurement activities.
+
+* Scheduling and Coordination Support (BAC SECRETARIAT function)
+
+     Assist in scheduling meetings, canvassing activities, BAC sessions, and procurement-related briefings, and coordinate logistical requirements as needed.
+
+* Data Encoding and Report Assistance
+
+     Encode procurement data into tracking systems, spreadsheets, or databases, and assist in the preparation of procurement reports, summaries, and status updates.
+
+* Communication and Liaison Functions
+
+     Serve as a point of contact for follow-ups with end-user units, suppliers, and internal offices regarding document status, schedules, and administrative requirements.
+
+* Confidentiality and Compliance Support
+
+     Ensure confidentiality of procurement information and observe proper handling of sensitive documents in accordance with procurement rules and internal policies.
+
+* Inventory and Office Support
+
+     Assist in monitoring procurement-related office supplies, forms, and materials necessary for day-to-day PMO operations.
+
+
+
+
+
+* Other Related Functions
+
+     Perform other procurement-related administrative tasks as may be assigned by the Procurement Director or immediate supervisor in support of office operations.
+
+IV. PROCESS FLOW
+
+The PMO follows a standardized procurement process, which includes:
+
+1. Receipt of Purchase Request (PR)
+
+Receive duly accomplished Purchase Requests (PRs) from end-user units.
+
+2. Verification Against PPMP/APP
+
+   Review and verify the PRs against the approved Project Procurement Management Plan (PPMP) and Annual Procurement Plan (APP).
+
+3. Validation by the PMO Director
+
+   Forward PRs for review, validation, and signature of the PMO Director to certify completeness and compliance.
+
+4. Pre-Numbering and Control of PRs
+
+Assign control numbers to validated PRs and record them in the procurement tracking log.
+
+5. Endorsement to Budget Management Office
+
+   Endorse controlled PRs to the Budget Management Office for fund availability and obligation clearance.
+
+6. Receipt of Approved PRs
+
+   Receive approved Purchase Requests signed by the Chancellor or authorized approving authority.
+
+7. Generation of Requests for Quotations (RFQs)
+
+   Generate RFQs based on the approved PRs, including complete technical specifications and approved ABC.
+
+
+
+8. Evaluation of Generated RFQs
+
+   Review RFQs for accuracy, completeness, and consistency with the approved PRs.
+
+9. Printing of RFQs / SVPs
+
+   Print three (3) or four (4) copies of RFQs or Small Value Procurement (SVP) documents, as required.
+
+10. Posting to PhilGEPS
+
+   Post RFQs and SVPs to PhilGEPS for procurements with an Approved Budget for the Contract (ABC) of:
+
+o ?50,000 and above for RFQs
+o ?200,000 and above for Small Value Procurement (SVP)
+11. Preparation of Abstract of Quotations (AOQ)
+
+   Receive supplier quotations and summarize all valid offers through the preparation of an Abstract of Quotations (AOQ).
+
+12. Evaluation of AOQs
+
+   Evaluate the generated AOQs for price reasonableness, compliance with technical specifications, and procurement rules.
+
+13. Receipt of Awarded AOQs
+
+   Receive duly awarded and signed AOQs for the preparation of Purchase Orders (POs). Ensure the end-user awarded and signed. AOQ with ABC more than 50K is BAC format (signatories: prepared by: PMO Staff, noted by PMO Director. Other signatories below are the End-user as well as the BAC members including vice-chairman and chairman). AOQ with less than 50K (signatories are prepared by: PMO staff, End-user, BAC TWG (only one) and the PMO Director.
+
+14. Generation and Evaluation of Purchase Orders
+
+   Generate Purchase Orders and review them for correctness, completeness, and consistency with approved AOQs.
+
+15. Validation and Signature by PMO Director
+
+Submit generated POs for validation and signature of the PMO Director.
+
+16. Forwarding to Budget Office
+
+   Forward validated POs to the Budget Management Office for obligation and certification.
+
+17. Receipt of Approved Purchase Orders
+
+Receive approved and obligated Purchase Orders.
+
+18. Release of Purchase Orders to Supplier
+
+Deliver the approved Purchase Orders to the winning bidder or supplier.
+
+19. Endorse the POs together with all complete attachments to the SPMO.
+
+   Forward the PO along with all complete supporting documents, to the SPMO for further processing.
+
+20. Monitoring and Documentation
+
+   Monitor procurement transactions and maintain complete documentation for tracking, reporting, and audit purposes.
+
+fsproc(AaexnSe	low)
+
+V. RISK MANAGEMENT AND ACTION PLAN
+
+      The Procurement Management Office (PMO) adopts a proactive risk management approach to ensure the integrity, efficiency, and compliance of procurement activities. Potential risks are systematically identified, assessed, and addressed through appropriate mitigation measures and continuous improvement actions to safeguard public resources and uphold procurement standards.
+
+A. Identified Risks
+
+1. Delays in Procurement Timelines
+
+   Procurement activities may be delayed due to late submission of Purchase Requests, incomplete requirements, coordination issues among offices, or non- adherence to procurement schedules, resulting in disruption of operations and delayed delivery of goods and services.
+
+2. Incomplete or Incorrect Documentation
+
+   Errors, omissions, or inconsistencies in procurement documents such as PRs, RFQs, AOQs, and Pos may lead to reprocessing, audit observations, and delays in procurement execution.
+
+3. Non-Compliance with Procurement Laws and Regulations
+
+   Failure to comply with applicable procurement laws, rules, and regulations, including prescribed procedures and posting requirements, may expose the institution to audit findings, legal risks, and reputational damage.
+
+4. Supplier Inability to Deliver
+
+   Suppliers may fail to deliver goods or services on time, provide substandard products, or fail to fulfill contractual obligations, which could disrupt operations and require alternative procurement measures.
+
+B. Risk Mitigation Measures
+
+1. Strict Adherence to Procurement Calendars
+
+   The PMO enforces approved procurement timelines and monitors compliance with the Annual Procurement Plan (APP) and procurement schedules to ensure timely execution of procurement activities.
+
+2. Regular Review and Validation of Documents
+
+   All procurement documents undergo multiple levels of review and validation by designated officers to ensure completeness, accuracy, and consistency prior to endorsement or approval.
+
+3. Capacity-Building and Continuous Training
+
+   Continuous professional development, skills enhancement, and updates on procurement laws and best practices are provided to PMO personnel to strengthen technical competence and compliance awareness.
+
+4. Supplier Vetting and Performance Monitoring
+
+   Conduct pre-qualification and accreditation of suppliers, maintain a supplier database, and monitor past performance to minimize the risk of non-delivery or substandard products. Include contingency planning for replacement suppliers if needed.
+
+C. Action Plan
+
+1. Periodic Internal Audits and Assessments
+
+   Conduct regular internal audits and process assessments to identify weaknesses, gaps, and areas for improvement in procurement procedures and internal controls.
+
+2. Updating of Procurement Guidelines and Procedures
+
+   Review and update procurement manuals, guidelines, and standard operating procedures to reflect changes in procurement laws, policies, and organizational needs.
+
+3. Strengthening Coordination with End-User Units
+
+   Enhance coordination and communication with end-user units through orientations, advisory support, and regular consultations to ensure timely submission of complete and compliant procurement requirements.
+
+
+4. Supplier Contingency Planning
+
+   Establish alternative supplier arrangements, monitor supplier performance, and develop corrective measures in case suppliers fail to deliver as per contract to minimize disruption to operations.
+
+VI. SCOPE
+
+      This policy and procedures apply to all university procurement requests and purchases, a guide to both academic, non-academic, and administrative staff within the university.
+
+VII. MATERIALS:
+
+7.1 Request for Quotations (RFQ)
+7.2 Abstract of Bids (AOB)
+7.3 Purchase Order (PO)
+7.4 Ballpen
+7.5 Laptop/Desktop Computer
+7.6 Printer
+7.7 Photocopier Machine
+7.8 Incoming/Outgoing Logbooks
+
+VIII. DEFINITION OF TERMS:
+
+PPMP	- Project Procurement Management Plan
+A summary of the quarterly list of materials, supplies, and services needed by all offices and colleges. It serves as the primary basis for procurement planning and budgeting.
+
+Supplemental PPMP - An additional PPMP that may be submitted only twice a year to accommodate unanticipated procurement requests not included in the original PPMP.
+
+RFQ	- Request for Quotation
+A controlled procurement document used for canvassing as an alternative method of procurement (shopping), allowing the institution to solicit and compare quotations from suppliers.
+
+SVP	- Small Value Procurement
+A controlled procurement document used for canvassing as an alternative method of procurement, particularly for items or services with limited suppliers or when the procurement value is below the threshold for public bidding.
+
+Acknowledgment Form	- An attachment to the RFQ or SVP that serves as a
+formal record of all suppliers or bidders who participated in the canvassing, whether or not they submitted a quotation.
+
+AOQ	- Abstract of Quotations
+A controlled procurement document that summarizes the quotations received from different qualified suppliers or bidders. It serves as the basis for evaluating bids and awarding contracts.
+
+PO	- Purchase Order
+A controlled procurement document issued to the awarded supplier or bidder. It is duly signed by the Budget Office and Accounting, and approved by the Chancellor.
+
+Re-bid	- A new set of RFQs issued for re-canvassing items or services when the original procurement process did not result in an award.
+
+Justification	- An attachment supporting the awarding of items or services not with the lowest calculated bid but compliant with technical specifications and requirements.
+
+Withholding Tax	- A tax to be recommended to the Accounting Office for items or services with an awarded amount less than one thousand pesos (?1,000).
+
+Sole Distributor Certificate  - A certification that verifies the supplier or bidder as
+the exclusive producer or manufacturer of the goods or services being offered.
+
+PhilGEPS Certificate	- A certification required from suppliers or bidders for
+items or services with an approved budget above fifty thousand pesos (?50,000), ensuring compliance with government electronic procurement regulations.
+
+
+IX. REFERENCE DOCUMENTS:
+
+      Based to governing principles, general policies, specific procedures, and process in procurement embedded in RA 9184/NGPA RA 12009.
+
+19
+
+ANNEX A.
+
+PROCESS OF PROCUREMENT (FLOW CHART)
+
+
+20
+
+
+
+
+
+
