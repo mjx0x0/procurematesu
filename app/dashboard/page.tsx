@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   FileText, LogOut, User, PlusCircle, 
-  Eye, Clock, CheckCircle, Loader2
+  Eye, Clock, CheckCircle, Loader2,
+  Bot
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
@@ -172,6 +173,13 @@ export default function DashboardPage() {
             </h1>
             <p className="text-gray-600 mt-1">Manage your procurement requests</p>
           </div>
+          <Link
+            href="/dashboard/chatbot"
+            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-purple-600/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
+          >
+            <Bot className="h-5 w-5" />
+            Ask Isko BidDo
+          </Link>          
           <Link
             href="/dashboard/new-pr"
             className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-600/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
