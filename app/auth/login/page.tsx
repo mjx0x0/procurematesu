@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
 import {
   FileText, Mail, Lock, ArrowRight, AlertCircle,
-  Eye, EyeOff
+  Eye, EyeOff, CheckCircle, Building2
 } from "lucide-react";
 
 export default function LoginPage() {
@@ -16,11 +16,36 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Check for success query param (e.g., after sign-up)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get("success");
+    if (success) {
+      setSuccessMessage(success);
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccessMessage(null);
+
+    // Basic validation
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      setLoading(false);
+      return;
+    }
+
+    // Domain validation (optional – you can keep or remove)
+    if (!email.endsWith("@msugensan.edu.ph")) {
+      setError("Only @msugensan.edu.ph email addresses are allowed.");
+      setLoading(false);
+      return;
+    }
 
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
@@ -34,6 +59,8 @@ export default function LoginPage() {
         msg = "Your email address has not been confirmed. Please check your inbox or contact the admin.";
       } else if (msg.includes("Invalid login credentials")) {
         msg = "The email or password you entered is incorrect. Please try again.";
+      } else if (msg.includes("User not found")) {
+        msg = "No account found with this email. Please contact the admin.";
       }
       setError(msg);
       setLoading(false);
@@ -43,14 +70,34 @@ export default function LoginPage() {
     // Success – get user role and redirect
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { data: userData } = await supabase
+      const { data: userData, error: userError } = await supabase
         .from("users")
-        .select("role")
+        .select("role, full_name, is_active")
         .eq("id", user.id)
         .single();
 
-      if (userData?.role === "admin") {
+      // Check if user record exists
+      if (userError || !userData) {
+        setError("Your account is not fully set up. Please contact the admin.");
+        setLoading(false);
+        return;
+      }
+
+      // Check if account is active
+      if (userData.is_active === false) {
+        setError("Your account has been deactivated. Please contact the admin.");
+        setLoading(false);
+        return;
+      }
+
+      // Redirect based on role
+      if (userData.role === "admin") {
         router.push("/admin");
+      } else if (userData.role === "pending") {
+        await supabase.auth.signOut();
+        setError("Your account is pending admin approval. Please wait for confirmation.");
+        setLoading(false);
+        return;
       } else {
         router.push("/dashboard");
       }
@@ -61,6 +108,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
       <div className="w-full max-w-md animate-fade-in-up">
+        {/* Logo & Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-200">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-1.5 rounded-lg">
@@ -72,8 +120,18 @@ export default function LoginPage() {
           <p className="text-gray-600 mt-2">Sign in with your MSU-GenSan credentials</p>
         </div>
 
+        {/* Login Card */}
         <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/30">
           <form onSubmit={handleLogin} className="space-y-6">
+            {/* Success Message */}
+            {successMessage && (
+              <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-xl text-sm flex items-start gap-2">
+                <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                <span>{successMessage}</span>
+              </div>
+            )}
+
+            {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
               <div className="relative">
@@ -85,10 +143,16 @@ export default function LoginPage() {
                   placeholder="you@msugensan.edu.ph"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
                   required
+                  disabled={loading}
                 />
               </div>
+              <p className="text-xs text-gray-400 mt-1">
+                <Building2 className="h-3 w-3 inline mr-1" />
+                Use your official university email
+              </p>
             </div>
 
+            {/* Password Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <div className="relative">
@@ -100,17 +164,20 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
                   required
+                  disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  disabled={loading}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
+            {/* Error Message */}
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm flex items-start gap-2">
                 <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
@@ -118,20 +185,28 @@ export default function LoginPage() {
               </div>
             )}
 
+            {/* Options */}
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <Link href="/auth/forgot-password" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link
+                href="/auth/forgot-password"
+                className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+              >
                 Forgot password?
               </Link>
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
             >
               {loading ? (
                 <>
@@ -147,9 +222,15 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-gray-500 text-sm mt-6">
-            Use your official MSU-GenSan email and password.
-          </p>
+          {/* Footer */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <p className="text-center text-gray-500 text-sm">
+              Use your official MSU-GenSan email and password.
+            </p>
+            <p className="text-center text-xs text-gray-400 mt-2">
+              By signing in, you agree to the university's data privacy policy.
+            </p>
+          </div>
         </div>
       </div>
     </div>
