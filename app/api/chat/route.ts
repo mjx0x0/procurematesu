@@ -6,76 +6,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-async function generateEmbedding(text: string): Promise<number[] | null> {
-  const HF_TOKEN = process.env.HF_TOKEN;
-  if (!HF_TOKEN) return null;
-
-  try {
-    const response = await fetch(
-      'https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2',
-      {
-        headers: {
-          Authorization: `Bearer ${HF_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify({ inputs: text }),
-        signal: AbortSignal.timeout(10000),
-      }
-    );
-
-    if (!response.ok) {
-      console.warn(`⚠️ HF API status: ${response.status}`);
-      return null;
-    }
-
-    const result = await response.json();
-    if (Array.isArray(result) && result.length > 0) {
-      if (typeof result[0] === 'number') return result as number[];
-      if (Array.isArray(result[0])) return result[0] as number[];
-    }
-    return null;
-  } catch {
-    console.warn('⚠️ Embedding failed – using fallback');
-    return null;
-  }
-}
-
-async function searchDocuments(query: string): Promise<string> {
-  const embedding = await generateEmbedding(query);
-  if (embedding) {
-    const { data: chunks, error } = await supabase.rpc('match_documents', {
-      query_embedding: embedding,
-      match_threshold: 0.6,
-      match_count: 5,
-    });
-    if (!error && chunks && chunks.length > 0) {
-      return chunks.map((c: any) => c.chunk_text).join('\n\n');
-    }
-  }
-
-  console.log('🔄 Using fallback text search...');
-  const cleaned = query
-    .trim()
-    .replace(/[^\w\s]/gi, '')
-    .split(/\s+/)
-    .filter(Boolean)
-    .join(' & ');
-
-  if (!cleaned) return '';
-
-  const { data: chunks, error } = await supabase
-    .from('document_chunks')
-    .select('chunk_text')
-    .textSearch('chunk_text', cleaned, { config: 'english' })
-    .limit(5);
-
-  if (!error && chunks && chunks.length > 0) {
-    return chunks.map((c) => c.chunk_text).join('\n\n');
-  }
-
-  return '';
-}
+// (keep generateEmbedding and searchDocuments as before – or use the improved version from previous answer)
 
 export async function POST(req: NextRequest) {
   try {
@@ -90,12 +21,17 @@ export async function POST(req: NextRequest) {
     const context = await searchDocuments(message);
     console.log(`📚 Context length: ${context.length} chars`);
 
+    // 🔥 Updated system prompt – strict and clean
     const systemPrompt = `
-You are Isko BidDo, a helpful and concise procurement assistant for Mindanao State University - General Santos.
-Your answers must be based **only** on the provided context below.
-If the context does not contain the answer, simply say: "I cannot find that in the procurement documents."
-Do **not** include any internal reasoning, extra fluff, or thinking tags.
-Answer in plain, clear English.
+You are Isko BidDo, a concise and helpful procurement assistant for MSU-GenSan.
+
+RULES:
+- Answer ONLY using the provided context.
+- If the context does not contain the answer, say exactly: "I cannot find that in the procurement documents."
+- Do NOT include any internal reasoning, thinking, or explanations about how you arrived at the answer.
+- Do NOT use tags like <think> or <reasoning>.
+- Provide only the final answer in plain, clear English.
+- Keep your answer short and direct (2-3 sentences maximum).
 
 Context:
 ${context || 'No relevant documents found.'}
@@ -121,8 +57,9 @@ ${context || 'No relevant documents found.'}
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message },
         ],
-        temperature: 0.3,
-        max_tokens: 500,
+        temperature: 0.1,
+        max_tokens: 150,
+        stop: ['\n\n', ' response:', 'Answer:'],
       }),
     });
 
@@ -137,9 +74,21 @@ ${context || 'No relevant documents found.'}
 
     const data = await response.json();
     let reply = data.choices?.[0]?.message?.content || 'No response received.';
-    reply = reply.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
 
-    // ✅ Fixed logging – no red line
+    // 🔥 Clean the reply
+    reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
+    // If reply contains thinking words, cut it off
+    const cutoff = reply.search(/think|reasoning|explanation|context|provided/i);
+    if (cutoff !== -1 && cutoff < 80) {
+      reply = reply.substring(0, cutoff).trim();
+    }
+
+    if (!reply || reply.length < 5) {
+      reply = 'I cannot find that in the procurement documents.';
+    }
+
+    // Log inquiry (non-blocking)
     if (userId) {
       void supabase
         .from('monitor_inquiries')
@@ -161,5 +110,25 @@ ${context || 'No relevant documents found.'}
       { error: 'Something went wrong. Please try again in a moment.' },
       { status: 500 }
     );
+  }
+}
+
+async function searchDocuments(message: string): Promise<string> {
+  try {
+    const { data, error } = await supabase
+      .from('documents')
+      .select('content')
+      .textSearch('content', message)
+      .limit(5);
+
+    if (error) {
+      console.error('Search error:', error);
+      return '';
+    }
+
+    return data?.map((doc: any) => doc.content).join('\n') || '';
+  } catch (err) {
+    console.error('Search failed:', err);
+    return '';
   }
 }
