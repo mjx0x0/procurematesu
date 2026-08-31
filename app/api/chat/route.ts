@@ -14,8 +14,9 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
   }
 
   try {
+    // HuggingFace serverless router URL
     const response = await fetch(
-      'https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2',
+      'https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2',
       {
         headers: {
           Authorization: `Bearer ${HF_TOKEN}`,
@@ -26,27 +27,31 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
           inputs: text,
           options: { wait_for_model: true },
         }),
-        signal: AbortSignal.timeout(15000), // Increased to 15s for cold starts
+        signal: AbortSignal.timeout(15000), // 15-second timeout for model cold starts
       }
     );
 
-    if (!response.ok) return null;
+    if (!response.ok) {
+      console.warn(`⚠️ HF API responded with status: ${response.status}`);
+      return null;
+    }
+
     const result = await response.json();
 
-    // Handles both 1D [0.1, 0.2] and 2D [[0.1, 0.2]] response shapes
+    // Handles both 1D array [0.1, 0.2, ...] and 2D array [[0.1, 0.2, ...]]
     if (Array.isArray(result) && result.length > 0) {
       if (typeof result[0] === 'number') return result as number[];
       if (Array.isArray(result[0])) return result[0] as number[];
     }
     return null;
   } catch (err) {
-    console.warn('⚠️ Embedding failed, will use fallback:', err);
+    console.warn('⚠️ Embedding failed, using fallback search:', err);
     return null;
   }
 }
 
 async function searchDocuments(query: string): Promise<string> {
-  // 1. Try vector search
+  // 1. Try vector similarity search
   const embedding = await generateEmbedding(query);
   if (embedding) {
     const { data: chunks, error } = await supabase.rpc('match_documents', {
@@ -59,10 +64,17 @@ async function searchDocuments(query: string): Promise<string> {
     }
   }
 
-  // 2. Fallback: full-text search on individual keywords instead of exact string
+  // 2. Fallback: Full-text keyword search
   console.log('🔄 Using fallback text search...');
-  const formattedQuery = query.trim().split(/\s+/).join(' & ');
-  
+  const formattedQuery = query
+    .trim()
+    .replace(/[^\w\s]/gi, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .join(' & ');
+
+  if (!formattedQuery) return '';
+
   const { data: chunks, error } = await supabase
     .from('document_chunks')
     .select('chunk_text')
@@ -110,7 +122,7 @@ ${context || 'No relevant documents found.'}
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile', // Updated to current active model
+        model: 'llama-3.1-8b-instant', // High-availability production model
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message },
