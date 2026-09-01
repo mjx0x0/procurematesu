@@ -21,7 +21,6 @@ export function Chatbot() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Get current user
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -30,12 +29,10 @@ export function Chatbot() {
     getUser();
   }, []);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Welcome message when chatbot opens
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setMessages([
@@ -52,7 +49,6 @@ export function Chatbot() {
   const handleSend = async () => {
     if (!input.trim() || loading) return;
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -84,7 +80,6 @@ export function Chatbot() {
       };
       setMessages(prev => [...prev, assistantMessage]);
 
-      // Save sessionId for subsequent messages
       if (data.sessionId) {
         setSessionId(data.sessionId);
       }
@@ -113,7 +108,7 @@ export function Chatbot() {
       {
         id: "welcome",
         role: "assistant",
-        content: "👋 Hello! I'm Isko BidDo, your procurement assistant. How can I help you today?",
+        content: "👋 Hello! I'm Isko BidDo. How can I help you today?",
         timestamp: new Date(),
       },
     ]);

@@ -4,9 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import {
-  FileText, Send, Bot, User, Loader2, 
-  ArrowLeft, MessageSquare, Sparkles, 
-  Clock, Trash2, Copy, CheckCircle
+  FileText, Send, Bot, User, Loader2,
+  ArrowLeft, Trash2, Copy
 } from "lucide-react";
 
 interface Message {
@@ -24,10 +23,10 @@ export default function ChatbotDashboard() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -36,7 +35,6 @@ export default function ChatbotDashboard() {
     scrollToBottom();
   }, [messages]);
 
-  // Check authentication on load
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -47,12 +45,11 @@ export default function ChatbotDashboard() {
       setUser(user);
       setIsAuthenticated(true);
 
-      // Add welcome message
       setMessages([
         {
           id: "welcome",
           role: "assistant",
-          content: "👋 Hello! I'm Isko BidDo, your procurement assistant. I can help you with:\n\n• Questions about RA 12009 and procurement rules\n• Purchase Request (PR) status inquiries\n• Drafting PRs with AI slot-filling\n• Step-by-step procurement guidance\n\nHow can I help you today?",
+          content: "👋 Hello! I'm Isko BidDo, your procurement assistant. I can help you with:\n\n• Questions about RA 12009 and procurement rules\n• Drafting Purchase Requests (just say 'Help me draft a PR')\n• Tracking PR status\n• Step-by-step procurement guidance\n\nHow can I help you today?",
           timestamp: new Date(),
         },
       ]);
@@ -73,7 +70,6 @@ export default function ChatbotDashboard() {
     setInput("");
     setLoading(true);
 
-    // Add loading message
     const loadingId = (Date.now() + 1).toString();
     setMessages(prev => [...prev, {
       id: loadingId,
@@ -90,30 +86,34 @@ export default function ChatbotDashboard() {
         body: JSON.stringify({
           message: userMessage.content,
           userId: user?.id,
+          sessionId: sessionId,
         }),
       });
 
       const data = await response.json();
 
-      // Replace loading message with actual response
-      setMessages(prev => prev.map(msg => 
-        msg.id === loadingId 
-          ? { 
-              ...msg, 
+      setMessages(prev => prev.map(msg =>
+        msg.id === loadingId
+          ? {
+              ...msg,
               content: data.response || 'Sorry, I could not process your request.',
-              isLoading: false 
+              isLoading: false
             }
           : msg
       ));
 
+      if (data.sessionId) {
+        setSessionId(data.sessionId);
+      }
+
     } catch (error) {
       console.error('Chat error:', error);
-      setMessages(prev => prev.map(msg => 
-        msg.id === loadingId 
-          ? { 
-              ...msg, 
+      setMessages(prev => prev.map(msg =>
+        msg.id === loadingId
+          ? {
+              ...msg,
               content: '❌ An error occurred. Please try again.',
-              isLoading: false 
+              isLoading: false
             }
           : msg
       ));
@@ -134,15 +134,15 @@ export default function ChatbotDashboard() {
       {
         id: "welcome",
         role: "assistant",
-        content: "👋 Hello! I'm Isko BidDo, your procurement assistant. How can I help you today?",
+        content: "👋 Hello! I'm Isko BidDo. How can I help you today?",
         timestamp: new Date(),
       },
     ]);
+    setSessionId(null);
   };
 
   const copyMessage = (content: string) => {
     navigator.clipboard.writeText(content);
-    // You could add a toast notification here
   };
 
   if (!isAuthenticated) {
@@ -155,7 +155,6 @@ export default function ChatbotDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Navigation */}
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -185,10 +184,8 @@ export default function ChatbotDashboard() {
         </div>
       </nav>
 
-      {/* Chat Area */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 overflow-hidden">
-          {/* Messages */}
           <div className="h-[500px] overflow-y-auto p-6 space-y-4">
             {messages.map((msg) => (
               <div
@@ -234,7 +231,6 @@ export default function ChatbotDashboard() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area */}
           <div className="border-t border-gray-200 p-4 bg-white/50">
             <div className="flex gap-3">
               <input
@@ -243,7 +239,7 @@ export default function ChatbotDashboard() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about procurement, RA 12009, or PR status..."
+                placeholder="Ask about procurement, RA 12009, or say 'Help me draft a PR'..."
                 className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
                 disabled={loading}
               />
@@ -262,13 +258,17 @@ export default function ChatbotDashboard() {
                 )}
               </button>
             </div>
-            <p className="text-xs text-gray-400 mt-2 text-center">
-              Ask about RA 12009, procurement procedures, or get help with your Purchase Requests
-            </p>
+            <div className="flex justify-between mt-2">
+              <p className="text-xs text-gray-400">
+                Ask about RA 12009, procurement procedures, or draft a PR
+              </p>
+              <span className="text-xs text-gray-400">
+                {sessionId ? 'Session active' : 'New session'}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Quick Suggestions */}
         <div className="mt-4 flex flex-wrap gap-2 justify-center">
           {[
             "What is RA 12009?",
