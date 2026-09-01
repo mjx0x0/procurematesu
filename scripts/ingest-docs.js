@@ -84,11 +84,12 @@ async function ingestDocument(filePath, docType, docName) {
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
       console.log(`📁 Created ${dataDir}. Place your .txt files there.`);
-      console.log('Expected files: new_ra12009.txt, ra9184.txt, irr2016.txt, irr.txt, gpmvol1.txt, gpmvol2.txt, gpmvol3.txt, gpmvol4.txt, procurement_manual.txt');
+      console.log('Expected files: ra12009.txt, new_ra12009.txt, ra9184.txt, irr2016.txt, irr.txt, gpmvol1.txt, gpmvol2.txt, gpmvol3.txt, gpmvol4.txt, procurement_manual.txt');
       return;
     }
 
   const files = [
+    { name: 'RA 12009', file: 'ra12009.txt', type: 'ra_12009' },
     { name: 'RA 12009 (New)', file: 'new_ra12009.txt', type: 'ra_12009' },
     { name: 'RA 9184', file: 'ra9184.txt', type: 'ra_9184' },
     { name: 'IRR 2016', file: 'irr2016.txt', type: 'irr' },
