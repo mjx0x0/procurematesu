@@ -1,7 +1,7 @@
 "use client";
-import { useSearchParams } from 'next/navigation';
+
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import {
@@ -16,6 +16,9 @@ import {
   Send,
 } from "lucide-react";
 
+// Force dynamic rendering – required for useSearchParams on static pages
+export const dynamic = "force-dynamic";
+
 interface Item {
   id: string;
   description: string;
@@ -27,6 +30,8 @@ interface Item {
 
 export default function NewPurchaseRequest() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -63,7 +68,9 @@ export default function NewPurchaseRequest() {
     },
   ]);
 
-  // Get current user
+  // ============================================================
+  // 1. Get current user
+  // ============================================================
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -72,47 +79,53 @@ export default function NewPurchaseRequest() {
         return;
       }
       setUserId(user.id);
-      // Get user name from metadata or users table
       setUserName(user.user_metadata?.full_name || user.email || "");
     };
     getUser();
   }, [router]);
 
-
-    // Inside the component:
-    const searchParams = useSearchParams();
-
-    useEffect(() => {
-    // Pre-fill from URL params
-    const department = searchParams.get('department');
-    const purpose = searchParams.get('purpose');
-    const itemsParam = searchParams.get('items');
-    const totalParam = searchParams.get('total');
+  // ============================================================
+  // 2. Pre-fill from URL params (AI slot-filling link)
+  // ============================================================
+  useEffect(() => {
+    const department = searchParams.get("department");
+    const purpose = searchParams.get("purpose");
+    const itemsParam = searchParams.get("items");
+    const totalParam = searchParams.get("total");
 
     if (department) setFormData(prev => ({ ...prev, department }));
     if (purpose) setFormData(prev => ({ ...prev, purpose }));
     if (totalParam) setFormData(prev => ({ ...prev, total_amount: parseFloat(totalParam) || 0 }));
 
     if (itemsParam) {
-        try {
-        const items = JSON.parse(itemsParam);
-        if (Array.isArray(items) && items.length > 0) {
-            const newItems = items.map((item, idx) => ({
+      try {
+        const parsedItems = JSON.parse(itemsParam);
+        if (Array.isArray(parsedItems) && parsedItems.length > 0) {
+          const newItems = parsedItems.map((item, idx) => ({
             id: Date.now().toString() + idx,
-            description: item.item_description || '',
+            description: item.item_description || "",
             qty: item.quantity || 1,
-            unit: item.unit || 'pcs',
+            unit: item.unit || "pcs",
             unit_cost: item.unit_cost || 0,
             total_cost: (item.quantity || 1) * (item.unit_cost || 0),
-            }));
-            setItems(newItems);
-            calculateTotal();
+          }));
+          setItems(newItems);
+          calculateTotal();
         }
-        } catch (e) {}
+      } catch (e) {
+        console.warn("Failed to parse items param", e);
+      }
     }
-    }, [searchParams]);
+  }, [searchParams]);
 
-  // Update total cost when quantity or unit cost changes
+  // ============================================================
+  // 3. Helpers: calculate total, add/remove items
+  // ============================================================
+  const calculateTotal = () => {
+    const total = items.reduce((sum, item) => sum + (item.total_cost || 0), 0);
+    setFormData(prev => ({ ...prev, total_amount: total }));
+  };
+
   const updateTotal = (index: number, field: keyof Item, value: number) => {
     const updated = [...items];
     (updated[index][field] as number) = value;
@@ -121,13 +134,6 @@ export default function NewPurchaseRequest() {
     calculateTotal();
   };
 
-  // Calculate total amount
-  const calculateTotal = () => {
-    const total = items.reduce((sum, item) => sum + (item.total_cost || 0), 0);
-    setFormData(prev => ({ ...prev, total_amount: total }));
-  };
-
-  // Add new item row
   const addItem = () => {
     setItems([
       ...items,
@@ -142,7 +148,6 @@ export default function NewPurchaseRequest() {
     ]);
   };
 
-  // Remove item row
   const removeItem = (index: number) => {
     if (items.length === 1) {
       setError("At least one item is required.");
@@ -153,7 +158,9 @@ export default function NewPurchaseRequest() {
     calculateTotal();
   };
 
-  // AI Slot-Filling
+  // ============================================================
+  // 4. AI Slot-Filling
+  // ============================================================
   const handleAiDraft = async () => {
     if (!aiInput.trim()) {
       setError("Please describe what you need to procure.");
@@ -180,7 +187,6 @@ export default function NewPurchaseRequest() {
       if (data.extracted) {
         const ext = data.extracted;
 
-        // Update form fields
         setFormData(prev => ({
           ...prev,
           purpose: ext.purpose || prev.purpose,
@@ -188,7 +194,6 @@ export default function NewPurchaseRequest() {
           total_amount: ext.total_amount || prev.total_amount,
         }));
 
-        // Update items
         if (ext.items && ext.items.length > 0) {
           const newItems = ext.items.map((item: any) => ({
             id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
@@ -202,7 +207,6 @@ export default function NewPurchaseRequest() {
           calculateTotal();
         }
 
-        // Close dialog and clear input
         setShowAiDialog(false);
         setAiInput("");
       }
@@ -214,7 +218,9 @@ export default function NewPurchaseRequest() {
     }
   };
 
-  // Submit form
+  // ============================================================
+  // 5. Submit form
+  // ============================================================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -226,7 +232,6 @@ export default function NewPurchaseRequest() {
         return;
       }
 
-      // Validate
       if (!formData.purpose) {
         setError("Please enter a purpose/description.");
         setSubmitting(false);
@@ -291,7 +296,6 @@ export default function NewPurchaseRequest() {
           }
         }
 
-        // Redirect to PR detail page
         router.push(`/dashboard/pr/${prData.pr_no}`);
       }
     } catch (err) {
@@ -301,7 +305,9 @@ export default function NewPurchaseRequest() {
     }
   };
 
-  // Loading state
+  // ============================================================
+  // 6. Render
+  // ============================================================
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -354,7 +360,7 @@ export default function NewPurchaseRequest() {
               </div>
             )}
 
-            {/* PR Number & Date Row */}
+            {/* PR Number & Date */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -421,7 +427,7 @@ export default function NewPurchaseRequest() {
               </div>
             </div>
 
-            {/* SAI & ALOBS Numbers */}
+            {/* SAI & ALOBS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
