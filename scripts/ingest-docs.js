@@ -3,13 +3,11 @@ const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config({ path: '.env.local' });
 
-// Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Embedding model – Transformers.js
 let embedder = null;
 async function getEmbedder() {
   if (!embedder) {
@@ -21,8 +19,8 @@ async function getEmbedder() {
   return embedder;
 }
 
-// Chunk text
-function chunkText(text, chunkSize = 1000, overlap = 200) {
+// ✅ Larger chunks for complete context
+function chunkText(text, chunkSize = 2000, overlap = 400) {
   const chunks = [];
   let start = 0;
   while (start < text.length) {
@@ -33,7 +31,6 @@ function chunkText(text, chunkSize = 1000, overlap = 200) {
   return chunks;
 }
 
-// Ingest a single text file
 async function ingestDocument(filePath, docType, docName) {
   try {
     if (!fs.existsSync(filePath)) {
@@ -81,29 +78,33 @@ async function ingestDocument(filePath, docType, docName) {
   }
 }
 
-// ===== MAIN =====
 (async () => {
   try {
     const dataDir = path.join(__dirname, '../data');
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
       console.log(`📁 Created ${dataDir}. Place your .txt files there.`);
-      console.log('Expected files: ra12009.txt, irr.txt, procurement_manual.txt');
+      console.log('Expected files: new_ra12009.txt, ra9184.txt, irr2016.txt, irr.txt, gpmvol1.txt, gpmvol2.txt, gpmvol3.txt, gpmvol4.txt, procurement_manual.txt');
       return;
     }
 
-    const files = [
-      { name: 'RA 12009', file: 'ra12009.txt', type: 'ra_12009' },
-      { name: 'IRR', file: 'irr.txt', type: 'irr' },
-      { name: 'Procurement Manual', file: 'procurement_manual.txt', type: 'procurement_manual' },
-    ];
+  const files = [
+    { name: 'RA 12009 (New)', file: 'new_ra12009.txt', type: 'ra_12009' },
+    { name: 'RA 9184', file: 'ra9184.txt', type: 'ra_9184' },
+    { name: 'IRR 2016', file: 'irr2016.txt', type: 'irr' },
+    { name: 'IRR', file: 'irr.txt', type: 'irr' },
+    { name: 'GPM Vol 1', file: 'gpmvol1.txt', type: 'gpm' },
+    { name: 'GPM Vol 2', file: 'gpmvol2.txt', type: 'gpm' },
+    { name: 'GPM Vol 3', file: 'gpmvol3.txt', type: 'gpm' },
+    { name: 'GPM Vol 4', file: 'gpmvol4.txt', type: 'gpm' },
+    { name: 'MSU Procurement Manual', file: 'procurement_manual.txt', type: 'procurement_manual' },
+  ];
 
     for (const f of files) {
       const filePath = path.join(dataDir, f.file);
       await ingestDocument(filePath, f.type, f.name);
     }
 
-    // Verify count
     const { count, error } = await supabase
       .from('document_chunks')
       .select('*', { count: 'exact', head: true });
