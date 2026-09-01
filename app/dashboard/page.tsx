@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Chatbot } from "@/components/chatbot/Chatbot";
 import { 
   FileText, LogOut, User, PlusCircle, 
   Eye, Clock, CheckCircle, Loader2,
@@ -172,6 +173,7 @@ export default function DashboardPage() {
               Welcome, {user?.user_metadata?.full_name || "User"}!
             </h1>
             <p className="text-gray-600 mt-1">Manage your procurement requests</p>
+            <Chatbot />
           </div>
           <Link
             href="/dashboard/chatbot"

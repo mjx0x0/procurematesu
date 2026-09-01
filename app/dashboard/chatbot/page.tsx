@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { Chatbot } from "@/components/chatbot/Chatbot";
 import {
   FileText, Send, Bot, User, Loader2,
   ArrowLeft, Trash2, Copy
@@ -170,6 +171,7 @@ export default function ChatbotDashboard() {
               </div>
               <span className="font-bold text-xl text-gray-900">Isko BidDo</span>
               <span className="text-sm bg-green-100 text-green-700 px-2 py-0.5 rounded-full">AI Assistant</span>
+              <Chatbot />
             </div>
           </div>
           <div className="flex items-center gap-3">

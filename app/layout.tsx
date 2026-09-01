@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from "next-themes";
-import { Chatbot } from "@/components/chatbot/Chatbot";
 import "./globals.css";
 
 // ============================================
@@ -109,7 +108,6 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <Chatbot />
         </ThemeProvider>
       </body>
     </html>

@@ -217,18 +217,20 @@ export async function POST(req: NextRequest) {
               const extracted = await extractPRDetails(fullDescription);
               if (extracted) {
                 newState.collected.extracted = extracted;
-                const params = new URLSearchParams();
-                params.set('department', extracted.department || '');
-                params.set('purpose', extracted.purpose || '');
-                params.set('items', JSON.stringify(extracted.items || []));
-                params.set('total', extracted.total_amount || 0);
-                const link = `/dashboard/new-pr?${params.toString()}`;
-                responseText = `✅ Draft ready! I've extracted the following details:\n\n` +
+                const dataToEncode = {
+                  department: extracted.department || '',
+                  purpose: extracted.purpose || '',
+                  items: extracted.items || [],
+                  total_amount: extracted.total_amount || 0,
+                };
+                const encoded = encodeURIComponent(btoa(JSON.stringify(dataToEncode)));
+                const link = `/dashboard/pr-print?data=${encoded}`;
+                responseText = `✅ Draft ready! Here's a summary of your Purchase Request:\n\n` +
                   `**Department:** ${extracted.department || 'N/A'}\n` +
                   `**Purpose:** ${extracted.purpose || 'N/A'}\n` +
                   `**Items:** ${extracted.items?.length || 0} item(s)\n` +
                   `**Total Amount:** ₱${extracted.total_amount?.toFixed(2) || '0.00'}\n\n` +
-                  `Click here to review and submit: [Open PR Form](${link})`;
+                  `Click here to **print** your PR form: [🖨️ Print PR](${link})`;
                 newState.drafting = false;
                 newState.step = null;
               } else {
