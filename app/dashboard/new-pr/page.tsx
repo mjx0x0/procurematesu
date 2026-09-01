@@ -1,5 +1,5 @@
 "use client";
-
+import { useSearchParams } from 'next/navigation';
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -77,6 +77,40 @@ export default function NewPurchaseRequest() {
     };
     getUser();
   }, [router]);
+
+
+    // Inside the component:
+    const searchParams = useSearchParams();
+
+    useEffect(() => {
+    // Pre-fill from URL params
+    const department = searchParams.get('department');
+    const purpose = searchParams.get('purpose');
+    const itemsParam = searchParams.get('items');
+    const totalParam = searchParams.get('total');
+
+    if (department) setFormData(prev => ({ ...prev, department }));
+    if (purpose) setFormData(prev => ({ ...prev, purpose }));
+    if (totalParam) setFormData(prev => ({ ...prev, total_amount: parseFloat(totalParam) || 0 }));
+
+    if (itemsParam) {
+        try {
+        const items = JSON.parse(itemsParam);
+        if (Array.isArray(items) && items.length > 0) {
+            const newItems = items.map((item, idx) => ({
+            id: Date.now().toString() + idx,
+            description: item.item_description || '',
+            qty: item.quantity || 1,
+            unit: item.unit || 'pcs',
+            unit_cost: item.unit_cost || 0,
+            total_cost: (item.quantity || 1) * (item.unit_cost || 0),
+            }));
+            setItems(newItems);
+            calculateTotal();
+        }
+        } catch (e) {}
+    }
+    }, [searchParams]);
 
   // Update total cost when quantity or unit cost changes
   const updateTotal = (index: number, field: keyof Item, value: number) => {

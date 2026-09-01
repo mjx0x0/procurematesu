@@ -1,296 +1,303 @@
-"use client";
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
-import {
-  FileText, Send, Bot, User, Loader2, 
-  ArrowLeft, MessageSquare, Sparkles, 
-  Clock, Trash2, Copy, CheckCircle
-} from "lucide-react";
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  isLoading?: boolean;
+// ------------------------------------------------------------------
+// Helper: Generate embedding (same as before)
+// ------------------------------------------------------------------
+async function generateEmbedding(text: string): Promise<number[] | null> {
+  const HF_TOKEN = process.env.HF_TOKEN;
+  if (!HF_TOKEN) return null;
+  try {
+    const response = await fetch(
+      'https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2',
+      {
+        headers: { Authorization: `Bearer ${HF_TOKEN}`, 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify({ inputs: text }),
+        signal: AbortSignal.timeout(10000),
+      }
+    );
+    if (!response.ok) return null;
+    const result = await response.json();
+    if (Array.isArray(result) && result.length > 0) {
+      if (typeof result[0] === 'number') return result as number[];
+      if (Array.isArray(result[0])) return result[0] as number[];
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
-export default function ChatbotDashboard() {
-  const router = useRouter();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+// ------------------------------------------------------------------
+// Helper: Search documents
+// ------------------------------------------------------------------
+async function searchDocuments(query: string): Promise<string> {
+  console.log(`🔍 Searching for: "${query}"`);
+  const embedding = await generateEmbedding(query);
+  if (embedding) {
+    const { data: chunks, error } = await supabase.rpc('match_documents', {
+      query_embedding: embedding,
+      match_threshold: 0.5,
+      match_count: 5,
+    });
+    if (!error && chunks && chunks.length > 0) {
+      return chunks.map((c: any) => c.chunk_text).join('\n\n---\n\n');
+    }
+  }
+  const { data: ilikeChunks, error: ilikeError } = await supabase
+    .from('document_chunks')
+    .select('chunk_text')
+    .ilike('chunk_text', `%${query}%`)
+    .limit(10);
+  if (!ilikeError && ilikeChunks && ilikeChunks.length > 0) {
+    return ilikeChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
+  }
+  const words = query.split(/\s+/).filter(w => w.length > 2);
+  for (const word of words) {
+    const { data: wordChunks, error: wordError } = await supabase
+      .from('document_chunks')
+      .select('chunk_text')
+      .ilike('chunk_text', `%${word}%`)
+      .limit(3);
+    if (!wordError && wordChunks && wordChunks.length > 0) {
+      return wordChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
+    }
+  }
+  return '';
+}
 
-  // Auto-scroll to bottom
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+// ------------------------------------------------------------------
+// Helper: Call Gemini for general chat
+// ------------------------------------------------------------------
+async function callGemini(prompt: string): Promise<string> {
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  if (!GEMINI_API_KEY) throw new Error('Gemini API key missing');
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.2, maxOutputTokens: 600 },
+      }),
+    }
+  );
+  if (!response.ok) throw new Error('Gemini API error');
+  const data = await response.json();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+}
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+// ------------------------------------------------------------------
+// Helper: Slot-fill from natural language (calls Gemini)
+// ------------------------------------------------------------------
+async function extractPRDetails(message: string): Promise<any> {
+  const systemPrompt = `
+You are an AI assistant that extracts purchase request details from natural language.
 
-  // Check authentication on load
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/auth/login");
-        return;
+Extract the following fields and return them as a JSON object:
+- department: string (e.g., "College of Science and Mathematics")
+- purpose: string (a brief description of the overall request)
+- items: array of objects with:
+  - item_description: string
+  - quantity: number
+  - unit: string (e.g., "pcs", "units", "sets")
+  - unit_cost: number (estimated cost per unit)
+  - total_cost: number (quantity × unit_cost) – can be calculated
+- total_amount: number (sum of all item total costs)
+
+If a field is not mentioned, use null.
+Return ONLY the JSON object, no other text.
+
+User input: "${message}"
+`;
+  const result = await callGemini(systemPrompt);
+  try {
+    const cleaned = result.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleaned);
+  } catch {
+    return null;
+  }
+}
+
+// ------------------------------------------------------------------
+// Main POST handler with stateful PR drafting
+// ------------------------------------------------------------------
+export async function POST(req: NextRequest) {
+  try {
+    const { message, userId, sessionId } = await req.json();
+
+    if (!message) {
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    }
+
+    console.log(`📨 Received: "${message}"`);
+
+    // If no sessionId, create a new one
+    let currentSessionId = sessionId;
+    if (!currentSessionId && userId) {
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .insert({ user_id: userId, title: 'New Conversation' })
+        .select('id')
+        .single();
+      if (!error && data) {
+        currentSessionId = data.id;
       }
-      setUser(user);
-      setIsAuthenticated(true);
+    }
 
-      // Add welcome message
-      setMessages([
-        {
-          id: "welcome",
-          role: "assistant",
-          content: "👋 Hello! I'm Isko BidDo, your procurement assistant. I can help you with:\n\n• Questions about RA 12009 and procurement rules\n• Purchase Request (PR) status inquiries\n• Drafting PRs with AI slot-filling\n• Step-by-step procurement guidance\n\nHow can I help you today?",
-          timestamp: new Date(),
-        },
-      ]);
-    };
-    checkAuth();
-  }, [router]);
+    // Get current session state
+    let state: any = {};
+    if (currentSessionId) {
+      const { data } = await supabase
+        .from('chat_sessions')
+        .select('state')
+        .eq('id', currentSessionId)
+        .single();
+      if (data?.state) state = data.state;
+    }
 
-  const handleSend = async () => {
-    if (!input.trim() || loading || !isAuthenticated) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input,
-      timestamp: new Date(),
-    };
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setLoading(true);
-
-    // Add loading message
-    const loadingId = (Date.now() + 1).toString();
-    setMessages(prev => [...prev, {
-      id: loadingId,
-      role: 'assistant',
-      content: '...',
-      timestamp: new Date(),
-      isLoading: true,
-    }]);
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userMessage.content,
-          userId: user?.id,
-        }),
+    // Log user message
+    if (currentSessionId) {
+      await supabase.from('chat_messages').insert({
+        session_id: currentSessionId,
+        sender: 'user',
+        content: message,
       });
-
-      const data = await response.json();
-
-      // Replace loading message with actual response
-      setMessages(prev => prev.map(msg => 
-        msg.id === loadingId 
-          ? { 
-              ...msg, 
-              content: data.response || 'Sorry, I could not process your request.',
-              isLoading: false 
-            }
-          : msg
-      ));
-
-    } catch (error) {
-      console.error('Chat error:', error);
-      setMessages(prev => prev.map(msg => 
-        msg.id === loadingId 
-          ? { 
-              ...msg, 
-              content: '❌ An error occurred. Please try again.',
-              isLoading: false 
-            }
-          : msg
-      ));
-    } finally {
-      setLoading(false);
     }
-  };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+    let responseText = '';
+    let newState = { ...state };
+
+    // ============================================================
+    // 1. Detect if user wants to draft a PR
+    // ============================================================
+    const draftIntents = /help me draft|create a pr|new purchase request|draft a purchase request|i need to request/i;
+    const isDraftIntent = draftIntents.test(message);
+
+    // ============================================================
+    // 2. If drafting intent detected or already in drafting state
+    // ============================================================
+    if (isDraftIntent || state.drafting === true) {
+      // Initialize drafting state
+      if (isDraftIntent) {
+        newState.drafting = true;
+        newState.step = 'purpose';
+        newState.collected = {};
+        responseText = "I'd be happy to help you draft a Purchase Request!\n\nPlease tell me the **purpose** of this procurement (e.g., 'Purchase of laptops for CSM department').";
+      } else {
+        // Continue the dialogue based on step
+        const step = state.step || 'purpose';
+        const collected = state.collected || {};
+
+        switch (step) {
+          case 'purpose':
+            collected.purpose = message;
+            newState.collected = collected;
+            newState.step = 'department';
+            responseText = "Great! Now, which **department** is this for? (e.g., College of Science and Mathematics)";
+            break;
+
+          case 'department':
+            collected.department = message;
+            newState.collected = collected;
+            newState.step = 'items';
+            responseText = "Please list the **items** you need. For each item, provide description, quantity, unit, and estimated unit cost.\n\nExample: '10 laptops, unit cost 50000' or '5 printers, 20 reams of paper'.\nYou can also just describe everything in one sentence.";
+            break;
+
+          case 'items':
+            // Combine previous collected items with new input
+            // We'll collect all text in this step and then process with AI
+            collected.items_raw = (collected.items_raw || '') + ' ' + message;
+            newState.collected = collected;
+            // After collecting items, we can call slot-fill
+            // But we can also allow the user to type "done" to finish
+            if (/done|finish|that's all/i.test(message)) {
+              // Call slot-fill with all collected info
+              const fullDescription = `Purpose: ${collected.purpose}. Department: ${collected.department}. Items: ${collected.items_raw}`;
+              const extracted = await extractPRDetails(fullDescription);
+              if (extracted) {
+                // Save extracted data to state
+                newState.collected.extracted = extracted;
+                // Generate a link to new PR page with pre-filled data
+                const params = new URLSearchParams();
+                params.set('department', extracted.department || '');
+                params.set('purpose', extracted.purpose || '');
+                params.set('items', JSON.stringify(extracted.items || []));
+                params.set('total', extracted.total_amount || 0);
+                const link = `/dashboard/new-pr?${params.toString()}`;
+                responseText = `✅ Draft ready! I've extracted the following details:\n\n` +
+                  `**Department:** ${extracted.department || 'N/A'}\n` +
+                  `**Purpose:** ${extracted.purpose || 'N/A'}\n` +
+                  `**Items:** ${extracted.items?.length || 0} item(s)\n` +
+                  `**Total Amount:** ₱${extracted.total_amount?.toFixed(2) || '0.00'}\n\n` +
+                  `Click here to review and submit: [Open PR Form](${link})`;
+                newState.drafting = false; // end drafting
+                newState.step = null;
+              } else {
+                responseText = "I couldn't parse the items. Please try again with a clear description, or use the manual form.";
+                newState.step = 'items'; // retry
+              }
+            } else {
+              responseText = "Got it. Please continue listing items or type **done** when you've finished.";
+            }
+            break;
+
+          default:
+            responseText = "Let's start over. What is the purpose of this Purchase Request?";
+            newState.step = 'purpose';
+        }
+      }
+    } else {
+      // ============================================================
+      // 3. Normal Q&A (existing chatbot logic)
+      // ============================================================
+      const context = await searchDocuments(message);
+      const systemPrompt = `
+You are Isko BidDo, a confident and knowledgeable procurement assistant for MSU-GenSan.
+Provide clear, accurate answers based ONLY on the provided context.
+Be direct and authoritative. Use bullet points if helpful.
+If the answer is not in the context, say: "The documents do not contain that specific information. Please refer to the official procurement manual or contact the Procurement Office."
+Context:
+${context || 'No relevant documents found.'}
+User question: ${message}
+`;
+      responseText = await callGemini(systemPrompt);
     }
-  };
 
-  const clearChat = () => {
-    setMessages([
-      {
-        id: "welcome",
-        role: "assistant",
-        content: "👋 Hello! I'm Isko BidDo, your procurement assistant. How can I help you today?",
-        timestamp: new Date(),
-      },
-    ]);
-  };
+    // Save assistant message
+    if (currentSessionId) {
+      await supabase.from('chat_messages').insert({
+        session_id: currentSessionId,
+        sender: 'ai',
+        content: responseText,
+      });
+    }
 
-  const copyMessage = (content: string) => {
-    navigator.clipboard.writeText(content);
-    // You could add a toast notification here
-  };
+    // Update session state
+    if (currentSessionId) {
+      await supabase
+        .from('chat_sessions')
+        .update({ state: newState })
+        .eq('id', currentSessionId);
+    }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
+    return NextResponse.json({
+      response: responseText,
+      sessionId: currentSessionId,
+    });
+
+  } catch (error: any) {
+    console.error('❌ Chat API error:', error);
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
     );
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <div className="flex items-center gap-2">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-                <Bot className="h-5 w-5 text-white" />
-              </div>
-              <span className="font-bold text-xl text-gray-900">Isko BidDo</span>
-              <span className="text-sm bg-green-100 text-green-700 px-2 py-0.5 rounded-full">AI Assistant</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={clearChat}
-              className="text-gray-500 hover:text-red-600 transition-colors text-sm flex items-center gap-1"
-            >
-              <Trash2 className="h-4 w-4" />
-              Clear Chat
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Chat Area */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 overflow-hidden">
-          {/* Messages */}
-          <div className="h-[500px] overflow-y-auto p-6 space-y-4">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-2xl p-4 ${
-                    msg.role === 'user'
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  {msg.isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <span className="animate-pulse">●</span>
-                      <span className="animate-pulse delay-100">●</span>
-                      <span className="animate-pulse delay-200">●</span>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                        {msg.content}
-                      </p>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-[10px] opacity-70">
-                          {msg.timestamp.toLocaleTimeString()}
-                        </span>
-                        {msg.role === 'assistant' && !msg.isLoading && (
-                          <button
-                            onClick={() => copyMessage(msg.content)}
-                            className="text-[10px] opacity-50 hover:opacity-100 transition-opacity"
-                          >
-                            <Copy className="h-3 w-3" />
-                          </button>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input Area */}
-          <div className="border-t border-gray-200 p-4 bg-white/50">
-            <div className="flex gap-3">
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask about procurement, RA 12009, or PR status..."
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
-                disabled={loading}
-              />
-              <button
-                onClick={handleSend}
-                disabled={loading || !input.trim()}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
-              >
-                {loading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <>
-                    Send
-                    <Send className="h-4 w-4" />
-                  </>
-                )}
-              </button>
-            </div>
-            <p className="text-xs text-gray-400 mt-2 text-center">
-              Ask about RA 12009, procurement procedures, or get help with your Purchase Requests
-            </p>
-          </div>
-        </div>
-
-        {/* Quick Suggestions */}
-        <div className="mt-4 flex flex-wrap gap-2 justify-center">
-          {[
-            "What is RA 12009?",
-            "How does Small Value Procurement work?",
-            "What are the procurement modes?",
-            "Help me draft a PR",
-            "What is the SVP threshold?",
-            "Explain the bidding process",
-          ].map((suggestion) => (
-            <button
-              key={suggestion}
-              onClick={() => {
-                setInput(suggestion);
-                inputRef.current?.focus();
-              }}
-              className="px-3 py-1.5 bg-white/70 backdrop-blur-sm rounded-full text-xs text-gray-600 hover:bg-white hover:shadow-md transition-all border border-gray-200"
-            >
-              {suggestion}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
 }
