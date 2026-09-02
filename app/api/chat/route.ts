@@ -205,19 +205,32 @@ async function handleDraftPR(
       collected.department = message;
       newState.collected = collected;
       newState.step = 'items';
+      newState.items_guide_shown = false; // reset guide flag
       return {
-        response: "Please list the **items** you need. For each item, provide description, quantity, unit, and estimated unit cost.\n\nExample: '10 laptops, unit cost 50000' or '5 printers, 20 reams of paper'.\nYou can also just describe everything in one sentence.",
+        response: "Please list the **items** you need. For each item, provide description, quantity, unit, and estimated unit cost.\n\nExample: '10 laptops, unit cost 50000' or '5 printers, 20 reams of paper'.\n\nYou can also just describe everything in one sentence.\n\nType **done** when finished.",
         newState,
       };
 
     case 'items':
+      // If first time, show guide
+      if (!state.items_guide_shown) {
+        newState.items_guide_shown = true;
+        // Still collect the message
+        collected.items_raw = (collected.items_raw || '') + ' ' + message;
+        newState.collected = collected;
+        return {
+          response: "Got it. Please continue listing items or type **done** when you've finished.",
+          newState,
+        };
+      }
+
       collected.items_raw = (collected.items_raw || '') + ' ' + message;
       newState.collected = collected;
 
       if (/done|finish|that's all/i.test(message)) {
         const fullDescription = `Purpose: ${collected.purpose}. Department: ${collected.department}. Items: ${collected.items_raw}`;
         const extracted = await extractPRDetails(fullDescription);
-        if (extracted) {
+        if (extracted && extracted.items && extracted.items.length > 0) {
           newState.collected.extracted = extracted;
           const dataToEncode = {
             department: extracted.department || '',
@@ -238,7 +251,7 @@ async function handleDraftPR(
           return { response, newState };
         } else {
           return {
-            response: "I couldn't parse the items. Please try again with a clear description, or use the manual form.",
+            response: "I couldn't understand the items. Please list each item with description, quantity, and unit cost, like:\n\n'10 laptops, unit cost 50000' or '5 printers, 20 reams of paper'.\n\nType **done** when finished, or try again with more detail.",
             newState,
           };
         }
