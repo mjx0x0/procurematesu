@@ -413,35 +413,23 @@ export default function NewPRForm() {
             </div>
 
             {/* SAI & ALOBS */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  SAI No.
-                </label>
-                <input
-                  type="text"
-                  value={formData.sai_no}
-                  onChange={(e) =>
-                    setFormData({ ...formData, sai_no: e.target.value })
-                  }
-                  placeholder="Enter SAI number"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ALOBs No.
-                </label>
-                <input
-                  type="text"
-                  value={formData.alobs_no}
-                  onChange={(e) =>
-                    setFormData({ ...formData, alobs_no: e.target.value })
-                  }
-                  placeholder="Enter ALOBs number"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">SAI No.</label>
+              <input
+                type="text"
+                value="Auto-generated"
+                disabled
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">ALOBs No.</label>
+              <input
+                type="text"
+                value="Auto-generated"
+                disabled
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+              />
             </div>
 
             {/* Purpose */}
