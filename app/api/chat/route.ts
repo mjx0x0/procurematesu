@@ -91,22 +91,81 @@ async function callGemini(prompt: string): Promise<string> {
 
 async function extractPRDetails(message: string): Promise<any> {
   const systemPrompt = `
-Extract purchase request details from the user's message.
-Return ONLY a JSON object with:
-- department: string
-- purpose: string
-- items: array of { item_description, quantity, unit, unit_cost, total_cost }
-- total_amount: number
+You are an AI assistant that extracts purchase request details from natural language.
+
+Extract the following fields and return them as a **valid JSON object**:
+- department: string (e.g., "College of Science and Mathematics")
+- purpose: string (a brief description of the overall request)
+- items: array of objects with:
+  - item_description: string
+  - quantity: number
+  - unit: string (e.g., "pcs", "units", "sets")
+  - unit_cost: number (estimated cost per unit)
+  - total_cost: number (quantity × unit_cost)
+- total_amount: number (sum of all item total costs)
+
 If a field is not mentioned, use null.
+If you cannot extract items, return an empty items array.
+The JSON must be valid and contain no extra text.
+
 User input: "${message}"
 `;
-  const result = await callGemini(systemPrompt);
   try {
+    const result = await callGemini(systemPrompt);
+    console.log("📝 Raw extraction result:", result);
     const cleaned = result.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleaned);
-  } catch {
-    return null;
+    const parsed = JSON.parse(cleaned);
+    if (!parsed.items) parsed.items = [];
+    if (!Array.isArray(parsed.items)) parsed.items = [];
+    return parsed;
+  } catch (e) {
+    console.error("❌ Extraction parse error:", e);
+    // Try to extract items manually using regex as a fallback
+    return extractItemsManually(message);
   }
+}
+
+// Fallback: manual extraction using regex (better than nothing)
+function extractItemsManually(text: string): any {
+  const items = [];
+  const lines = text.split(/[.,\n;]/).filter(line => line.trim());
+  for (const line of lines) {
+    const match = line.match(/(\d+)\s*([a-zA-Z]+)?\s*(.+)/);
+    if (match) {
+      const qty = parseInt(match[1]);
+      const unit = match[2] || 'pcs';
+      const description = match[3]?.trim() || line.trim();
+      const unitCostMatch = line.match(/cost\s*[:=]?\s*(\d+)/i);
+      const unitCost = unitCostMatch ? parseInt(unitCostMatch[1]) : 0;
+      items.push({
+        item_description: description,
+        quantity: qty,
+        unit: unit,
+        unit_cost: unitCost,
+        total_cost: qty * unitCost,
+      });
+    }
+  }
+  if (items.length === 0) {
+    // If still no items, treat the whole text as a single item
+    const qtyMatch = text.match(/(\d+)/);
+    const qty = qtyMatch ? parseInt(qtyMatch[1]) : 1;
+    const costMatch = text.match(/(\d+)/g);
+    const cost = costMatch && costMatch.length > 0 ? parseInt(costMatch[costMatch.length - 1]) : 0;
+    items.push({
+      item_description: text.trim(),
+      quantity: qty,
+      unit: 'pcs',
+      unit_cost: cost,
+      total_cost: qty * cost,
+    });
+  }
+  return {
+    department: null,
+    purpose: text,
+    items: items,
+    total_amount: items.reduce((sum, i) => sum + i.total_cost, 0),
+  };
 }
 
 function getStatusLabel(status: string): string {
@@ -212,10 +271,8 @@ async function handleDraftPR(
       };
 
     case 'items':
-      // If first time, show guide
       if (!state.items_guide_shown) {
         newState.items_guide_shown = true;
-        // Still collect the message
         collected.items_raw = (collected.items_raw || '') + ' ' + message;
         newState.collected = collected;
         return {
@@ -229,7 +286,11 @@ async function handleDraftPR(
 
       if (/done|finish|that's all/i.test(message)) {
         const fullDescription = `Purpose: ${collected.purpose}. Department: ${collected.department}. Items: ${collected.items_raw}`;
-        const extracted = await extractPRDetails(fullDescription);
+        let extracted = await extractPRDetails(fullDescription);
+        // If extraction returned null or empty items, use manual fallback
+        if (!extracted || !extracted.items || extracted.items.length === 0) {
+          extracted = extractItemsManually(fullDescription);
+        }
         if (extracted && extracted.items && extracted.items.length > 0) {
           newState.collected.extracted = extracted;
           const dataToEncode = {
