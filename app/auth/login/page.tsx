@@ -113,10 +113,10 @@ export default function LoginPage() {
     // 4. Redirect based on role
     if (userData?.role === "admin") {
       console.log("✅ Redirecting to /admin");
-      router.push("/admin");
+      router.push("app/admin");
     } else {
       console.log("✅ Redirecting to /dashboard");
-      router.push("/dashboard");
+      router.push("app/dashboard");
     }
     setLoading(false);
   };

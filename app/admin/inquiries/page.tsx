@@ -96,7 +96,7 @@ export default function AdminInquiriesPage() {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => router.push("/admin")}
+              onClick={() => router.push("app/admin")}
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
