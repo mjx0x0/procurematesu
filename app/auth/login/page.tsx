@@ -28,7 +28,6 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccessMessage(null);
 
     if (!email || !password) {
       setError("Please fill in all fields.");
@@ -42,8 +41,7 @@ export default function LoginPage() {
       return;
     }
 
-    // 1. Authenticate
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
+    const { error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -62,66 +60,20 @@ export default function LoginPage() {
       return;
     }
 
-    // 2. Get current user
+    // ✅ After authentication, get user role and redirect
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setError("User not found. Please try again.");
-      setLoading(false);
-      return;
-    }
-
-    // 3. Get role via RPC
-    const { data: role, error: rpcError } = await supabase
-      .rpc("get_user_role", { user_id: user.id });
-
-    // Debug: log the role (remove this after testing)
-    console.log("Role from RPC:", role, "Error:", rpcError);
-
-    // If RPC fails or role is null, try direct select (if RLS allows)
-    if (rpcError || role === null) {
-      // Attempt to insert default profile (in case user record is missing)
-      const { error: insertError } = await supabase
+    if (user) {
+      const { data: userData } = await supabase
         .from("users")
-        .upsert({
-          id: user.id,
-          email: user.email,
-          full_name: user.user_metadata?.full_name || user.email,
-          department: user.user_metadata?.department || "",
-          role: "end_user",
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }, { onConflict: "id" });
+        .select("role")
+        .eq("id", user.id)
+        .single();
 
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        setError("Failed to set up your account. Please contact the admin.");
-        setLoading(false);
-        return;
-      }
-
-      // Re-fetch role after insert
-      const { data: newRole } = await supabase
-        .rpc("get_user_role", { user_id: user.id });
-      const finalRole = newRole || "end_user";
-
-      // Redirect based on final role
-      if (finalRole === "admin") {
+      if (userData?.role === "admin") {
         router.push("/admin");
       } else {
         router.push("/dashboard");
       }
-      setLoading(false);
-      return;
-    }
-
-    // 4. Use the role from RPC
-    if (role === "admin") {
-      router.push("/admin");
-    } else if (role === "pending") {
-      await supabase.auth.signOut();
-      setError("Your account is pending admin approval. Please wait.");
-      setLoading(false);
     } else {
       router.push("/dashboard");
     }
@@ -139,7 +91,7 @@ export default function LoginPage() {
             <span className="font-bold text-xl text-gray-900">ProcuremateSU</span>
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mt-4">Welcome Back</h2>
-          <p className="text-gray-600 mt-2">Sign in with your MSU‑GenSan credentials</p>
+          <p className="text-gray-600 mt-2">Sign in with your MSU-GenSan credentials</p>
         </div>
 
         <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/30">
@@ -162,7 +114,6 @@ export default function LoginPage() {
                   placeholder="you@msugensan.edu.ph"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
                   required
-                  disabled={loading}
                 />
               </div>
               <p className="text-xs text-gray-400 mt-1">
@@ -182,13 +133,11 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
                   required
-                  disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  disabled={loading}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -203,7 +152,7 @@ export default function LoginPage() {
             )}
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex items-center gap-2">
                 <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                 <span className="text-gray-600">Remember me</span>
               </label>
@@ -233,7 +182,7 @@ export default function LoginPage() {
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="text-center text-gray-500 text-sm">
-              Use your official MSU‑GenSan email and password.
+              Use your official MSU-GenSan email and password.
             </p>
             <p className="text-center text-xs text-gray-400 mt-2">
               By signing in, you agree to the university's data privacy policy.
