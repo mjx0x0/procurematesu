@@ -24,6 +24,7 @@ import {
   Trash2,
   RefreshCw,
   X,
+  MessageSquare,
 } from "lucide-react";
 
 interface PR {
@@ -296,7 +297,17 @@ export default function AdminDashboard() {
           </div>
         </div>
       </nav>
-
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30 text-center">
+        <MessageSquare className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+        <h3 className="font-semibold text-gray-900">Monitor Inquiries</h3>
+        <p className="text-sm text-gray-600 mt-1">See what users are asking the chatbot.</p>
+        <Link
+          href="/admin/inquiries"
+          className="mt-4 inline-block text-purple-600 hover:text-purple-800 font-medium text-sm"
+        >
+          View Inquiries →
+        </Link>
+      </div>
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
