@@ -116,7 +116,7 @@ export default function LoginPage() {
       router.push("/admin");
     } else {
       console.log("✅ Redirecting to /dashboard");
-      router.push("app/dashboard");
+      router.push("/dashboard");
     }
     setLoading(false);
   };
