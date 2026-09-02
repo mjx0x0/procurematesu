@@ -2,125 +2,117 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import {
   FileText, LogOut, User, Users, FileCheck, Clock, Loader2,
-  AlertCircle, Building2, Activity, CheckCircle
+  Plus, Eye, Edit, Trash2, CheckCircle, XCircle, AlertCircle
 } from "lucide-react";
+
+interface PR {
+  pr_no: string;
+  purpose: string;
+  total: number;
+  current_stage: string;
+  created_at: string;
+  department: string;
+  user_id: string;
+}
 
 export default function AdminPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [prs, setPrs] = useState<PR[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    completed: 0,
-    departments: 0,
-  });
-  const [recentPRs, setRecentPRs] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0 });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedPR, setSelectedPR] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const checkAdmin = async () => {
-      try {
-        // 1. Get current user
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError || !user) {
-          router.push("/auth/login");
-          return;
-        }
-
-        // 2. Get user role via RPC (bypasses RLS)
-        const { data: role, error: rpcError } = await supabase
-          .rpc("get_user_role", { user_id: user.id });
-
-        if (rpcError || role === null) {
-          // User record missing – insert default
-          const { error: insertError } = await supabase
-            .from("users")
-            .insert({
-              id: user.id,
-              email: user.email,
-              full_name: user.user_metadata?.full_name || user.email,
-              role: "end_user",
-              is_active: true,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            });
-
-          if (insertError) {
-            setError("Failed to set up your account. Please contact the admin.");
-            setLoading(false);
-            return;
-          }
-          // After insert, redirect to dashboard (not admin)
-          router.push("/dashboard");
-          return;
-        }
-
-        if (role !== "admin") {
-          router.push("/dashboard");
-          return;
-        }
-
-        // Admin – load stats and data
-        setUser(user);
-        await loadStats();
-        await loadRecentPRs();
-      } catch (err) {
-        console.error("Admin check error:", err);
-        setError("Something went wrong. Please try again.");
-      } finally {
-        setLoading(false);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/auth/login");
+        return;
       }
-    };
 
-    const loadStats = async () => {
-      const { count: total, error: totalError } = await supabase
-        .from("purchase_requests")
-        .select("*", { count: "exact", head: true });
+      const { data: userData } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", user.id)
+        .single();
 
-      const { count: pending, error: pendingError } = await supabase
-        .from("purchase_requests")
-        .select("*", { count: "exact", head: true })
-        .not("current_stage", "eq", "completed")
-        .not("current_stage", "eq", "cancelled");
-
-      const { count: completed, error: completedError } = await supabase
-        .from("purchase_requests")
-        .select("*", { count: "exact", head: true })
-        .eq("current_stage", "completed");
-
-      if (!totalError) setStats((prev) => ({ ...prev, total: total || 0 }));
-      if (!pendingError) setStats((prev) => ({ ...prev, pending: pending || 0 }));
-      if (!completedError) setStats((prev) => ({ ...prev, completed: completed || 0 }));
-
-      // Get unique departments count
-      const { data: depts, error: deptError } = await supabase
-        .from("purchase_requests")
-        .select("department");
-      if (!deptError && depts) {
-        const uniqueDepts = new Set(depts.map((p) => p.department));
-        setStats((prev) => ({ ...prev, departments: uniqueDepts.size }));
+      if (userData?.role !== "admin") {
+        router.push("/dashboard");
+        return;
       }
-    };
 
-    const loadRecentPRs = async () => {
-      const { data, error } = await supabase
-        .from("purchase_requests")
-        .select("pr_no, purpose, total, current_stage, created_at, department")
-        .order("created_at", { ascending: false })
-        .limit(5);
-      if (!error) setRecentPRs(data || []);
+      setUser(user);
+      await loadData();
     };
-
     checkAdmin();
   }, [router]);
+
+  const loadData = async () => {
+    try {
+      // Get all PRs
+      const { data: prsData } = await supabase
+        .from("purchase_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (prsData) {
+        setPrs(prsData);
+        const total = prsData.length;
+        const pending = prsData.filter(p =>
+          p.current_stage !== "completed" && p.current_stage !== "cancelled"
+        ).length;
+        const completed = prsData.filter(p => p.current_stage === "completed").length;
+        setStats({ total, pending, completed });
+      }
+    } catch (err) {
+      console.error("Error loading data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/");
+  };
+
+  const handleDelete = async () => {
+    if (!selectedPR) return;
+    setDeleting(true);
+    try {
+      // Delete PR items first (due to foreign key)
+      await supabase
+        .from("pr_items")
+        .delete()
+        .eq("pr_no", selectedPR);
+
+      // Delete PR
+      await supabase
+        .from("purchase_requests")
+        .delete()
+        .eq("pr_no", selectedPR);
+
+      // Also delete any related stages
+      await supabase
+        .from("pr_stages_completed")
+        .delete()
+        .eq("pr_no", selectedPR);
+
+      setShowDeleteModal(false);
+      setSelectedPR(null);
+      await loadData();
+    } catch (err) {
+      console.error("Delete error:", err);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -161,41 +153,16 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 max-w-md w-full shadow-2xl border border-red-200">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-8 w-8 text-red-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Error</h2>
-              <p className="text-gray-600 mt-1">{error}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
-              >
-                Retry
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
+      <nav className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
@@ -220,26 +187,34 @@ export default function AdminPage() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-1">Overview of all procurement activities</p>
+          <div className="flex gap-3">
+            <Link
+              href="/admin/inquiries"
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+            >
+              <Eye className="h-4 w-4" />
+              View Inquiries
+            </Link>
+          </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30">
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-                <div className="text-sm text-gray-600">Total Purchase Requests</div>
+                <div className="text-sm text-gray-600">Total PRs</div>
               </div>
               <div className="p-3 bg-blue-50 rounded-lg">
                 <FileCheck className="h-6 w-6 text-blue-600" />
               </div>
             </div>
           </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
@@ -250,8 +225,7 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
@@ -262,98 +236,127 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold text-purple-600">{stats.departments}</div>
-                <div className="text-sm text-gray-600">Departments Engaged</div>
-              </div>
-              <div className="p-3 bg-purple-50 rounded-lg">
-                <Building2 className="h-6 w-6 text-purple-600" />
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Recent PRs */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/30 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Purchase Requests</h2>
-            <span className="text-sm text-gray-500">{recentPRs.length} latest</span>
+        {/* PR Management Table */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h2 className="text-lg font-semibold text-gray-900">Purchase Requests Management</h2>
+            <span className="text-sm text-gray-500">{prs.length} total</span>
           </div>
 
-          {recentPRs.length === 0 ? (
-            <div className="p-12 text-center">
-              <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No purchase requests yet.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50/50">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    PR No.
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Purpose
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Department
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {prs.length === 0 ? (
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PR #</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                      No purchase requests found.
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {recentPRs.map((pr) => (
-                    <tr key={pr.pr_no} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{pr.pr_no}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{pr.purpose}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{pr.department}</td>
+                ) : (
+                  prs.map((pr) => (
+                    <tr key={pr.pr_no} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        {pr.pr_no}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
+                        {pr.purpose}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {pr.department}
+                      </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
                         ₱{pr.total?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(pr.current_stage)}`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(pr.current_stage)}`}>
                           {getStatusLabel(pr.current_stage)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {new Date(pr.created_at).toLocaleDateString()}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/dashboard/pr/${pr.pr_no}`}
+                            className="text-blue-600 hover:text-blue-800 transition-colors"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                          <button
+                            onClick={() => {
+                              setSelectedPR(pr.pr_no);
+                              setShowDeleteModal(true);
+                            }}
+                            className="text-red-600 hover:text-red-800 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30 text-center">
-            <Users className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900">User Management</h3>
-            <p className="text-sm text-gray-600 mt-1">Manage faculty and staff accounts.</p>
-            <button className="mt-4 text-blue-600 hover:text-blue-800 font-medium text-sm">
-              Go to Users →
-            </button>
-          </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30 text-center">
-            <FileCheck className="h-8 w-8 text-green-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900">PR Logbook</h3>
-            <p className="text-sm text-gray-600 mt-1">View and manage all purchase requests.</p>
-            <button className="mt-4 text-green-600 hover:text-green-800 font-medium text-sm">
-              View All PRs →
-            </button>
-          </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30 text-center">
-            <Activity className="h-8 w-8 text-purple-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900">Monitor Inquiries</h3>
-            <p className="text-sm text-gray-600 mt-1">See what users are asking the chatbot.</p>
-            <button className="mt-4 text-purple-600 hover:text-purple-800 font-medium text-sm">
-              View Inquiries →
-            </button>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <AlertCircle className="h-6 w-6" />
+              <h3 className="text-lg font-semibold">Confirm Delete</h3>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete PR <strong>{selectedPR}</strong>? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setSelectedPR(null);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
