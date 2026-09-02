@@ -21,18 +21,24 @@ export function Chatbot() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Get current user
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) setUserId(user.id);
+      if (user) {
+        setUserId(user.id);
+        console.log("✅ Chatbot: User ID set to", user.id);
+      }
     };
     getUser();
   }, []);
 
+  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Welcome message when chatbot opens
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setMessages([
@@ -46,6 +52,49 @@ export function Chatbot() {
     }
   }, [isOpen]);
 
+  // Helper to format message with clickable links
+  const formatMessage = (content: string) => {
+    const lines = content.split('\n');
+    return lines.map((line, idx) => {
+      // Match URLs (http, https, or /dashboard)
+      const urlMatch = line.match(/(https?:\/\/[^\s]+|\/dashboard\/[^\s]+)/);
+      if (urlMatch) {
+        const url = urlMatch[0];
+        const parts = line.split(url);
+        return (
+          <div key={idx} className="whitespace-pre-wrap">
+            {parts[0]}
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline font-medium hover:text-blue-800"
+            >
+              🖨️ Open Printable PR
+            </a>
+            {parts[1]}
+          </div>
+        );
+      }
+      // Check for bold markers (**) – simple conversion to <strong>
+      const boldRegex = /\*\*(.*?)\*\*/g;
+      if (boldRegex.test(line)) {
+        const parts = line.split(boldRegex);
+        return (
+          <div key={idx} className="whitespace-pre-wrap">
+            {parts.map((part, i) => {
+              if (i % 2 === 1) {
+                return <strong key={i}>{part}</strong>;
+              }
+              return part;
+            })}
+          </div>
+        );
+      }
+      return <div key={idx} className="whitespace-pre-wrap">{line}</div>;
+    });
+  };
+
   const handleSend = async () => {
     if (!input.trim() || loading) return;
 
@@ -56,21 +105,26 @@ export function Chatbot() {
       timestamp: new Date(),
     };
     setMessages(prev => [...prev, userMessage]);
+    const sentMessage = input;
     setInput("");
     setLoading(true);
 
     try {
+      console.log("📤 Sending message:", sentMessage);
+      console.log("🆔 SessionId:", sessionId);
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: userMessage.content,
+          message: sentMessage,
           userId: userId,
           sessionId: sessionId,
         }),
       });
 
       const data = await response.json();
+      console.log("📩 Response:", data);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -80,11 +134,13 @@ export function Chatbot() {
       };
       setMessages(prev => [...prev, assistantMessage]);
 
+      // Update sessionId if provided
       if (data.sessionId) {
         setSessionId(data.sessionId);
+        console.log("🆕 New SessionId:", data.sessionId);
       }
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error('❌ Chat error:', error);
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -113,6 +169,7 @@ export function Chatbot() {
       },
     ]);
     setSessionId(null);
+    console.log("🧹 Chat cleared, session reset");
   };
 
   return (
@@ -175,9 +232,15 @@ export function Chatbot() {
                           : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                        {msg.content}
-                      </p>
+                      {msg.role === 'assistant' ? (
+                        <div className="text-sm whitespace-pre-wrap leading-relaxed">
+                          {formatMessage(msg.content)}
+                        </div>
+                      ) : (
+                        <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                          {msg.content}
+                        </p>
+                      )}
                       <p className="text-[10px] opacity-70 mt-1 text-right">
                         {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>

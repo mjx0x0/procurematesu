@@ -10,35 +10,20 @@ const supabase = createClient(
 // HELPER FUNCTIONS
 // ============================================================
 
-// ------------------------------------------------------------------
-// Generate embedding (Hugging Face)
-// ------------------------------------------------------------------
 async function generateEmbedding(text: string): Promise<number[] | null> {
   const HF_TOKEN = process.env.HF_TOKEN;
-  if (!HF_TOKEN) {
-    console.warn('⚠️ HF_TOKEN not set, skipping embedding');
-    return null;
-  }
-
+  if (!HF_TOKEN) return null;
   try {
     const response = await fetch(
       'https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2',
       {
-        headers: {
-          Authorization: `Bearer ${HF_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { Authorization: `Bearer ${HF_TOKEN}`, 'Content-Type': 'application/json' },
         method: 'POST',
         body: JSON.stringify({ inputs: text }),
         signal: AbortSignal.timeout(10000),
       }
     );
-
-    if (!response.ok) {
-      console.warn(`⚠️ HF API status: ${response.status}`);
-      return null;
-    }
-
+    if (!response.ok) return null;
     const result = await response.json();
     if (Array.isArray(result) && result.length > 0) {
       if (typeof result[0] === 'number') return result as number[];
@@ -46,30 +31,20 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
     }
     return null;
   } catch {
-    console.warn('⚠️ Embedding failed – using fallback search');
     return null;
   }
 }
 
-// ------------------------------------------------------------------
-// Search documents (RAG)
-// ------------------------------------------------------------------
 async function searchDocuments(query: string): Promise<string> {
   console.log(`🔍 Searching for: "${query}"`);
-
-  // 1. Exact phrase match
   const { data: exactChunks, error: exactError } = await supabase
     .from('document_chunks')
     .select('chunk_text')
     .ilike('chunk_text', `%${query}%`)
     .limit(5);
-
   if (!exactError && exactChunks && exactChunks.length > 0) {
-    console.log(`✅ Found ${exactChunks.length} exact phrase matches`);
     return exactChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
   }
-
-  // 2. Vector similarity
   const embedding = await generateEmbedding(query);
   if (embedding) {
     const { data: chunks, error } = await supabase.rpc('match_documents', {
@@ -78,13 +53,9 @@ async function searchDocuments(query: string): Promise<string> {
       match_count: 5,
     });
     if (!error && chunks && chunks.length > 0) {
-      console.log(`✅ Vector search found ${chunks.length} chunks`);
       return chunks.map((c: any) => c.chunk_text).join('\n\n---\n\n');
     }
   }
-
-  // 3. Keyword fallback
-  console.log('🔄 Trying keyword search...');
   const words = query.split(/\s+/).filter(w => w.length > 2);
   for (const word of words) {
     const { data: wordChunks, error: wordError } = await supabase
@@ -93,18 +64,12 @@ async function searchDocuments(query: string): Promise<string> {
       .ilike('chunk_text', `%${word}%`)
       .limit(3);
     if (!wordError && wordChunks && wordChunks.length > 0) {
-      console.log(`✅ Found chunks for word: "${word}"`);
       return wordChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
     }
   }
-
-  console.log('❌ No chunks found.');
   return '';
 }
 
-// ------------------------------------------------------------------
-// Call Gemini
-// ------------------------------------------------------------------
 async function callGemini(prompt: string): Promise<string> {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) throw new Error('Gemini API key missing');
@@ -119,36 +84,20 @@ async function callGemini(prompt: string): Promise<string> {
       }),
     }
   );
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`❌ Gemini error: ${response.status} ${errorText}`);
-    throw new Error('Gemini API error');
-  }
+  if (!response.ok) throw new Error('Gemini API error');
   const data = await response.json();
   return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 }
 
-// ------------------------------------------------------------------
-// Extract PR details (slot-filling)
-// ------------------------------------------------------------------
 async function extractPRDetails(message: string): Promise<any> {
   const systemPrompt = `
-You are an AI assistant that extracts purchase request details from natural language.
-
-Extract the following fields and return them as a JSON object:
-- department: string (e.g., "College of Science and Mathematics")
-- purpose: string (a brief description of the overall request)
-- items: array of objects with:
-  - item_description: string
-  - quantity: number
-  - unit: string (e.g., "pcs", "units", "sets")
-  - unit_cost: number (estimated cost per unit)
-  - total_cost: number (quantity × unit_cost)
-- total_amount: number (sum of all item total costs)
-
+Extract purchase request details from the user's message.
+Return ONLY a JSON object with:
+- department: string
+- purpose: string
+- items: array of { item_description, quantity, unit, unit_cost, total_cost }
+- total_amount: number
 If a field is not mentioned, use null.
-Return ONLY the JSON object, no other text.
-
 User input: "${message}"
 `;
   const result = await callGemini(systemPrompt);
@@ -160,9 +109,6 @@ User input: "${message}"
   }
 }
 
-// ------------------------------------------------------------------
-// Get status label
-// ------------------------------------------------------------------
 function getStatusLabel(status: string): string {
   const labels: Record<string, string> = {
     draft: 'Draft',
@@ -181,9 +127,6 @@ function getStatusLabel(status: string): string {
   return labels[status] || status;
 }
 
-// ------------------------------------------------------------------
-// Check if user is admin
-// ------------------------------------------------------------------
 async function isUserAdmin(userId: string): Promise<boolean> {
   const { data } = await supabase
     .from('users')
@@ -192,10 +135,6 @@ async function isUserAdmin(userId: string): Promise<boolean> {
     .single();
   return data?.role === 'admin';
 }
-
-// ============================================================
-// INTENT DETECTION
-// ============================================================
 
 function detectIntent(message: string): 'draft_pr' | 'track_pr' | 'step_by_step' | 'general' {
   const lower = message.toLowerCase();
@@ -214,7 +153,6 @@ function detectIntent(message: string): 'draft_pr' | 'track_pr' | 'step_by_step'
 function extractPRNumber(message: string): string | null {
   const match = message.match(/PR[- ]?(\d{4}[- ]?\d{4})/i);
   if (match) {
-    // Normalize to PR-YYYY-NNNN
     const raw = match[1];
     if (raw.length === 9) return `PR-${raw.slice(0,4)}-${raw.slice(5)}`;
     if (raw.length === 4) {
@@ -227,22 +165,18 @@ function extractPRNumber(message: string): string | null {
 }
 
 // ============================================================
-// HANDLERS FOR EACH INTENT
+// DRAFT PR HANDLER
 // ============================================================
-
-// ------------------------------------------------------------------
-// Draft PR Handler (Slot‑Filling)
-// ------------------------------------------------------------------
 async function handleDraftPR(
   message: string,
   state: any,
   userId: string,
-  sessionId: string,
-  supabaseClient: any
+  sessionId: string
 ): Promise<{ response: string; newState: any }> {
+  console.log('📝 handleDraftPR called with state:', state);
+
   let newState = { ...state };
 
-  // If no drafting state, initialize
   if (!state.drafting) {
     newState.drafting = true;
     newState.step = 'purpose';
@@ -253,9 +187,9 @@ async function handleDraftPR(
     };
   }
 
-  // Continue the dialogue
   const step = state.step || 'purpose';
   const collected = state.collected || {};
+  console.log(`📝 Step: ${step}, Collected:`, collected);
 
   switch (step) {
     case 'purpose':
@@ -323,11 +257,10 @@ async function handleDraftPR(
   }
 }
 
-// ------------------------------------------------------------------
-// Track PR Handler
-// ------------------------------------------------------------------
+// ============================================================
+// TRACK PR HANDLER
+// ============================================================
 async function handleTrackPR(prNo: string, userId: string): Promise<string> {
-  // Fetch PR from database
   const { data: pr, error } = await supabase
     .from('purchase_requests')
     .select('*, pr_stages_completed(*)')
@@ -338,7 +271,6 @@ async function handleTrackPR(prNo: string, userId: string): Promise<string> {
     return `I couldn't find PR ${prNo}. Please check the number and try again.`;
   }
 
-  // Check if user has access (own PR or admin)
   const isAdmin = await isUserAdmin(userId);
   if (!isAdmin && pr.user_id !== userId) {
     return `You don't have permission to view PR ${prNo}.`;
@@ -361,9 +293,9 @@ async function handleTrackPR(prNo: string, userId: string): Promise<string> {
   return response;
 }
 
-// ------------------------------------------------------------------
-// Step-by-Step Handler
-// ------------------------------------------------------------------
+// ============================================================
+// STEP-BY-STEP HANDLER
+// ============================================================
 async function handleStepByStep(message: string): Promise<string> {
   const context = await searchDocuments(message);
   if (context) {
@@ -393,6 +325,7 @@ export async function POST(req: NextRequest) {
     }
 
     console.log(`📨 Received: "${message}"`);
+    console.log(`🆔 SessionId: ${sessionId}, UserId: ${userId}`);
 
     // 1. Get or create session
     let currentSessionId = sessionId;
@@ -404,6 +337,7 @@ export async function POST(req: NextRequest) {
         .single();
       if (!error && data) {
         currentSessionId = data.id;
+        console.log(`✅ Created new session: ${currentSessionId}`);
       }
     }
 
@@ -416,6 +350,7 @@ export async function POST(req: NextRequest) {
         .eq('id', currentSessionId)
         .single();
       if (data?.state) state = data.state;
+      console.log(`📦 Session state:`, state);
     }
 
     // 3. Log user message
@@ -427,40 +362,45 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 4. Detect intent
-    const intent = detectIntent(message);
-
     let responseText = '';
     let newState = { ...state };
 
-    // 5. Handle based on intent
-    switch (intent) {
-      case 'draft_pr': {
-        const result = await handleDraftPR(message, state, userId, currentSessionId, supabase);
-        responseText = result.response;
-        newState = result.newState;
-        break;
-      }
+    // 4. Check if already in drafting state FIRST
+    if (state.drafting === true) {
+      console.log('🔄 Continuing drafting flow...');
+      const result = await handleDraftPR(message, state, userId, currentSessionId);
+      responseText = result.response;
+      newState = result.newState;
+    } else {
+      // 5. Detect intent only if not already drafting
+      const intent = detectIntent(message);
+      console.log(`🎯 Intent: ${intent}`);
 
-      case 'track_pr': {
-        const prNo = extractPRNumber(message);
-        if (prNo) {
-          responseText = await handleTrackPR(prNo, userId);
-        } else {
-          responseText = "I didn't see a PR number. Please provide the PR number (e.g., PR-2026-0001).";
+      switch (intent) {
+        case 'draft_pr': {
+          console.log('📝 Starting new draft...');
+          const result = await handleDraftPR(message, state, userId, currentSessionId);
+          responseText = result.response;
+          newState = result.newState;
+          break;
         }
-        break;
-      }
-
-      case 'step_by_step': {
-        responseText = await handleStepByStep(message);
-        break;
-      }
-
-      default: {
-        // General Q&A with RAG
-        const context = await searchDocuments(message);
-        const systemPrompt = `
+        case 'track_pr': {
+          const prNo = extractPRNumber(message);
+          if (prNo) {
+            responseText = await handleTrackPR(prNo, userId);
+          } else {
+            responseText = "I didn't see a PR number. Please provide the PR number (e.g., PR-2026-0001).";
+          }
+          break;
+        }
+        case 'step_by_step': {
+          responseText = await handleStepByStep(message);
+          break;
+        }
+        default: {
+          const context = await searchDocuments(message);
+          console.log(`📚 Context length: ${context.length} chars`);
+          const systemPrompt = `
 You are Isko BidDo, a confident procurement assistant for MSU-GenSan.
 Answer the user's question based ONLY on the provided context.
 If the answer is not in the context, say: "I cannot find that information in the procurement documents."
@@ -471,7 +411,8 @@ ${context || 'No relevant documents found.'}
 
 User question: ${message}
 `;
-        responseText = await callGemini(systemPrompt);
+          responseText = await callGemini(systemPrompt);
+        }
       }
     }
 
@@ -490,6 +431,7 @@ User question: ${message}
         .from('chat_sessions')
         .update({ state: newState })
         .eq('id', currentSessionId);
+      console.log(`✅ Updated session state:`, newState);
     }
 
     return NextResponse.json({
