@@ -192,7 +192,7 @@ export default function DashboardPage() {
           <div className="flex flex-wrap gap-3">
             {isAdmin && (
               <Link
-                href="app/admin"
+                href="/admin"
                 className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-purple-600/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
               >
                 <Shield className="h-5 w-5" />
