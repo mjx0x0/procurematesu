@@ -41,6 +41,7 @@ export default function LoginPage() {
       return;
     }
 
+    // 1. Authenticate
     const { error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -60,21 +61,61 @@ export default function LoginPage() {
       return;
     }
 
-    // ✅ After authentication, get user role and redirect
+    // 2. Get user and role
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: userData } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .single();
+    if (!user) {
+      setError("User not found. Please try again.");
+      setLoading(false);
+      return;
+    }
 
-      if (userData?.role === "admin") {
-        router.push("/admin");
-      } else {
+    console.log("✅ Logged in user:", user.email);
+
+    // 3. Fetch user role from `users` table
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (userError) {
+      console.error("❌ Error fetching user role:", userError);
+      // If user record doesn't exist, create one with default role
+      if (userError.code === "PGRST116") { // record not found
+        const { error: insertError } = await supabase
+          .from("users")
+          .insert({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || user.email,
+            role: "end_user",
+            is_active: true,
+          });
+        if (insertError) {
+          console.error("❌ Failed to create user record:", insertError);
+        } else {
+          console.log("✅ Created user record with role 'end_user'");
+        }
+        // Redirect to dashboard (default for non-admin)
         router.push("/dashboard");
+        setLoading(false);
+        return;
+      } else {
+        // Other error – redirect to dashboard as fallback
+        router.push("/dashboard");
+        setLoading(false);
+        return;
       }
+    }
+
+    console.log("✅ User role:", userData?.role);
+
+    // 4. Redirect based on role
+    if (userData?.role === "admin") {
+      console.log("✅ Redirecting to /admin");
+      router.push("/admin");
     } else {
+      console.log("✅ Redirecting to /dashboard");
       router.push("/dashboard");
     }
     setLoading(false);
