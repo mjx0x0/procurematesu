@@ -1,13 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter }from "next/navigation";
 import Link from "next/link";
 import { Chatbot } from "@/components/chatbot/Chatbot";
-import { 
-  FileText, LogOut, User, PlusCircle, 
-  Eye, Clock, CheckCircle, Loader2,
-  Bot
+import {
+  FileText,
+  LogOut,
+  User,
+  PlusCircle,
+  Eye,
+  Clock,
+  CheckCircle,
+  Loader2,
+  Bot,
+  Shield,
+  Users,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
@@ -25,6 +33,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [prs, setPrs] = useState<PurchaseRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0 });
 
   useEffect(() => {
@@ -38,15 +47,18 @@ export default function DashboardPage() {
         }
         setUser(user);
 
-        // Check if user exists in users table, if not create them
-        const { data: existingUser } = await supabase
+        // Check user role
+        const { data: userData } = await supabase
           .from("users")
           .select("id, role")
           .eq("id", user.id)
           .single();
 
-        if (!existingUser) {
-          // Create user record
+        let userRole = "end_user";
+        if (userData) {
+          userRole = userData.role;
+        } else {
+          // If user doesn't exist in users table, create them
           await supabase.from("users").insert({
             id: user.id,
             email: user.email,
@@ -56,7 +68,7 @@ export default function DashboardPage() {
           });
         }
 
-        const isAdmin = existingUser?.role === "admin";
+        setIsAdmin(userRole === "admin");
 
         // Get purchase requests
         let query = supabase
@@ -65,7 +77,7 @@ export default function DashboardPage() {
           .order("created_at", { ascending: false });
 
         // If not admin, only show user's own PRs
-        if (!isAdmin) {
+        if (userRole !== "admin") {
           query = query.eq("user_id", user.id);
         }
 
@@ -74,10 +86,10 @@ export default function DashboardPage() {
         if (prsData) {
           setPrs(prsData);
           const total = prsData.length;
-          const pending = prsData.filter(p => 
-            p.current_stage !== "completed" && p.current_stage !== "cancelled"
+          const pending = prsData.filter(
+            (p) => p.current_stage !== "completed" && p.current_stage !== "cancelled"
           ).length;
-          const completed = prsData.filter(p => p.current_stage === "completed").length;
+          const completed = prsData.filter((p) => p.current_stage === "completed").length;
           setStats({ total, pending, completed });
         }
       } catch (err) {
@@ -107,7 +119,7 @@ export default function DashboardPage() {
       for_award: "bg-teal-100 text-teal-600",
       po_issued: "bg-emerald-100 text-emerald-600",
       completed: "bg-green-100 text-green-600",
-      cancelled: "bg-red-100 text-red-600"
+      cancelled: "bg-red-100 text-red-600",
     };
     return colors[status] || "bg-gray-100 text-gray-600";
   };
@@ -125,7 +137,7 @@ export default function DashboardPage() {
       for_award: "For Award",
       po_issued: "PO Issued",
       completed: "Completed",
-      cancelled: "Cancelled"
+      cancelled: "Cancelled",
     };
     return labels[status] || status;
   };
@@ -148,6 +160,9 @@ export default function DashboardPage() {
               <FileText className="h-5 w-5 text-white" />
             </div>
             <span className="font-bold text-xl text-gray-900">ProcuremateSU</span>
+            {isAdmin && (
+              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Admin</span>
+            )}
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600 hidden sm:inline">
@@ -173,22 +188,32 @@ export default function DashboardPage() {
               Welcome, {user?.user_metadata?.full_name || "User"}!
             </h1>
             <p className="text-gray-600 mt-1">Manage your procurement requests</p>
-            <Chatbot />
           </div>
-          <Link
-            href="/dashboard/chatbot"
-            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-purple-600/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
-          >
-            <Bot className="h-5 w-5" />
-            Ask Isko BidDo
-          </Link>          
-          <Link
-            href="/dashboard/new-pr"
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-600/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
-          >
-            <PlusCircle className="h-5 w-5" />
-            New Purchase Request
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-purple-600/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
+              >
+                <Shield className="h-5 w-5" />
+                Admin Panel
+              </Link>
+            )}
+            <Link
+              href="/dashboard/chatbot"
+              className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-indigo-500/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
+            >
+              <Bot className="h-5 w-5" />
+              Ask Isko BidDo
+            </Link>
+            <Link
+              href="/dashboard/new-pr"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-600/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
+            >
+              <PlusCircle className="h-5 w-5" />
+              New Purchase Request
+            </Link>
+          </div>
         </div>
 
         {/* Stats */}
@@ -234,7 +259,7 @@ export default function DashboardPage() {
             <h2 className="text-lg font-semibold text-gray-900">Your Purchase Requests</h2>
             <span className="text-sm text-gray-500">{prs.length} total</span>
           </div>
-          
+
           {prs.length === 0 ? (
             <div className="p-12 text-center">
               <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -284,10 +309,18 @@ export default function DashboardPage() {
                         {pr.purpose}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        ₱{pr.total?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ₱
+                        {pr.total?.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(pr.current_stage)}`}>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                            pr.current_stage
+                          )}`}
+                        >
                           {getStatusLabel(pr.current_stage)}
                         </span>
                       </td>
@@ -311,6 +344,9 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* Floating Chatbot */}
+      <Chatbot />
     </div>
   );
 }
