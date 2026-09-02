@@ -72,21 +72,41 @@ async function searchDocuments(query: string): Promise<string> {
 
 async function callGemini(prompt: string): Promise<string> {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-  if (!GEMINI_API_KEY) throw new Error('Gemini API key missing');
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 400 },
-      }),
+  if (!GEMINI_API_KEY) {
+    console.error('❌ GEMINI_API_KEY is not set');
+    throw new Error('Gemini API key missing');
+  }
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 1024, // ✅ Increased from 400
+          },
+        }),
+      }
+    );
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ Gemini API error: ${response.status} ${errorText}`);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
-  );
-  if (!response.ok) throw new Error('Gemini API error');
-  const data = await response.json();
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    if (!text) {
+      console.warn('⚠️ Gemini returned empty response');
+      return '';
+    }
+    return text;
+  } catch (error) {
+    console.error('❌ Gemini call failed:', error);
+    throw error;
+  }
 }
 
 async function extractPRDetails(message: string): Promise<any> {
