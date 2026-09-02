@@ -435,17 +435,6 @@ export default function AdminDashboard() {
               <span className="text-sm text-gray-500">({filteredPrs.length})</span>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30 text-center">
-            <MessageSquare className="h-8 w-8 text-purple-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900">Monitor Inquiries</h3>
-            <p className="text-sm text-gray-600 mt-1">See what users are asking the chatbot.</p>
-            <Link
-              href="/admin/inquiries"
-              className="mt-4 inline-block text-purple-600 hover:text-purple-800 font-medium text-sm"
-            >
-              View Inquiries →
-            </Link>
-          </div>
 
           {filteredPrs.length === 0 ? (
             <div className="p-12 text-center">
@@ -503,6 +492,17 @@ export default function AdminDashboard() {
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
+                        </div>
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30 text-center">
+                          <MessageSquare className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+                          <h3 className="font-semibold text-gray-900">Monitor Inquiries</h3>
+                          <p className="text-sm text-gray-600 mt-1">See what users are asking the chatbot.</p>
+                          <Link
+                            href="/admin/inquiries"
+                            className="mt-4 inline-block text-purple-600 hover:text-purple-800 font-medium text-sm"
+                          >
+                            View Inquiries →
+                          </Link>
                         </div>
                       </td>
                     </tr>

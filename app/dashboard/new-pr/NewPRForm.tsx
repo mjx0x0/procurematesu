@@ -48,7 +48,6 @@ export default function NewPRForm() {
     sai_no: "",
     alobs_no: "",
     total_amount: 0,
-    requested_by: "",
     requested_by_designation: "",
     approved_by: "",
     approved_by_designation: "",
@@ -148,7 +147,7 @@ export default function NewPRForm() {
     calculateTotal();
   };
 
-  // AI Slot-Filling (manual button)
+  // AI Slot-Filling
   const handleAiDraft = async () => {
     if (!aiInput.trim()) {
       setError("Please describe what you need to procure.");
@@ -230,6 +229,7 @@ export default function NewPRForm() {
         return;
       }
 
+      // 1. Insert purchase request
       const { data: prData, error: prError } = await supabase
         .from("purchase_requests")
         .insert({
@@ -250,11 +250,12 @@ export default function NewPRForm() {
 
       if (prError) {
         console.error("PR insert error:", prError);
-        setError("Failed to create purchase request. Please try again.");
+        setError(`Failed to create PR: ${prError.message}`);
         setSubmitting(false);
         return;
       }
 
+      // 2. Insert items
       if (prData) {
         const itemsToInsert = items
           .filter(item => item.description.trim())
