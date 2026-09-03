@@ -52,13 +52,67 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
 }
 
 // ------------------------------------------------------------------
-// Search documents (RAG) – enhanced with law reference extraction
+// Search documents (RAG) – FIXED: Expands acronyms + law numbers
 // ------------------------------------------------------------------
 async function searchDocuments(query: string): Promise<string> {
   console.log(`🔍 Searching for: "${query}"`);
 
-  // STEP 1: Extract law references like "RA 12009", "Republic Act 12009"
-  const lawMatch = query.match(/(?:RA|R\.A\.|Republic Act)\s*(\d{4,5})/i);
+  // --- ACRONYM EXPANSION MAP ---
+  const ACRONYM_MAP: Record<string, string> = {
+    GPPB: 'Government Procurement Policy Board',
+    BAC: 'Bids and Awards Committee',
+    ABC: 'Approved Budget for the Contract',
+    SVP: 'Small Value Procurement',
+    APP: 'Annual Procurement Plan',
+    PPMP: 'Project Procurement Management Plan',
+    HOPE: 'Head of the Procuring Entity',
+    COA: 'Commission on Audit',
+    DBM: 'Department of Budget and Management',
+    TWG: 'Technical Working Group',
+    RFQ: 'Request for Quotation',
+    LCRQ: 'Lowest Calculated Responsive Quotation',
+    NOA: 'Notice of Award',
+    NTP: 'Notice to Proceed',
+    PhilGEPS: 'Philippine Government Electronic Procurement System',
+    IRR: 'Implementing Rules and Regulations',
+    GOP: 'Government of the Philippines',
+    COFILCO: 'Confederation of Filipino Consulting Organizations',
+    CIAP: 'Construction Industry Authority of the Philippines',
+    POs: 'Purchase Orders',
+    PRs: 'Purchase Requests',
+  };
+
+  // STEP 0: Expand acronyms and search directly for the full term
+  let expandedSearchTerms: string[] = [query];
+  for (const [acro, full] of Object.entries(ACRONYM_MAP)) {
+    const regex = new RegExp(`\\b${acro}\\b`, 'gi');
+    if (regex.test(query)) {
+      console.log(`🔍 Found acronym: ${acro}, expanding to "${full}"`);
+
+      // Try to fetch chunks directly using the full name
+      const { data: directChunks, error: directError } = await supabase
+        .from('document_chunks')
+        .select('chunk_text')
+        .ilike('chunk_text', `%${full}%`)
+        .limit(5);
+
+      if (!directError && directChunks && directChunks.length > 0) {
+        console.log(`✅ Found ${directChunks.length} chunks using expanded acronym "${full}"`);
+        return directChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
+      }
+
+      // If no direct find, add the full name to the search pool for later steps
+      expandedSearchTerms.push(full);
+    }
+  }
+
+  // Combine all search terms into one string for full-text and ILIKE
+  const combinedQuery = expandedSearchTerms.join(' ');
+
+  // STEP 1: Law References (handles "RA 12009", "Republic Act No. 12009", etc.)
+  const lawMatch = combinedQuery.match(
+    /(?:RA|R\.A\.|Republic Act|Republic Act No\.|R\.A\. No\.)\s*(\d{4,5})/i
+  );
   if (lawMatch) {
     const lawNumber = lawMatch[1];
     const variations = [
@@ -67,29 +121,31 @@ async function searchDocuments(query: string): Promise<string> {
       `Republic Act ${lawNumber}`,
       `RA${lawNumber}`,
       `R.A.${lawNumber}`,
+      `Republic Act No. ${lawNumber}`,
+      `R.A. No. ${lawNumber}`,
+      `RA No. ${lawNumber}`,
     ];
-    console.log(`🔍 Looking for law: ${variations.join(', ')}`);
     for (const term of variations) {
       const { data: chunks, error } = await supabase
         .from('document_chunks')
         .select('chunk_text')
         .ilike('chunk_text', `%${term}%`)
         .limit(5);
-      if (!error && chunks && chunks.length > 0) {
+      if (error) continue;
+      if (chunks && chunks.length > 0) {
         console.log(`✅ Found ${chunks.length} chunks for "${term}"`);
         return chunks.map((c) => c.chunk_text).join('\n\n---\n\n');
       }
     }
   }
 
-  // STEP 2: Full-text search (clean the query)
-  const cleaned = query
+  // STEP 2: Full-text search (using the combined query)
+  const cleaned = combinedQuery
     .trim()
     .replace(/[^\w\s]/gi, '')
     .split(/\s+/)
     .filter(Boolean)
     .join(' & ');
-
   if (cleaned) {
     const { data: tsChunks, error: tsError } = await supabase
       .from('document_chunks')
@@ -102,8 +158,8 @@ async function searchDocuments(query: string): Promise<string> {
     }
   }
 
-  // STEP 3: Simple ILIKE with important words
-  const words = query.split(/\s+/).filter(w => w.length > 2);
+  // STEP 3: ILIKE with important words (from combined query)
+  const words = combinedQuery.split(/\s+/).filter(w => w.length > 2);
   for (const word of words) {
     const { data: wordChunks, error: wordError } = await supabase
       .from('document_chunks')
@@ -116,7 +172,22 @@ async function searchDocuments(query: string): Promise<string> {
     }
   }
 
-  console.log('❌ No chunks found.');
+  // STEP 4: Raw number fallback
+  const numMatch = combinedQuery.match(/\b(\d{4,5})\b/);
+  if (numMatch) {
+    const number = numMatch[1];
+    const { data: numChunks, error: numError } = await supabase
+      .from('document_chunks')
+      .select('chunk_text')
+      .ilike('chunk_text', `%${number}%`)
+      .limit(3);
+    if (!numError && numChunks && numChunks.length > 0) {
+      console.log(`✅ Found ${numChunks.length} chunks containing number "${number}"`);
+      return numChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
+    }
+  }
+
+  console.log('❌ No chunks found in any search step.');
   return '';
 }
 
