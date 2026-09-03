@@ -52,134 +52,47 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
 }
 
 // ------------------------------------------------------------------
-// Search documents (RAG) – FIXED with EXPLICIT RA 12009 handler
+// Search documents (RAG) – FIXED to handle "No." variations
 // ------------------------------------------------------------------
 async function searchDocuments(query: string): Promise<string> {
   console.log(`🔍 Searching for: "${query}"`);
 
-  // ================================================================
-  // 🚀 SPECIAL RA 12009 HANDLER (TOP PRIORITY)
-  // ================================================================
-  const raMatch = query.match(/(?:RA|R\.A\.|Republic Act)\s*(\d{4,5})/i);
-  if (raMatch) {
-    const num = raMatch[1];
-    console.log(`🔍 RA Handler activated for number: ${num}`);
-
-    const exactPhrases = [
-      `Republic Act No. ${num}`,
-      `Republic Act ${num}`,
-      `R.A. No. ${num}`,
-      `RA No. ${num}`,
-      `Republic Act Number ${num}`,
-    ];
-
-    for (const phrase of exactPhrases) {
-      console.log(`🔍 Trying exact phrase: "${phrase}"`);
-      const { data, error } = await supabase
-        .from('document_chunks')
-        .select('chunk_text')
-        .ilike('chunk_text', `%${phrase}%`)
-        .limit(5);
-
-      if (error) {
-        console.error(`❌ Supabase error for "${phrase}":`, error.message);
-        continue;
-      }
-
-      if (data && data.length > 0) {
-        console.log(`✅ RA Handler found ${data.length} chunks for "${phrase}"`);
-        return data.map((c) => c.chunk_text).join('\n\n---\n\n');
-      }
-    }
-  }
-
-  // --- COMPLETE ACRONYM EXPANSION MAP ---
-  const ACRONYM_MAP: Record<string, string> = {
-    GPPB: 'Government Procurement Policy Board',
-    BAC: 'Bids and Awards Committee',
-    TWG: 'Technical Working Group',
-    ABC: 'Approved Budget for the Contract',
-    SVP: 'Small Value Procurement',
-    APP: 'Annual Procurement Plan',
-    PPMP: 'Project Procurement Management Plan',
-    HOPE: 'Head of the Procuring Entity',
-    COA: 'Commission on Audit',
-    DBM: 'Department of Budget and Management',
-    RFQ: 'Request for Quotation',
-    LCRQ: 'Lowest Calculated Responsive Quotation',
-    NOA: 'Notice of Award',
-    NTP: 'Notice to Proceed',
-    IRR: 'Implementing Rules and Regulations',
-    PhilGEPS: 'Philippine Government Electronic Procurement System',
-    GOP: 'Government of the Philippines',
-    COFILCO: 'Confederation of Filipino Consulting Organizations',
-    CIAP: 'Construction Industry Authority of the Philippines',
-    POs: 'Purchase Orders',
-    PRs: 'Purchase Requests',
-  };
-
-  // STEP 0: Expand acronyms and search directly for the full term
-  let expandedSearchTerms: string[] = [query];
-  for (const [acro, full] of Object.entries(ACRONYM_MAP)) {
-    const regex = new RegExp(`\\b${acro.replace('.', '\\.')}\\b`, 'gi');
-    if (regex.test(query)) {
-      console.log(`🔍 Found acronym: ${acro}, expanding to "${full}"`);
-
-      const fullVariations = [
-        full,
-        `${full} No.`,
-        `${full} No`,
-        `${full} Number`,
-      ];
-
-      for (const variation of fullVariations) {
-        const { data: directChunks, error: directError } = await supabase
-          .from('document_chunks')
-          .select('chunk_text')
-          .ilike('chunk_text', `%${variation}%`)
-          .limit(5);
-
-        if (directError) {
-          console.log(`❌ Supabase error for "${variation}":`, directError.message);
-          continue;
-        }
-
-        if (directChunks && directChunks.length > 0) {
-          console.log(`✅ Found ${directChunks.length} chunks using expanded acronym "${variation}"`);
-          return directChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
-        }
-      }
-
-      expandedSearchTerms.push(full);
-    }
-  }
-
-  const combinedQuery = expandedSearchTerms.join(' ');
-
-  // STEP 1: Law References (fallback)
-  const lawMatch = combinedQuery.match(
+  // STEP 1: Extract law references 
+  // ✅ FIXED: Now matches "Republic Act No. 12009", "R.A. No. 12009", "RA 12009", etc.
+  const lawMatch = query.match(
     /(?:RA|R\.A\.|Republic Act|Republic Act No\.|R\.A\. No\.)\s*(\d{4,5})/i
   );
+
   if (lawMatch) {
     const lawNumber = lawMatch[1];
+    // ✅ ADDED the exact formats that exist in your database
     const variations = [
       `RA ${lawNumber}`,
       `R.A. ${lawNumber}`,
       `Republic Act ${lawNumber}`,
       `RA${lawNumber}`,
       `R.A.${lawNumber}`,
-      `Republic Act No. ${lawNumber}`,
-      `R.A. No. ${lawNumber}`,
-      `RA No. ${lawNumber}`,
-      `Republic Act Number ${lawNumber}`,
+      // These next 3 are the CRITICAL additions for your database:
+      `Republic Act No. ${lawNumber}`,   // Matches your database exactly
+      `R.A. No. ${lawNumber}`,           // Handles abbreviated "No."
+      `RA No. ${lawNumber}`,             // Handles mixed format
     ];
+    
+    console.log(`🔍 Looking for variations: ${variations.join(', ')}`);
+
+    // Try each variation
     for (const term of variations) {
       const { data: chunks, error } = await supabase
         .from('document_chunks')
         .select('chunk_text')
         .ilike('chunk_text', `%${term}%`)
         .limit(5);
-      if (error) continue;
+
+      if (error) {
+        console.error(`❌ Supabase error for "${term}":`, error.message);
+        continue;
+      }
+
       if (chunks && chunks.length > 0) {
         console.log(`✅ Found ${chunks.length} chunks for "${term}"`);
         return chunks.map((c) => c.chunk_text).join('\n\n---\n\n');
@@ -187,57 +100,74 @@ async function searchDocuments(query: string): Promise<string> {
     }
   }
 
-  // STEP 2: Full-text search
-  const cleaned = combinedQuery
+  // STEP 2: Full-text search (clean the query)
+  const cleaned = query
     .trim()
     .replace(/[^\w\s]/gi, '')
     .split(/\s+/)
     .filter(Boolean)
     .join(' & ');
+
   if (cleaned) {
-    console.log(`🔍 Full-text search: "${cleaned}"`);
+    console.log(`🔍 Trying full-text search with: "${cleaned}"`);
     const { data: tsChunks, error: tsError } = await supabase
       .from('document_chunks')
       .select('chunk_text')
       .textSearch('chunk_text', cleaned, { config: 'english' })
       .limit(5);
+
+    if (tsError) {
+      console.error(`❌ Full-text search error:`, tsError.message);
+    }
+
     if (!tsError && tsChunks && tsChunks.length > 0) {
-      console.log(`✅ Full-text found ${tsChunks.length}`);
+      console.log(`✅ Full-text search found ${tsChunks.length} chunks`);
       return tsChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
     }
   }
 
-  // STEP 3: Word ILIKE
-  const words = combinedQuery.split(/\s+/).filter((w) => w.length > 2);
+  // STEP 3: Simple ILIKE with important words
+  const words = query.split(/\s+/).filter(w => w.length > 2);
   for (const word of words) {
     const { data: wordChunks, error: wordError } = await supabase
       .from('document_chunks')
       .select('chunk_text')
       .ilike('chunk_text', `%${word}%`)
       .limit(3);
-    if (!wordError && wordChunks && wordChunks.length > 0) {
+
+    if (wordError) {
+      console.error(`❌ Word search error for "${word}":`, wordError.message);
+      continue;
+    }
+
+    if (wordChunks && wordChunks.length > 0) {
       console.log(`✅ Found chunks for word: "${word}"`);
       return wordChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
     }
   }
 
   // STEP 4: Raw number fallback
-  const numMatch = combinedQuery.match(/\b(\d{4,5})\b/);
+  const numMatch = query.match(/\b(\d{4,5})\b/);
   if (numMatch) {
     const number = numMatch[1];
-    console.log(`🔍 Raw number fallback: "${number}"`);
+    console.log(`🔍 Trying raw number fallback for: "${number}"`);
     const { data: numChunks, error: numError } = await supabase
       .from('document_chunks')
       .select('chunk_text')
       .ilike('chunk_text', `%${number}%`)
       .limit(3);
+
+    if (numError) {
+      console.error(`❌ Number search error:`, numError.message);
+    }
+
     if (!numError && numChunks && numChunks.length > 0) {
-      console.log(`✅ Found ${numChunks.length} chunks for number "${number}"`);
+      console.log(`✅ Found ${numChunks.length} chunks containing number "${number}"`);
       return numChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
     }
   }
 
-  console.log('❌ No chunks found.');
+  console.log('❌ No chunks found in any search step.');
   return '';
 }
 
@@ -260,7 +190,7 @@ async function callGemini(prompt: string): Promise<string> {
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.3,
+            temperature: 0.1,
             maxOutputTokens: 1024,
           },
         }),
@@ -312,14 +242,14 @@ User input: "${message}"
 `;
   try {
     const result = await callGemini(systemPrompt);
-    console.log('📝 Raw extraction result:', result);
+    console.log("📝 Raw extraction result:", result);
     const cleaned = result.replace(/```json/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleaned);
     if (!parsed.items) parsed.items = [];
     if (!Array.isArray(parsed.items)) parsed.items = [];
     return parsed;
   } catch (e) {
-    console.error('❌ Extraction parse error:', e);
+    console.error("❌ Extraction parse error:", e);
     return extractItemsManually(message);
   }
 }
@@ -329,7 +259,7 @@ User input: "${message}"
 // ------------------------------------------------------------------
 function extractItemsManually(text: string): any {
   const items = [];
-  const lines = text.split(/[.,\n;]/).filter((line) => line.trim());
+  const lines = text.split(/[.,\n;]/).filter(line => line.trim());
   for (const line of lines) {
     const match = line.match(/(\d+)\s*([a-zA-Z]+)?\s*(.+)/);
     if (match) {
@@ -423,7 +353,7 @@ function extractPRNumber(message: string): string | null {
   const match = message.match(/PR[- ]?(\d{4}[- ]?\d{4})/i);
   if (match) {
     const raw = match[1];
-    if (raw.length === 9) return `PR-${raw.slice(0, 4)}-${raw.slice(5)}`;
+    if (raw.length === 9) return `PR-${raw.slice(0,4)}-${raw.slice(5)}`;
     if (raw.length === 4) {
       const year = new Date().getFullYear();
       return `PR-${year}-${raw}`;
@@ -434,7 +364,7 @@ function extractPRNumber(message: string): string | null {
 }
 
 // ============================================================
-// DRAFT PR HANDLER (with kind, warm tone)
+// DRAFT PR HANDLER
 // ============================================================
 async function handleDraftPR(
   message: string,
@@ -451,8 +381,7 @@ async function handleDraftPR(
     newState.step = 'purpose';
     newState.collected = {};
     return {
-      response:
-        "Good day! 😊 I'd be absolutely delighted to help you draft a Purchase Request. Let's make this process as smooth as possible for you!\n\nTo start, could you please tell me the **purpose** of this procurement? (For example: 'Purchase of laptops for the CSM department' or 'Office supplies for the Registrar's Office')",
+      response: "I'd be happy to help you draft a Purchase Request!\n\nPlease tell me the **purpose** of this procurement (e.g., 'Purchase of laptops for CSM department').",
       newState,
     };
   }
@@ -467,8 +396,7 @@ async function handleDraftPR(
       newState.collected = collected;
       newState.step = 'department';
       return {
-        response:
-          "Got it! That's a great start. 😊 Now, could you tell me which **department** this request is for? (e.g., College of Science and Mathematics, Office of the Registrar, etc.)",
+        response: "Great! Now, which **department** is this for? (e.g., College of Science and Mathematics)",
         newState,
       };
 
@@ -478,8 +406,7 @@ async function handleDraftPR(
       newState.step = 'items';
       newState.items_guide_shown = false;
       return {
-        response:
-          "Perfect! Thank you. 😊 Now, let's list the **items** you need. For each item, please include:\n- Description\n- Quantity\n- Unit (e.g., pcs, sets, reams)\n- Estimated unit cost (in pesos)\n\n**Example:** '10 laptops, unit cost ₱50,000' or '5 printers, 20 reams of bond paper'.\n\nYou can type them one by one or all in one go. When you're done, just type **done**.\n\nTake your time—I'm here to help! 🤗",
+        response: "Please list the **items** you need. For each item, provide description, quantity, unit, and estimated unit cost.\n\nExample: '10 laptops, unit cost 50000' or '5 printers, 20 reams of paper'.\n\nYou can also just describe everything in one sentence.\n\nType **done** when finished.",
         newState,
       };
 
@@ -489,8 +416,7 @@ async function handleDraftPR(
         collected.items_raw = (collected.items_raw || '') + ' ' + message;
         newState.collected = collected;
         return {
-          response:
-            "Thank you! I've noted that down. 😊 Please continue listing your items, or type **done** when you've finished adding everything.",
+          response: "Got it. Please continue listing items or type **done** when you've finished.",
           newState,
         };
       }
@@ -498,7 +424,7 @@ async function handleDraftPR(
       collected.items_raw = (collected.items_raw || '') + ' ' + message;
       newState.collected = collected;
 
-      if (/done|finish|that's all|that is all/i.test(message)) {
+      if (/done|finish|that's all/i.test(message)) {
         const fullDescription = `Purpose: ${collected.purpose}. Department: ${collected.department}. Items: ${collected.items_raw}`;
         let extracted = await extractPRDetails(fullDescription);
         if (!extracted || !extracted.items || extracted.items.length === 0) {
@@ -514,37 +440,31 @@ async function handleDraftPR(
           };
           const encoded = encodeURIComponent(btoa(JSON.stringify(dataToEncode)));
           const link = `/dashboard/pr-print?data=${encoded}`;
-          const response =
-            `✅ **Draft Complete!** 🎉\n\nHere's a summary of your Purchase Request:\n\n` +
+          const response = `✅ Draft ready! Here's a summary of your Purchase Request:\n\n` +
             `**Department:** ${extracted.department || 'N/A'}\n` +
             `**Purpose:** ${extracted.purpose || 'N/A'}\n` +
-            `**Number of Items:** ${extracted.items?.length || 0}\n` +
-            `**Total Estimated Amount:** ₱${extracted.total_amount?.toFixed(2) || '0.00'}\n\n` +
-            `Please review the details. If everything looks good, click the link below to generate and print your official PR form:\n\n` +
-            `🔗 **${link}**\n\n` +
-            `If you need to make changes, just let me know and we can start over. I'm always here to assist you! 😊`;
+            `**Items:** ${extracted.items?.length || 0} item(s)\n` +
+            `**Total Amount:** ₱${extracted.total_amount?.toFixed(2) || '0.00'}\n\n` +
+            `Click here to print your PR form:\n${link}`;
           newState.drafting = false;
           newState.step = null;
           return { response, newState };
         } else {
           return {
-            response:
-              "Hmm, I'm having a bit of trouble understanding the items you listed. Could you please try again with a clearer format? For example:\n\n'10 laptops, unit cost 50000'\n'5 printers, 20 reams of paper'\n\nOr you can just tell me in plain English what you need, and I'll do my best to organize it. 😊 Type **done** when you're finished!",
+            response: "I couldn't understand the items. Please list each item with description, quantity, and unit cost, like:\n\n'10 laptops, unit cost 50000' or '5 printers, 20 reams of paper'.\n\nType **done** when finished, or try again with more detail.",
             newState,
           };
         }
       } else {
         return {
-          response:
-            "Thank you! I've recorded that. 😊 Please continue listing your items, or type **done** when you're all set.",
+          response: "Got it. Please continue listing items or type **done** when you've finished.",
           newState,
         };
       }
 
     default:
       return {
-        response:
-          "I apologize for the confusion! Let's start fresh. 😊 What is the purpose of this Purchase Request?",
+        response: "Let's start over. What is the purpose of this Purchase Request?",
         newState: { drafting: true, step: 'purpose', collected: {} },
       };
   }
@@ -561,56 +481,48 @@ async function handleTrackPR(prNo: string, userId: string): Promise<string> {
     .single();
 
   if (error || !pr) {
-    return `I'm so sorry, but I couldn't find a Purchase Request with the number **${prNo}**. 😔 Could you please double-check the number and try again? If you need help, you can ask me for guidance on how to locate your PR number. 🤗`;
+    return `I couldn't find PR ${prNo}. Please check the number and try again.`;
   }
 
   const isAdmin = await isUserAdmin(userId);
   if (!isAdmin && pr.user_id !== userId) {
-    return `I appreciate your inquiry, but it looks like you don't have permission to view PR **${prNo}**. Please reach out to the Procurement Office if you believe this is a mistake. 😊`;
+    return `You don't have permission to view PR ${prNo}.`;
   }
 
   const stages = pr.pr_stages_completed || [];
   const statusLabel = getStatusLabel(pr.current_stage);
 
-  let response = `📋 **Here's the current status of PR ${prNo}:**\n\n`;
+  let response = `📋 **PR ${prNo}**\n`;
   response += `**Status:** ${statusLabel}\n`;
   response += `**Department:** ${pr.department}\n`;
   response += `**Purpose:** ${pr.purpose}\n`;
   response += `**Total Amount:** ₱${pr.total?.toFixed(2)}\n`;
   if (stages.length > 0) {
-    response += `\n**Timeline of Progress:**\n`;
+    response += `\n**Timeline:**\n`;
     stages.forEach((s: any) => {
       response += `- ${s.stage_name} (${new Date(s.completed_at).toLocaleDateString()})\n`;
     });
   }
-  response += `\nLet me know if you need any more details! I'm happy to help. 😊`;
   return response;
 }
 
 // ============================================================
-// STEP-BY-STEP HANDLER (with kind tone)
+// STEP-BY-STEP HANDLER
 // ============================================================
 async function handleStepByStep(message: string): Promise<string> {
   const context = await searchDocuments(message);
   if (context) {
     const systemPrompt = `
-You are Isko BidDo, a warm, friendly, and professional procurement assistant for MSU-GenSan. 😊
-Your tone should be helpful, encouraging, and kind—like a supportive colleague guiding a friend through a process.
-
+You are Isko BidDo, a helpful procurement assistant for MSU-GenSan.
 Based on the following context, provide clear, step-by-step instructions to answer the user's question.
-Break it down into simple, numbered steps so it's easy to follow.
-If applicable, include any important reminders or tips.
-
+Keep it concise and use numbered steps if applicable.
 User question: ${message}
-
 Context:
 ${context}
-
-Your step-by-step guidance (written in a warm, encouraging tone):
 `;
     return await callGemini(systemPrompt);
   }
-  return "That's a great question, and I'd love to help! 😊 However, I couldn't find specific step-by-step guidance for that in the procurement documents I have access to. I would recommend reaching out directly to the MSU-GenSan Procurement Office—they are the experts and will be more than happy to guide you through the process. Would you like me to help you with something else in the meantime? 🤗";
+  return "I couldn't find step-by-step guidance for that. Please check the Procurement Manual or contact the Procurement Office.";
 }
 
 // ============================================================
@@ -690,8 +602,7 @@ export async function POST(req: NextRequest) {
           if (prNo) {
             responseText = await handleTrackPR(prNo, userId);
           } else {
-            responseText =
-              "I noticed you're asking about tracking a Purchase Request, but I couldn't find a PR number in your message. 😊 Could you please provide the PR number (e.g., PR-2026-0001) so I can look it up for you? I'm here to help! 🤗";
+            responseText = "I didn't see a PR number. Please provide the PR number (e.g., PR-2026-0001).";
           }
           break;
         }
@@ -701,25 +612,21 @@ export async function POST(req: NextRequest) {
         }
         default: {
           const context = await searchDocuments(message);
-          console.log('📚 Retrieved context (first 500 chars):', context?.slice(0, 500));
+          console.log("📚 Retrieved context (first 500 chars):", context?.slice(0, 500));
           console.log(`📚 Context length: ${context.length} chars`);
-
           const systemPrompt = `
-You are Isko BidDo, a warm, friendly, and professional procurement assistant for MSU-GenSan. 😊
-Your goal is to be incredibly helpful, kind, and accommodating to university staff and faculty members.
-
-**IMPORTANT INSTRUCTION:** You MUST answer ONLY using the provided context below. Do not use any external knowledge.
-If the context does not contain the answer, politely say something like:
-"I appreciate your question! However, I couldn't find that specific detail in the procurement documents I have access to. I recommend reaching out to the Procurement Office directly—they will be happy to assist you further! 😊"
-
-Synthesize information from all parts of the context if needed. Keep your answer clear, friendly, and concise.
+You are Isko BidDo, a confident procurement assistant for MSU-GenSan.
+**CRITICAL INSTRUCTION:** You MUST answer ONLY using the provided context. Do not use any external knowledge.
+If the context does not contain the answer, say: "I cannot find that information in the procurement documents."
+Synthesize information from all parts of the context if needed.
+Be direct and concise.
 
 Context:
 ${context || 'No relevant documents found.'}
 
 User question: ${message}
 
-Your answer (based ONLY on the context, in a warm and helpful tone):
+Your answer (based ONLY on the context):
 `;
           responseText = await callGemini(systemPrompt);
         }
@@ -748,6 +655,7 @@ Your answer (based ONLY on the context, in a warm and helpful tone):
       response: responseText,
       sessionId: currentSessionId,
     });
+
   } catch (error: any) {
     console.error('❌ Chat API fatal error:', error);
     return NextResponse.json(
