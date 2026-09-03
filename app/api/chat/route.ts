@@ -52,12 +52,37 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
 }
 
 // ------------------------------------------------------------------
-// Search documents (RAG) – improved
+// Search documents (RAG) – enhanced with law reference extraction
 // ------------------------------------------------------------------
 async function searchDocuments(query: string): Promise<string> {
   console.log(`🔍 Searching for: "${query}"`);
 
-  // 1. Clean query for full-text search
+  // STEP 1: Extract law references like "RA 12009", "Republic Act 12009"
+  const lawMatch = query.match(/(?:RA|R\.A\.|Republic Act)\s*(\d{4,5})/i);
+  if (lawMatch) {
+    const lawNumber = lawMatch[1];
+    const variations = [
+      `RA ${lawNumber}`,
+      `R.A. ${lawNumber}`,
+      `Republic Act ${lawNumber}`,
+      `RA${lawNumber}`,
+      `R.A.${lawNumber}`,
+    ];
+    console.log(`🔍 Looking for law: ${variations.join(', ')}`);
+    for (const term of variations) {
+      const { data: chunks, error } = await supabase
+        .from('document_chunks')
+        .select('chunk_text')
+        .ilike('chunk_text', `%${term}%`)
+        .limit(5);
+      if (!error && chunks && chunks.length > 0) {
+        console.log(`✅ Found ${chunks.length} chunks for "${term}"`);
+        return chunks.map((c) => c.chunk_text).join('\n\n---\n\n');
+      }
+    }
+  }
+
+  // STEP 2: Full-text search (clean the query)
   const cleaned = query
     .trim()
     .replace(/[^\w\s]/gi, '')
@@ -65,36 +90,32 @@ async function searchDocuments(query: string): Promise<string> {
     .filter(Boolean)
     .join(' & ');
 
-  if (!cleaned) return '';
-
-  // 2. Full-text search (most relevant)
-  const { data: tsChunks, error: tsError } = await supabase
-    .from('document_chunks')
-    .select('chunk_text')
-    .textSearch('chunk_text', cleaned, { config: 'english' })
-    .limit(10); // increased to 10
-
-  if (!tsError && tsChunks && tsChunks.length > 0) {
-    console.log(`✅ Full-text search found ${tsChunks.length} chunks`);
-    console.log("📚 First chunk preview:", tsChunks[0]?.chunk_text?.slice(0, 200) + "...");
-    return tsChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
+  if (cleaned) {
+    const { data: tsChunks, error: tsError } = await supabase
+      .from('document_chunks')
+      .select('chunk_text')
+      .textSearch('chunk_text', cleaned, { config: 'english' })
+      .limit(5);
+    if (!tsError && tsChunks && tsChunks.length > 0) {
+      console.log(`✅ Full-text search found ${tsChunks.length} chunks`);
+      return tsChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
+    }
   }
 
-  // 3. Fallback: simple ILIKE with only important words
+  // STEP 3: Simple ILIKE with important words
   const words = query.split(/\s+/).filter(w => w.length > 2);
   for (const word of words) {
     const { data: wordChunks, error: wordError } = await supabase
       .from('document_chunks')
       .select('chunk_text')
       .ilike('chunk_text', `%${word}%`)
-      .limit(5);
+      .limit(3);
     if (!wordError && wordChunks && wordChunks.length > 0) {
       console.log(`✅ Found chunks for word: "${word}"`);
       return wordChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
     }
   }
 
-  // 4. If still nothing, return empty
   console.log('❌ No chunks found.');
   return '';
 }
@@ -542,7 +563,6 @@ export async function POST(req: NextRequest) {
           const context = await searchDocuments(message);
           console.log("📚 Retrieved context (first 500 chars):", context?.slice(0, 500));
           console.log(`📚 Context length: ${context.length} chars`);
-
           const systemPrompt = `
 You are Isko BidDo, a confident procurement assistant for MSU-GenSan.
 **CRITICAL INSTRUCTION:** You MUST answer ONLY using the provided context. Do not use any external knowledge.
