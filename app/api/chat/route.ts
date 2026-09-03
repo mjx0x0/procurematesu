@@ -10,20 +10,35 @@ const supabase = createClient(
 // HELPER FUNCTIONS
 // ============================================================
 
+// ------------------------------------------------------------------
+// Generate embedding (Hugging Face)
+// ------------------------------------------------------------------
 async function generateEmbedding(text: string): Promise<number[] | null> {
   const HF_TOKEN = process.env.HF_TOKEN;
-  if (!HF_TOKEN) return null;
+  if (!HF_TOKEN) {
+    console.warn('⚠️ HF_TOKEN not set, skipping embedding');
+    return null;
+  }
+
   try {
     const response = await fetch(
       'https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2',
       {
-        headers: { Authorization: `Bearer ${HF_TOKEN}`, 'Content-Type': 'application/json' },
+        headers: {
+          Authorization: `Bearer ${HF_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
         method: 'POST',
         body: JSON.stringify({ inputs: text }),
         signal: AbortSignal.timeout(10000),
       }
     );
-    if (!response.ok) return null;
+
+    if (!response.ok) {
+      console.warn(`⚠️ HF API status: ${response.status}`);
+      return null;
+    }
+
     const result = await response.json();
     if (Array.isArray(result) && result.length > 0) {
       if (typeof result[0] === 'number') return result as number[];
@@ -31,20 +46,31 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
     }
     return null;
   } catch {
+    console.warn('⚠️ Embedding failed – using fallback search');
     return null;
   }
 }
 
+// ------------------------------------------------------------------
+// Search documents (RAG)
+// ------------------------------------------------------------------
 async function searchDocuments(query: string): Promise<string> {
   console.log(`🔍 Searching for: "${query}"`);
+
+  // 1. Exact phrase match – return up to 10 chunks
   const { data: exactChunks, error: exactError } = await supabase
     .from('document_chunks')
     .select('chunk_text')
     .ilike('chunk_text', `%${query}%`)
-    .limit(5);
+    .limit(10);
+
   if (!exactError && exactChunks && exactChunks.length > 0) {
+    console.log(`✅ Found ${exactChunks.length} exact phrase matches`);
+    console.log("📚 First chunk preview:", exactChunks[0]?.chunk_text?.slice(0, 200) + "...");
     return exactChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
   }
+
+  // 2. Vector similarity
   const embedding = await generateEmbedding(query);
   if (embedding) {
     const { data: chunks, error } = await supabase.rpc('match_documents', {
@@ -53,9 +79,13 @@ async function searchDocuments(query: string): Promise<string> {
       match_count: 5,
     });
     if (!error && chunks && chunks.length > 0) {
+      console.log(`✅ Vector search found ${chunks.length} chunks`);
       return chunks.map((c: any) => c.chunk_text).join('\n\n---\n\n');
     }
   }
+
+  // 3. Keyword fallback
+  console.log('🔄 Trying keyword search...');
   const words = query.split(/\s+/).filter(w => w.length > 2);
   for (const word of words) {
     const { data: wordChunks, error: wordError } = await supabase
@@ -64,18 +94,25 @@ async function searchDocuments(query: string): Promise<string> {
       .ilike('chunk_text', `%${word}%`)
       .limit(3);
     if (!wordError && wordChunks && wordChunks.length > 0) {
+      console.log(`✅ Found chunks for word: "${word}"`);
       return wordChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
     }
   }
+
+  console.log('❌ No chunks found.');
   return '';
 }
 
+// ------------------------------------------------------------------
+// Call Gemini with increased token limit
+// ------------------------------------------------------------------
 async function callGemini(prompt: string): Promise<string> {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
     console.error('❌ GEMINI_API_KEY is not set');
     throw new Error('Gemini API key missing');
   }
+
   try {
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -91,11 +128,13 @@ async function callGemini(prompt: string): Promise<string> {
         }),
       }
     );
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`❌ Gemini API error: ${response.status} ${errorText}`);
       throw new Error(`Gemini API error: ${response.status}`);
     }
+
     const data = await response.json();
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
     if (!text) {
@@ -109,6 +148,9 @@ async function callGemini(prompt: string): Promise<string> {
   }
 }
 
+// ------------------------------------------------------------------
+// Extract PR details (AI + fallback)
+// ------------------------------------------------------------------
 async function extractPRDetails(message: string): Promise<any> {
   const systemPrompt = `
 You are an AI assistant that extracts purchase request details from natural language.
@@ -140,12 +182,13 @@ User input: "${message}"
     return parsed;
   } catch (e) {
     console.error("❌ Extraction parse error:", e);
-    // Try to extract items manually using regex as a fallback
     return extractItemsManually(message);
   }
 }
 
-// Fallback: manual extraction using regex (better than nothing)
+// ------------------------------------------------------------------
+// Fallback manual extraction
+// ------------------------------------------------------------------
 function extractItemsManually(text: string): any {
   const items = [];
   const lines = text.split(/[.,\n;]/).filter(line => line.trim());
@@ -167,7 +210,6 @@ function extractItemsManually(text: string): any {
     }
   }
   if (items.length === 0) {
-    // If still no items, treat the whole text as a single item
     const qtyMatch = text.match(/(\d+)/);
     const qty = qtyMatch ? parseInt(qtyMatch[1]) : 1;
     const costMatch = text.match(/(\d+)/g);
@@ -188,6 +230,9 @@ function extractItemsManually(text: string): any {
   };
 }
 
+// ------------------------------------------------------------------
+// Get status label
+// ------------------------------------------------------------------
 function getStatusLabel(status: string): string {
   const labels: Record<string, string> = {
     draft: 'Draft',
@@ -206,6 +251,9 @@ function getStatusLabel(status: string): string {
   return labels[status] || status;
 }
 
+// ------------------------------------------------------------------
+// Check if user is admin
+// ------------------------------------------------------------------
 async function isUserAdmin(userId: string): Promise<boolean> {
   const { data } = await supabase
     .from('users')
@@ -214,6 +262,10 @@ async function isUserAdmin(userId: string): Promise<boolean> {
     .single();
   return data?.role === 'admin';
 }
+
+// ============================================================
+// INTENT DETECTION
+// ============================================================
 
 function detectIntent(message: string): 'draft_pr' | 'track_pr' | 'step_by_step' | 'general' {
   const lower = message.toLowerCase();
@@ -284,7 +336,7 @@ async function handleDraftPR(
       collected.department = message;
       newState.collected = collected;
       newState.step = 'items';
-      newState.items_guide_shown = false; // reset guide flag
+      newState.items_guide_shown = false;
       return {
         response: "Please list the **items** you need. For each item, provide description, quantity, unit, and estimated unit cost.\n\nExample: '10 laptops, unit cost 50000' or '5 printers, 20 reams of paper'.\n\nYou can also just describe everything in one sentence.\n\nType **done** when finished.",
         newState,
@@ -307,7 +359,6 @@ async function handleDraftPR(
       if (/done|finish|that's all/i.test(message)) {
         const fullDescription = `Purpose: ${collected.purpose}. Department: ${collected.department}. Items: ${collected.items_raw}`;
         let extracted = await extractPRDetails(fullDescription);
-        // If extraction returned null or empty items, use manual fallback
         if (!extracted || !extracted.items || extracted.items.length === 0) {
           extracted = extractItemsManually(fullDescription);
         }
@@ -496,14 +547,17 @@ export async function POST(req: NextRequest) {
           console.log(`📚 Context length: ${context.length} chars`);
           const systemPrompt = `
 You are Isko BidDo, a confident procurement assistant for MSU-GenSan.
-Answer the user's question based ONLY on the provided context.
-If the answer is not in the context, say: "I cannot find that information in the procurement documents."
-Be direct and concise. Do not add extra commentary.
+**CRITICAL INSTRUCTION:** You MUST answer ONLY using the provided context. Do not use any external knowledge.
+If the context does not contain the answer, say: "I cannot find that information in the procurement documents."
+Synthesize information from all parts of the context if needed.
+Be direct and concise.
 
 Context:
 ${context || 'No relevant documents found.'}
 
 User question: ${message}
+
+Your answer (based ONLY on the context):
 `;
           responseText = await callGemini(systemPrompt);
         }
