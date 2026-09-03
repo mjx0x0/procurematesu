@@ -52,7 +52,7 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
 }
 
 // ------------------------------------------------------------------
-// Search documents (RAG)
+// Search documents (RAG) – improved
 // ------------------------------------------------------------------
 async function searchDocuments(query: string): Promise<string> {
   console.log(`🔍 Searching for: "${query}"`);
@@ -72,10 +72,11 @@ async function searchDocuments(query: string): Promise<string> {
     .from('document_chunks')
     .select('chunk_text')
     .textSearch('chunk_text', cleaned, { config: 'english' })
-    .limit(5);
+    .limit(10); // increased to 10
 
   if (!tsError && tsChunks && tsChunks.length > 0) {
     console.log(`✅ Full-text search found ${tsChunks.length} chunks`);
+    console.log("📚 First chunk preview:", tsChunks[0]?.chunk_text?.slice(0, 200) + "...");
     return tsChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
   }
 
@@ -86,13 +87,14 @@ async function searchDocuments(query: string): Promise<string> {
       .from('document_chunks')
       .select('chunk_text')
       .ilike('chunk_text', `%${word}%`)
-      .limit(3);
+      .limit(5);
     if (!wordError && wordChunks && wordChunks.length > 0) {
       console.log(`✅ Found chunks for word: "${word}"`);
       return wordChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
     }
   }
 
+  // 4. If still nothing, return empty
   console.log('❌ No chunks found.');
   return '';
 }
@@ -117,7 +119,7 @@ async function callGemini(prompt: string): Promise<string> {
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.1,
-            maxOutputTokens: 1024, // ✅ Increased from 400
+            maxOutputTokens: 1024,
           },
         }),
       }
@@ -539,9 +541,9 @@ export async function POST(req: NextRequest) {
         default: {
           const context = await searchDocuments(message);
           console.log("📚 Retrieved context (first 500 chars):", context?.slice(0, 500));
-          console.log("📚 FULL CONTEXT:", context); // <- add this
           console.log(`📚 Context length: ${context.length} chars`);
-const systemPrompt = `
+
+          const systemPrompt = `
 You are Isko BidDo, a confident procurement assistant for MSU-GenSan.
 **CRITICAL INSTRUCTION:** You MUST answer ONLY using the provided context. Do not use any external knowledge.
 If the context does not contain the answer, say: "I cannot find that information in the procurement documents."
