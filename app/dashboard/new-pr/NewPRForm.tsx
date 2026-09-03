@@ -395,14 +395,16 @@ export default function NewPRForm() {
                   required
                 >
                   <option value="">Select department</option>
-                  <option value="College of Science and Mathematics">College of Science and Mathematics</option>
+                  <option value="College of Agriculture">College of Agriculture</option>
+                  <option value="College of Business Administration and Accountancy">College of Business Administration and Accountancy</option>
                   <option value="College of Education">College of Education</option>
-                  <option value="College of Business Administration">College of Business Administration</option>
                   <option value="College of Engineering">College of Engineering</option>
-                  <option value="College of Arts and Sciences">College of Arts and Sciences</option>
-                  <option value="Administrative Office">Administrative Office</option>
-                  <option value="Procurement Office">Procurement Office</option>
-                  <option value="Office of the Chancellor">Office of the Chancellor</option>
+                  <option value="College of Fisheries & Aquatic Sciences">College of Fisheries & Aquatic Sciences</option>
+                  <option value="College of Law">College of Law</option>
+                  <option value="College of Medicine">College of Medicine</option>
+                  <option value="College of Natural Sciences and Mathematics">College of Natural Sciences and Mathematics</option>
+                  <option value="College of Social Sciences and Humanities">College of Social Sciences and Humanities</option>
+                  <option value="Institute of Islamic, Arabic and International Studies">Institute of Islamic, Arabic and International Studies</option>
                 </select>
               </div>
               <div>

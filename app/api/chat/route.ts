@@ -57,35 +57,29 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
 async function searchDocuments(query: string): Promise<string> {
   console.log(`🔍 Searching for: "${query}"`);
 
-  // 1. Exact phrase match – return up to 10 chunks
-  const { data: exactChunks, error: exactError } = await supabase
+  // 1. Clean query for full-text search
+  const cleaned = query
+    .trim()
+    .replace(/[^\w\s]/gi, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .join(' & ');
+
+  if (!cleaned) return '';
+
+  // 2. Full-text search (most relevant)
+  const { data: tsChunks, error: tsError } = await supabase
     .from('document_chunks')
     .select('chunk_text')
-    .ilike('chunk_text', `%${query}%`)
-    .limit(10);
+    .textSearch('chunk_text', cleaned, { config: 'english' })
+    .limit(5);
 
-  if (!exactError && exactChunks && exactChunks.length > 0) {
-    console.log(`✅ Found ${exactChunks.length} exact phrase matches`);
-    console.log("📚 First chunk preview:", exactChunks[0]?.chunk_text?.slice(0, 200) + "...");
-    return exactChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
+  if (!tsError && tsChunks && tsChunks.length > 0) {
+    console.log(`✅ Full-text search found ${tsChunks.length} chunks`);
+    return tsChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
   }
 
-  // 2. Vector similarity
-  const embedding = await generateEmbedding(query);
-  if (embedding) {
-    const { data: chunks, error } = await supabase.rpc('match_documents', {
-      query_embedding: embedding,
-      match_threshold: 0.5,
-      match_count: 5,
-    });
-    if (!error && chunks && chunks.length > 0) {
-      console.log(`✅ Vector search found ${chunks.length} chunks`);
-      return chunks.map((c: any) => c.chunk_text).join('\n\n---\n\n');
-    }
-  }
-
-  // 3. Keyword fallback
-  console.log('🔄 Trying keyword search...');
+  // 3. Fallback: simple ILIKE with only important words
   const words = query.split(/\s+/).filter(w => w.length > 2);
   for (const word of words) {
     const { data: wordChunks, error: wordError } = await supabase
@@ -544,8 +538,10 @@ export async function POST(req: NextRequest) {
         }
         default: {
           const context = await searchDocuments(message);
+          console.log("📚 Retrieved context (first 500 chars):", context?.slice(0, 500));
+          console.log("📚 FULL CONTEXT:", context); // <- add this
           console.log(`📚 Context length: ${context.length} chars`);
-          const systemPrompt = `
+const systemPrompt = `
 You are Isko BidDo, a confident procurement assistant for MSU-GenSan.
 **CRITICAL INSTRUCTION:** You MUST answer ONLY using the provided context. Do not use any external knowledge.
 If the context does not contain the answer, say: "I cannot find that information in the procurement documents."
