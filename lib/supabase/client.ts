@@ -44,8 +44,8 @@ const INITIAL_PRS = [
     pr_date: '2026-02-15',
     created_at: '2026-02-15T08:30:00.000Z',
     updated_at: '2026-02-25T11:00:00.000Z',
-    sai_no: 'SAI-2026-014',
-    alobs_no: 'ALOBS-2026-089',
+    sai_no: null,
+    alobs_no: null,
   },
   {
     pr_no: 'PR-2026-0002',
@@ -60,8 +60,8 @@ const INITIAL_PRS = [
     pr_date: '2026-02-28',
     created_at: '2026-02-28T09:15:00.000Z',
     updated_at: '2026-02-28T09:15:00.000Z',
-    sai_no: 'SAI-2026-022',
-    alobs_no: 'ALOBS-2026-112',
+    sai_no: null,
+    alobs_no: null,
   },
   {
     pr_no: 'PR-2026-0003',
@@ -76,8 +76,8 @@ const INITIAL_PRS = [
     pr_date: '2026-01-20',
     created_at: '2026-01-20T10:00:00.000Z',
     updated_at: '2026-02-05T16:00:00.000Z',
-    sai_no: 'SAI-2026-005',
-    alobs_no: 'ALOBS-2026-015',
+    sai_no: null,
+    alobs_no: null,
   },
 ];
 

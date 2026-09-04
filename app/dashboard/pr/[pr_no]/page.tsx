@@ -6,6 +6,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PRPDF from "@/components/PRPDF";
+import { MsuLogo } from "@/components/msu-logo";
 import {
   FileText,
   ArrowLeft,
@@ -50,6 +51,7 @@ interface Item {
   item_description: string;
   quantity: number;
   unit: string;
+  stock_no?: string;
   unit_cost: number;
   total_cost: number;
 }
@@ -65,6 +67,32 @@ export default function PRDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [newNameVal, setNewNameVal] = useState("");
+  const [savingName, setSavingName] = useState(false);
+
+  const handleSaveName = async () => {
+    if (!newNameVal.trim() || newNameVal.includes("@")) {
+      alert("Please enter your actual full name, not an email address.");
+      return;
+    }
+    setSavingName(true);
+    try {
+      const { error: updateErr } = await supabase
+        .from("purchase_requests")
+        .update({ printed_name: newNameVal.trim() })
+        .eq("pr_no", prNo);
+
+      if (!updateErr) {
+        setPr(prev => prev ? { ...prev, printed_name: newNameVal.trim() } : null);
+        setEditingName(false);
+      } else {
+        alert("Failed to update name: " + updateErr.message);
+      }
+    } finally {
+      setSavingName(false);
+    }
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -258,116 +286,261 @@ export default function PRDetailPage() {
           </div>
         </div>
 
-        {/* Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-stone-200/90">
-            <h3 className="font-bold text-[#4D0C0D] mb-4 flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#7A1315]" />
-              Request Details
-            </h3>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm text-gray-500">Purpose</p>
-                <p className="text-gray-900">{pr.purpose}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Department</p>
-                  <p className="text-gray-900">{pr.department || "N/A"}</p>
+        {/* Details and Official Form */}
+        <div className="mb-8">
+          {/* Official MSU-GenSan Purchase Request Document Sheet */}
+          <div className="bg-white rounded-xl shadow-sm border border-stone-300 p-4 sm:p-8 overflow-x-auto print:p-0 print:border-0 print:shadow-none">
+            <div className="min-w-[700px] border-[2px] border-black text-black bg-white">
+              {/* Header */}
+              <div className="border-b-[2px] border-black text-center py-3 px-4 relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 hidden sm:block">
+                  <MsuLogo size={42} />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Section</p>
-                  <p className="text-gray-900">{pr.section || "N/A"}</p>
-                </div>
-              </div>
-              {pr.sai_no && (
-                <div>
-                  <p className="text-sm text-gray-500">SAI No.</p>
-                  <p className="text-gray-900">{pr.sai_no}</p>
-                </div>
-              )}
-              {pr.alobs_no && (
-                <div>
-                  <p className="text-sm text-gray-500">ALOBs No.</p>
-                  <p className="text-gray-900">{pr.alobs_no}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-stone-200/90">
-            <h3 className="font-bold text-[#4D0C0D] mb-4 flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-[#7A1315]" />
-              Budget Information
-            </h3>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm text-gray-500">Total Amount</p>
-                <p className="text-2xl font-extrabold text-[#7A1315]">
-                  ₱{totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <h2 className="text-xl font-black uppercase tracking-wider font-serif">
+                  PURCHASE REQUEST
+                </h2>
+                <p className="text-sm font-bold mt-0.5 tracking-wide font-serif">
+                  MINDANAO STATE UNIVERSITY - General Santos City
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Items</p>
-                <p className="text-gray-900">{items.length} item(s)</p>
+
+              {/* Department, Section, PR No, SAI No, ALOBS No Metadata Grid */}
+              <div className="grid grid-cols-12 border-b-[2px] border-black text-xs">
+                {/* Left Column: Department & Section */}
+                <div className="col-span-6 border-r-[2px] border-black p-3 space-y-2">
+                  <div className="flex items-end">
+                    <span className="font-semibold text-stone-800 w-24 shrink-0">Department</span>
+                    <span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold uppercase">
+                      {pr.department || ""}
+                    </span>
+                  </div>
+                  <div className="flex items-end">
+                    <span className="font-semibold text-stone-800 w-24 shrink-0">Section</span>
+                    <span className="flex-1 border-b border-black pl-2 pb-0.5 font-medium">
+                      {pr.section || ""}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right Column: PR No, SAI No, ALOBS No with Dates */}
+                <div className="col-span-6 p-3 space-y-2">
+                  {/* Row 1: PR No & Date */}
+                  <div className="grid grid-cols-12 gap-2 items-end">
+                    <div className="col-span-7 flex items-end">
+                      <span className="font-semibold text-stone-800 w-16 shrink-0">PR No.</span>
+                      <span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold">
+                        {pr.pr_no || ""}
+                      </span>
+                    </div>
+                    <div className="col-span-5 flex items-end">
+                      <span className="font-semibold text-stone-800 w-10 shrink-0">Date</span>
+                      <span className="flex-1 border-b border-black pl-1 pb-0.5 font-medium text-center">
+                        {new Date(pr.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Row 2: SAI No & Date (Left empty per official template) */}
+                  <div className="grid grid-cols-12 gap-2 items-end">
+                    <div className="col-span-7 flex items-end">
+                      <span className="font-semibold text-stone-800 w-16 shrink-0">SAI No.</span>
+                      <span className="flex-1 border-b border-black pl-2 pb-0.5 font-medium min-h-[20px]">
+                        &nbsp;
+                      </span>
+                    </div>
+                    <div className="col-span-5 flex items-end">
+                      <span className="font-semibold text-stone-800 w-10 shrink-0">Date</span>
+                      <span className="flex-1 border-b border-black pl-1 pb-0.5 font-medium text-center min-h-[20px]">
+                        &nbsp;
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Row 3: ALOBS No & Date (Left empty per official template) */}
+                  <div className="grid grid-cols-12 gap-2 items-end">
+                    <div className="col-span-7 flex items-end">
+                      <span className="font-semibold text-stone-800 w-16 shrink-0">ALOBS No.</span>
+                      <span className="flex-1 border-b border-black pl-2 pb-0.5 font-medium min-h-[20px]">
+                        &nbsp;
+                      </span>
+                    </div>
+                    <div className="col-span-5 flex items-end">
+                      <span className="font-semibold text-stone-800 w-10 shrink-0">Date</span>
+                      <span className="flex-1 border-b border-black pl-1 pb-0.5 font-medium text-center min-h-[20px]">
+                        &nbsp;
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Requested By</p>
-                <p className="text-gray-900">{pr.printed_name || "N/A"}</p>
-                <p className="text-sm text-gray-500">{pr.designation || ""}</p>
+
+              {/* Table Headers */}
+              <div className="grid grid-cols-12 border-b-[2px] border-black text-center font-bold text-xs bg-white">
+                <div className="col-span-1 border-r-[2px] border-black py-2 px-1">Quantity</div>
+                <div className="col-span-1 border-r-[2px] border-black py-2 px-1">Unit</div>
+                <div className="col-span-5 border-r-[2px] border-black py-2 px-2 italic">ITEM DESCRIPTION</div>
+                <div className="col-span-1 border-r-[2px] border-black py-2 px-1">Stock No.</div>
+                <div className="col-span-2 border-r-[2px] border-black py-2 px-1 italic">
+                  Estimated Unit Cost
+                </div>
+                <div className="col-span-2 py-2 px-1 italic">
+                  Estimated Cost
+                </div>
+              </div>
+
+              {/* Table Items */}
+              <div className="divide-y divide-black text-xs">
+                {items.map((item, idx) => (
+                  <div key={idx} className="grid grid-cols-12 min-h-[26px] items-center">
+                    <div className="col-span-1 border-r-[2px] border-black py-1.5 px-1 text-center font-medium">
+                      {item.quantity}
+                    </div>
+                    <div className="col-span-1 border-r-[2px] border-black py-1.5 px-1 text-center font-medium">
+                      {item.unit || "pcs"}
+                    </div>
+                    <div className="col-span-5 border-r-[2px] border-black py-1.5 px-2.5 font-normal">
+                      {item.item_description}
+                    </div>
+                    <div className="col-span-1 border-r-[2px] border-black py-1.5 px-1 text-center font-mono text-[11px]">
+                      {item.stock_no || ""}
+                    </div>
+                    <div className="col-span-2 border-r-[2px] border-black py-1.5 px-2 text-right font-medium">
+                      {item.unit_cost ? item.unit_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}
+                    </div>
+                    <div className="col-span-2 py-1.5 px-2 text-right font-semibold">
+                      {item.total_cost ? item.total_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}
+                    </div>
+                  </div>
+                ))}
+
+                {/* ****Nothing Follows**** Row */}
+                <div className="grid grid-cols-12 min-h-[24px] items-center">
+                  <div className="col-span-1 border-r-[2px] border-black py-1"></div>
+                  <div className="col-span-1 border-r-[2px] border-black py-1"></div>
+                  <div className="col-span-5 border-r-[2px] border-black py-1 text-center font-bold tracking-wider text-[11px]">
+                    ****Nothing Follows****
+                  </div>
+                  <div className="col-span-1 border-r-[2px] border-black py-1"></div>
+                  <div className="col-span-2 border-r-[2px] border-black py-1"></div>
+                  <div className="col-span-2 py-1"></div>
+                </div>
+
+                {/* Blank Spacer Rows to preserve standard requisition sheet layout */}
+                {Array.from({ length: Math.max(0, 5 - items.length) }).map((_, i) => (
+                  <div key={`blank-${i}`} className="grid grid-cols-12 min-h-[24px]">
+                    <div className="col-span-1 border-r-[2px] border-black"></div>
+                    <div className="col-span-1 border-r-[2px] border-black"></div>
+                    <div className="col-span-5 border-r-[2px] border-black"></div>
+                    <div className="col-span-1 border-r-[2px] border-black"></div>
+                    <div className="col-span-2 border-r-[2px] border-black"></div>
+                    <div className="col-span-2"></div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Purpose Row */}
+              <div className="grid grid-cols-12 border-t-[2px] border-b-[2px] border-black text-xs font-semibold">
+                <div className="col-span-10 border-r-[2px] border-black p-2.5 flex items-baseline gap-2">
+                  <span className="font-bold italic">Purpose</span>
+                  <span className="font-normal italic flex-1">{pr.purpose || "Official university procurement"}</span>
+                </div>
+                <div className="col-span-2 p-2.5 text-right font-bold flex items-center justify-end">
+                  {totalAmount > 0
+                    ? totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    : "-"}
+                </div>
+              </div>
+
+              {/* Signature Section Header */}
+              <div className="grid grid-cols-12 border-b-[2px] border-black text-xs font-bold text-center">
+                <div className="col-span-6 border-r-[2px] border-black py-1.5 uppercase">
+                  REQUESTED BY
+                </div>
+                <div className="col-span-6 py-1.5 uppercase">
+                  APPROVED BY
+                </div>
+              </div>
+
+              {/* Signature Section Body */}
+              <div className="grid grid-cols-12 min-h-[96px] text-xs">
+                {/* Left: Requester Info */}
+                <div className="col-span-6 border-r-[2px] border-black p-3 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex">
+                      <span className="w-24 text-stone-700">Signature</span>
+                      <span className="flex-1"></span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="w-24 text-stone-700">Printed Name</span>
+                      {editingName ? (
+                        <div className="flex items-center gap-1.5 flex-1">
+                          <input
+                            type="text"
+                            value={newNameVal}
+                            onChange={(e) => setNewNameVal(e.target.value)}
+                            placeholder="Enter actual full name"
+                            className="border border-stone-300 px-2 py-0.5 text-xs rounded font-bold uppercase w-full bg-stone-50"
+                            autoFocus
+                          />
+                          <button
+                            onClick={handleSaveName}
+                            disabled={savingName}
+                            className="px-2 py-0.5 bg-[#7A1315] text-white text-[10px] rounded font-semibold hover:bg-[#630E10]"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setEditingName(false)}
+                            className="px-2 py-0.5 bg-stone-200 text-stone-700 text-[10px] rounded hover:bg-stone-300"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="font-bold uppercase">
+                            {pr.printed_name && pr.printed_name.includes("@")
+                              ? pr.printed_name.split("@")[0].replace(/[._]/g, " ")
+                              : (pr.printed_name || "")}
+                          </span>
+                          <button
+                            onClick={() => {
+                              setNewNameVal(
+                                pr.printed_name && pr.printed_name.includes("@")
+                                  ? pr.printed_name.split("@")[0].replace(/[._]/g, " ")
+                                  : (pr.printed_name || "")
+                              );
+                              setEditingName(true);
+                            }}
+                            className="text-stone-400 hover:text-[#7A1315] text-[10px] px-1 py-0.5 rounded border border-transparent hover:border-stone-300 transition-colors print:hidden"
+                            title="Edit to actual full name"
+                          >
+                            Edit
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex">
+                      <span className="w-24 text-stone-700">Designation</span>
+                      <span className="font-medium flex-1">{pr.designation || ""}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Approver (Chancellor) */}
+                <div className="col-span-6 p-3 flex flex-col justify-end items-center text-center">
+                  <div className="w-64 border-b border-black mb-1"></div>
+                  <p className="font-bold text-xs uppercase tracking-tight">
+                    Atty. Shidik T. Abantas, MDM, LLM
+                  </p>
+                  <p className="text-[11px] text-stone-800">
+                    Chancellor
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Items Table */}
-        {items.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-stone-200/90 mb-8 overflow-hidden">
-            <div className="px-6 py-4 border-b border-stone-200">
-              <h3 className="font-bold text-[#4D0C0D]">Items</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-stone-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                      Description
-                    </th>
-                    <th className="px-6 py-3 text-center text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                      Qty
-                    </th>
-                    <th className="px-6 py-3 text-center text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                      Unit
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                      Unit Cost
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                      Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {items.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-stone-50">
-                      <td className="px-6 py-4 text-sm text-gray-900">{item.item_description}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900 text-center">{item.quantity}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900 text-center">{item.unit || "pcs"}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900 text-right">₱{item.unit_cost.toFixed(2)}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900 text-right">₱{item.total_cost.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-stone-50">
-                    <td colSpan={4} className="px-6 py-3 text-right font-bold text-gray-900">TOTAL:</td>
-                    <td className="px-6 py-3 text-right font-bold text-[#7A1315]">₱{totalAmount.toFixed(2)}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          </div>
-        )}
 
         {/* Timeline */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-stone-200/90 mb-8">
