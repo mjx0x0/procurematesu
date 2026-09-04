@@ -1,24 +1,27 @@
 "use client";
 
+import Link from "next/link";
 import { ForgotPasswordForm } from "@/components/forgot-password-form";
-import { FileText } from "lucide-react";
+import { MsuLogo } from "@/components/msu-logo";
 
 export default function ForgotPasswordPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50/50 px-4">
-      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl -z-10" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-200/30 rounded-full blur-3xl -z-10" />
-      
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-xl">
-              <FileText className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-gray-900">ProcuremateSU</span>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5] px-4 py-8">
+      <div className="w-full max-w-md animate-fade-in-up">
+        <div className="text-center mb-6 flex flex-col items-center">
+          <Link href="/" className="inline-block transition-transform hover:scale-105 mb-2" title="Return to Home">
+            <MsuLogo size={88} />
+          </Link>
+          <h1 className="text-2xl font-extrabold text-[#4D0C0D] tracking-tight">
+            Procuremate<span className="text-[#B88E13]">SU</span>
+          </h1>
+          <p className="text-xs font-semibold text-[#7A1315] uppercase tracking-wide mt-0.5">
+            Account Recovery • MSU-GenSan
+          </p>
         </div>
-        <ForgotPasswordForm />
+        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-stone-200/90">
+          <ForgotPasswordForm />
+        </div>
       </div>
     </div>
   );

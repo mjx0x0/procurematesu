@@ -11,7 +11,7 @@ PREPARING FOR THE PROCUREMENT OF CONSULTING SERVICES ................ 7
 PREPARING FOR THE PROCUREMENT OF CONSULTING SERVICES................................. 9
 PROCUREMENT PLANNING ............................................................................... 10
 What is the purpose of procurement planning? ......................................................... 10
-What is the “Approved Budget for the Contract” or the ABC? ...................................... 10
+What is the ï¿½Approved Budget for the Contractï¿½ or the ABC? ...................................... 10
 What are the factors that should be considered in determining the ABC? ...................... 10
 How do you compute the cost of consultancy? .......................................................... 11
 On per diems ...................................................................................................... 13
@@ -145,7 +145,7 @@ What happens if no short listed bidder submits a bid? ..........................
 Who are involved in the receipt, opening and preliminary examination
  of the Bids? .................................................................................................. 53
 How are bids received, opened, and preliminarily examined? ...................................... 53
-When is a document deemed “complete” and “sufficient”? ......................................... 54
+When is a document deemed ï¿½completeï¿½ and ï¿½sufficientï¿½? ......................................... 54
 Are short listed consultants allowed to modify or withdraw their bids? ......................... 55
 What happens to the bid security of a short listed consultant that withdraws
  its bid after the deadline for the submission of bids? .......................................... 55
@@ -202,7 +202,7 @@ Legal Reference ................................................................
 When must the winning bidder and the HoPE enter into a contract? ............................. 72
 What are the Timelines to be considered with respect to contract approval? ................. 72
 When shall the Procuring Entity issue the NTP? ........................................................ 72
-When is a contract “effective”? .............................................................................. 72
+When is a contract ï¿½effectiveï¿½? .............................................................................. 72
 Who are the Parties involved in Contract Signing and Approval and Issuance of
  the NTP? ...................................................................................................... 73
 What documents form part of the contract? ............................................................. 73
@@ -303,10 +303,10 @@ FAP Foreign Assisted Project
 GAA General Appropriations Act
 GCC General Conditions of Contract
 GFI Government Financial Institution
-GOCC Government-owned and/or –controlled corporation
+GOCC Government-owned and/or ï¿½controlled corporation
 GoP Government of the Philippines
 GPPB Government Procurement Policy Board
-GPPB-TSO GPPB – Technical Support Office
+GPPB-TSO GPPB ï¿½ Technical Support Office
 HoPE Head of the Procuring Entity
 HRB Highest Rated Bid
 HRRB Highest Rated Responsive Bid
@@ -326,8 +326,8 @@ PPMP Project Procurement Management Plan
 QBE Quality-Based Evaluation Procedure
 QCBE Quality-Cost Based Evaluation Procedure
 R.A. Republic Act
-R.A. 9184 Republic Act No. 9184, otherwise known as the “Government Procurement
-Reform Act”
+R.A. 9184 Republic Act No. 9184, otherwise known as the ï¿½Government Procurement
+Reform Actï¿½
 REI Request for Expression of Interest
 RFP Request for Proposals
 SARO Special Allotment Release Order
@@ -345,7 +345,7 @@ Scope of Volume 4
 This Manual seeks to provide its users with clear, concise, and accurate information on the
 public procurement of consulting services, by discussing the steps that need to be taken
 to effect such procurement in the manner prescribed by R.A. 9184, otherwise known as the
-“Government Procurement Reform Act” and its 2016 IRR. It also discusses important issues
+ï¿½Government Procurement Reform Actï¿½ and its 2016 IRR. It also discusses important issues
 that may confront government officials in all stages of consulting services procurement, from
 the preparation of bid documents, to the actual conduct of the bidding activity, monitoring of
 contract implementation and the final payment to the consultant.
@@ -363,7 +363,7 @@ studies; (iii) design; (iv) construction supervision; (v) management and related
 (vi) other technical services or special studies. (2016 IRR Section 5 [i])
 What are the types of consulting services?
 Consulting services can be divided into six (6) broad categories, namely: (2016 IRR Annex
-“B”)
+ï¿½Bï¿½)
 1. Advisory and Review Services
 These services include advice on particular projects or problems. These will include
 advice on and review of, among others, planning, design and other professional
@@ -512,7 +512,7 @@ their individual and collective impacts are optimized at the least cost.
 Preparing for procurement basically involves three activities: procurement planning,
 preparation of the bidding documents, and the conduct of the pre-procurement conference.
 Procurement planning entails ensuring that plans for procurement are linked to budgets, as
-well as to the agency’s thrust and priorities, and strategic and operational plans, preparing
+well as to the agencyï¿½s thrust and priorities, and strategic and operational plans, preparing
 the PPMP and consolidating all PPMPs into the APP. Formulating the PPMP involves identifying
 the procurement project requirements, writing the TOR, determining the ABC, identifying the
 schedule of milestone activities, and determining the method of procurement.
@@ -533,13 +533,13 @@ Manual of Procedures for the Procurement of Consulting Services
 Procurement Planning
 What is the purpose of procurement planning?
 The purpose of procurement planning is for the procurement entity to schedule its
-procurement activities in advance, consistent with the agency’s APP. During the planning
+procurement activities in advance, consistent with the agencyï¿½s APP. During the planning
 stage, the following activities must be undertaken, among others:
 ? Preparation of the draft terms of reference by the end user
 ? Determination of the method of procurement
 ? Type of consultant (e.g. individual or firm, local or foreign)
 ? Determination of the Approved Budget for the Contract
-What is the “Approved Budget for the Contract” or the ABC?
+What is the ï¿½Approved Budget for the Contractï¿½ or the ABC?
 The ABC is the budget for the contract duly approved by the HoPE, as provided for in:
 1. The GAA, continuing and automatic appropriations, in the case of NGAs;
 2. The corporate budget for the contract approved by the governing board, pursuant to
@@ -573,8 +573,8 @@ actual procurement date.
 the ABC.
 Page 11 of 108
 Manual of Procedures for the Procurement of Consulting Services
-Note! The Bureau of Internal Revenue – Revenue Memorandum Circular No. 85-2017,
-provides that: “Sales to the government or any of its political subdivisions, instrumentalities or
+Note! The Bureau of Internal Revenue ï¿½ Revenue Memorandum Circular No. 85-2017,
+provides that: ï¿½Sales to the government or any of its political subdivisions, instrumentalities or
 agencies, including government-owned or controlled corporations (GOCCs), of goods and/or
 services are generally subject to the twelve percent (12%) VAT under Sections 106 and 108 of
 the NIRC, unless the sale transaction is specifically VAT-exempt or VAT zero-rated under the
@@ -590,7 +590,7 @@ the specific field of specialization of the consultant.
 The cost of consultancy shall consist of the following and shall be presented in the agreement
 in like manner:
 1. Remuneration Costs
-These are the remuneration to be paid to the consultant’s staff/personnel who are
+These are the remuneration to be paid to the consultantï¿½s staff/personnel who are
 directly engaged in the consulting services as per agreed manning schedule. It covers
 the basic rates of the staff multiplied by a billing factor of the consulting firm.
 a. Basic Rates
@@ -636,16 +636,16 @@ handling charges;
 between assignments; and
 ? Taxes.
 ii. Social Charges
-These are cost items for the welfare and benefit of the consultant’s
+These are cost items for the welfare and benefit of the consultantï¿½s
 staff in accordance with the policies of the consultant and of the
 government. Expressed as a percentage of the basic rates of the
-consultant’s personnel, these cost items may include any or a
+consultantï¿½s personnel, these cost items may include any or a
 combination of the following, based on audited and sworn statement
 to be submitted by the consultant to the Procuring Entity:
 ? Bonuses;
 ? Vacation/sick leave and paid public holidays;
 ? Medical Care;
-? Pension plan – retirement and/or terminal pay;
+? Pension plan ï¿½ retirement and/or terminal pay;
 ? Company insurance; and
 ? Other benefits as required by law.
 iii. Management Fee
@@ -668,7 +668,7 @@ These are cost items which are payable at agreed unit rates to the staff and
 include the following, among others:
 i. Housing Allowance
 These cover housing costs, including those for power and water, for
-consultant’s staff. It should not include food and laundry since these
+consultantï¿½s staff. It should not include food and laundry since these
 are basic necessities that the consultant has to spend for even without
 the project. In considering the housing allowance, the base of
 operation and the designated official station of duty of the consultant
@@ -679,7 +679,7 @@ The base of operation is the location of
 the home office of the consultant while
 the designated official station of duty is
 the location outside of the base of
-operation where most of the consultant’s
+operation where most of the consultantï¿½s
 staff will be working more often
 continuously during the duration of the
 services.
@@ -688,11 +688,11 @@ operation is usually in Metro Manila, and
 the designated official station of duty is
 the project site outside Metro Manila.
 Sometimes, in undertaking the services,
-the consultant’s staff is grouped into two (2), i.e. those who are
+the consultantï¿½s staff is grouped into two (2), i.e. those who are
 stationed at the base of operation and those stationed at the project
 site, depending on where they will be staying longer continuously
 during the duration of the services.
-Housing allowance shall be given only for long-term consultant’s staff,
+Housing allowance shall be given only for long-term consultantï¿½s staff,
 i.e. those who will be staying at the designated official station of duty
 continuously for more than one (1) month. The agency may also
 have the option to provide for housing facilities at the designated
@@ -720,14 +720,14 @@ and/or other supporting papers, and include the following:
 i. International Travel
 This covers the cost of full fare economy class air transportation,
 preferably through a Filipino-owned airline, by the most direct and
-expeditious air routes of the consultant’s expatriate staff and their
+expeditious air routes of the consultantï¿½s expatriate staff and their
 eligible dependents, i.e., wife and children under eighteen (18) years
 of age not to exceed two (2) children, from their point of origin.
 Eligible dependents are those of the personnel assigned to resident
 duty in the Philippines for periods of not less than one (1) year. For
 those whose period of constructive assignment is over six (6) months
 but less than 1 year, only the wife will be entitled for the cost of
-Tips: Let’s do things easier
+Tips: Letï¿½s do things easier
 On per diems
 Per diem rates vary for short visits and
 longer stays and by location within the
@@ -740,7 +740,7 @@ baggage up to 20 kilograms each per round trip.
 ii. Domestic Travel
 This covers the cost of full fare economy class air transportation
 and/or land transportation by the most direct and expeditious routes
-of the consultant’s staff for official trips authorized by the agency
+of the consultantï¿½s staff for official trips authorized by the agency
 and/or explicitly required in the contract.
 iii. Domestic Transportation
 This covers the provision of vehicles and equipment either through
@@ -763,10 +763,10 @@ approved by the agency concerned prior to its being incurred and provided, furth
 that they shall be used only in line with the unit rates and costs specified in the
 contract and in strict compliance with the project needs. Contingency amount must
 not exceed five percent (5%) of the amount of the contract.
-Tips: Let’s do things easier
+Tips: Letï¿½s do things easier
 On determining the cost of consulting services
 The end-user must estimate the cost of consulting services through cost research in the
-local market. This study ought to focus on the monthly salaries paid to the consultant’s
+local market. This study ought to focus on the monthly salaries paid to the consultantï¿½s
 staff, per diems for hotel and living expenses for staff away from normal duty station,
 air or land transportation, and other out-of-pocket expenses, to obtain a good basis for
 the budget. For contract duration of more than one (1) year, a reasonable percentage
@@ -812,7 +812,7 @@ The ABC shall be the upper limit or ceiling for bid prices, such that bid prices
 ceiling shall be disqualified outright from further participating in the bidding. The total
 calculated bid prices, as evaluated and corrected for computational errors, and other bid
 modifications, which exceed the ABC shall be disqualified. It must be noted that the rules
-referred to “total calculated bid prices that exceed the ABC” as ground for disqualifying a bid.
+referred to ï¿½total calculated bid prices that exceed the ABCï¿½ as ground for disqualifying a bid.
 Thus, as long as the total calculated bid prices does not exceed the ABC, the bid shall be
 considered responsive, regardless whether some of the cost components of the bid exceed the
 estimated cost for an identified component.
@@ -848,8 +848,8 @@ The PBDs contain the following:3
 6. Bid Data Sheet (BDS);
 7. General Conditions of Contract (GCC);
 8. Special Conditions of Contract (SCC);
-9. Technical Proposal – Standard Forms;
-10. Financial Proposal – Standard Forms;
+9. Technical Proposal ï¿½ Standard Forms;
+10. Financial Proposal ï¿½ Standard Forms;
 11. Terms of Reference; and
 12. Appendices.
 What should the ITB provide?
@@ -942,7 +942,7 @@ FORM OF BID SECURITY
 AMOUNT OF BID SECURITY
 (Not less than the
 percentage of the ABC)
-a. Cash, cashier’s check/manager’s check issued by a
+a. Cash, cashierï¿½s check/managerï¿½s check issued by a
 Universal or Commercial Bank; Two percent (2%)
 b. Bank draft/guarantee or irrevocable letter of credit
 issued by a Universal or Commercial Bank: Provided,
@@ -978,7 +978,7 @@ Should it become necessary to extend the validity of the bids and the bid securi
 Procuring Entity should request in writing all those who submitted bids for such extension
 before the expiry date thereof. Bidders shall have the right to refuse to grant such extension
 without forfeiting their bid securities. The bid security of bidders who refuse to grant the
-Procuring Entity’s request for an extension of the validity of their respective bid securities will
+Procuring Entityï¿½s request for an extension of the validity of their respective bid securities will
 have these securities returned to them. (2016 IRR Section 28.2) However, they are
 deemed to have waived their right to further participate in the bidding.
 In what currency shall the Bid Security be denominated?
@@ -997,7 +997,7 @@ securities, bid securities shall be returned only after the bidder with the HRRB
 contract and furnished the performance security, but in no case later than the expiration of
 the bid security validity period indicated in the ITB. (2016 IRR Section 27.6)
 When may a Bid Security be forfeited?
-A bidder’s bid security may be forfeited, or enforced in the case of a Bid Securing Declaration,
+A bidderï¿½s bid security may be forfeited, or enforced in the case of a Bid Securing Declaration,
 when the bidder:
 1. Does not accept correction of arithmetical errors;
 2. Has a finding against the veracity of the required documents submitted;
@@ -1033,7 +1033,7 @@ AMOUNT
 (Not less than the
 Percentage of the
 Total Contract Price)
-a. Cash, or cashier’s/manager’s check issued by a Universal or
+a. Cash, or cashierï¿½s/managerï¿½s check issued by a Universal or
 Commercial Bank; Five percent (5%)
 b. Bank draft/guarantee or irrevocable letter of credit issued
 by a Universal or Commercial Bank: Provided, however,
@@ -1117,7 +1117,7 @@ general procurement guidelines;
 the different activities;
 5. Review, modify and agree on the criteria for eligibility screening and criteria for
 shortlisting, including the weights for each criterion, and ensure that the said criteria
-are fair, reasonable, and that they are of the “pass / fail” type and are written in such
+are fair, reasonable, and that they are of the ï¿½pass / failï¿½ type and are written in such
 manner;
 6. Determine the actual number of consultants to be included in the short list. The
 number shall be from three (3) to seven (7) consultants, with five (5) as the
@@ -1137,7 +1137,7 @@ that the weight of the financial proposal be closer to forty percent (40%);
 Page 23 of 108
 Manual of Procedures for the Procurement of Consulting Services
 8. Finalize and approve the Bidding Documents; and
-9. Reiterate and emphasize the “no contact rule” during the bid evaluation process, and
+9. Reiterate and emphasize the ï¿½no contact ruleï¿½ during the bid evaluation process, and
 the applicable sanctions and penalties, as well as agree on measures to ensure
 compliance with the foregoing.
 When do you conduct a Pre-procurement Conference?
@@ -1163,7 +1163,7 @@ The technical proposals of consultants shall be evaluated based on the following
 key staff to perform the duties of the particular assignments and their general
 qualifications and competence, including education and training (Recommended
 weight: 30%-70%);
-2. Experience and capability of the consultant. The consultant’s experience and
+2. Experience and capability of the consultant. The consultantï¿½s experience and
 capability should include its record in previous engagements and the quality of its
 performance in similar and other projects. These also include its relationship with
 previous and current clients, overall current work commitments, the geographical
@@ -1195,7 +1195,7 @@ SECTION 3
 Instructions on the Procedural
 Steps for the Procurement of
 Consulting Services
-PART ONE – COMPETITIVE BIDDING
+PART ONE ï¿½ COMPETITIVE BIDDING
 Page 27 of 108
 Manual of Procedures for the Procurement of Consulting Services
 Pre-
@@ -1364,10 +1364,10 @@ available to the public, unless the procurement at hand affects national securit
 In procurements involving and affecting national security, the disclosure of the specific
 components of the procurement documents, such as, the technical specifications,
 requirements and components, shall be dependent upon the HoPE having due regard to the
-nature, classification, sensitivity and confidentiality of the relevant documents vis-à-vis the
+nature, classification, sensitivity and confidentiality of the relevant documents vis-ï¿½-vis the
 purpose and reason for the request. (2016 IRR Section 19)
 Based on the National Intelligence Coordinating Agency (NICA), national security refers to the
-state or condition wherein the country’s national interests, the well-being of its people and
+state or condition wherein the countryï¿½s national interests, the well-being of its people and
 institutions, and its sovereignty and territorial integrity are protected and enhanced.
 When should Expressions of Interest be submitted?
 A prospective bidder should submit its Expression of Interest (Eligibility Documents
@@ -1407,7 +1407,7 @@ to all prospective bidders.
 When could consultants be hired?
 Consultants may be hired if the services they would be providing is of such magnitude and/or
 scope as would require a level of expertise or attention beyond the optimum in-house
-capability of the Procuring Entity concerned and consistent with the Government’s policy not
+capability of the Procuring Entity concerned and consistent with the Governmentï¿½s policy not
 to compete with the private sector. (2016 IRR Annex B para. 2)
 Who may be hired as consultants?
 In order to manifest trust and confidence in and promote the development of Filipino
@@ -1520,13 +1520,13 @@ can provide competent consulting services. As proof of the availability of Filip
 will prepare a list of its members that have expertise in a specific field. It will list its
 standards for competence in the field and certify that the members that it had listed had
 passed such standards.
-The umbrella organization’s certification and list of consultant-members will help guide the
+The umbrella organizationï¿½s certification and list of consultant-members will help guide the
 BAC in determining the fields where Filipino consultants are already qualified and capable, and
 thus would not require foreign consultants. (2016 IRR Annex B)
 What is an Eligibility Check?
 It is a procedure to determine if a prospective bidder is eligible to participate in the bidding at
-hand. In determining a prospective bidder’s eligibility, the BAC shall use non-discretionary
-“pass/fail” criteria, as stated in the REI and the ITB. Essentially, this means that the absence,
+hand. In determining a prospective bidderï¿½s eligibility, the BAC shall use non-discretionary
+ï¿½pass/failï¿½ criteria, as stated in the REI and the ITB. Essentially, this means that the absence,
 Page 35 of 108
 Manual of Procedures for the Procurement of Consulting Services
 incompleteness or insufficiency of a document shall make a prospective bidder ineligible to bid
@@ -1543,7 +1543,7 @@ of ineligibility for corrupt, fraudulent, collusive and coercive practices by th
 Are there instances where a conflict of interest may arise in consulting
 services?
 GoP policies require that consultants provide professional, objective and impartial advice, and
-at all times hold the client’s interests paramount, without any consideration for future work,
+at all times hold the clientï¿½s interests paramount, without any consideration for future work,
 and that in providing advice they avoid conflicts with other assignments and their own
 corporate interests. Consultants should not be hired for any assignment that would be in
 conflict with their prior or current obligations to other clients, or that may place them in a
@@ -1622,14 +1622,14 @@ that respect give a consultant a competitive advantage.
 What are the minimum eligibility requirements?
 The eligibility of a prospective bidder that is a Filipino consultant is determined based on its
 submission of the following documents: (2016 IRR Section 24.7.1)
-1. Class “A” Documents
+1. Class ï¿½Aï¿½ Documents
 a. Legal Documents
 i Registration certificate from SEC, DTI for sole proprietorship, or CDA
 for cooperatives.
-ii Mayor’s/Business permit issued in the city or municipality where the
+ii Mayorï¿½s/Business permit issued in the city or municipality where the
 principal place of business of the prospective bidder is located, or the
 equivalent document for Exclusive Economic Zones or Areas.
-In the case of recently expired Mayor’s/Business permits, it shall be
+In the case of recently expired Mayorï¿½s/Business permits, it shall be
 accepted together with the official receipt as proof that the bidder has
 applied for renewal within the period prescribed by the concerned
 LGU, provided that the renewed permit shall be submitted as a postqualification requirement in accordance with 2016 IRR Section 34.2.
@@ -1637,7 +1637,7 @@ Page 37 of 108
 Manual of Procedures for the Procurement of Consulting Services
 For individual consultants not registered under a sole proprietorship, a
 BIR Certificate of Registration shall be submitted, in lieu of DTI
-registration and Mayor’s/Business permit.
+registration and Mayorï¿½s/Business permit.
 iii Tax Clearance per E.O. 398, s. 2005, as finally reviewed and approved
 by the BIR.
 b. Technical Documents
@@ -1650,7 +1650,7 @@ the following:
 ? Name and location of the contract/project;
 ? Date of award of the contract;
 ? Type and brief description of the consulting service;
-? Consultant’s role (whether main consultant, subconsultant, or
+? Consultantï¿½s role (whether main consultant, subconsultant, or
 JV partner);
 ? Amount of contract;
 ? Contract duration;
@@ -1664,11 +1664,11 @@ Professional Regulatory Commission or PRC for engineers, and
 Supreme Court for lawyers) to practice those profession, including
 their respective curriculum vitae.
 c. Financial Document
-The consultant’s audited financial statements, showing, among other things, the
-consultant’s total and current assets and liabilities, stamped “received” by the BIR or
+The consultantï¿½s audited financial statements, showing, among other things, the
+consultantï¿½s total and current assets and liabilities, stamped ï¿½receivedï¿½ by the BIR or
 its duly accredited and authorized institutions, for the preceding calendar year, which
 should not be earlier than two (2) years from the date of bid submission.
-2. Class “B” Documents
+2. Class ï¿½Bï¿½ Documents
 a. Valid joint venture agreement (JVA), in case a joint venture is already in
 existence. In the absence of a JVA, duly notarized statements from all the
 potential joint venture partners stating that they will enter into and abide by
@@ -1683,18 +1683,18 @@ For foreign bidders, the foregoing documents may be substituted by the appropria
 equivalent documents in English, if any, issued by the country of the bidder
 concerned. Otherwise, it must be accompanied by a translation of the documents in
 English by the relevant foreign government agency, the foreign government agency
-authorized to translate documents, or a registered translator in the foreign bidder’s
+authorized to translate documents, or a registered translator in the foreign bidderï¿½s
 country, and shall be authenticated by the appropriate Philippine foreign service
 Page 38 of 108
 Manual of Procedures for the Procurement of Consulting Services
 establishment/post or the equivalent office having jurisdiction over the foreign
-bidder’s affairs in the Philippines.
+bidderï¿½s affairs in the Philippines.
 To facilitate determination of eligibility, the BAC of a Procuring Entity shall use the contents of
 the PhilGEPS electronic registry of consultants in accordance with 2016 IRR Section 8.5.2.
 Consultants wishing to participate in government project shall, therefore, upload and maintain
-in PhilGEPS a current and updated file of the following Class “A” eligibility documents:
+in PhilGEPS a current and updated file of the following Class ï¿½Aï¿½ eligibility documents:
 a. Registration Certificate;
-b. Mayor’s/Business Permit;
+b. Mayorï¿½s/Business Permit;
 c. Tax Clearance; and
 d. Audited Financial Statements.
 These documents shall be accompanied by a sworn statement in a form prescribed by the
@@ -1702,16 +1702,16 @@ GPPB stating that the documents submitted are complete and authentic copies of t
 and all statements and information provided therein are true and correct. Upon receipt of the
 said documents, the PhilGEPS shall process the same in accordance with the guidelines on the
 GoP-Official Merchants Registry.
-Consultants that maintain a current and updated file of the above Class “A” eligibility
+Consultants that maintain a current and updated file of the above Class ï¿½Aï¿½ eligibility
 documents with PhilGEPS shall be given a PhilGEPS Certificate of Registration which shall be
-submitted as one of the required eligibility documents in lieu of the said Class “A” eligibility
+submitted as one of the required eligibility documents in lieu of the said Class ï¿½Aï¿½ eligibility
 documents.
 For procurement to be performed overseas, it shall be subject to the Guidelines to be issued
 by the GPPB.
 How and when shall the Eligibility Requirements be submitted?
 Prospective bidders shall enclose their original eligibility documents in a sealed envelope
-marked “ORIGINAL – ELIGIBILTY DOCUMENTS”. Each copy thereof shall be similarly sealed
-duly marking the envelopes as “COPY NO. ___ - ELIGIBILITY DOCUMENTS”. These envelopes
+marked ï¿½ORIGINAL ï¿½ ELIGIBILTY DOCUMENTSï¿½. Each copy thereof shall be similarly sealed
+duly marking the envelopes as ï¿½COPY NO. ___ - ELIGIBILITY DOCUMENTSï¿½. These envelopes
 containing the original and the copies shall then be enclosed in one single envelope.
 All envelopes shall:
 a. Contain the name of the contract
@@ -1719,11 +1719,11 @@ to be bid;
 b. Bear the name and address of the
 prospective bidder;
 c. Be addressed to the Procuring
-Entity’s BAC;
+Entityï¿½s BAC;
 d. Bear the specific identification of
 the Project; and
-e. Bear a warning “DO NOT OPEN
-BEFORE …” the date and time for
+e. Bear a warning ï¿½DO NOT OPEN
+BEFORE ï¿½ï¿½ the date and time for
 the opening of eligibility
 documents.
 Eligibility documents that are not properly sealed and marked, as required in the bidding
@@ -1750,9 +1750,9 @@ Page 39 of 108
 Manual of Procedures for the Procurement of Consulting Services
 Eligibility documents must be received by the BAC at the address and on or before the date
 and time indicated in the REI. Any eligibility documents submitted after the deadline for
-submission and receipt shall be declared “Late” and shall not be accepted by the BAC. The
+submission and receipt shall be declared ï¿½Lateï¿½ and shall not be accepted by the BAC. The
 BAC shall record in the minutes of submission and opening of eligibility documents, the
-bidder’s name, its representative, and the time the eligibility documents were submitted late.
+bidderï¿½s name, its representative, and the time the eligibility documents were submitted late.
 
 What happens if only one bidder submits an Eligibility Envelope?
 Even if only one bidder submits its eligibility envelope, the bidding process continues. The
@@ -1770,12 +1770,12 @@ The following parties participate in the eligibility check/screening:
 5. The Observers.
 How should Eligibility Envelopes be received?
 Upon receiving an eligibility envelope, the BAC Secretariat must stamp an eligibility envelope
-as “RECEIVED,” indicating thereon the date and time of receipt, and have the stamp
+as ï¿½RECEIVED,ï¿½ indicating thereon the date and time of receipt, and have the stamp
 countersigned by an authorized representative.
 How is an Eligibility Check conducted?
 1. The BAC shall open in public the Eligibility envelopes on the date and time specified in
 the REI. (2016 IRR Section 24.4.1) The BAC shall read in public the contents of the
-Eligibility envelopes, and shall examine each prospective bidder’s eligibility
+Eligibility envelopes, and shall examine each prospective bidderï¿½s eligibility
 requirements or statements. It shall record the presence or absence of the required
 eligibility documents in a checklist.
 This procedure is referred to as
@@ -1783,8 +1783,8 @@ Eligibility Check, the purpose of which is
 to determine if a prospective bidder is
 eligible to participate in the bidding at
 hand. In determining a prospective
-bidder’s eligibility, the BAC shall use
-non-discretionary “pass/fail” criteria, as
+bidderï¿½s eligibility, the BAC shall use
+non-discretionary ï¿½pass/failï¿½ criteria, as
 stated in the REI and the eligibility
 documents. Essentially, this means that
 the absence, incompleteness or
@@ -1792,11 +1792,11 @@ insufficiency of a required document
 shall make a prospective bidder
 ineligible to bid for the particular
 procurement.
-2. The BAC shall declare prospective bidders as either “eligible” or “ineligible”, based on
+2. The BAC shall declare prospective bidders as either ï¿½eligibleï¿½ or ï¿½ineligibleï¿½, based on
 the findings in Item 1 above, and inform them accordingly. The BAC shall provide the
 prospective bidders a Notice of Eligibility or a Notice of Ineligibility, depending on the
 results of the eligibility check. In case a prospective bidder is declared ineligible, the
-Let’s make things easier
+Letï¿½s make things easier
 The BAC should have a secure
 depository of all the original copies of
 the Eligibility documents submitted by
@@ -1809,13 +1809,13 @@ and trouble of rectifying such loss.
 Page 40 of 108
 Manual of Procedures for the Procurement of Consulting Services
 Notice of Ineligibility shall state the reason for such ineligibility. The Notice will be
-received officially by the bidder’s authorized representative.
+received officially by the bidderï¿½s authorized representative.
 3. The BAC shall inquire from ineligible bidders whether or not they intend to file a
 request for reconsideration; if they signify their intention to do so, the BAC shall keep
 the eligibility envelopes containing the eligibility requirements and re-seal and sign
 the same in the presence of all the participants. These shall be deposited in the Bid
 Box or any other secured place or location. The BAC may return the eligibility
-envelope if the prospective bidder is declared “ineligible” and expressly waives his
+envelope if the prospective bidder is declared ï¿½ineligibleï¿½ and expressly waives his
 right to file a request for reconsideration. Such waiver shall be made in writing, to be
 executed by the authorized representative of the ineligible bidder.
 What can a potential bidder do if it is found ineligible?
@@ -1882,7 +1882,7 @@ a prospective bidder after it had been declared as eligible?
 Notwithstanding the eligibility of a prospective bidder, the Procuring Entity concerned reserves
 the right to review its qualifications at any stage of the procurement process if it has
 reasonable grounds to believe that a misrepresentation has been made by the said
-prospective bidder, or that there has been a change in the prospective bidder’s capability to
+prospective bidder, or that there has been a change in the prospective bidderï¿½s capability to
 undertake the project from the time it submitted its eligibility requirements. Should such
 review uncover any misrepresentation made in the eligibility requirements, statements or
 documents, or any changes in the situation of the prospective bidder which will affect the
@@ -1964,7 +1964,7 @@ bidding documents for the project.
 Page 44 of 108
 Manual of Procedures for the Procurement of Consulting Services
 b. Qualification of principal and key staff of the consultant who may be assigned
-to the job vis-à-vis extent and complexity of the undertaking (Recommended
+to the job vis-ï¿½-vis extent and complexity of the undertaking (Recommended
 weight: 30%); and
 c. Current workload relative to capacity (Recommended weight: 20%).
 2. Rank the eligible consultants based on the average of the total ratings given them by
@@ -2090,7 +2090,7 @@ Supplemental/Bid Bulletins
 Legal Reference
 2016 IRR Section 22 specifies the rules in relation to the conduct of a pre-bid conference.
 What is a Pre-bid Conference?
-The pre-bid conference is the initial forum where the Procuring Entity’s representatives and
+The pre-bid conference is the initial forum where the Procuring Entityï¿½s representatives and
 the short listed bidders discuss the different aspects of the procurement at hand.
 The ground rules that will govern the procurement are discussed during the conference. In
 particular, the participants discuss the legal, technical and financial components of the
@@ -2140,10 +2140,10 @@ How should the participants conduct themselves during the Pre-Bid
 Conference and other stages of the procurement process?
 The BAC, BAC Secretariat, TWG, and other officials involved in procurement are expected to
 act in an impartial, courteous and professional manner in all their dealings and interactions
-with the bidders during all stages of the procurement. The bidders’ representatives are
+with the bidders during all stages of the procurement. The biddersï¿½ representatives are
 likewise enjoined to adopt the same professional manner in their dealings with the Procuring
-Entity’s officials. Communications between the parties must, as much as possible, be made in
-writing, except during the pre-bid conference when verbal clarifications may be allowed –
+Entityï¿½s officials. Communications between the parties must, as much as possible, be made in
+writing, except during the pre-bid conference when verbal clarifications may be allowed ï¿½
 keeping in mind, however, that any statement made at the pre-bid conference would not
 modify the terms of the bidding documents, unless such statement is specifically identified in
 writing as an amendment of the documents and issued as a supplemental/bid bulletin.
@@ -2177,12 +2177,12 @@ the bidding documents must be identified as an amendment. (2016 IRR Section 22.5
 The BAC should also post the supplemental/bid bulletin on the website of the Procuring Entity
 concerned, if available, the website of the PhilGEPS, and at any conspicuous place within the
 premises of the Procuring Entity, within the same timetable. It shall be the short listed
-bidders’ responsibility to ask for, and secure, these bulletins.
+biddersï¿½ responsibility to ask for, and secure, these bulletins.
 Page 50 of 108
 Manual of Procedures for the Procurement of Consulting Services
 A supplemental/bid bulletin must contain a brief but comprehensive and accurate summary of
 the issue or issues that it wishes to address. If it was a short listed bidder that raised the
-issue addressed by the bulletin, then it ought to contain a summary of that bidder’s request
+issue addressed by the bulletin, then it ought to contain a summary of that bidderï¿½s request
 for clarification and/or interpretation, without identifying the short listed bidder.
 Short listed bidders who have submitted bids before a supplemental/bid bulletin is issued
 have to be informed in writing and allowed to modify or withdraw their respective bids.
@@ -2227,8 +2227,8 @@ Legal Reference
 What is a Bid?
 A Bid refers to a signed offer or proposal to undertake a contract submitted by a short listed
 consultant in response to, and in consonance with, the requirements stated in the bidding
-documents. “Bid” is also equivalent to and may be used interchangeably with “Proposal” and
-“Tender.” A Bid has two components, the Technical Proposal or the Technical Bid, and the
+documents. ï¿½Bidï¿½ is also equivalent to and may be used interchangeably with ï¿½Proposalï¿½ and
+ï¿½Tender.ï¿½ A Bid has two components, the Technical Proposal or the Technical Bid, and the
 Financial Proposal or the Financial Bid. The Technical and Financial Bids must each be
 contained in separate sealed bid envelopes.
 What are the contents of the Technical Proposal?
@@ -2243,7 +2243,7 @@ documents;
 5. Approach, work plan, and schedule on how the Consultant shall carry out the services
 to meet all the requirements in the TOR using form TPF 4, provided that for
 architectural design, submission of architectural plans and designs shall not be
-required during the consultant’s selection process;
+required during the consultantï¿½s selection process;
 6. Organizational chart of the key and support staff indicating their tasks, among others,
 using form TPF 5 of the bidding documents;
 7. List of key personnel to be assigned to the contract to be bid with their curriculum
@@ -2263,9 +2263,9 @@ acts necessary to participate, submit the bid, and to sign and execute the
 Page 52 of 108
 Manual of Procedures for the Procurement of Consulting Services
 ensuing contract accompanied by the duly notarized Special Power of
-Attorney, Board/Partnership Resolution, or Secretary’s Certificate, whichever
+Attorney, Board/Partnership Resolution, or Secretaryï¿½s Certificate, whichever
 is applicable;
-(b) It is not “blacklisted” or barred from bidding by the GoP or any of its agencies,
+(b) It is not ï¿½blacklistedï¿½ or barred from bidding by the GoP or any of its agencies,
 offices, corporations, or LGUs, including foreign government/foreign or
 international financing institution whose blacklisting rules have been
 recognized by the GPPB;
@@ -2295,16 +2295,16 @@ provided in the bidding documents and the following financial information/docume
 How should the envelopes be submitted and received?
 Both envelopes must be labeled with the name of the contract to be bid and the name of the
 bidder in capital letters, addressed to the BAC of the agency concerned. The bidder shall
-mark the two (2) envelopes: “Do not open before (date and time of opening of bids).” Both
+mark the two (2) envelopes: ï¿½Do not open before (date and time of opening of bids).ï¿½ Both
 envelopes shall then be put in an outer envelope, which shall be sealed and addressed to the
-BAC Chairperson. The Financial Proposal shall also be marked with a warning: “Do not open
-with the Technical Proposal.” This outer envelope must be marked as specified in the ITB.
+BAC Chairperson. The Financial Proposal shall also be marked with a warning: ï¿½Do not open
+with the Technical Proposal.ï¿½ This outer envelope must be marked as specified in the ITB.
 Unsealed or unmarked bid envelopes shall be rejected. However, bid envelopes that are not
 properly sealed and marked as required in the bidding documents, shall be accepted, provided
 that the bidder or its duly authorized representative shall acknowledge such condition of the
 bid as submitted. The BAC shall assume no responsibility for the misplacement of the
 improperly sealed or marked bid, or for its premature opening. (2016 IRR Section 25.8)
-The bid must be submitted to the BAC through the bidder’s duly authorized representative.
+The bid must be submitted to the BAC through the bidderï¿½s duly authorized representative.
 (2016 IRR Section 25.1)
 Page 53 of 108
 Manual of Procedures for the Procurement of Consulting Services
@@ -2314,7 +2314,7 @@ for submission of bids, and at the place, as stated in the bidding documents. Th
 receipt of bids should be within seventy five (75) calendar days from the last day of posting
 the REI. (2016 IRR Section 25.5(c)) Bids submitted after the specified deadline shall not
 be accepted by the BAC (2016 IRR Section 25.6). The BAC shall record in the minutes of
-bid submission and opening, the bidder’s name, its representative, and the time the late bid
+bid submission and opening, the bidderï¿½s name, its representative, and the time the late bid
 was submitted.
 What happens if only one short listed consultant submits a bid envelope?
 Even if only one short listed consultant submits a bid envelope, the bidding process should
@@ -2356,7 +2356,7 @@ The following should be involved in the receipt, opening and preliminary examina
 4. The Observers; and
 5. The Short listed Consultants.
 How are bids received, opened, and preliminarily examined?
-TIPS: Let’s do things
+TIPS: Letï¿½s do things
 easier
 The BAC shall require one (1) original
 and at least five (5) copies of the
@@ -2395,7 +2395,7 @@ the eligibility check. For each bid,
 the BAC opens the Technical
 Envelopes of short listed
 consultants to determine each
-one’s compliance with the required
+oneï¿½s compliance with the required
 documents for the technical
 component of the bid. The BAC
 checks the submitted documents of
@@ -2403,7 +2403,7 @@ each bidder against a checklist of
 required documents to ascertain if
 they are all present in the technical
 envelope, using non-discretionary
-“pass/fail” criteria. (2016 IRR
+ï¿½pass/failï¿½ criteria. (2016 IRR
 Sections 30.1) The opening of
 bids must be done in public,
 following the same procedure as
@@ -2420,13 +2420,13 @@ their technical envelopes; and
 d. The technical envelopes of short listed consultants that have submitted bids
 on or before the deadline without any modification.
 5. In case one or more of the required documents is missing, incomplete, or patently
-insufficient, it must rate the bid concerned as “failed”. Otherwise, it shall rate the
-said first bid envelope as “passed.”
-How’s that again?
+insufficient, it must rate the bid concerned as ï¿½failedï¿½. Otherwise, it shall rate the
+said first bid envelope as ï¿½passed.ï¿½
+Howï¿½s that again?
 When is a document deemed
-“complete” and “sufficient”?
-For a document, to be deemed “complete” and
-“sufficient”, it must be complete on its face, that
+ï¿½completeï¿½ and ï¿½sufficientï¿½?
+For a document, to be deemed ï¿½completeï¿½ and
+ï¿½sufficientï¿½, it must be complete on its face, that
 is, contain all the information required, and
 must comply with the requirements set out in
 the Bidding Documents. For example, a Bid
@@ -2444,9 +2444,9 @@ Entity concerned.
 7. All members of the BAC, or their alternates who are present during bid opening, shall
 initial every page of the original copies of all bids received and opened.
 8. The financial envelopes of all short listed consultants must remain sealed and secured.
-9. All technical envelopes must be resealed. Those rated “passed” will be secured in
+9. All technical envelopes must be resealed. Those rated ï¿½passedï¿½ will be secured in
 preparation for the detailed technical evaluation (which normally starts the following
-day). Those rated “failed” will be secured for purposes of potential filing of request
+day). Those rated ï¿½failedï¿½ will be secured for purposes of potential filing of request
 for reconsideration except when the shortlisted consultant waives its right to file such
 request.
 10. The BAC Secretariat shall record the proceedings. The minutes of the bid opening
@@ -2459,7 +2459,7 @@ A short listed consultant may modify its bid, provided that this is done before 
 the submission and receipt of bids. If such a consultant modifies its bid, it shall not be
 allowed to retrieve its original bid, but shall only be allowed to send another bid equally
 sealed, properly identified, linked or related to its original bid and marked as a
-“MODIFICATION” of the original, and stamped “RECEIVED” by the BAC. Bid modifications
+ï¿½MODIFICATIONï¿½ of the original, and stamped ï¿½RECEIVEDï¿½ by the BAC. Bid modifications
 received after the applicable deadline will not be considered and must be returned to the
 consultant unopened. (2016 IRR Section 26.1) Any discount should form part of the bid
 submission in the financial envelope.
@@ -2467,7 +2467,7 @@ A short listed consultant may, through a letter, withdraw its bid before the dea
 receipt of bids. Withdrawal of bids after the applicable deadline must be subject to
 appropriate sanctions as prescribed in the 2016 IRR. A short listed consultant may also
 express its intention not to participate in the bidding through a letter which should reach and
-be stamped “RECEIVED” by the BAC before the deadline for the receipt of bids. A consultant
+be stamped ï¿½RECEIVEDï¿½ by the BAC before the deadline for the receipt of bids. A consultant
 that withdraws its bid shall not be permitted to submit another bid, directly or indirectly, for
 the same contract. (2016 IRR Section 26.2) Moreover, a consultant that withdraws its bid
 without any justifiable cause therefor shall be subject to the administrative sanctions provided
@@ -2482,14 +2482,14 @@ technical requirements of the Bid?
 The short listed consultant that has failed to comply with any of the technical requirements of
 the Bid will be disqualified by the BAC. Similar to ineligible bidders, it may file a written
 request for reconsideration within three (3) calendar days upon receipt of written notice
-regarding its bid’s deficiency or upon verbal notification. The short listed consultant,
+regarding its bidï¿½s deficiency or upon verbal notification. The short listed consultant,
 Page 56 of 108
 Manual of Procedures for the Procurement of Consulting Services
 however, shall not be allowed to submit additional documents to correct the bid submitted.
 (2016 IRR Section 55.1)
 In case a bidder is determined to have failed in the first envelope, which contains the
 Technical Proposal, and it signifies its intention to file for a request for reconsideration, the
-BAC must hold this bidder’s second envelope unopened until such time the request for
+BAC must hold this bidderï¿½s second envelope unopened until such time the request for
 reconsideration has been resolved. (2016 IRR Section 55.1)
 What happens if no short listed consultant passes the preliminary
 examination of bids?
@@ -2517,7 +2517,7 @@ Legal Reference
 After the preliminary examination of the Technical Proposals, the BAC will conduct the
 detailed evaluation of the Technical Proposals. Normally, the BAC members are given each a
 copy of all the technical envelopes of each bidder whose technical bid has been rated
-“passed.” This is why the bidders are asked to submit several copies of the envelopes, so
+ï¿½passed.ï¿½ This is why the bidders are asked to submit several copies of the envelopes, so
 that each member of the BAC may be given his own copy. The BAC agrees on when to meet
 again to discuss the ratings that they will give each technical bid.
 Why do you need to evaluate the bids?
@@ -2631,7 +2631,7 @@ consultant. If the proposed price exceeds the ABC, the bidder will be disqualifi
 arithmetical errors, and corrects the recorded proposed prices, if warranted.
 7. The BAC disqualifies a consultant if:
 a. It provides for a required item but does not indicate a price for it and is thus
-deemed as non-compliant, except that if it specifies a “0” (zero) or a “-“
+deemed as non-compliant, except that if it specifies a ï¿½0ï¿½ (zero) or a ï¿½-ï¿½
 (dash) for the said item, it would be deemed as having offered the item for
 free to the government, or
 b. Its corrected price exceeds the ABC.
@@ -2661,9 +2661,9 @@ percent (15%) up to a maximum of forty percent (40%).
 10. The BAC adjusts the weight of the technical criteria such that their total weight in
 percentage terms, together with the weight given to the Financial Proposal, shall be
 equivalent to one hundred percent (100%).
-11. The BAC multiplies the average score of each qualified consultant’s Technical Proposal
+11. The BAC multiplies the average score of each qualified consultantï¿½s Technical Proposal
 with the percentage value allowed as weight for Technical Proposals. It also multiplies
-the rate earned by each consultant’s Financial Proposal with the percentage value
+the rate earned by each consultantï¿½s Financial Proposal with the percentage value
 allowed as weight for Financial Proposals. It then adds the resulting products of both
 operations for each consultant. The sum becomes the total score for the consultant.
 The formula is as follows:
@@ -2789,7 +2789,7 @@ rates for staff and the reimbursables, shall not be negotiated since it has alre
 factor in the selection of the consultant.
 When is the Financial Proposal opened?
 For contracts awarded using the QBE procedure, the Financial Proposal of consultant with the
-HRB is opened in the presence of the bidder during the negotiation stage – normally during
+HRB is opened in the presence of the bidder during the negotiation stage ï¿½ normally during
 the first day of the negotiations.
 Page 63 of 108
 Manual of Procedures for the Procurement of Consulting Services
@@ -2835,7 +2835,7 @@ bidding.
 What additional guidelines may a Procuring Entity adopt during
 negotiations?
 1. Negotiations should include discussions of the TOR, the methodology, staffing, the
-Procuring Entity’s inputs, and special conditions of the contract. The Procuring Entity
+Procuring Entityï¿½s inputs, and special conditions of the contract. The Procuring Entity
 Page 64 of 108
 Manual of Procedures for the Procurement of Consulting Services
 should give the consultants adequate authority to discharge their responsibilities and
@@ -2854,8 +2854,8 @@ availability, the firm may be disqualified and the process continued with the ne
 ranked firm. Replacement of key staff may be allowed for justifiable reasons as may
 be determined by the BAC, such as death, incapacity or resignation. The replacement
 should have qualifications equal to or better than the key staff initially proposed.
-6. Financial negotiations should include clarification of the consultant’s tax liability in the
-Procuring Entity’s country (if any) and how this tax liability has been or would be
+6. Financial negotiations should include clarification of the consultantï¿½s tax liability in the
+Procuring Entityï¿½s country (if any) and how this tax liability has been or would be
 reflected in the contract.
 7. As Lump-sum Contracts payments are based on delivery of outputs (or products),
 the offered price should include all costs (staff time, overhead, travel, etc.). If the
@@ -2899,25 +2899,25 @@ submitted by the Consultant that submitted the HRB and has successfully complete
 negotiations to determine whether it complies with and is responsive to all the requirements
 and conditions specified in the Bidding Documents. (2016 IRR Section 34)
 1. Legal Requirements. The post-qualification process under this criterion involves the
-verification, validation and ascertaining of the consultant’s claim that it is not included
-in any government “blacklist,” as well as all the licenses, permits and other
+verification, validation and ascertaining of the consultantï¿½s claim that it is not included
+in any government ï¿½blacklist,ï¿½ as well as all the licenses, permits and other
 documents it submitted, including the following:
 a. Registration certificate from SEC, DTI for sole proprietorship, or CDA for
 cooperatives;
 
-b. Mayor’s/Business Permit; and
+b. Mayorï¿½s/Business Permit; and
 c. Tax Clearance Certificate and Income and Business Tax Returns.
-The bidder’s status with regard to “blacklisting” may be verified by checking the
+The bidderï¿½s status with regard to ï¿½blacklistingï¿½ may be verified by checking the
 blacklist, if any, of other government agencies.
 In verifying the information contained in the above documents, the TWG may make
 inquiries with appropriate government agencies and examine the original documents
-kept in the bidder’s place of business. The use of other means, e.g., internet, for online verification and validation of such documents may be resorted to by the TWG.
+kept in the bidderï¿½s place of business. The use of other means, e.g., internet, for online verification and validation of such documents may be resorted to by the TWG.
 2. Technical Requirements. Post-qualification under this criterion means that the BAC
 would have to verify, validate and ascertain the veracity of the documents submitted
 by a consultant to prove compliance of the consulting services it offers with the
 requirements of the contract and bidding documents. These documents include:
-a. Documents proving the bidder’s stated competence and experience, and the
-competence and experience of the bidder’s key personnel to be assigned to
+a. Documents proving the bidderï¿½s stated competence and experience, and the
+competence and experience of the bidderï¿½s key personnel to be assigned to
 the project, such as:
 i. A list of completed projects; and
 ii. A list of key personnel to be assigned to the contract, with complete
@@ -3023,7 +3023,7 @@ not precluded from using the information from a previous post-qualification repo
 reference, it is still but necessary on the part of the BAC to re-validate and confirm the report
 based on the requirements of the new project, as the legal, financial and technical capability
 of the bidder may have already changed within the six-month period. Likewise, the happening
-of the grounds for post-disqualification that are hinged on the bidder’s performance on any of
+of the grounds for post-disqualification that are hinged on the bidderï¿½s performance on any of
 its ongoing products may vary within the said 6-month period.
 
 Page 69 of 108
@@ -3065,7 +3065,7 @@ the foreign professionals engaging in the practice of regulated professions and 
 professions; and
 3. Performance security in accordance with 2016 IRR Section 39.
 The bidder with the HRRB/SRRB needs to sign the Contract within the same 10 calendar days.
-How’s that again?
+Howï¿½s that again?
 What is the maximum period of time
 that a contract can be awarded?
 Contract award must be made within the bid
@@ -3159,8 +3159,8 @@ sign the contract within ten (10) calendar days from receipt by the winning bidd
 The Procuring Entity signatory is encouraged to sign within the same day as the signing of the
 bidder as there are penalties against delaying, without justifiable cause, the award of the
 contract. (2016 IRR Section 65.1(b)) Moreover, it would be best for the winning bidder
-and the HoPE, or its appropriate signing authority, to sign/execute the contract together –
-provided that all contract documents and requirements are complete – so that both may
+and the HoPE, or its appropriate signing authority, to sign/execute the contract together ï¿½
+provided that all contract documents and requirements are complete ï¿½ so that both may
 personally appear before a Notary Public.
 What are the Timelines to be considered with respect to contract approval?
 When, after contract signing, further approval of a higher authority is required, the approving
@@ -3181,7 +3181,7 @@ successful bidder within 7 calendar days from the date of approval of the contra
 HoPE or its authorized representative. All notices called for by the terms of the contract shall
 be effective only at the time of receipt thereof by the successful Consultant. (2016 IRR
 Section 37.4.1).
-When is a contract “effective”?
+When is a contract ï¿½effectiveï¿½?
  Unless otherwise specified in the contract, the contract effectivity date shall be the date of
 contract signing. The Consultant shall commence performance of the obligations only upon
 receipt of the NTP.
@@ -3198,7 +3198,7 @@ What documents form part of the contract?
 The contract shall include the following:
 1. The Contract Agreement;
 2. Bidding Documents;
-3. Winning Consultant’s bid, including the Eligibility Documents, Technical and Financial
+3. Winning Consultantï¿½s bid, including the Eligibility Documents, Technical and Financial
 Proposals, and all other documents/statements submitted;
 4. Performance Security;
 5. NOA of Contract; and
@@ -3246,7 +3246,7 @@ All Government contracts required by law to be acted upon and/or approved by the
 and any subsequent amendments or supplements thereto, shall be submitted with complete
 documentation to NEDA, through its Director-General, within seven (7) days from approval by
 the Head of Procuring Entity concerned or his duly authorized representative, as the case may
-be, for NEDA’s review and evaluation.
+be, for NEDAï¿½s review and evaluation.
 Government contracts submitted shall be accompanied by a complete execution copy of the
 contract, related agreements, annexes, other approvals and permits, including a detailed
 summary of the pertinent laws, rules and regulations governing the processing and award of
@@ -3255,7 +3255,7 @@ alternative methods of procurement where resorted to.
 How long is the entire process of public bidding for consulting services?
 From advertisement/posting of the procurement opportunity to issuance of NTP, the minimum
 and maximum periods are estimated to be 35 and 180 calendar days, respectively. All
-members of the BAC shall be on a “jury duty” type of assignment until the NOA is issued by
+members of the BAC shall be on a ï¿½jury dutyï¿½ type of assignment until the NOA is issued by
 the HoPE in order to complete the entire bidding process at the earliest possible time.
 What happens if the Consultant with the HRRB/SRRB refuses or is unable,
 through its own fault, to submit the required documents, post the
@@ -3366,7 +3366,7 @@ SECTION 3
 Instructions on the Procedural
 Steps for the Procurement of
 Consulting Services
-PART TWO – ALTERNATIVE METHODS OF
+PART TWO ï¿½ ALTERNATIVE METHODS OF
 PROCUREMENT
 Page 81 of 108
 Manual of Procedures for the Procurement of Consulting Services
@@ -3594,7 +3594,7 @@ the BAC shall post-qualify the consultant to determine if its bid complies with
 the technical and financial requirements of the project.
 e. The BAC shall recommend award of contract to the HoPE in favor of the
 consultant determined to have submitted the HRRB. Within a period of 15
-calendar days from receipt, the HoPE shall approve or disapprove the BAC’s
+calendar days from receipt, the HoPE shall approve or disapprove the BACï¿½s
 recommendation. In case of approval, the HoPE shall immediately issue the
 NOA to the consultant. In the event the HoPE disapproves the
 recommendation, such disapproval shall be based only on valid, reasonable,
@@ -3635,7 +3635,7 @@ danger to life during a state of calamity, there must be a declaration by a comp
 authority of a state of calamity pursuant to existing laws, rules and regulations before
 any procurement activity may be undertaken.
 Considering that the underlying reason to support a Negotiated Procurement through
-the emergency modality relates to “time element” as when there is – a) imminent
+the emergency modality relates to ï¿½time elementï¿½ as when there is ï¿½ a) imminent
 danger to life or property; b) when time is of the essence; or c) immediate action is
 necessary, the Procuring Entity, through the HoPE, BAC, its Secretariat and end-user/
 implementing unit, should consider appropriate timing or the proximity of time
@@ -3668,12 +3668,12 @@ ii) To restore vital public services, infrastructure facilities and other public
 utilities.
 Procedure
 a. The BAC shall negotiate and post-qualify the second HRB for the project under
-consideration at the said bidder’s own original bid price, applicable to the
+consideration at the said bidderï¿½s own original bid price, applicable to the
 remaining services to be done. Authority to negotiate contracts for projects
 under the foregoing exceptional cases shall be subject to prior written
 approval by the HoPE concerned, within their respective limits of authority.
 b. If negotiations fail or if post-qualification is unsuccessful, the BAC shall
-negotiate and post-qualify the next highest rated bidder at the said bidder’s
+negotiate and post-qualify the next highest rated bidder at the said bidderï¿½s
 own original bid price.
 c. If negotiations fail or post-qualification is unsuccessful another time, the
 process is repeated until all the bidders from the previous bidding have been
@@ -3685,7 +3685,7 @@ bids, or resort to any other appropriate alternative method of procurement.
 e. In case of successful negotiation and post-qualification, the BAC shall
 recommend the award of contract with the said consultant. Within a period of
 15 calendar days from receipt, the HoPE shall approve or disapprove the
-BAC’s recommendation. In case of approval, the HoPE shall immediately issue
+BACï¿½s recommendation. In case of approval, the HoPE shall immediately issue
 the NOA to the consultant. In the event the HoPE disapproves the
 recommendation, such disapproval shall be based only on valid, reasonable,
 and justifiable grounds to be expressed in writing, addressed to the BAC.
@@ -3723,7 +3723,7 @@ f. The consultant has no negative slippage/delay in the original contract during
 the time of negotiation; and
 g. Negotiations for the procurement are commenced before the expiry of the
 original contract.
-The phrase “adjacent or contiguous” pertains to the linkage or relationship of the
+The phrase ï¿½adjacent or contiguousï¿½ pertains to the linkage or relationship of the
 subject matters, outputs or deliverables required.
 If there is a necessity to introduce new items which are related to the scope of
 services of the original contract, the Procuring Entity shall ensure that the unit prices
@@ -3734,7 +3734,7 @@ a. The BAC shall negotiate with the consultant for the on-going consulting
 services (e.g., TOR, unit price and other terms and conditions of the contract).
 b. In case of successful negotiation, the BAC shall recommend to the HoPE the
 award of contract in favor of the consultant. Within a period of 15 calendar
-days from receipt, the HoPE shall approve or disapprove the BAC’s
+days from receipt, the HoPE shall approve or disapprove the BACï¿½s
 recommendation. In case of approval, the HoPE shall immediately issue the
 NOA to the consultant. In the event the HoPE disapproves the
 recommendation, such disapproval shall be based only on valid, reasonable,
@@ -3800,7 +3800,7 @@ financially capable consultant based on the TOR prepared by the End-user
 Unit.
 b. Upon successful negotiation, the BAC shall recommend award of contract to
 the HoPE. Within a period of 15 calendar days from receipt, the HoPE shall
-approve or disapprove the BAC’s recommendation. In case of approval, the
+approve or disapprove the BACï¿½s recommendation. In case of approval, the
 HoPE shall immediately issue the NOA to the consultant. In the event the
 HoPE disapproves the recommendation, such disapproval shall be based only
 on valid, reasonable, and justifiable grounds to be expressed in writing,
@@ -3841,7 +3841,7 @@ Page 91 of 108
 Manual of Procedures for the Procurement of Consulting Services
 c. The BAC shall recommend to the HoPE the award of contract to the individual
 consultant. Within a period of 15 calendar days from receipt, the HoPE shall
-approve or disapprove the BAC’s recommendation. In case of approval, the
+approve or disapprove the BACï¿½s recommendation. In case of approval, the
 HoPE shall immediately issue the NOA to the consultant. In the event the
 HoPE disapproves the recommendation, such disapproval shall be based only
 on valid, reasonable, and justifiable grounds to be expressed in writing,
@@ -3959,13 +3959,13 @@ amount that shall not exceed fifteen percent (15%) of the contract amount to cov
 of mobilization. The advance payment shall be made only upon the submission of a written
 request by the consultant together with an irrevocable standby letter of credit issued by an
 entity acceptable to the Procuring Entity and of an amount equal to the advance payment.
-(2016 IRR Annex “F”)
+(2016 IRR Annex ï¿½Fï¿½)
 How can the Procuring Entity recover the advance payment it made to a
 consultant?
 The Procuring Entity must recover the advance payment by deducting from the progress
 payments to the consultant such sum as agreed during contract negotiations until the
 advance payment shall have been fully liquidated within the duration of the contract. (2016
-IRR Annex “F”)
+IRR Annex ï¿½Fï¿½)
 The consultant, for its part, may reduce his standby letter of credit or guarantee instrument
 by the amounts refunded in the advance payment.
 
@@ -3978,20 +3978,20 @@ justifiable reason as may be determined by the Procuring Entity. If the Consulta
 changes in the key personnel for reasons other than death, serious illness, incapacity, or
 resignation of the individual personnel during the first fifty percent (50%) of the contracted
 inputs of the said individual, this shall result in the imposition of damages. Violators will be
-fined an amount equal to the refund of the replaced personnel’s basic rate, which should be at
+fined an amount equal to the refund of the replaced personnelï¿½s basic rate, which should be at
 least fifty percent (50%) of the total basic rate for the duration of the engagement (2016
 IRR Section 33.3). The Consultant shall seek a replacement who should have equal or
 better qualifications, in terms of education, experience, and training, but will receive
 remuneration not exceeding that which would have been payable to the person replaced. The
 Consultant shall have no claim for additional costs arising out of or incidental to any removal
 and/or replacement of staff. Prior written approval by the Procuring Entity shall be obtained
-before any replacement of the Consultant’s key personnel is made.
+before any replacement of the Consultantï¿½s key personnel is made.
 What must a Procuring Entity do if it considers the performance of one or
 more key personnel to be unsatisfactory?
 If the Procuring Entity finds that any of the personnel has committed serious misconduct or
 has been charged with having committed a criminal action under Philippine law, or has
 reasonable cause to be dissatisfied with the performance of any of the personnel, then the
-consultant must, at the Procuring Entity’s written request specifying the grounds therefor,
+consultant must, at the Procuring Entityï¿½s written request specifying the grounds therefor,
 forthwith provide as replacement a person with qualifications and experience acceptable to
 the Procuring Entity. The determination of the qualifications and the remuneration of the
 replacement shall follow the above described procedure.
@@ -4040,7 +4040,7 @@ provision for price adjustment when local or foreign inflation is expected to be
 12 For FAPs, RFPs should clearly state that firms may express the price for their services, in any fully convertible
 currency. If the consultants wish to express the price as a sum of amounts in different foreign currencies, they may do
 so, provided the proposal includes no more than three (3) foreign currencies. The Procuring Entity may require
-consultants to state the portion of the price representing costs in the currency of the Procuring Entity’s country.
+consultants to state the portion of the price representing costs in the currency of the Procuring Entityï¿½s country.
 Payment under the contract should be made in the currency or currencies in which the price is expressed in the proposal.
 Page 99 of 108
 Manual of Procedures for the Procurement of Consulting Services
@@ -4079,9 +4079,9 @@ design and are hence discouraged. Therefore, the use of such a contract for
 architectural services is recommended only if it is based on a fixed target cost and
 covers precisely defined services (for example, not works supervision).
 5. Indefinite Delivery Contract (Price Agreement)
-These contracts are used when Procuring Entities need to have “on call” specialized
+These contracts are used when Procuring Entities need to have ï¿½on callï¿½ specialized
 services to provide advice on a particular activity, the extent and timing of which
-cannot be defined in advance. These are commonly used to retain “advisers” for
+cannot be defined in advance. These are commonly used to retain ï¿½advisersï¿½ for
 implementation of complex projects (for example, dam panel), expert adjudicators for
 dispute resolution panels, institutional reforms, procurement advice, technical
 troubleshooting, and so forth, normally for a period of a year or more. The Procuring
@@ -4103,10 +4103,10 @@ the contract may be rescinded or terminated by the Procuring Entity, without pre
 other courses of action and remedies available under the circumstances. In case the contract
 is rescinded or terminated, the Procuring Entity may take over the contract or award the
 same to a qualified consultant through negotiated procurement. In addition to the liquidated
-damages, the erring consultant’s performance security shall also be forfeited.
+damages, the erring consultantï¿½s performance security shall also be forfeited.
 In case the delay in the completion of the services exceeds ten percent (10%) of the specified
 contract time plus any time extension duly granted to the consultant, the Procuring Entity
-may rescind the contract. It then forfeits the consultant’s performance security and takes
+may rescind the contract. It then forfeits the consultantï¿½s performance security and takes
 over the prosecution of the contract or award the same to a qualified consultant through
 negotiated procurement.
 
@@ -4132,7 +4132,7 @@ the Procuring Entity. A maximum of twenty percent (20%) of the Services may be
 subcontracted by the Consultant.
 Subcontracting of any portion shall not relieve the Consultant from any liability or obligation
 that may arise from the contract. The Consultant will be responsible for the acts, defaults, and
-negligence of any subconsultant as fully as if these were the Consultant’s own acts, defaults,
+negligence of any subconsultant as fully as if these were the Consultantï¿½s own acts, defaults,
 or negligence.
 A subconsultant must comply with the eligibility criteria and the documentary requirements
 specified in the BDS. In the event that any subconsultant is found by the Procuring Entity to
@@ -4197,8 +4197,8 @@ work, provided that the consultant secures a written certification from the Phil
 National Police station that has responsibility over the affected area, as confirmed by
 the Department of the Interior and Local Government Regional Director, that such
 conditions exist; or
-3. Delay in the payment of consultant’s claim for progress billing beyond sixty (60)
-calendar days from the time the consultant’s claim has been certified by the Procuring
+3. Delay in the payment of consultantï¿½s claim for progress billing beyond sixty (60)
+calendar days from the time the consultantï¿½s claim has been certified by the Procuring
 Entity as being supported by complete documentation and a notice from the
 consultant has been received by the Procuring Entity that such payment is overdue,
 unless there are justifiable reasons which shall be communicated in writing to the
@@ -4229,11 +4229,11 @@ thereof granted by the Procuring Entity pursuant to a request made by the consul
 prior to the delay;
 2. As a result of force majeure, the consultant is unable to deliver or perform a material
 portion of the outputs and deliverables for a period of not less than sixty (60)
-calendar days after the consultant’s receipt of the notice from the Procuring Entity
+calendar days after the consultantï¿½s receipt of the notice from the Procuring Entity
 stating that the circumstance of force majeure is deemed to have ceased; or
 3. The consultant fails to perform any other obligation under the contract.
 The rescission of the contract shall be accompanied by the confiscation by the Procuring Entity
-of the consultant’s performance security. The consultant will also be recommended for
+of the consultantï¿½s performance security. The consultant will also be recommended for
 blacklisting. The consultant shall be paid on a quantum meruit basis.
 May a Procuring Entity terminate a contract by reason of Unlawful Acts?
 The Procuring Entity may terminate the contract in case it is determined prima facie that the
@@ -4258,7 +4258,7 @@ Under what conditions and how may a consultant terminate its contract
 with a Procuring Entity?
 The consultant may terminate its agreement with the Procuring Entity if the latter is in
 material breach of its obligations pursuant to the contract and has not remedied the same
-within sixty (60) calendar days following its receipt of the consultant’s notice specifying such
+within sixty (60) calendar days following its receipt of the consultantï¿½s notice specifying such
 breach.
 The consultant must serve a written notice to Procuring Entity of its intention to terminate the
 contract at least thirty (30) calendar days before its intended termination. The contract is
@@ -4274,7 +4274,7 @@ May termination be allowed for reasons other than those attributable to the
 consultant?
 The Procuring Entity, by written notice sent to the consultant, may terminate the contract, in
 whole or in part, at any time for its convenience. The notice of termination shall specify that
-the termination is for the Procuring Entity’s convenience, the extent to which performance of
+the termination is for the Procuring Entityï¿½s convenience, the extent to which performance of
 the contractor under the contract is terminated, and the date upon which such termination
 becomes effective.
 What circumstances may constitute sufficient grounds to terminate a
@@ -4406,8 +4406,8 @@ by the BAC and other participants that the use of the quality-based evaluation p
 would be recommended in the selection of consultants. The head of agency approved the use
 of said evaluation procedure.
 The project, which has an approved budget of P6,500,000, was advertised on 12 November
-2015 in a newspaper of nationwide general circulation, and posted in the agency’s website,
-the PhilGEPS, and a conspicuous place in the agency’s premises. Fifteen (15) firms responded
+2015 in a newspaper of nationwide general circulation, and posted in the agencyï¿½s website,
+the PhilGEPS, and a conspicuous place in the agencyï¿½s premises. Fifteen (15) firms responded
 by submitting their eligibility documents on or before the deadline specified in the Request for
 Expression of Interest (REI).
 During the eligibility check conducted by the BAC on 24 November 2015, the BAC declared
@@ -4436,7 +4436,7 @@ stating, among others, the place and deadline for the submission of the technica
 proposals.
 A pre-bid conference was scheduled on 13 January 2016, while the deadline for submission of
 technical and financial proposals was set on 22 January 2016, 10:00 a.m., at the Conference
-Room, 3rd floor of the agency’s building.
+Room, 3rd floor of the agencyï¿½s building.
 The BAC specified that the attendance of the 6 firms in the pre-bid conference is mandatory,
 and that failure to attend would be considered a ground for disqualification. All 6 firms
 attended the pre-bid conference and the minutes of the pre-bid conference were issued to the
@@ -4445,7 +4445,7 @@ Five of the six firms submitted their technical and financial proposals on or be
 January 2016, 10:00 a.m. deadline, at the 3rd floor Conference Room. The sixth firm
 (Company F) arrived at the 3rd floor Conference Room at 10:03 a.m. and insisted that its
 technical and financial proposals be accepted as they were in the building at 9:57 a.m., as
-recorded in the security guard’s logbook. The BAC decided to accept the technical and
+recorded in the security guardï¿½s logbook. The BAC decided to accept the technical and
 financial proposals of Company F.
 The BAC started opening the technical envelopes of the six firms at the time indicated in the
 Notice of Eligibility and Short Listing to determine the presence of the required technical
@@ -4487,9 +4487,9 @@ should file a request for reconsideration within 3 calendar days upon receipt of
 or verbal notification.
 2. During the pre-procurement conference, the BAC should have already determined the
 number of shortlist of consultants, as provided in Section 24.5.2. The Section further
-provides that “(s)hould only one (1) or less than the required number apply for eligibility and
+provides that ï¿½(s)hould only one (1) or less than the required number apply for eligibility and
 short listing, pass the eligibility check, and/or pass the minimum score required in the short
-listing, the BAC shall consider the same.” Determining the number of shortlist and the
+listing, the BAC shall consider the same.ï¿½ Determining the number of shortlist and the
 minimum score during actual shortlisting gives the BAC the opportunity to have a lesser or
 larger number of shortlist, from three (3) to seven (7), to favor a preferred firm.
 3. The BAC is a recommendatory body. It should have obtained the approval of the Head of
@@ -4505,8 +4505,8 @@ the pre-bid conference should be stated in writing and issued as a Supplemental/
 BAC as these were submitted at the designated place, which is the 3rd floor Conference Room
 Page 114 of 108
 Manual of Procedures for the Procurement of Consulting Services
-of the agency’s building and not just any place, beyond the deadline. Section 25.6 provides
-that “(b)ids submitted after the deadline should not be accepted by the BAC.”
+of the agencyï¿½s building and not just any place, beyond the deadline. Section 25.6 provides
+that ï¿½(b)ids submitted after the deadline should not be accepted by the BAC.ï¿½
 6. The evaluation criteria for the technical proposals should also have been agreed upon by
 the BAC during the pre-procurement conference. Although the BAC has not yet started
 evaluating the technical proposals when it finalized the evaluation criteria and could claim that

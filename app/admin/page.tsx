@@ -114,16 +114,17 @@ export default function AdminDashboard() {
       setFilteredPrs(prsData || []);
 
       // Calculate stats
-      const total = prsData?.length || 0;
-      const pending = prsData?.filter(p => p.current_stage === "draft" || p.current_stage === "pending").length || 0;
-      const in_progress = prsData?.filter(p => 
+      const prList = (prsData as PR[]) || [];
+      const total = prList.length;
+      const pending = prList.filter((p: PR) => p.current_stage === "draft" || p.current_stage === "pending").length;
+      const in_progress = prList.filter((p: PR) => 
         p.current_stage !== "draft" && 
         p.current_stage !== "pending" && 
         p.current_stage !== "completed" && 
         p.current_stage !== "cancelled"
-      ).length || 0;
-      const completed = prsData?.filter(p => p.current_stage === "completed").length || 0;
-      const cancelled = prsData?.filter(p => p.current_stage === "cancelled").length || 0;
+      ).length;
+      const completed = prList.filter((p: PR) => p.current_stage === "completed").length;
+      const cancelled = prList.filter((p: PR) => p.current_stage === "cancelled").length;
 
       setStats({ total, pending, in_progress, completed, cancelled });
     } catch (err) {
@@ -262,35 +263,40 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
+          <Loader2 className="h-12 w-12 animate-spin text-[#7A1315] mx-auto" />
+          <p className="mt-4 text-stone-600 font-medium">Loading admin dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-[#FAF8F5]">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
+      <nav className="bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-              <FileText className="h-5 w-5 text-white" />
+          <div className="flex items-center gap-2.5">
+            <div className="bg-[#7A1315] p-2 rounded-xl text-amber-300 border border-amber-400/30 shadow-xs">
+              <FileText className="h-5 w-5 text-amber-200" />
             </div>
-            <span className="font-bold text-xl text-gray-900">ProcuremateSU</span>
-            <span className="text-sm bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Admin</span>
+            <span className="font-bold text-xl text-[#4D0C0D]">
+              Procuremate<span className="text-[#B88E13]">SU</span>
+            </span>
+            <span className="text-xs bg-red-100 text-[#7A1315] font-bold px-2.5 py-0.5 rounded-full border border-red-200">
+              Admin Portal
+            </span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 hidden sm:inline">
-              <User className="h-4 w-4 inline mr-1" />
+            <span className="text-xs text-stone-600 hidden sm:inline font-medium">
+              <User className="h-3.5 w-3.5 inline mr-1 text-[#7A1315]" />
               {user?.email}
             </span>
             <button
               onClick={handleLogout}
-              className="text-gray-600 hover:text-red-600 transition-colors"
+              className="text-stone-500 hover:text-red-700 transition-colors p-1"
+              title="Sign Out"
             >
               <LogOut className="h-5 w-5" />
             </button>
@@ -302,99 +308,106 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p className="text-gray-600 mt-1">Manage all purchase requests</p>
+            <h1 className="text-3xl font-extrabold text-[#4D0C0D]">Admin Dashboard</h1>
+            <p className="text-stone-600 mt-1">MSU-GenSan Purchase Requests &amp; Modality Oversight</p>
           </div>
           <button
             onClick={() => window.location.reload()}
-            className="bg-white/70 backdrop-blur-sm text-gray-700 px-4 py-2 rounded-lg hover:bg-white transition-colors flex items-center gap-2 border border-gray-200"
+            className="bg-white text-stone-700 px-4 py-2 rounded-xl hover:bg-stone-50 transition-colors flex items-center gap-2 border border-stone-300 text-sm font-medium shadow-2xs"
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="h-4 w-4 text-[#7A1315]" />
             Refresh
           </button>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/30">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200/90">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-                <div className="text-sm text-gray-600">Total</div>
+                <div className="text-2xl font-bold text-[#7A1315]">{stats.total}</div>
+                <div className="text-xs font-semibold text-stone-600">Total PRs</div>
               </div>
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <FileCheck className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-red-50 rounded-lg">
+                <FileCheck className="h-5 w-5 text-[#7A1315]" />
               </div>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/30">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200/90">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-                <div className="text-sm text-gray-600">Pending</div>
+                <div className="text-2xl font-bold text-amber-600">{stats.pending}</div>
+                <div className="text-xs font-semibold text-stone-600">Pending</div>
               </div>
-              <div className="p-2 bg-yellow-50 rounded-lg">
-                <Clock className="h-5 w-5 text-yellow-600" />
+              <div className="p-2 bg-amber-50 rounded-lg">
+                <Clock className="h-5 w-5 text-amber-600" />
               </div>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/30">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200/90">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold text-orange-600">{stats.in_progress}</div>
-                <div className="text-sm text-gray-600">In Progress</div>
+                <div className="text-xs font-semibold text-stone-600">In Progress</div>
               </div>
               <div className="p-2 bg-orange-50 rounded-lg">
                 <AlertCircle className="h-5 w-5 text-orange-600" />
               </div>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/30">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200/90">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
-                <div className="text-sm text-gray-600">Completed</div>
+                <div className="text-2xl font-bold text-emerald-700">{stats.completed}</div>
+                <div className="text-xs font-semibold text-stone-600">Completed</div>
               </div>
-              <div className="p-2 bg-green-50 rounded-lg">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="p-2 bg-emerald-50 rounded-lg">
+                <CheckCircle className="h-5 w-5 text-emerald-700" />
               </div>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/30">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200/90">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-red-600">{stats.cancelled}</div>
-                <div className="text-sm text-gray-600">Cancelled</div>
+                <div className="text-2xl font-bold text-stone-600">{stats.cancelled}</div>
+                <div className="text-xs font-semibold text-stone-600">Cancelled</div>
               </div>
-              <div className="p-2 bg-red-50 rounded-lg">
-                <XCircle className="h-5 w-5 text-red-600" />
+              <div className="p-2 bg-stone-100 rounded-lg">
+                <XCircle className="h-5 w-5 text-stone-500" />
               </div>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30 text-center">
-            <MessageSquare className="h-8 w-8 text-purple-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900">Monitor Inquiries</h3>
-            <p className="text-sm text-gray-600 mt-1">See what users are asking the chatbot.</p>
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-stone-200/90 text-center col-span-2 sm:col-span-3 lg:col-span-5 flex items-center justify-between">
+            <div className="flex items-center gap-3 text-left">
+              <div className="p-2.5 bg-red-50 text-[#7A1315] rounded-xl">
+                <MessageSquare className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-[#4D0C0D]">Monitor Chatbot Inquiries</h3>
+                <p className="text-xs text-stone-600">Review faculty &amp; staff inquiries to Isko BidDo regarding procurement rules &amp; PR tracking.</p>
+              </div>
+            </div>
             <Link
               href="/admin/inquiries"
-              className="mt-4 inline-block text-purple-600 hover:text-purple-800 font-medium text-sm"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#7A1315] to-[#8B1518] hover:from-[#630E10] hover:to-[#7A1315] text-white rounded-xl text-xs font-semibold transition-all shadow-2xs border border-amber-400/30"
             >
-              View Inquiries →
+              <span>View Inquiries</span>
+              <span>&rarr;</span>
             </Link>
           </div>
         </div>
 
         {/* Filters & Search */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/30 mb-6">
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200/90 mb-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
               <input
                 type="text"
                 placeholder="Search by PR number, purpose, or department..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
               />
             </div>
             <div className="flex gap-4">
@@ -402,7 +415,7 @@ export default function AdminDashboard() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="appearance-none pl-4 pr-8 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
+                  className="appearance-none pl-4 pr-8 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                 >
                   <option value="all">All Statuses</option>
                   <option value="draft">Draft</option>
@@ -418,32 +431,32 @@ export default function AdminDashboard() {
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none" />
               </div>
               <div className="relative">
                 <select
                   value={departmentFilter}
                   onChange={(e) => setDepartmentFilter(e.target.value)}
-                  className="appearance-none pl-4 pr-8 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
+                  className="appearance-none pl-4 pr-8 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                 >
                   <option value="all">All Departments</option>
                   {uniqueDepartments.map((dept) => (
                     <option key={dept} value={dept}>{dept}</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none" />
               </div>
             </div>
           </div>
         </div>
 
         {/* PR Table */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/30 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <div className="bg-white rounded-xl shadow-sm border border-stone-200/90 overflow-hidden">
+          <div className="px-6 py-4 border-b border-stone-200 flex justify-between items-center bg-stone-50/50">
             <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Purchase Requests</h2>
-              <span className="text-sm text-gray-500">({filteredPrs.length})</span>
+              <FileText className="h-5 w-5 text-[#7A1315]" />
+              <h2 className="text-base font-bold text-[#4D0C0D]">Purchase Requests</h2>
+              <span className="text-xs bg-stone-200 px-2 py-0.5 rounded-full font-semibold text-stone-700">({filteredPrs.length})</span>
             </div>
           </div>
 
@@ -491,7 +504,7 @@ export default function AdminDashboard() {
                               setSelectedPR(pr);
                               setShowDetailModal(true);
                             }}
-                            className="text-blue-600 hover:text-blue-800 transition-colors"
+                            className="text-[#7A1315] hover:text-[#4D0C0D] transition-colors p-1"
                             title="View Details"
                           >
                             <Eye className="h-4 w-4" />
@@ -554,7 +567,7 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Total Amount</p>
-                  <p className="text-xl font-bold text-blue-600">
+                  <p className="text-xl font-bold text-[#7A1315]">
                     ₱{selectedPR.total?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 </div>
@@ -576,7 +589,7 @@ export default function AdminDashboard() {
                       disabled={updatingStatus || selectedPR.current_stage === status}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         selectedPR.current_stage === status
-                          ? "bg-blue-600 text-white"
+                          ? "bg-[#7A1315] text-white shadow-xs"
                           : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >

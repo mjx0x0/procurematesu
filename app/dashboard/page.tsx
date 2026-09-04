@@ -84,12 +84,13 @@ export default function DashboardPage() {
         const { data: prsData } = await query;
 
         if (prsData) {
-          setPrs(prsData);
-          const total = prsData.length;
-          const pending = prsData.filter(
-            (p) => p.current_stage !== "completed" && p.current_stage !== "cancelled"
+          const prList = prsData as PurchaseRequest[];
+          setPrs(prList);
+          const total = prList.length;
+          const pending = prList.filter(
+            (p: PurchaseRequest) => p.current_stage !== "completed" && p.current_stage !== "cancelled"
           ).length;
-          const completed = prsData.filter((p) => p.current_stage === "completed").length;
+          const completed = prList.filter((p: PurchaseRequest) => p.current_stage === "completed").length;
           setStats({ total, pending, completed });
         }
       } catch (err) {
@@ -144,34 +145,40 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
+        <Loader2 className="h-12 w-12 animate-spin text-[#7A1315]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FAF8F5]">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
+      <nav className="bg-white border-b border-red-950/10 px-4 py-3 sticky top-0 z-50 shadow-xs">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-              <FileText className="h-5 w-5 text-white" />
+          <div className="flex items-center gap-2.5">
+            <div className="bg-[#7A1315] p-2 rounded-xl text-amber-300 border border-amber-400/30 shadow-xs">
+              <FileText className="h-5 w-5" />
             </div>
-            <span className="font-bold text-xl text-gray-900">ProcuremateSU</span>
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-xl text-[#4D0C0D]">Procuremate<span className="text-[#B88E13]">SU</span></span>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-red-50 text-[#7A1315] border border-red-200">
+                MSU-GenSan
+              </span>
+            </div>
             {isAdmin && (
-              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Admin</span>
+              <span className="text-xs bg-red-100 text-[#7A1315] font-semibold px-2 py-0.5 rounded-full border border-red-200">Admin</span>
             )}
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600 hidden sm:inline">
-              <User className="h-4 w-4 inline mr-1" />
+              <User className="h-4 w-4 inline mr-1 text-[#7A1315]" />
               {user?.email}
             </span>
             <button
               onClick={handleLogout}
-              className="text-gray-600 hover:text-red-600 transition-colors"
+              className="text-gray-500 hover:text-[#7A1315] hover:bg-red-50 p-1.5 rounded-lg transition-colors"
+              title="Sign Out"
             >
               <LogOut className="h-5 w-5" />
             </button>
@@ -184,33 +191,33 @@ export default function DashboardPage() {
         {/* Welcome & Actions */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Welcome, {user?.user_metadata?.full_name || "User"}!
+            <h1 className="text-3xl font-extrabold text-[#4D0C0D] tracking-tight">
+              Welcome, {user?.user_metadata?.full_name || "MSU-GenSan Requisitioner"}!
             </h1>
-            <p className="text-gray-600 mt-1">Manage your procurement requests</p>
+            <p className="text-gray-600 mt-1">Manage, draft, and track your purchase requests</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {isAdmin && (
               <Link
                 href="/admin"
-                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-purple-600/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
+                className="bg-stone-800 hover:bg-stone-900 text-white px-5 py-2.5 rounded-xl font-medium shadow-xs transition-all flex items-center gap-2 whitespace-nowrap"
               >
-                <Shield className="h-5 w-5" />
+                <Shield className="h-4 w-4 text-amber-300" />
                 Admin Panel
               </Link>
             )}
             <Link
               href="/dashboard/chatbot"
-              className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-indigo-500/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
+              className="bg-white hover:bg-red-50 text-[#7A1315] border border-red-200/80 px-5 py-2.5 rounded-xl font-semibold shadow-2xs transition-all flex items-center gap-2 whitespace-nowrap"
             >
-              <Bot className="h-5 w-5" />
+              <Bot className="h-4 w-4 text-[#B88E13]" />
               Ask Isko BidDo
             </Link>
             <Link
               href="/dashboard/new-pr"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-600/30 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap"
+              className="bg-gradient-to-r from-[#7A1315] to-[#91191C] hover:from-[#630E10] hover:to-[#7A1315] text-white px-5 py-2.5 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all flex items-center gap-2 whitespace-nowrap border border-amber-400/30"
             >
-              <PlusCircle className="h-5 w-5" />
+              <PlusCircle className="h-4 w-4 text-amber-300" />
               New Purchase Request
             </Link>
           </div>
@@ -218,14 +225,14 @@ export default function DashboardPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-xl p-6 shadow-xs border border-stone-200/70">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
-                <div className="text-sm text-gray-600">Total Requests</div>
+                <div className="text-2xl font-bold text-[#4D0C0D]">{stats.total}</div>
+                <div className="text-sm text-gray-600">Total Requisitions</div>
               </div>
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <FileText className="h-6 w-6 text-blue-600" />
+              <div className="p-3 bg-red-50 rounded-xl text-[#7A1315]">
+                <FileText className="h-6 w-6" />
               </div>
             </div>
           </div>
@@ -269,7 +276,7 @@ export default function DashboardPage() {
               </p>
               <Link
                 href="/dashboard/new-pr"
-                className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-block bg-[#7A1315] hover:bg-[#4D0C0D] text-white font-semibold px-6 py-2.5 rounded-xl shadow-xs transition-colors border border-amber-400/30 text-sm"
               >
                 Create Your First PR
               </Link>
@@ -330,7 +337,7 @@ export default function DashboardPage() {
                       <td className="px-6 py-4 text-right">
                         <Link
                           href={`/dashboard/pr/${pr.pr_no}`}
-                          className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center gap-1"
+                          className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold transition-colors inline-flex items-center gap-1"
                         >
                           <Eye className="h-4 w-4" />
                           View

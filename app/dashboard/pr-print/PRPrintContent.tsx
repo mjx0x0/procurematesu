@@ -16,6 +16,10 @@ export default function PRPrintContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!searchParams) {
+      setLoading(false);
+      return;
+    }
     const encoded = searchParams.get("data");
     if (encoded) {
       try {

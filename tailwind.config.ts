@@ -51,6 +51,34 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        msu: {
+          maroon: {
+            DEFAULT: "#7A1315", // Signature MSU Deep Maroon
+            900: "#4D0C0D",
+            800: "#630E10",
+            700: "#7A1315",
+            600: "#91191C",
+            500: "#AA2023",
+            100: "#FBE9E9",
+            50: "#FDF5F5",
+          },
+          gold: {
+            DEFAULT: "#D4AF37", // Signature MSU Gold
+            900: "#7A5E0B",
+            800: "#9A770F",
+            700: "#B88E13",
+            600: "#D4AF37",
+            500: "#E5C158",
+            400: "#F2D57E",
+            100: "#FEF7E6",
+            50: "#FFFDF8",
+          },
+          green: {
+            DEFAULT: "#1B5E20",
+            700: "#1B5E20",
+            100: "#E8F5E9",
+          }
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

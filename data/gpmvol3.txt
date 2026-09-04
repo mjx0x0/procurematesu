@@ -18,7 +18,7 @@ How is Detailed Engineering commenced? .........................................
 What Activities are covered by Detailed Engineering? .................................................. 8
 What are the considerations on setting the standards and technical
  specifications? ................................................................................................ 11
-What is the “Approved Budget for the Contract” or the ABC? ...................................... 11
+What is the ï¿½Approved Budget for the Contractï¿½ or the ABC? ...................................... 11
 What are the factors that should be considered in determining the ABC? ...................... 12
 PREPARING THE BIDDING DOCUMENTS .............................................................. 16
 Legal Reference ................................................................................................... 16
@@ -97,8 +97,8 @@ STEP 4 RECEIVE, OPEN AND EXAMINE THE TECHNICAL AND FINANCIAL
 Legal Reference ................................................................................................... 37
 Who may be eligible to participate in a public bidding for
  infrastructure projects? .................................................................................... 37
-When is a contract “similar” to another? .................................................................. 38
-What do we mean by “coinciding with the contract to be bid”? .................................... 38
+When is a contract ï¿½similarï¿½ to another? .................................................................. 38
+What do we mean by ï¿½coinciding with the contract to be bidï¿½? .................................... 38
 Can foreign bidders participate in the bidding for infrastructure projects? ..................... 39
 When is a prospective bidder eligible to bid? ............................................................ 39
 What are the minimum eligibility requirements? ....................................................... 39
@@ -115,7 +115,7 @@ Are bidders allowed to modify or withdraw their bids? ..........................
 Who are involved in the Receipt and Opening of Bids? ............................................... 44
 Methodology: How are the bids received, opened and preliminarily examined? ............. 44
 Can the BAC reject unsealed or unmarked bid envelopes? .......................................... 44
-When is a document deemed “complete” and “sufficient”? ......................................... 45
+When is a document deemed ï¿½completeï¿½ and ï¿½sufficientï¿½? ......................................... 45
 What happens if no prospective bidder submits a bid? ............................................... 46
 What is an eligibility check? ................................................................................... 46
 How do you determine the eligibility of the prospective bidders? ................................. 46
@@ -130,7 +130,7 @@ What is the purpose of Bid Evaluation?..........................................
 When should the bids be evaluated? ....................................................................... 49
 Who are the participants in Bid Evaluation? ............................................................. 49
 Methodology: How are bids evaluated? .................................................................. 49
-On clarifications during bid evaluation (the “no-contact” rule) ..................................... 51
+On clarifications during bid evaluation (the ï¿½no-contactï¿½ rule) ..................................... 51
 What happens if a bidder does not accept the arithmetical corrections done by the
  BAC on its bid? ............................................................................................... 51
 What happens if no bid complies with all bid requirements? ....................................... 51
@@ -169,7 +169,7 @@ Manual of Procedures for the Procurement of Infrastructure Projects
 Legal Reference ................................................................................................... 60
 When must the winning bidder and the Procuring Entity enter into a contract? .............. 60
 What documents form part of the contract? ............................................................. 60
-When is a contract “effective”? .............................................................................. 61
+When is a contract ï¿½effectiveï¿½? .............................................................................. 61
 Who are the Parties involved in Contract Signing and Approval and
  Issuance of the NTP? ....................................................................................... 61
 Methodology: What happens if no action on the contract is taken
@@ -208,12 +208,12 @@ PROJECTS .......................................................................
 Legal Reference ................................................................................................... 81
 What is covered by Contract Implementation? .......................................................... 81
 When shall a contract be deemed effective? ............................................................. 81
-Procuring Entity’s Responsibilities ........................................................................... 81
+Procuring Entityï¿½s Responsibilities ........................................................................... 81
 Subcontracting .................................................................................................... 81
 Inspection and Tests ............................................................................................ 82
 Dayworks ........................................................................................................... 83
 The Use of Accredited Testing Laboratories .............................................................. 83
-Evaluation of Contractor’s Performance ................................................................... 83
+Evaluation of Contractorï¿½s Performance ................................................................... 83
 What must a Procuring Entity do if there are no CPES Guidelines for
 Page v
 Manual of Procedures for the Procurement of Infrastructure Projects
@@ -265,7 +265,7 @@ Who are the parties involved in the issuance of a Suspension Order? ............
 Methodology: How is a Suspension Order issued? ..................................................... 95
 CONTRACT TIME EXTENSION............................................................................ 96
 Legal Reference: .................................................................................................. 96
-2016 IRR Annex “E” provides the rules in relation to contract time extension. ............... 96
+2016 IRR Annex ï¿½Eï¿½ provides the rules in relation to contract time extension. ............... 96
 Can the contract time be extended? ....................................................................... 96
 Some special circumstances to be considered for contract time extension: ................... 96
 Under what circumstances should the Procuring Entity automatically
@@ -310,7 +310,7 @@ GENERAL PROCUREMENT ACTIVITIES AND TIMELINE FOR INFRASTRUCTURE
 PROJECTS .................................................................................................. 107
 CASE STUDY: PROCUREMENT OF INFRASTRUCTURE PROJECTS ............................... 109
 Analysis: ........................................................................................................... 109
-CASE STUDY……………………………………………………………………………107
+CASE STUDYï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½107
 
 Page vii
 Manual of Procedures for the Procurement of Infrastructure Projects
@@ -326,7 +326,7 @@ BIR Bureau of Internal Revenue
 BRS Bureau of Research and Standards
 BSP Bangko Sentral ng Pilipinas
 CAF Certificate of Availability of Funds
-CARI Contractor’s All-Risk Insurance
+CARI Contractorï¿½s All-Risk Insurance
 CDA Cooperatives Development Authority
 CIAP Construction Industry Authority of the Philippines
 CPE Constructors Performance Evaluators
@@ -349,10 +349,10 @@ Page viii
 Manual of Procedures for the Procurement of Infrastructure Projects
 GCC General Conditions of Contract
 GFI Government Financial Institution
-GOCC Government-owned and/or –controlled corporation
+GOCC Government-owned and/or ï¿½controlled corporation
 GoP Government of the Philippines
 GPPB Government Procurement Policy Board
-GPPB-TSO GPPB – Technical Support Office
+GPPB-TSO GPPB ï¿½ Technical Support Office
 GPRA Government Procurement Reform Act
 GSIS Government Service Insurance System
 IB Invitation to Bid
@@ -385,8 +385,8 @@ PNP Philippine National Police
 PPMP Project Procurement Management Plan
 PSA Philippine Statistics Authority
 R.A. Republic Act
-R.A. 9184 Republic Act No. 9184, otherwise known as the “Government Procurement
-Reform Act of 2003”
+R.A. 9184 Republic Act No. 9184, otherwise known as the ï¿½Government Procurement
+Reform Act of 2003ï¿½
 ROW Right-of-way
 SARO Special Allotment Release Order
 SBDs Standard Bidding Documents (of IFIs and bilateral agencies)
@@ -405,7 +405,7 @@ Scope of Volume 3
 This Manual seeks to provide its users clear, concise, and accurate information on the public
 procurement of infrastructure projects, by discussing the steps that need to be taken to
 effect such procurement in the manner prescribed by R.A. 9184, otherwise known as the
-“Government Procurement Reform Act, and its 2016 IRR” It also discusses important issues
+ï¿½Government Procurement Reform Act, and its 2016 IRRï¿½ It also discusses important issues
 that may confront government procurement officials in all stages of infrastructure
 procurement, from the preparation of bid documents, to the actual bidding activity,
 monitoring of contract implementation and the final payment to the contractor.
@@ -422,19 +422,19 @@ infrastructures such as irrigation, flood control and drainage, water supply, sa
 sewerage and solid waste management systems, shore protection, energy/power and
 electrification facilities, national buildings, school buildings, hospital buildings, and other
 related construction projects of the government. Under R.A. 9184 and its 2016 IRR, the term
-“infrastructure projects” has the same meaning as and is used interchangeably with the term
-“civil works” or “works.” (2016 IRR Section 5 [u])
+ï¿½infrastructure projectsï¿½ has the same meaning as and is used interchangeably with the term
+ï¿½civil worksï¿½ or ï¿½works.ï¿½ (2016 IRR Section 5 [u])
 In addition, the following terms are used in the manner indicated below:
 1. The bidder shall be referred to differently at different stages of the procurement
 process. Thus, the bidder is called:
-a. “prospective bidder” from the posting of the Invitation to Bid (IB) to the
+a. ï¿½prospective bidderï¿½ from the posting of the Invitation to Bid (IB) to the
 simultaneous submission of the Technical and Financial Bids;
-b. “eligible bidder” after passing the eligibility check/screening;
-c. “bidder with the LCB” after detailed evaluation;
-d. “bidder with the LCRB” after passing post-qualification; and
-e. “contractor” after the issuance of the NTP.
-2. The term “bid” will be used instead of “proposal” or “offer.”
-3. “Eligibility Check” and “Eligibility Screening” shall be used interchangeably.
+b. ï¿½eligible bidderï¿½ after passing the eligibility check/screening;
+c. ï¿½bidder with the LCBï¿½ after detailed evaluation;
+d. ï¿½bidder with the LCRBï¿½ after passing post-qualification; and
+e. ï¿½contractorï¿½ after the issuance of the NTP.
+2. The term ï¿½bidï¿½ will be used instead of ï¿½proposalï¿½ or ï¿½offer.ï¿½
+3. ï¿½Eligibility Checkï¿½ and ï¿½Eligibility Screeningï¿½ shall be used interchangeably.
 4. Eligibility Requirements are Eligibility Documents enclosed in the Technical Bid
 Envelope together with the technical documents.
 5. The Technical Envelope contains the Technical component of the bid together with the
@@ -489,7 +489,7 @@ Page 8 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 Procurement Planning
 Legal Reference
-2016 IRR Sections 7, 17.6 and Annex “A” provide the rules in relation to Detailed Engineering
+2016 IRR Sections 7, 17.6 and Annex ï¿½Aï¿½ provide the rules in relation to Detailed Engineering
 and Procurement Planning.
 What is the purpose of Procurement Planning?
 The purpose of procurement planning is for the Procuring Entity to schedule its procurement
@@ -504,7 +504,7 @@ investigations, surveys and designs including the acquisition of the ROW for the
 been sufficiently carried out and duly approved in accordance with the standards and
 specifications prescribed by the HoPE concerned or his duly authorized representative,
 pursuant to the recommendation of the end-user or implementing unit and in accordance with
-the provisions of Annex “A” of the 2016 IRR. In case of projects with pending acquisition of
+the provisions of Annex ï¿½Aï¿½ of the 2016 IRR. In case of projects with pending acquisition of
 right-of-way site or location, the procurement process may commence, but no award of
 contract shall be made until an authority or permit to enter is issued by the property owner,
 or a notarized deed of sale or deed of notation is executed in favor of the government, or a
@@ -549,19 +549,19 @@ for the project being considered
 16. Preparation of Bid/Tender Documents
 Furthermore, work under detailed engineering shall include, but not necessarily be limited to,
 the following:
-1. Design Standards – Design standards shall be in accordance with appropriate
+1. Design Standards ï¿½ Design standards shall be in accordance with appropriate
 standards and accepted detailed engineering practice adopted by the agency
 concerned. Design standards for structures shall take into account, among other
 things, the seismicity of the area to determine the optimum safety of structures and
 to minimize possible earthquake damage.
-2. Field Surveys and Investigations – Necessary field surveys and investigations which
+2. Field Surveys and Investigations ï¿½ Necessary field surveys and investigations which
 may include aerial, hydrographic, topographic, hydrologic, sub-surface, monumenting
 and other surveys shall be carried out in accordance with the design guidelines,
 criteria and standards adopted by the agency concerned. All survey and investigation
 works shall be prepared in a manner satisfactory to carry out accurate design and
 production of plans that will permit quantity estimates to be made within plus or
 minus ten percent (10%) of the final quantities of the completed structure.
-3. Contract Plans – The following plans shall be prepared for each construction contract
+3. Contract Plans ï¿½ The following plans shall be prepared for each construction contract
 in accordance with guidelines and standards adopted by the Procuring Entity
 concerned, incorporating at least the following:
 a. Site development plan;
@@ -573,17 +573,17 @@ that the complete structure can be set out and constructed; and
 Page 10 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 f. Other details which may be required by the head of the agency.
-4. Quantities – All construction quantities shall be computed to a reasonable accuracy of
+4. Quantities ï¿½ All construction quantities shall be computed to a reasonable accuracy of
 not more than plus or minus ten percent (10%) of the final quantities of the as-built
 structure.
-5. Special Provisions – Specifications shall be prepared for specific items of work or
+5. Special Provisions ï¿½ Specifications shall be prepared for specific items of work or
 methods of construction, measurement and payment under each contract, which are
 not covered by Standard Construction and Material Specifications adopted by the
 Procuring Entity concerned.
-6. Unit Prices – These shall be prepared for each contract using costs based on
+6. Unit Prices ï¿½ These shall be prepared for each contract using costs based on
 reasonable approved current prices as projected over the proposed construction
 period, divided into local and foreign exchange costs, as the case may be.
-7. Approved Budget for the Contract – The approved budget for the contract to be bid
+7. Approved Budget for the Contract ï¿½ The approved budget for the contract to be bid
 shall be prepared by official(s) duly designated by the HoPE concerned or by his duly
 authorized official. It shall be approved by the HoPE or his duly designated official.
 Since the contracts are fixed price contracts, the approved budget for the contract to
@@ -596,7 +596,7 @@ such as earthwork, roadwork, and massive concreting, the components for equipmen
 rentals, fuel, labor, materials and overhead, including the cost of the approved
 construction safety and health program and warranty premium.
 8. Bidding documents shall be prepared as provided for in the 2016 IRR.
-9. Program of Work – Before prosecuting any project, the necessary program of work
+9. Program of Work ï¿½ Before prosecuting any project, the necessary program of work
 shall be prepared and submitted for approval. In no case shall construction funds be
 remitted to field offices or construction work on a project be started before the
 program of work is approved, in accordance with existing laws.
@@ -607,7 +607,7 @@ work shall cover at least a usable portion of the project and no construction sh
 started for portions of the project that are less than usable, except projects requiring
 stage construction, in which case continuity of construction up to the completion of a
 usable portion must be assured.
-10. Contract Time or Duration – In the preparation of the Bidding Documents, the agency
+10. Contract Time or Duration ï¿½ In the preparation of the Bidding Documents, the agency
 shall make an estimate of the actual number of working days required to complete the
 project through PERT/CPM analysis of the project activities and corrected for holidays
 and weekends. Likewise, the agency shall make an estimate of the number of rainy/
@@ -625,15 +625,15 @@ conditions.
 
 Page 11 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
-11. Warranty Period – Likewise, the Bidding Documents shall specify the type of project
+11. Warranty Period ï¿½ Likewise, the Bidding Documents shall specify the type of project
 and the corresponding warranty period required by the Procuring Entity.
-12. Value Engineering – For major projects as specified by the agency, value engineering
+12. Value Engineering ï¿½ For major projects as specified by the agency, value engineering
 shall be conducted according to accepted standards and practices. Value engineering
-shall analyze alternative schemes of achieving the project’s objectives in order to
+shall analyze alternative schemes of achieving the projectï¿½s objectives in order to
 delete or reduce non-essential features and lessen the life cycle costs of the projects
 without sacrificing the quality and integrity of the structure, while maintaining its
 essential function, performance and safety.
-13. Site or Right-of-Way Acquisition Plans Resettlement Action Plans – These shall be
+13. Site or Right-of-Way Acquisition Plans Resettlement Action Plans ï¿½ These shall be
 prepared based on parcellary surveys and socio-economic surveys of households
 affected by the project.
 For projects to be implemented by phases, the Procuring Entity shall ensure that there is a
@@ -670,7 +670,7 @@ may be specified; and
 3. In all cases, the bidding documents should state that equipment, material or
 workmanship meeting other standards, which promise at least substantial equivalent,
 should also be accepted.
-What is the “Approved Budget for the Contract” or the ABC?
+What is the ï¿½Approved Budget for the Contractï¿½ or the ABC?
 The ABC is the budget for the contract duly approved by the HoPE, as provided for in:
 1. The GAA, continuing, and automatic appropriations, in the case of NGAs;
 Page 12 of 113
@@ -743,27 +743,27 @@ local taxes, construction and/or maintenance of haul roads, etc.
 (a) Salaries and wages, as authorized by the Department of Labor and
 Employment.
 (b) Fringe benefits, such as vacation and sick leaves, benefits under the
-Workmen’s Compensation Act, Social Security System (SSS) contributions,
+Workmenï¿½s Compensation Act, Social Security System (SSS) contributions,
 allowances, 13th month pay, bonuses, etc.
 (3) Equipment Expenses:
-(a) Rental rates of equipment–based on the prevailing “Associated Construction
-Equipment Lessors, Inc.” (ACEL) rental rates approved for use by the DPWH.
+(a) Rental rates of equipmentï¿½based on the prevailing ï¿½Associated Construction
+Equipment Lessors, Inc.ï¿½ (ACEL) rental rates approved for use by the DPWH.
 Rental rates of equipment not indicated in the ACEL booklet shall be taken
 from the rental rates prepared by the Bureau of Equipment. For simplicity in
 computation, the operated rental rates are preferred to the bare rental rates
-as the former includes operator’s wages, fringe benefits, fuel, oil, lubricants
+as the former includes operatorï¿½s wages, fringe benefits, fuel, oil, lubricants
 and equipment maintenance. The make, model and capacity of the equipment
 should be indicated in the detailed unit cost analysis.
-(b) Mobilization and demobilization –treated as a separate pay item. It shall be
+(b) Mobilization and demobilization ï¿½treated as a separate pay item. It shall be
 computed based on the equipment requirements of the project stipulated in
 the proposal and contract booklet. In no case shall mobilization and
 demobilization exceed one percent (1%) of the EDC of the civil works items.
 (4) Cost for Permits, Clearances and other Government Taxes (i.e. MMDA Permit,
 LGU Permits, Bureau of Fire Protection Clearance, etc.) shall be included in the
-cost under Part B – Other General Requirements of the Program of Works (POW)
+cost under Part B ï¿½ Other General Requirements of the Program of Works (POW)
 and Estimate/ABC.
 b. The Estimated Indirect Cost shall consist of the following:
-(1) Overhead Expenses– range from seven to eleven percent (7-11%) of the
+(1) Overhead Expensesï¿½ range from seven to eleven percent (7-11%) of the
 EDC, which include the following:
 Page 14 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
@@ -771,20 +771,20 @@ Manual of Procedures for the Procurement of Infrastructure Projects
 (b) Transportation allowances.
 (c) Office Expenses, e.g., for office equipment and supplies, power and water
 consumption, communication and maintenance.
-(d) Premium on Contractor’s All Risk Insurance (CARI).
+(d) Premium on Contractorï¿½s All Risk Insurance (CARI).
 (e) Financing Cost.
 i. Premium on Bid Security
 ii. Premium on Performance Security
 iii. Premium on Surety for Advance Payment
 iv. Premium on Warranty Bond (one year)
-(2) Contingencies– range from five-tenths to three percent (0.5-3.0%) of the EDC.
+(2) Contingenciesï¿½ range from five-tenths to three percent (0.5-3.0%) of the EDC.
 These include expenses for meetings, coordination with other stakeholders,
 billboards (excluding Project Billboard which is a pay item under General
 Requirements), stages during ground breaking and inauguration ceremonies, and
 other unforeseen events.
-(3) Miscellaneous Expenses– range from five-tenths to one percent (0.5-1.0%) of the
+(3) Miscellaneous Expensesï¿½ range from five-tenths to one percent (0.5-1.0%) of the
 EDC. These include laboratory tests for quality control and plan preparation.
-(4) Contractor’s Profit Margin– shall be eight percent (8%) of the EDC for projects
+(4) Contractorï¿½s Profit Marginï¿½ shall be eight percent (8%) of the EDC for projects
 with an EDC of more than PhP5Million and ten percent (10%) for projects with an
 EDC of PhP5Million and below.
 Estimates for Overhead, Contingencies and Miscellaneous or OCM (items b(1),
@@ -879,7 +879,7 @@ assured of equal opportunities to obtain additional information on a timely basi
 prospective bidders.
 3. For works, particularly for those requiring refurbishing existing works, a pre-bid
 conference may be arranged whereby potential bidders may meet with the Procuring
-Entity’s representatives to seek clarifications (in person or online).
+Entityï¿½s representatives to seek clarifications (in person or online).
 4. Any additional information, clarification, correction of errors, or modifications of
 bidding documents should be sent to each recipient of the original bidding documents
 in sufficient time before the deadline for receipt of bids to enable bidders to take
@@ -949,7 +949,7 @@ FORM OF BID SECURITY
 AMOUNT OF BID SECURITY
 (Not less than the
 percentage of the ABC)
-a. Cash, cashier’s check/manager’s check issued by a
+a. Cash, cashierï¿½s check/managerï¿½s check issued by a
 Universal or Commercial Bank; 2% of ABC
 b. Bank draft/guarantee or irrevocable letter of credit
 issued by a Universal or Commercial Bank: Provided, 2% of ABC
@@ -969,7 +969,7 @@ Commission as authorized to issue such security; or
 Who determines the form of the Bid Security to be submitted by bidders?
 The bidders choose, from the different forms of bid security, the preferred form and the
 corresponding amount it shall submit.
-In order to enhance competition and bidders’ participation, reduce transactional costs, and
+In order to enhance competition and biddersï¿½ participation, reduce transactional costs, and
 promote economy in procurement activities of the government, the use of the Bid Securing
 Declaration shall be an alternative to the existing forms of bid security. (Guidelines on the
 Use of Bid Securing Declaration)
@@ -985,7 +985,7 @@ Should it become necessary to extend the validity of the bids and the bid securi
 Procuring Entity should request in writing all those who submitted bids for such extension
 before the expiry date thereof. Bidders shall have the right to refuse to grant such extension
 without forfeiting their bid securities. The bid security of bidders who refuse to grant the
-Procuring Entity’s request for an extension of the validity of their respective bid securities will
+Procuring Entityï¿½s request for an extension of the validity of their respective bid securities will
 have these securities returned to them. (2016 IRR Section 28.2) However, they are
 deemed to have waived their right to further participate in the bidding.
 In what currency shall the Bid Security be denominated?
@@ -1007,7 +1007,7 @@ Section 27.6)
 Page 20 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 When may a bid security be forfeited?
-A bidder’s bid security may be forfeited when the bidder:
+A bidderï¿½s bid security may be forfeited when the bidder:
 1. Withdraws its bid during the period of bid validity;
 2. Does not accept corrections of arithmetical errors;
 3. Being post-qualified, did not provide the BAC the required clarifications within the
@@ -1025,7 +1025,7 @@ insurance company) submitted to the Procuring Entity by the winning bidder that 
 faithfully perform its obligations under the contract prepared in accordance with the bidding
 documents. (2016 IRR Section 39.1) The performance security shall be denominated in
 Philippine Pesos and posted in favor of the Procuring Entity, which shall be forfeited in the
-latter’s favor in the event it is established that the winning bidder is in default in any of its
+latterï¿½s favor in the event it is established that the winning bidder is in default in any of its
 obligations under the contract. (2016 IRR Section 39.3)
 When shall the Performance Security be posted by the Bidder with the
 LCRB?
@@ -1044,7 +1044,7 @@ AMOUNT
 (Not less than the
 Percentage of the
 Total Contract Price)
-a. Cash, or cashier’s/manager’s check issued by a Universal or
+a. Cash, or cashierï¿½s/managerï¿½s check issued by a Universal or
 Commercial Bank; Ten percent (10%)
 b. Bank draft/guarantee or irrevocable letter of credit issued
 by a Universal or Commercial Bank: Provided, however, Ten percent (10%)
@@ -1099,11 +1099,11 @@ a. Must remain valid until issuance by the Procuring Entity of the Certificate o
 Final Acceptance at the end of the Defects Liability Period; and
 Page 22 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
-b. The following provisions shall form part of the performance security: “The
+b. The following provisions shall form part of the performance security: ï¿½The
 right to institute action on the penal bond pursuant to Act No. 3688 of any
 individual firm, partnership, corporation and association supplying the
 contractor with labor and materials for the prosecution of the work is hereby
-acknowledged and confirmed.”
+acknowledged and confirmed.ï¿½
 
 2. The BAC Secretariat accepts the performance security and indicates such posting and
 acceptance by attaching the appropriate form to the contract.
@@ -1167,11 +1167,11 @@ example, the bidding documents shall emphasize that the bidder shall provide
 information on the minimum equipment required for the project, such as, the
 corresponding engine numbers, chassis numbers and/or serial numbers. Additionally,
 the bidding documents shall clearly state the minimum required experiences of the
-bidders’ personnel, such as project managers, project engineers, material engineers
+biddersï¿½ personnel, such as project managers, project engineers, material engineers
 and foreman;
 5. Review and adopt the procurement schedule, including deadlines and timeframes, for
 the different activities;
-6. Reiterate and emphasize the “no contact rule” during the bid evaluation process, and
+6. Reiterate and emphasize the ï¿½no contact ruleï¿½ during the bid evaluation process, and
 the applicable sanctions and penalties, as well as agree on measures to ensure
 compliance with the foregoing; and
 7. Finalize and approve the IB.
@@ -1181,7 +1181,7 @@ SECTION 3
 Instructions on the Procedural
 Steps for the Procurement of
 Infrastructure Projects
-PART ONE – COMPETITIVE BIDDING
+PART ONE ï¿½ COMPETITIVE BIDDING
 Page 28 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 Competitive Bidding
@@ -1323,10 +1323,10 @@ the procurement at hand affects national security.
 In procurements involving and affecting national security, the disclosure of the specific
 components of the procurement documents, such as, the technical specifications,
 requirements and components, shall be dependent upon the HoPE having due regard to the
-nature, classification, sensitivity and confidentiality of the relevant documents vis-à-vis the
+nature, classification, sensitivity and confidentiality of the relevant documents vis-ï¿½-vis the
 purpose and reason for the request. (2016 IRR Section 19)
 Based on the National Intelligence Coordinating Agency (NICA), national security refers to the
-state or condition wherein the country’s national interests, the well-being of its people and
+state or condition wherein the countryï¿½s national interests, the well-being of its people and
 institutions, and its sovereignty and territorial integrity are protected and enhanced.
 How much must prospective bidders pay for the bidding documents?
 Standard rates have been formulated by the GPPB to rationalize the fees primarily to regulate
@@ -1424,7 +1424,7 @@ Supplemental/Bid Bulletins
 Legal Reference
 2016 IRR Section 22 specifies the rules in relation to the conduct of a Pre-bid Conference.
 What is a Pre-Bid Conference?
-The pre-bid conference is the initial forum where the Procuring Entity’s representatives and
+The pre-bid conference is the initial forum where the Procuring Entityï¿½s representatives and
 the prospective bidders discuss the different aspects of the procurement at hand.
 The ground rules that will govern the procurement are discussed. In particular, the
 participants discuss the legal, technical and financial components of the contract to be bid.
@@ -1475,10 +1475,10 @@ How should the participants conduct themselves during the Pre-Bid
 Conference and other stages of the procurement process?
 The BAC, BAC Secretariat, TWG, and other officials involved in procurement are expected to
 act in an impartial, courteous and professional manner in all their dealings and interactions
-with the bidders during all stages of the procurement. The bidders’ representatives are
+with the bidders during all stages of the procurement. The biddersï¿½ representatives are
 likewise enjoined to adopt the same professional manner in their dealings with the Procuring
-Entity’s officials. Communications between the parties must, as much as possible, be made in
-writing, except during the pre-bid conference when verbal clarifications may be allowed –
+Entityï¿½s officials. Communications between the parties must, as much as possible, be made in
+writing, except during the pre-bid conference when verbal clarifications may be allowed ï¿½
 keeping in mind, however, that any statement made at the pre-bid conference would not
 modify the terms of the bidding documents, unless such statement is specifically identified in
 writing as an amendment of the documents and issued as a supplemental/bid bulletin.
@@ -1510,15 +1510,15 @@ and receipt of bids. (2016 IRR Section 22.5.1)
 The BAC may, at its own initiative, also issue supplemental/bid bulletins for purposes of
 clarifying or modifying any provision of the bidding documents not later than seven (7)
 calendar days before the deadline for the submission and receipt of bids. Any modification to
-the bidding documents must be identified as an “AMENDMENT.” (2016 IRR Section 22.5.2)
+the bidding documents must be identified as an ï¿½AMENDMENT.ï¿½ (2016 IRR Section 22.5.2)
 Page 36 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 The BAC should also post the supplemental/bid bulletin on the website of the Procuring Entity
 concerned, if available, and on the PhilGEPS, within the same timetable. Nonetheless, it will
-be the prospective bidders’ responsibility to ask for, and secure, these bulletins.
+be the prospective biddersï¿½ responsibility to ask for, and secure, these bulletins.
 A supplemental/bid bulletin must contain a brief but comprehensive and accurate summary of
 the issue or issues that it wishes to address. If it was a prospective bidder that raised the
-issue addressed by the bulletin, then it ought to contain a summary of that bidder’s request
+issue addressed by the bulletin, then it ought to contain a summary of that bidderï¿½s request
 for clarification and/or interpretation, without identifying the bidder.
 Bidders who have submitted bids before a supplemental/bid bulletin is issued have to be
 informed in writing and allowed to modify or withdraw their respective bids. (2016 IRR
@@ -1530,7 +1530,7 @@ steps are followed:
 supplemental/bid bulletin for approval by the BAC.
 2. The BAC approves the supplemental/bid bulletin and the BAC Chairperson signs it.
 3. The BAC Secretariat posts the supplemental/bid bulletin in the PhilGEPS, the website
-of the Procuring Entity, if any, and in the agency’s premises not later than seven (7)
+of the Procuring Entity, if any, and in the agencyï¿½s premises not later than seven (7)
 calendar days before the deadline for the submission and receipt of bids.
 If the supplemental/bid bulletin is being issued in response to a request for clarification
 submitted by a prospective bidder, the process is as follows:
@@ -1611,7 +1611,7 @@ Medium B Up to 200
 Large A Up to 300
 Large B No limit
 The SLCC shall be supported by an
-Owner’s Certificate of Final Acceptance
+Ownerï¿½s Certificate of Final Acceptance
 issued by the project owner other than
 the contractor or a final rating of at
 least Satisfactory in the Constructors
@@ -1636,16 +1636,16 @@ Current Assets= P 3,000,000
 Current Liabilities= P 500,000
 Value of Outstanding Works= P 4,000,000
 
-NFCC =[ (P 3,000,000 – P 500,000) x 15 ] – P 4,000,000
- = P 37,500,000 – P 4,000,000
+NFCC =[ (P 3,000,000 ï¿½ P 500,000) x 15 ] ï¿½ P 4,000,000
+ = P 37,500,000 ï¿½ P 4,000,000
  = P 33,500,000
-The values of the domestic bidder’s current assets and current liabilities shall be based on the
+The values of the domestic bidderï¿½s current assets and current liabilities shall be based on the
 latest Audited Financial Statements submitted to the BIR. For purposes of computing the
-foreign bidder’s NFCC, the value of the current assets and the current liabilities shall be based
+foreign bidderï¿½s NFCC, the value of the current assets and the current liabilities shall be based
 on their Audited Financial Statements prepared in accordance with international financial
 reporting standards.
-What do we mean by “coinciding
-with the contract to be bid”?
+What do we mean by ï¿½coinciding
+with the contract to be bidï¿½?
 In computing for the NFCC, for ongoing
 contracts and contracts awarded but not
 yet started, not all of the value of the
@@ -1663,7 +1663,7 @@ not the value of the outstanding works
 of the 2 year ongoing contract and the
 entire 3 year contract awarded but not
 yet started shall be deducted.
-When is a contract “similar” to
+When is a contract ï¿½similarï¿½ to
 another?
 A contract is similar to the contract to be
 bid if it has the same major categories of
@@ -1693,16 +1693,16 @@ by the government.
 What are the minimum eligibility requirements?
 2016 IRR Section 23.1 prescribes the submission to the BAC of the following eligibility
 documents following the forms prescribed in the Bidding Documents:
-1. Class “A” Documents
+1. Class ï¿½Aï¿½ Documents
 a. Legal Documents
 i. DTI business name registration in the case of Single Proprietorships,
 SEC registration certificate, in the case of Partnerships or
 Corporations, or CDA Registration in case of Cooperatives.
-ii. Valid and current Mayor’s/Business Permit issued by the city or
+ii. Valid and current Mayorï¿½s/Business Permit issued by the city or
 municipality where the principal place of business of the prospective
 bidder is located, or the equivalent document for Exclusive Economic
 Zones or areas.
-In cases of recently expired mayor’s/Business Permits, it shall be
+In cases of recently expired mayorï¿½s/Business Permits, it shall be
 accepted together with the official receipt as proof that the bidder has
 applied for renewal within the period prescribed by the concerned
 LGU, provided that the renewed permit shall be submitted as a postqualification requirement.
@@ -1715,7 +1715,7 @@ any, whether similar or not similar in nature and complexity to the
 contract to be bid;
 Page 40 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
-v. Statement of the bidder’s SLCC similar to the contract to be bid,
+v. Statement of the bidderï¿½s SLCC similar to the contract to be bid,
 except under conditions provided for in 2016 IRR Section 23.4.2.4;
 Both statements above shall include all information required in the
 PBDs for Procurement of Infrastructure Projects.
@@ -1723,10 +1723,10 @@ vi. Valid PCAB license and registration for the type and cost of contract to
 be bid. In the case of joint ventures, a Special PCAB license of the
 joint venture;
 c. Financial Documents
-vii. The prospective bidder’s audited financial statements, showing,
-among others, the prospective bidder’s total and current assets and
+vii. The prospective bidderï¿½s audited financial statements, showing,
+among others, the prospective bidderï¿½s total and current assets and
 liabilities, stamped
-“received’’ by the BIR or
+ï¿½receivedï¿½ï¿½ by the BIR or
 its duly accredited and
 authorized institutions,
 for the preceding
@@ -1735,9 +1735,9 @@ should not be earlier
 than two (2) years from
 the date of bid
 submission; and
-viii. The prospective bidder’s
+viii. The prospective bidderï¿½s
 computation of its NFCC.
-2. Class “B” Documents
+2. Class ï¿½Bï¿½ Documents
 If the prospective bidder is a joint venture, a valid JVA in accordance with R.A. 4566
 and its IRR.
 Each partner of the joint venture should submit their respective PhilGEPS Certificates
@@ -1759,7 +1759,7 @@ Manual of Procedures for the Procurement of Infrastructure Projects
 What is a Bid?
 A Bid refers to a signed offer or proposal to undertake a contract submitted by a bidder in
 response to, and in consonance with, the requirements stated in the bidding documents.
-“Bid” is also equivalent to and may be used interchangeably with “Proposal” and “Tender”. A
+ï¿½Bidï¿½ is also equivalent to and may be used interchangeably with ï¿½Proposalï¿½ and ï¿½Tenderï¿½. A
 Bid has two components, the Technical Proposal or the Technical Bid, and the Financial
 Proposal or the Financial Bid. The Technical and Financial Bids must each be contained in
 separate sealed bid envelopes.
@@ -1779,9 +1779,9 @@ bid, and whose value must be at least fifty percent (50%) of the ABC to be bid;
 How can submission of eligibility documents be made
 easier?
 All bidders shall upload and maintain in PhilGEPS a current and updated file of the
-following Class “A” eligibility documents:
+following Class ï¿½Aï¿½ eligibility documents:
 a) Registration Certificate;
-b) Mayor’s/Business Permit;
+b) Mayorï¿½s/Business Permit;
 c) Tax Clearance; and
 d) Audited Financial Statements.
 For Foreign Bidders, the abovementioned documents may be substituted by the
@@ -1789,28 +1789,28 @@ appropriate equivalent documents in English, if any, issued by the country of th
 concerned. Otherwise, it must be accompanied by a translation of the documents in
 English issued by the relevant foreign government agency, the foreign government
 agency authorized to translate documents, or a registered translator in the foreign
-bidder’s country. It shall be authenticated by the appropriate Philippine foreign service
-establishment/post or the equivalent office having jurisdiction over the foreign bidder’s
+bidderï¿½s country. It shall be authenticated by the appropriate Philippine foreign service
+establishment/post or the equivalent office having jurisdiction over the foreign bidderï¿½s
 affairs in the Philippines.
 These documents shall be accompanied by a Sworn Statement in a form prescribed by
 the GPPB stating that the documents submitted are complete and authentic copies of the
 original, and all statements and information provided therein are true and correct. Upon
 receipt of the said documents, the PhilGEPS shall process the same in accordance with
-the guidelines on the Government of the Philippines – Official Merchants Registry (GoPOMR). (2016 IRR Section 8.5.2)
-Bidders who are maintaining current and updated Class “A” Eligibility Documents, as
+the guidelines on the Government of the Philippines ï¿½ Official Merchants Registry (GoPOMR). (2016 IRR Section 8.5.2)
+Bidders who are maintaining current and updated Class ï¿½Aï¿½ Eligibility Documents, as
 enumerated above, shall be issued their PhilGEPS Certificate of registration and
 Membership. This PhilGEPS Certificate will be required during submission of bids, in lieu
-of the same Class “A” Eligibility Documents.
+of the same Class ï¿½Aï¿½ Eligibility Documents.
 Page 42 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 6. Joint Venture Agreement, if applicable;
 7. The bid security in the prescribed form, amount and validity period;
 8. Project requirements, which shall include the following:
 a. Organizational chart for the contract to be bid (not of the firm);
-b. List of contractor’s key personnel (e.g., Project Manager, Project Engineers,
+b. List of contractorï¿½s key personnel (e.g., Project Manager, Project Engineers,
 Materials Engineers, and Foremen), to be assigned to the contract to be bid, their
 complete qualification and experience data;
-c. List of contractor’s major equipment units pledged for the contract to be bid,
+c. List of contractorï¿½s major equipment units pledged for the contract to be bid,
 which are owned (supported by proof/s of ownership), leased, and/or under
 purchase agreements (with corresponding engine numbers, chassis numbers
 and/or serial numbers), supported by certification of availability of equipment
@@ -1821,8 +1821,8 @@ the form prescribed in the bidding documents. The OSS shall contain the followin
 granted full power and authority to do, execute and perform any and all acts
 necessary to participate, submit the bid, and to sign and execute the ensuing
 contract accompanied by the duly notarized Special Power of Attorney,
-Board/Partnership Resolution, or Secretary’s Certificate, whichever is applicable;
-(b) It is not “blacklisted” or barred from bidding by the GoP or any of its agencies,
+Board/Partnership Resolution, or Secretaryï¿½s Certificate, whichever is applicable;
+(b) It is not ï¿½blacklistedï¿½ or barred from bidding by the GoP or any of its agencies,
 offices, corporations, or LGUs, including foreign government/foreign or
 international financing institution whose blacklisting rules have been recognized
 by the GPPB;
@@ -1879,13 +1879,13 @@ Fifty (50) million and below 50 calendar days
 Above fifty (50) million 65 calendar days
 Bids, including the eligibility requirements, submitted after the specified deadline shall not be
 accepted by the BAC. The BAC shall record in the minutes of bid submission and opening the
-bidder’s name, its representative and the time the late bid was submitted. (2016 IRR
+bidderï¿½s name, its representative and the time the late bid was submitted. (2016 IRR
 Section 25.6)
 Are bidders allowed to modify or withdraw their bids?
 A bidder may modify its bid, provided that this is done before the deadline for the submission
 and receipt of bids. If a bidder modifies its bid, it shall not be allowed to retrieve its original
 bid, but shall only be allowed to send another bid equally sealed, properly identified, linked to
-its original bid and marked as a “Modification,” of the original, and stamped “Received” by the
+its original bid and marked as a ï¿½Modification,ï¿½ of the original, and stamped ï¿½Receivedï¿½ by the
 BAC. Bid modifications received after the applicable deadline will not be considered and must
 be returned to the bidder unopened. (2016 IRR Section 26.1)
 A bidder may, through a Letter of Withdrawal, withdraw its bid, before the deadline for the
@@ -1926,7 +1926,7 @@ container containing the Technical
 and Financial Proposals, the BAC
 Secretariat must stamp the face of
 the outer envelope/container as
-“RECEIVED,” indicating thereon the
+ï¿½RECEIVED,ï¿½ indicating thereon the
 date and time of receipt.
 4. The BAC then proceeds with the opening and preliminary examination of bids in
 public. For each bid, the BAC first opens the envelope containing the Technical
@@ -1934,9 +1934,9 @@ Proposal and the eligibility requirements to determine its compliance with the r
 documents. The BAC conducts an eligibility check on the submitted eligibility
 documents contained in the Technical Bid Envelope of each bidder against a checklist
 of required documents to ascertain if they are all present, using non-discretionary
-“pass/fail” criteria. (2016 IRR Section 30.1)
+ï¿½pass/failï¿½ criteria. (2016 IRR Section 30.1)
 5. In case one or more of the required eligibility documents in the Technical Bid
-Envelope is missing, incomplete or insufficient, the BAC rates the bid “failed” and
+Envelope is missing, incomplete or insufficient, the BAC rates the bid ï¿½failedï¿½ and
 immediately returns the eligibility documents and Technical Proposal to the bidder
 
 10 The receipt, opening and preliminary examination methodology may vary for FAPs. Reference should be made to the
@@ -1959,36 +1959,36 @@ concerned, together with the
 unopened envelope containing the
 Financial Proposal. Otherwise, the
 BAC rates the Technical Proposal
-“passed”.
+ï¿½passedï¿½.
 6. The BAC then examines the technical bid documents submitted against a checklist of
 technical bid requirements. In case one or more of the required technical documents
 in the Technical Bid Envelope is missing, incomplete or insufficient, the BAC rates the
-bid “failed” and immediately returns the eligibility documents and Technical Proposal
+bid ï¿½failedï¿½ and immediately returns the eligibility documents and Technical Proposal
 to the bidder concerned, together with the unopened envelope containing the
-Financial Proposal. Otherwise, the BAC rates the Technical Proposal “passed”.
+Financial Proposal. Otherwise, the BAC rates the Technical Proposal ï¿½passedï¿½.
 7. The BAC then immediately opens the envelope containing the Financial Proposal of
-each remaining bidder whose Technical Proposal (first envelope) was rated “passed.”
+each remaining bidder whose Technical Proposal (first envelope) was rated ï¿½passed.ï¿½
 The Financial envelope of each complying bidder shall be opened within the same day.
 The BAC determines whether all the requirements/documents required for the
 Financial Proposal are complete and sufficient, and if the total bid price does not
-exceed the ABC. If so, the BAC rates the bid “passed”. If not, then the BAC rates the
-bid “failed”. Only bids that are rated “passed” for both the Technical and Financial
+exceed the ABC. If so, the BAC rates the bid ï¿½passedï¿½. If not, then the BAC rates the
+bid ï¿½failedï¿½. Only bids that are rated ï¿½passedï¿½ for both the Technical and Financial
 Proposals shall be considered for the next stage of the procurement process, i.e.
 detailed evaluation and comparison of bids. (2016 IRR Sections 30.2)
 In the case of foreign currency denominated bids, where allowed by the law and rules,
 the same shall be converted to Philippine currency, based on the exchange rate
 prevailing on the day of the bid opening. The BSP reference rate as of the date of the
 bid opening shall be used.
-8. The BAC reads the total bid prices of the bidders that are rated “passed.”
+8. The BAC reads the total bid prices of the bidders that are rated ï¿½passed.ï¿½
 9. All members of the BAC, or in their absence their alternates, who are present during
 the bid opening, shall initial every page of the original copies of all bids received and
 opened. (2016 IRR Sections 29)
 10. The BAC members and the Observers (if they concur with the proceedings) shall also
-sign the “Abstract of Bids as Read” after the Preliminary Examination of Bids.
+sign the ï¿½Abstract of Bids as Readï¿½ after the Preliminary Examination of Bids.
 11. The BAC Secretariat shall record the proceedings. The minutes of the bid opening
 should be prepared and completed as soon as possible after the bid opening date, so
 that copies thereof could immediately be sent to the BAC members, Observers,
-Bidders and other interested parties. Copies of the “Abstract of Bids as Read” and the
+Bidders and other interested parties. Copies of the ï¿½Abstract of Bids as Readï¿½ and the
 minutes shall be made available to the public upon written request and payment of a
 specified fee to recover cost of materials.
 12. In case the bids cannot be opened as scheduled due to justified reasons, the BAC
@@ -2000,16 +2000,16 @@ What happens if only one prospective bidder submits a bid envelope?
 
 11 For ADB- and WB-funded projects, rescheduling the date of opening of bids shall not be considered except for force
 majeure, such as natural calamities. In re-scheduling the opening of bids, the BAC shall issue a Notice of Postponement
-to be posted at the PhilGEPS’ and the Procuring Entity’s websites.
+to be posted at the PhilGEPSï¿½ and the Procuring Entityï¿½s websites.
 When is a document deemed
-“complete” and “sufficient”?
-For a document, to be deemed “complete” and
-“sufficient”, it must be complete on its face, that is,
+ï¿½completeï¿½ and ï¿½sufficientï¿½?
+For a document, to be deemed ï¿½completeï¿½ and
+ï¿½sufficientï¿½, it must be complete on its face, that is,
 contain all the information required, and must
 comply with the requirements set out in the bidding
-documents. For example, a Mayor’s Permit should
-be current, and submission of an expired Mayor’s
-Permit is deemed a “non-submission”. Another
+documents. For example, a Mayorï¿½s Permit should
+be current, and submission of an expired Mayorï¿½s
+Permit is deemed a ï¿½non-submissionï¿½. Another
 example of an insufficient submission is a Bid
 Security in an amount below the requirement.
 Page 46 of 113
@@ -2046,8 +2046,8 @@ increased by more than 20% of the ABC for the
 last failed bidding.
 What is an eligibility check?
 It is a procedure to determine if a prospective bidder is eligible to participate in the bidding at
-hand. In determining a prospective bidder’s eligibility, the BAC shall use non-discretionary
-“pass/fail” criteria, as stated in the IB and the ITB. Essentially, this means that the absence,
+hand. In determining a prospective bidderï¿½s eligibility, the BAC shall use non-discretionary
+ï¿½pass/failï¿½ criteria, as stated in the IB and the ITB. Essentially, this means that the absence,
 incompleteness or insufficiency of a document shall make a prospective bidder ineligible to bid
 for the particular procurement.12 (2016 IRR Section 23.2)
 How do you determine the eligibility of the prospective bidders?
@@ -2065,7 +2065,7 @@ lending agency. Moreover, pre-qualification may be utilized for large or complex
 which the high costs of preparing detailed bids could discourage competition such as custom designed equipment,
 industrial plant, specialized services, some complex information and technology, and contracts to be let under turnkey,
 design and build, or management contracting.
-TIPS: Let’s make things
+TIPS: Letï¿½s make things
 easier
 The BAC shall require one (1) original
 and at least two (2) copies of the
@@ -2140,7 +2140,7 @@ a prospective bidder after it had been declared as eligible?
 Notwithstanding the eligibility of a prospective bidder, the Procuring Entity concerned reserves
 the right to review its qualifications at any stage of the procurement process if it has
 reasonable grounds to believe that a misrepresentation has been made by the said
-prospective bidder, or that there has been a change in the prospective bidder’s capability to
+prospective bidder, or that there has been a change in the prospective bidderï¿½s capability to
 undertake the project from the time it submitted its eligibility requirements. Should such
 review uncover any misrepresentation made in the eligibility requirements, statements or
 documents, or any changes in the situation of the prospective bidder which will affect the
@@ -2200,7 +2200,7 @@ The following must participate in the bid evaluation process:
 4. The Observers.
 Methodology: How are bids evaluated?13
 1. After the preliminary examination of bids, the BAC, or through the TWG, shall
-immediately conduct a detailed evaluation of all bids rated “passed,” using a nondiscretionary criteria, as stated in the IB and the ITB, which shall include a
+immediately conduct a detailed evaluation of all bids rated ï¿½passed,ï¿½ using a nondiscretionary criteria, as stated in the IB and the ITB, which shall include a
 consideration of the following: (2016 IRR Section 32.2.1)
 a. The bid must be complete. Unless the ITB specifically allows partial bids, bids
 not addressing or providing all of the required items in the bidding documents
@@ -2211,7 +2211,7 @@ indicated, the same shall be considered as non-responsive, but specifying a
 13 For FAPs, the rules on evaluation will depend on the standard bidding documents for the project.
 Page 50 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
-“0” (zero) or a “-“ (dash) for the said item would mean that it is being offered
+ï¿½0ï¿½ (zero) or a ï¿½-ï¿½ (dash) for the said item would mean that it is being offered
 for free to the Government, except those required by law or regulations to be
 provided for. (2016 IRR Section 32.2.1a)
 b. Minor arithmetical corrections to consider computational errors and omissions
@@ -2301,9 +2301,9 @@ Biddings) of Annex H (Consolidated Guidelines for the Alternative Methods of Pro
 the 2016 IRR. However, if the Procuring Entity resorts to negotiated procurement, the ABC
 cannot be increased by more than 20% of the ABC for the last failed bidding.
 
-Let’s do things easier
+Letï¿½s do things easier
 On clarifications during bid evaluation
-(the “no-contact” rule)
+(the ï¿½no-contactï¿½ rule)
 The BAC and the TWG shall not entertain
 clarifications from Bidders, neither shall they
 initiate communication with the Bidders, during
@@ -2326,9 +2326,9 @@ Legal Reference
 What is Post-qualification?
 Post-qualification is the process of verifying, validating and ascertaining all the statements
 made and documents submitted by the bidder with the LCB using non-discretionary criteria.
-The BAC shall ascertain the said bidder’s compliance with all requirements and conditions
+The BAC shall ascertain the said bidderï¿½s compliance with all requirements and conditions
 stated in the Bidding Documents. The criteria for post-qualification shall consider, but not
-limited to, the bidder’s compliance with the eligibility, technical and financial requirements of
+limited to, the bidderï¿½s compliance with the eligibility, technical and financial requirements of
 the bid. If the BAC determines that the bidder with the LCB is responsive to the bid
 requirements, the BAC shall declare the bid to be the LCRB, and recommend to the HoPE the
 award of contract to the said bidder at its submitted bid price or calculated bid price,
@@ -2345,13 +2345,13 @@ What does Post-qualification entail?
 Post-qualification involves the BAC verifying, validating and ascertaining that the bidder
 satisfies the following requirements: (2016 IRR Section 34.3)
 1. Legal Requirements. The post-qualification process under this criterion involves the
-verification, validation and ascertaining of the contractor’s claim that it is not included
-in any government “blacklist,” as well as all the licenses, permits and other
+verification, validation and ascertaining of the contractorï¿½s claim that it is not included
+in any government ï¿½blacklist,ï¿½ as well as all the licenses, permits and other
 documents it submitted, including the following;
 a. PCAB license;
 b. Registration Certificate coming from SEC, DTI for sole proprietorship, or CDA
 for cooperatives;
-c. Mayor’s/Business Permit or the equivalent document for Exclusive Economic
+c. Mayorï¿½s/Business Permit or the equivalent document for Exclusive Economic
 Zones or Areas; and
 d. Tax Clearance per EO 398, s. 2005.
 2. Technical Requirements. Post-qualification under this criterion means that the BAC
@@ -2361,7 +2361,7 @@ requirements of the contract and bidding documents. This involves the following
 processes:
 Page 53 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
-a. Verification of the bidder’s stated competence and experience, as well as the
+a. Verification of the bidderï¿½s stated competence and experience, as well as the
 competence and experience of its key personnel to be assigned to the project,
 to ensure that these meet the minimum requirements,
 b. Verification of availability and commitment, and/or inspection and testing, of
@@ -2375,30 +2375,30 @@ single contract;
 two or more contracts;
 ? Failure of the contractor to commence repair works on ongoing
 contracts within seven (7) calendar days and to complete them within
-thirty (30) calendar days after receipt of the Procuring Entity’s notice
+thirty (30) calendar days after receipt of the Procuring Entityï¿½s notice
 of defects and deficiencies;
 ? Failure of the contractor to commence repair works on contracts with
 pending certificates of acceptance within thirty (30) calendar days and
 complete them within ninety (90) calendar days after receipt of the
-Procuring Entity’s notice of defects and failures;
+Procuring Entityï¿½s notice of defects and failures;
 ? Substandard quality of work as per contract plans and specifications;
-? Unsatisfactory performance of contractor’s obligations as per contract
+? Unsatisfactory performance of contractorï¿½s obligations as per contract
 terms and conditions, at the time of inspection; or
 ? That there are overlaps in the proposed utilization of the minimum
 required equipment with those equipment in the on-going works of
 the contractor.
 Any of which will be a ground for disqualification from award of contract if
-verified by the BAC to be due to the bidder’s fault or negligence.
+verified by the BAC to be due to the bidderï¿½s fault or negligence.
 c. Ascertainment of the authenticity of the Bid Security and its correctness as to
 type, amount, form and wording, and validity period, as required in the
 Bidding Documents.
 d. Verification of completeness and compliance of statements with requirements
 of the Omnibus Sworn Statement.
 3. Financial Requirements. Under this criterion, the BAC ought to verify, validate and
-ascertain the bid price proposal of the bidder, the bidder’s stated net worth and liquid
+ascertain the bid price proposal of the bidder, the bidderï¿½s stated net worth and liquid
 assets, net working capital, the value of all outstanding or unfinished works under
-ongoing contracts, and the bidder’s NFCC, as recalculated considering developments
-in the bidders’ other projects, whenever applicable. This is done to ensure that the
+ongoing contracts, and the bidderï¿½s NFCC, as recalculated considering developments
+in the biddersï¿½ other projects, whenever applicable. This is done to ensure that the
 bidder can sustain the operating cash flow of the transaction. This process involves:
 a. Examination of the Bill of Quantities, Detailed Estimates and Cash Flow;
 b. Ascertaining of the updated NFCC taking into consideration the up-to-date
@@ -2425,11 +2425,11 @@ accuracy of the legal, technical and financial documents submitted by the bidder
 the LCB, using the non-discretionary criteria described above.
 In verifying the information contained in such documents, the TWG may make
 inquiries with appropriate government agencies and examine the original documents
-kept in the bidder’s place of business. The use of other means for verification and
+kept in the bidderï¿½s place of business. The use of other means for verification and
 validation of such documents may be resorted to by the TWG, such as the Internet
 and other research methods that yield the same results.
 
-2. The BAC/TWG inquires about the bidder’s performance in relation with other
+2. The BAC/TWG inquires about the bidderï¿½s performance in relation with other
 contracts/transactions as indicated in its eligibility statement (statement of on-going,
 completed and/or awarded but not yet started contracts).
 3. If the TWG conducts post-qualification, it prepares a Post-qualification Report to be
@@ -2473,7 +2473,7 @@ the BAC, if it so wishes, a reconsideration of this decision. The BAC shall eval
 for reconsideration, if any, using the same non-discretionary criteria, and shall issue its final
 determination of the said request within seven (7) calendar days from receipt thereof. (2016
 IRR 34.4) Similar to the cases of bidders deemed to be ineligible and whose bids are rated
-“failed,” the bidder with the LCB who fails to pass post-qualification may likewise file a protest
+ï¿½failed,ï¿½ the bidder with the LCB who fails to pass post-qualification may likewise file a protest
 with the corresponding fee in case the BAC denies its request for reconsideration.
 Immediately after the BAC has notified the first bidder of its post-disqualification, and
 notwithstanding any pending request for reconsideration thereof, the BAC shall initiate and
@@ -2515,7 +2515,7 @@ not precluded from using the information from a previous post-qualification repo
 reference, it is still but necessary on the part of the BAC to re-validate and confirm the report
 based on the requirements of the new project, as the legal, financial and technical capability
 of the bidder may have already changed within the six-month period. Likewise, the happening
-of the grounds for post-disqualification that are hinged on the bidder’s performance on any of
+of the grounds for post-disqualification that are hinged on the bidderï¿½s performance on any of
 its ongoing products may vary within the said 6-month period.
 
 Page 57 of 113
@@ -2600,7 +2600,7 @@ reconsideration within 7 calendar days from the filing thereof and furnish the b
 the resolution immediately from its promulgation. In no case shall the request for
 reconsideration stay or delay the bidding process. However, the request for reconsideration
 must first be resolved before any award is made (2016 IRR Section 37.1.3).
-How’s that again?
+Howï¿½s that again?
 What is the maximum period of time
 that a contract can be awarded?
 Contract award must be made within the bid
@@ -2649,11 +2649,11 @@ What documents form part of the contract?
 The contract shall include the following:
 1. The Contract Agreement;
 2. Bidding Documents, including Addenda and/or Supplemental/Bid Bulletins, if any;
-3. Winning bidder’s bid, including the Eligibility requirements, Technical and Financial
+3. Winning bidderï¿½s bid, including the Eligibility requirements, Technical and Financial
 proposals, and all other documents form including all the documents/statements
 submitted;
-4. Performance Security and Contractor’s All-Risk Insurance (CARI);
-5. Notice of Award of Contract with the winning bidder’s ”Conforme” thereto; and
+4. Performance Security and Contractorï¿½s All-Risk Insurance (CARI);
+5. Notice of Award of Contract with the winning bidderï¿½s ï¿½Conformeï¿½ thereto; and
 Other contract documents that may be required by existing laws and/or the Procuring
 Entity concerned, as specified in the Bidding Documents, such as construction
 schedule and S-curve, manpower schedule, construction methods, equipment
@@ -2672,7 +2672,7 @@ h) Bill of Quantities; and
 i) Drawings.
 Page 61 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
-When is a contract “effective”?
+When is a contract ï¿½effectiveï¿½?
 Unless otherwise specified in the contract, the contract effectivity date shall be the date of
 contract signing. The winning contractor shall commence performance of its obligations only
 upon receipt of the NTP.
@@ -2726,7 +2726,7 @@ All Government contracts required by law to be acted upon and/or approved by the
 and any subsequent amendments or supplements thereto, shall be submitted with complete
 documentation to NEDA, through its Director-General, within seven (7) days from approval by
 the Head of Procuring Entity concerned or his duly authorized representative, as the case may
-be, for NEDA’s review and evaluation.
+be, for NEDAï¿½s review and evaluation.
 Government contracts submitted shall be accompanied by a complete execution copy of the
 contract, related agreements, annexes, other approvals and permits, including a detailed
 summary of the pertinent laws, rules and regulations governing the processing and award of
@@ -2744,7 +2744,7 @@ Procuring Entity within fifteen (15) calendar days from the issuance of the NTP.
 How long is the entire process of public bidding for infrastructure projects?
 From advertisement/posting of the procurement opportunity to issuance of the NTP, the
 minimum and maximum periods are estimated to be 26 and 156 calendar days, respectively.
-All members of the BAC shall be on a “jury duty” type of assignment until the NOA is issued
+All members of the BAC shall be on a ï¿½jury dutyï¿½ type of assignment until the NOA is issued
 by the HoPE in order to complete the entire bidding process at the earliest time.,
 What happens if the bidder with the LCRB or SCRB refuses or is unable,
 through its own fault, to post the performance security and sign the
@@ -2826,7 +2826,7 @@ When does a failure of bidding occur?
 1. The BAC shall declare the bidding a failure when any of the following situations take place
 (IRR Section 35):
 a. No bids are received.
-How’s that again?
+Howï¿½s that again?
 What are instances of the BAC not
 following prescribed procedures?
 The following are some instances when a BAC fails
@@ -2873,7 +2873,7 @@ SECTION 3
 Instructions on the Procedural
 Steps for the Procurement of
 Infrastructure Projects
-PART TWO – ALTERNATIVE METHODS OF
+PART TWO ï¿½ ALTERNATIVE METHODS OF
 PROCUREMENT
 Page 68 of 113
 Page 69 of 113
@@ -3019,7 +3019,7 @@ the BAC shall post-qualify the contractor to determine if its bid complies with
 the technical and financial requirements of the project.
 e. The BAC shall recommend award of contract to the HoPE in favor of the
 contractor determined to have submitted the LCRB. Within a period of 15
-calendar days from receipt, the HoPE shall approve or disapprove the BAC’s
+calendar days from receipt, the HoPE shall approve or disapprove the BACï¿½s
 recommendation. In case of approval, the HoPE shall immediately issue the
 NOA to the contractor. In the event the HoPE disapproves the
 recommendation, such disapproval shall be based only on valid, reasonable,
@@ -3060,7 +3060,7 @@ danger to life during a state of calamity, there must be a declaration by a comp
 authority of a state of calamity pursuant to existing laws, rules and regulations before
 any procurement activity may be undertaken.
 Considering that the underlying reason to support a Negotiated Procurement through
-the emergency modality relates to “time element” as when there is – a) imminent
+the emergency modality relates to ï¿½time elementï¿½ as when there is ï¿½ a) imminent
 danger to life or property; b) when time is of the essence; or c) immediate action is
 necessary, the Procuring Entity, through the HoPE, BAC, its Secretariat and end-user
 unit, should consider appropriate timing or the proximity of time between the actual
@@ -3098,13 +3098,13 @@ ii) To restore vital public services, infrastructure facilities and other public
 utilities.
 Procedure
 a. The BAC shall post-qualify the second LCB for the project under consideration
-at the said bidder’s own original bid price, applicable to the remaining works
+at the said bidderï¿½s own original bid price, applicable to the remaining works
 to be done. Authority to negotiate contracts for projects under the foregoing
 exceptional cases shall be subject to prior written approval by the HoPE
 concerned, within their respective limits of approving authority.
 b. If negotiations fail or if post-qualification is unsuccessful, the BAC shall
 negotiate and post-qualify the next lowest calculated bidder at the said
-bidder’s own original bid price.
+bidderï¿½s own original bid price.
 c. If negotiations fail or post-qualification is unsuccessful another time, the
 process is repeated until all the bidders from the previous bidding have been
 considered.
@@ -3116,7 +3116,7 @@ e. In case of successful negotiation and post-qualification, the BAC shall
 recommend the award of contract with the said contractor. Within a period of
 15 calendar days from receipt, the HoPE shall approve or disapprove the
 Page 74 of 113
-BAC’s recommendation. In case of approval, the HoPE shall immediately issue
+BACï¿½s recommendation. In case of approval, the HoPE shall immediately issue
 the NOA to the contractor. In the event the HoPE disapproves the
 recommendation, such disapproval shall be based only on valid, reasonable,
 and justifiable grounds to be expressed in writing, addressed to the BAC.
@@ -3152,7 +3152,7 @@ f. The contractor has no negative slippage/delay in the original contract during
 the time of negotiation; and
 g. Negotiations for the procurement are commenced before the expiry of the
 original contract.
-The phrase “adjacent or contiguous” refers to projects that are in actual physical
+The phrase ï¿½adjacent or contiguousï¿½ refers to projects that are in actual physical
 contact with each other or in the immediate vicinity such that the required equipment
 and other resources can easily be mobilized.
 If there is a necessity to introduce new items which are related to the scope of work
@@ -3165,7 +3165,7 @@ project.
 b. In case of successful negotiation, the BAC shall recommend to the HoPE the
 award of contract in favor of the contractor. Within a period of 15 calendar
 Page 75 of 113
-days from receipt, the HoPE shall approve or disapprove the BAC’s
+days from receipt, the HoPE shall approve or disapprove the BACï¿½s
 recommendation. In case of approval, the HoPE shall immediately issue the
 NOA to the contractor. In the event the HoPE disapproves the
 recommendation, such disapproval shall be based only on valid, reasonable,
@@ -3234,7 +3234,7 @@ financially capable contractor based on the scope of work prepared by the
 End-user Unit.
 b. Upon successful negotiation, the BAC shall recommend award of contract to
 the HoPE. Within a period of 15 calendar days from receipt, the HoPE shall
-approve or disapprove the BAC’s recommendation. In case of approval, the
+approve or disapprove the BACï¿½s recommendation. In case of approval, the
 HoPE shall immediately issue the NOA to the contractor. In the event the
 HoPE disapproves the recommendation, such disapproval shall be based only
 on valid, reasonable, and justifiable grounds to be expressed in writing,
@@ -3343,13 +3343,13 @@ Manual of Procedures for the Procurement of Infrastructure Projects
 Contract Implementation for the Procurement of Infrastructure
 Projects
 Legal Reference
-2016 IRR Section 42 and Annex “E” provide the rules on contract implementation and
+2016 IRR Section 42 and Annex ï¿½Eï¿½ provide the rules on contract implementation and
 termination.
 What is covered by Contract Implementation?
 Contract implementation covers the following milestones:
-1. Contractor’s performance of his
+1. Contractorï¿½s performance of his
 contractual obligations;
-2. Procuring Entity’s performance
+2. Procuring Entityï¿½s performance
 of its contractual obligations, as
 specified in the contract;
 3. Final acceptance or project
@@ -3360,8 +3360,8 @@ Entity.
 When shall a contract be deemed effective?
 The contract effectivity date is the date of contract signing. However, the contractor shall
 commence execution of the Works on the Start Date, which is the date of receipt of the NTP.
-Procuring Entity’s Responsibilities
-What are the Procuring Entity’s responsibilities to the contractor if the latter needs
+Procuring Entityï¿½s Responsibilities
+What are the Procuring Entityï¿½s responsibilities to the contractor if the latter needs
 to coordinate with other government entities for it to be able to perform its
 contractual obligations?
 Whenever the implementation of the infrastructure project requires that the contractor obtain
@@ -3378,7 +3378,7 @@ allowed to subcontract a material or significant portion of the contract or proj
 portion must not exceed fifty percent (50%) of the total project cost. The bidding documents
 must specify what are considered as significant/material component(s) of the project.
 Moreover, except if otherwise provided by the contract, it should not subcontract any part of
-Let’s make things easier
+Letï¿½s make things easier
 The Implementing Unit or end-user unit should
 determine the period of contract
 implementation during the procurement
@@ -3405,49 +3405,49 @@ Subcontractors should pass the eligibility requirements for the portions of the 
 they will undertake. If they are determined to be ineligible, subcontracting of such portion of
 the works shall be disallowed.
 Inspection and Tests
-What is the scope of the Procuring Entity’s right to inspect the infrastructure project
+What is the scope of the Procuring Entityï¿½s right to inspect the infrastructure project
 procured?
 All materials, plant/s and workmanship shall be of the kind described in the contract and in
-accordance with the Procuring Entity’s representative’s instructions. To ensure that this,
+accordance with the Procuring Entityï¿½s representativeï¿½s instructions. To ensure that this,
 indeed, is the case, these materials, plant/s and workmanship will be subjected, from time to
-time, to such tests as the Procuring Entity’s representative may require. These tests must be
+time, to such tests as the Procuring Entityï¿½s representative may require. These tests must be
 at the place of manufacture, fabrication or preparation, or on site or at such other place or
 places as may be specified in the contract, or at all or any of such places.
-The Procuring Entity’s representative, and any person authorized by him, must, at all
+The Procuring Entityï¿½s representative, and any person authorized by him, must, at all
 reasonable times, have access to the site and to all workshops and places where materials or
 plant are being manufactured, fabricated or prepared for the works. The contractor, for its
 part, shall afford every facility for, and every assistance in, obtaining the right to such access.
-The Procuring Entity’s representative shall be entitled, during manufacture, fabrication or
+The Procuring Entityï¿½s representative shall be entitled, during manufacture, fabrication or
 preparation of materials to be used in the project, to inspect and test these materials and the
 plant or plants where these materials are being manufactured, fabricated, and/or prepared.
 If the materials are being manufactured, fabricated or prepared in workshops or places other
-than those of the contractor, the contractor must obtain permission for the Procuring Entity’s
+than those of the contractor, the contractor must obtain permission for the Procuring Entityï¿½s
 representative to carry out inspection and testing in those workshops or places. Such
 inspection or testing will not release the contractor from any obligation under the contract.
 If, at the time and place agreed above, the materials or plant are not ready for inspection or
-testing, the Procuring Entity’s representative may reject these materials or the plant and must
+testing, the Procuring Entityï¿½s representative may reject these materials or the plant and must
 notify the contractor of such rejection immediately. He/she must also do so if, as a result of
 the inspection or testing, he/she determines that the materials or plant are defective or
-otherwise not in accordance with the contract. The notice must state the Procuring Entity’s
-representative’s objection and the reasons for the objection. The contractor, for its part,
+otherwise not in accordance with the contract. The notice must state the Procuring Entityï¿½s
+representativeï¿½s objection and the reasons for the objection. The contractor, for its part,
 must then promptly make good the defect or ensure that rejected materials or plant comply
-with the contract. If the Procuring Entity’s representative so requests, the test of rejected
+with the contract. If the Procuring Entityï¿½s representative so requests, the test of rejected
 materials or plant shall be made or repeated under the same terms and conditions.
-The Procuring Entity’s representative will, after consultation with the contractor, determine all
+The Procuring Entityï¿½s representative will, after consultation with the contractor, determine all
 the costs incurred in the repetition of the test or tests. These costs are recoverable from the
 contractor by the Procuring Entity and may be deducted from any monies due to the
-contractor. The Procuring Entity’s representative must notify the contractor accordingly, with
+contractor. The Procuring Entityï¿½s representative must notify the contractor accordingly, with
 a copy being furnished the Procuring Entity.
 Page 83 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 Dayworks
 How are Dayworks undertaken and compensated?
-If applicable, as indicated in the contract, the dayworks rates in the contractor’s bid shall be
-used for small additional amounts of work, only when the Procuring Entity’s representative
+If applicable, as indicated in the contract, the dayworks rates in the contractorï¿½s bid shall be
+used for small additional amounts of work, only when the Procuring Entityï¿½s representative
 has given written instructions in advance for additional work to be paid for in that way.
 All works to be paid for as dayworks shall be recorded by the contractor on forms approved by
-the Procuring Entity’s representative. Each completed form shall be verified and signed by
-the Procuring Entity’s representative within two (2) days of the work being done.
+the Procuring Entityï¿½s representative. Each completed form shall be verified and signed by
+the Procuring Entityï¿½s representative within two (2) days of the work being done.
 The contractor shall be paid for dayworks subject to obtaining signed dayworks forms.
 The Use of Accredited Testing Laboratories
 Can the Procuring Entity engage the services of private testing laboratories?
@@ -3456,8 +3456,8 @@ Research and Standards (BRS) of the DPWH, the DOST or the DTI shall accredit the
 laboratories whose services are engaged or to be engaged in government infrastructure
 projects. All government infrastructure project owners must accept results of material test(s)
 coming only from DOST/BRS accredited laboratories.
-Evaluation of Contractor’s Performance
-What is the subject and scope of the Procuring Entity’s evaluation of a contractor’s
+Evaluation of Contractorï¿½s Performance
+What is the subject and scope of the Procuring Entityï¿½s evaluation of a contractorï¿½s
 performance?
 All Procuring Entities implementing government infrastructure projects must evaluate the
 performance of their contractors using the NEDA-Approved CPES Guidelines for the type of
@@ -3465,8 +3465,8 @@ project being implemented. These guidelines cover all infrastructure projects aw
 government regardless of contract amount and funding source.
 CPES evaluation must be done during construction and upon completion of the project. To
 ensure continuous implementation of CPES, all Procuring Entities concerned are required to
-include in their Projects’ Engineering and Administrative Overhead Cost the budget for such
-system’s implementation pursuant to NEDA Board Resolution No. 18 (s.2002).
+include in their Projectsï¿½ Engineering and Administrative Overhead Cost the budget for such
+systemï¿½s implementation pursuant to NEDA Board Resolution No. 18 (s.2002).
 What must a Procuring Entity do if there are no CPES Guidelines for the kind
 of infrastructure project it is implementing?
 For project types that do not have specific CPES Guidelines, the Procuring Entities concerned
@@ -3479,7 +3479,7 @@ All Procuring Entities implementing infrastructure projects are required to esta
 Implementing Units (IUs) in their respective offices/agencies/corporations. The CPES
 Implementing Units shall be responsible for the implementation of the CPES Implementing
 Guidelines, including but not limited to, the supervision of Contractors Performance Evaluators
-to be accredited by the CIAP. The Procuring Entity’s CPES IU shall be responsible for the
+to be accredited by the CIAP. The Procuring Entityï¿½s CPES IU shall be responsible for the
 following: a) pre-screening of applications of CPEs; b) funding for CPEs accreditation and
 training, including seminars; and c) yearly evaluation of CPEs.
 Page 84 of 113
@@ -3487,7 +3487,7 @@ Manual of Procedures for the Procurement of Infrastructure Projects
 Where must a Procuring Entity submit its CPES evaluation results and how
 must these results be disseminated?
 All Procuring Entities implementing CPES shall submit the results of their performance
-evaluation to the CIAP on a monthly basis or as often as necessary. The Procuring Entity’s
+evaluation to the CIAP on a monthly basis or as often as necessary. The Procuring Entityï¿½s
 CPES IU shall likewise develop and maintain a databank and disseminate the CPES reports to
 the concerned units/departments within the Procuring Entity and to other interested users.
 How are the CPES evaluation results used?
@@ -3509,15 +3509,15 @@ They should not therefore be taken as the actual and correct quantities of the w
 executed by the contractor in fulfillment of his obligations under the contract. They can vary
 to up to ten percent (10%) of the contract price to account for variation orders as provided
 for in Annex E of the 2016 IRR.
-The Procuring Entity’s representative must, except if otherwise stated in the Quantities of the
+The Procuring Entityï¿½s representative must, except if otherwise stated in the Quantities of the
 Detailed Engineering, measure the value of the works actually in-place in accordance with the
 contract. This measurement will be the basis for the payment that will be made to the
-contractor in accordance with the Statement of Work Accomplished. The Procuring Entity’s
+contractor in accordance with the Statement of Work Accomplished. The Procuring Entityï¿½s
 representative must, when he/she needs to measure any part of the works, give reasonable
-notice to the contractor’s authorized agent, who must:
-1. Forthwith attend or send a qualified representative to assist the Procuring Entity’s
+notice to the contractorï¿½s authorized agent, who must:
+1. Forthwith attend or send a qualified representative to assist the Procuring Entityï¿½s
 representative in making such measurement; and
-2. Supply all particulars required by the Procuring Entity’s representative.
+2. Supply all particulars required by the Procuring Entityï¿½s representative.
 How must infrastructure project impact on traffic and adjoining properties?
 All operations necessary for the execution and completion of the works and the remedying of
 any defects therein must, so far as compliance with the requirements of the contract permits,
@@ -3540,7 +3540,7 @@ works that are no longer required.
 Upon the issue of the Taking-Over Certificate, the contractor shall remove from that part of
 the site to which the certificate relates, all equipment, surplus material, rubbish and
 temporary works of every kind. It must leave such part of the site and works clean and in a
-workmanlike condition to the satisfaction of the Procuring Entity’s engineer. However, it is
+workmanlike condition to the satisfaction of the Procuring Entityï¿½s engineer. However, it is
 entitled to retain until the end of the defects liability period such materials, equipment and
 temporary works he may need to fulfill his obligations in relation to the project.
 At the end of the project, what happens to materials and equipment paid for
@@ -3556,7 +3556,7 @@ Manual of Procedures for the Procurement of Infrastructure Projects
 Contract Price and Payment
 
 Legal Reference:
-2016 IRR Section 61 and Annex “E” provide the rules for Contract Prices and Payment.
+2016 IRR Section 61 and Annex ï¿½Eï¿½ provide the rules for Contract Prices and Payment.
 Are contract prices fixed?
 Price escalation is generally not allowed.14 For the given scope of work in the contract as
 awarded, the price must be considered as a fixed price, except under extraordinary
@@ -3567,10 +3567,10 @@ submitted by the concerned entity to the NEDA with the endorsement of the Procur
 The burden of proving the occurrence of extraordinary circumstances that will allow for price
 escalation shall rest with the entity requesting for such escalation. NEDA shall only respond
 to such request after receiving the proof and the necessary documentation.
-“Extraordinary circumstances” shall refer to events defined in the Civil Code of the Philippines,
+ï¿½Extraordinary circumstancesï¿½ shall refer to events defined in the Civil Code of the Philippines,
 consistent with the guidelines issued by the GPPB. In particular, the Guidelines for Contract
 Price Escalation approved by the GPPB in Resolution 07-2004, dated July 22, 2004, provides
-that the term “extraordinary circumstances” shall refer to the following Articles of the Civil
+that the term ï¿½extraordinary circumstancesï¿½ shall refer to the following Articles of the Civil
 Code of the Philippines:
 1. Article 1174, as it pertains to Ordinary Fortuitous Events or those events which
 ordinarily happen to which could be reasonable foreseen but are inevitable, such as,
@@ -3673,26 +3673,26 @@ IRR Section 42.4)
 Progress Payment
 How are progress payments made?
 The first progress payment may be paid by the Procuring Entity to the contractor provided at
-least 20% of the work had been accomplished as certified by the Procuring Entity’s
+least 20% of the work had been accomplished as certified by the Procuring Entityï¿½s
 representative. Thereafter, payments can be made once a month, provided that the latter
 submits a Progress Billing or a request for payment for work accomplished. Such request for
 payment, including the Statement of Work Accomplished by the contractor, must be verified
 and approved by the government project engineer concerned. Except as otherwise stipulated
 in the ITB, materials and equipment delivered on the site but not completely put in place shall
 not be included for payment.
-The Procuring Entity has the right to deduct from the contractor’s progress billing such
+The Procuring Entity has the right to deduct from the contractorï¿½s progress billing such
 amount as may be necessary to cover third party liabilities. It must not process any progress
 payment unless the discovered defects are corrected.
 Retention Money
-What is “retention money” and why is it withheld?
-“Retention money” refers to the amount equal to ten percent (10%) of the progress
+What is ï¿½retention moneyï¿½ and why is it withheld?
+ï¿½Retention moneyï¿½ refers to the amount equal to ten percent (10%) of the progress
 payments, before deductions are made, that is withheld by the Procuring Entity to cover the
 uncorrected discovered defects and third party liabilities. It is collected from all progress
 payments until works equivalent to fifty percent (50%) of the value of works, as determined
 by the Procuring Entity, is accomplished. If, after fifty percent (50%) completion, the work is
 satisfactorily done and on schedule, no additional retention shall be made; otherwise, the ten
 percent (10%) retention shall continue to be imposed.
-The total “retention money” shall be due for release after the defects liability period, upon
+The total ï¿½retention moneyï¿½ shall be due for release after the defects liability period, upon
 final acceptance of the works.
 The contractor may request the Procuring Entity that, instead of retention money being
 withheld from each progress billing, it issues in favor of the government, irrevocable standby
@@ -3724,13 +3724,13 @@ Page 90 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 Variation Orders
 Legal Reference:
-2016 IRR Annex “E” provides the rules in relation to Variation Orders.
+2016 IRR Annex ï¿½Eï¿½ provides the rules in relation to Variation Orders.
 What is a Variation Order?
 A Variation Order refers to any increase/decrease in quantities within the general scope of the
 project as bid and awarded, in any of the following aspects:
 1. Introduction of new work items that are not included in the original contract; or
 2. Reclassification of work items that are either due to change of plans, design or
-alignment to suit actual field conditions resulting in disparity between the preconstruction plans used for purposes of the bidding and the “as staked plans” or
+alignment to suit actual field conditions resulting in disparity between the preconstruction plans used for purposes of the bidding and the ï¿½as staked plansï¿½ or
 construction drawings prepared after a joint survey by the contractor and the
 government after award of the contract, or during actual construction.
 A Variation Order may either be in the form of a Change Order or Extra Work Order.
@@ -3775,7 +3775,7 @@ Variation Orders and receive payments?
 Under no circumstances can a contractor proceed to commence work under any Change Order
 or Extra Work Order unless the HoPE or his/her duly authorized representative has approved
 the order.
-The Procuring Entity’s representative/Project Engineer may, subject to the availability of funds
+The Procuring Entityï¿½s representative/Project Engineer may, subject to the availability of funds
 and within the limits of his delegated authority, authorize the immediate start of work under
 any Change Order or Extra Work Order, subject to any or all of the following conditions:
 1. In the event of any emergency where the prosecution of the work is urgent to avoid
@@ -3804,7 +3804,7 @@ be based on the direct unit costs used in the original contract (e.g., unit cost
 cement, rebars, form lumber, labor rate, equipment rental, etc.). All new components
 of the new work item shall be fixed prices, provided the same is acceptable to both
 the government and the contractor. The direct unit costs of new components must
-also be based on the contractor’s estimate as validated by the Procuring Entity via
+also be based on the contractorï¿½s estimate as validated by the Procuring Entity via
 documented canvass in accordance with existing rules and regulations. The direct
 cost of the new work item must then be combined with the mark-up factor (i.e. taxes
 and profit) used by the contractor in his bid to determine the unit price of the new
@@ -3814,7 +3814,7 @@ Manual of Procedures for the Procurement of Infrastructure Projects
 The request for payment by the contractor for any extra work must be accompanied by a
 statement, with the approved supporting forms, giving a detailed accounting and record of
 amount for which he claims payment. This request for payment must be included in the
-contractor’s statement for progress payment.
+contractorï¿½s statement for progress payment.
 Who are the parties involved in the issuance of a Variation Order?
 The following parties are involved in the issuance of a Variation Order:
 1. The Implementing Unit or end-user unit;
@@ -3828,18 +3828,18 @@ for extra cost shall have occurred, the contractor should have delivered a notic
 full and detailed particulars of any extra cost in order that it may be investigated at
 that time. Failure to provide either of such notices in the time stipulated shall
 constitute a waiver by the contractor for any claim.
-2. If the Procuring Entity’s representative/Project Engineer finds that a Change Order or
+2. If the Procuring Entityï¿½s representative/Project Engineer finds that a Change Order or
 Extra Work Order is justified, he/she must prepare the proposed order, accompanied
 with the following:
 a. Notices submitted by the contractor;
 b. The plans to effect the adjustments;
-c. The contractor’s computations as to the quantities of the additional works
+c. The contractorï¿½s computations as to the quantities of the additional works
 involved per item indicating the specific stations where such works are
 needed, the date of his inspections and investigations thereon, and the log
 book thereof; and
 d. A detailed estimate of the unit cost of such items of work, together with the
 justifications for the need of such Change Order of Extra Work Order
-The Procuring Entity’s representative/Project Engineer then submits the same to the
+The Procuring Entityï¿½s representative/Project Engineer then submits the same to the
 HoPE for approval .
 3. The HoPE or his duly authorized representative, upon receipt of the proposed Change
 Order or Extra Work Order shall immediately instruct the appropriate technical staff or
@@ -3868,7 +3868,7 @@ Page 94 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 Suspension of Work
 Legal Reference:
-2016 IRR Annex “E” provides the rules in relation to contract suspension.
+2016 IRR Annex ï¿½Eï¿½ provides the rules in relation to contract suspension.
 When can the Procuring Entity suspend work?
 The Procuring Entity has the authority to suspend the work wholly or partly by written order
 for such period as may be deemed necessary due to the following:
@@ -3891,10 +3891,10 @@ issued to the contractor, in the process precluding any work called by such plan
 3. Peace and order conditions make it extremely dangerous, if not impossible, to work,
 such conditions having been certified in writing by the PNP station which has
 responsibility over the affected area and confirmed by the DILG Regional Director;
-4. There is a failure on the part of the Procuring Entity to deliver government– furnished
+4. There is a failure on the part of the Procuring Entity to deliver governmentï¿½ furnished
 materials and equipment as stipulated in the contract; or
-5. The payment of the contractor’s claim for progress billing beyond forty-five (45)
-calendar days from the time the claim has been certified by the Procuring Entity’s
+5. The payment of the contractorï¿½s claim for progress billing beyond forty-five (45)
+calendar days from the time the claim has been certified by the Procuring Entityï¿½s
 authorized representative as having been supported by complete documentation,
 unless there are justifiable reasons thereof which shall be communicated in writing to
 the contractor.
@@ -3944,7 +3944,7 @@ Page 96 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 Contract Time Extension
 Legal Reference:
-2016 IRR Annex “E” provides the rules in relation to contract time extension.
+2016 IRR Annex ï¿½Eï¿½ provides the rules in relation to contract time extension.
 Can the contract time be extended?
 Yes, the contractor can request for a time extension provided that:
 1. There are additional work or other special circumstances that would entitle the
@@ -3973,7 +3973,7 @@ shall examine the facts and extent
 of the delay and shall extend the
 contract time completing the
 contract works when, in the
-Procuring Entity’s opinion, the
+Procuring Entityï¿½s opinion, the
 findings of fact justify an
 extension.
 Under what circumstances should the Procuring Entity automatically
@@ -4052,7 +4052,7 @@ Page 98 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 Delays in Work Completion and Liquidated Damages
 Legal Reference:
-2016 IRR Section 68 and Annex “E” provide the rules in relation to delivery and liquidated
+2016 IRR Section 68 and Annex ï¿½Eï¿½ provide the rules in relation to delivery and liquidated
 damages.
 What is the rule on the applicable period for the completion of work?
 The contractor must complete the work procured within the period prescribed by the
@@ -4091,7 +4091,7 @@ under the circumstances. The Procuring Entity may also take over the contract or
 Page 99 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 same to a qualified supplier through negotiation. In addition to the liquidated damages, the
-erring contractor’s performance security shall also be forfeited.18
+erring contractorï¿½s performance security shall also be forfeited.18
 
 18 For FAPs, the applicable liquidated damages is at least 1/10 of 1% of the cost of unperformed portion for every day of
 delay. The maximum deduction shall be 10% of the amount of the contract, and the procuring entity shall rescind the
@@ -4106,9 +4106,9 @@ When may a Procuring Entity terminate a contract for Default?
 
 The HoPE may terminate a contract for default when any of the following conditions attend its
 implementation:
-1. Due to the contractor’s fault and while the project is on-going, it has incurred
+1. Due to the contractorï¿½s fault and while the project is on-going, it has incurred
 negative slippage of fifteen percent (15%) or more in accordance with P.D. 1870;
-2. Due to the contractor’s fault and after the contract time has expired, it has incurred a
+2. Due to the contractorï¿½s fault and after the contract time has expired, it has incurred a
 negative slippage of ten percent (10%) or more in the completion of the work; or
 3. The contractor:
 a. Abandons the contract works, refuses or fails to comply with a valid
@@ -4125,7 +4125,7 @@ been rejected as defective or unsuitable; or
 e. Sub-lets any part of the contract works without approval by the Procuring
 Entity.
 The rescission of the contract shall be accompanied by the forfeiture by the Procuring Entity of
-the contractor’s performance security. The contractor will also be recommended for
+the contractorï¿½s performance security. The contractor will also be recommended for
 blacklisting.
 May a Procuring Entity terminate a contract by reason of Unlawful Acts?
 The Procuring Entity may terminate the contract in case it is determined prima facie that the
@@ -4169,7 +4169,7 @@ May termination be allowed for reasons other than those attributable to the
 contractor?
 The Procuring Entity, by written notice sent to the contractor, may terminate the contract, in
 whole or in part, at any time for its convenience. The notice of termination shall specify that
-the termination is for the Procuring Entity’s convenience, the extent to which performance of
+the termination is for the Procuring Entityï¿½s convenience, the extent to which performance of
 the contractor under the contract is terminated, and the date upon which such termination
 becomes effective.
 What circumstances may constitute sufficient grounds to terminate a
@@ -4187,7 +4187,7 @@ Page 103 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 Contract Completion
 Legal Reference:
-2016 IRR Annex “E” provides the rules in relation to contract completion.
+2016 IRR Annex ï¿½Eï¿½ provides the rules in relation to contract completion.
 What should the Procuring Entity do in anticipation of contract completion?
 Once the project reaches an accomplishment level of ninety-five percent (95%) of the total
 contract amount, the Procuring Entity may create an inspectorate team to make preliminary
@@ -4195,7 +4195,7 @@ inspection and submit a punch-list to the contractor in preparation for the fina
 project. This punch-list will contain, among others, the remaining works, work deficiencies for
 necessary corrections, and the specific duration/time to fully complete the project considering
 the approved remaining contract time. This, however, shall not preclude the Procuring
-Entity’s claim for liquidated damages.
+Entityï¿½s claim for liquidated damages.
 
 Page 104 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
@@ -4220,7 +4220,7 @@ repair works, at his own expense, of any damage to the infrastructure projects o
 the use of materials of inferior quality
 within ninety (90) days from the time the
 HoPE has issued an order to undertake
-repair. In case of contractor’s failure or
+repair. In case of contractorï¿½s failure or
 refusal to comply with this mandate, the
 government shall undertake such repair
 works and shall be entitled to full
@@ -4250,7 +4250,7 @@ Five Percent (5%)
 2. Bank Guarantee confirmed by a Universal or
 Commercial Bank; or Ten Percent (10%)
 3. Surety Bond callable upon demand issued by GSIS or Thirty Percent (30%)
-How’s that again?
+Howï¿½s that again?
 On the warranty
 During the defects liability period, the
 contractor shall post a warranty security in
@@ -4297,14 +4297,14 @@ Who will be held responsible for defects/failures during the Warranty
 period?
 In cases where structural defects and/or failures arise during the warranty period, the
 following persons/parties shall be held liable: (2016 IRR Section 62.2.3)
-1. Contractor – Where structural defects and/or failures arise due to faults attributable to
+1. Contractor ï¿½ Where structural defects and/or failures arise due to faults attributable to
 improper construction use of inferior quality/substandard materials, and any violation
 of the contract plans & specifications, the contractor shall be held liable;
-2. Consultants – Where structural defects and/or failures arise due to faulty and/or
+2. Consultants ï¿½ Where structural defects and/or failures arise due to faulty and/or
 inadequate design and specifications as well as construction supervision, then the
 consultant who prepared the design or undertook construction supervision for the
 project shall be held liable;
-What’s that?
+Whatï¿½s that?
 On Bank Guarantees
 A special bank guarantee should be
 contract specific, that is, it shall be
@@ -4313,8 +4313,8 @@ covering the warranty for the
 subject procurement contract.
 Page 106 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
-3. Procuring Entity’s Representatives/Project Manager/Construction Managers and
-Supervisors – The project owner’s representative(s), project manager, construction
+3. Procuring Entityï¿½s Representatives/Project Manager/Construction Managers and
+Supervisors ï¿½ The project ownerï¿½s representative(s), project manager, construction
 manager, and supervisor(s) shall be held liable in cases where the structural
 defects/failures are due to his/their willful intervention in altering the designs and
 other specifications; negligence or omission in not approving or acting on proposed
@@ -4326,12 +4326,12 @@ diggings/excavations, underground cables and electrical wires, underground tunne
 mining shaft and the like, in which case the applicable warranty to such structure
 should be levied to third parties for their construction or restoration works.
 5. Users - In cases where structural defects/failures are due to abuse/misuse by the end
-user of the constructed facility and/or non–compliance by a user with the technical
+user of the constructed facility and/or nonï¿½compliance by a user with the technical
 design limits and/or intended purpose of the same, then the user concerned shall be
 held liable.
-The term “structural defects” shall mean major faults/flaws/deficiencies in one or more key
+The term ï¿½structural defectsï¿½ shall mean major faults/flaws/deficiencies in one or more key
 structural elements of the project which may lead to structural failure of the completed
-elements or structure. The term “Structural Failures” is defined as an occurrence where one or
+elements or structure. The term ï¿½Structural Failuresï¿½ is defined as an occurrence where one or
 more key structural elements in an infrastructure facility fails or collapses, thereby rendering
 the facility or part thereof incapable of withstanding the design loads, and/or endangering the
 safety of the users or the general public. (2016 IRR Section 62.2.3)
@@ -4473,7 +4473,7 @@ A concrete road project with an ABC of P10.0 million was advertised for bidding.
 contractors submitted their bids on or before the deadline for submission and receipt of bids
 specified in the Invitation to Bid and the Bidding Documents. On the date and time of the
 opening of bids, the technical bid envelopes were opened. The eligibility and technical bid
-documents of the 20 contractors were examined using the non-discretionary “pass/fail”
+documents of the 20 contractors were examined using the non-discretionary ï¿½pass/failï¿½
 criteria. Only ten (10) contractors were found to be complying with the eligibility and
 technical bid requirements.
 The financial envelopes of the 10 contractors were opened and all were deemed complying
@@ -4484,7 +4484,7 @@ During the Detailed Bid Evaluation, the bid of Contractor A was corrected for ar
 errors. The recalculated bid of Contractor A went up to P9.0 million.
 During the Post-Qualification, Contractor B wrote the BAC Chairman and informed him that
 Contractor A has an on-going project with outstanding works of about P40.0 million. This
-project was apparently not taken into consideration in Contractor A’s submitted calculation of
+project was apparently not taken into consideration in Contractor Aï¿½s submitted calculation of
 its NFCC, a requirement for eligibility.
 The BAC called the attention of Contractor A on the matter of the deficient NFCC. In reply,
 Contractor A posted a credit line in an amount which is more than enough to cover for the
@@ -4494,7 +4494,7 @@ project, and has done all its previous projects satisfactorily with no negative 
 Further, there is political pressure on the BAC to award the contract to Contractor A as it is
 being endorsed by the Congressman in the locality of the project.
 In comparison, the bidder with the second lowest bid, Contractor B, has completed all its
-previous projects satisfactorily, suffering only a negative slippage of – 12% in one of its
+previous projects satisfactorily, suffering only a negative slippage of ï¿½ 12% in one of its
 projects. Further, its legal, technical and financial requirements would have passed the PostQualification. The BAC is wary of it though as its owner is the first cousin of the BAC
 Chairman.
 The BAC will meet to deliberate on the award of the project.
@@ -4507,20 +4507,20 @@ Contractor A is not eligible. While the eligibility requirements it submitted pa
 Eligibility Check, information that the BAC gathered during Post-Qualification shows that
 Contractor A misrepresented itself by not reporting its on-going project, whose outstanding
 works would have a negative impact on its NFCC.
-2016 IRR Section 23.6 says: “Notwithstanding the eligibility of a prospective bidder, the
+2016 IRR Section 23.6 says: ï¿½Notwithstanding the eligibility of a prospective bidder, the
 Procuring Entity concerned reserves the right to review its qualification at any stage of the
 procurement process if it has reasonable grounds to believe that a misrepresentation has
 been made by the said prospective bidder, or that there has been a change in the prospective
-bidder’s capability to undertake the project from the time it submitted its eligibility
+bidderï¿½s capability to undertake the project from the time it submitted its eligibility
 requirements. Should such review uncover any misrepresentation made in the eligibility
 requirements, statements or documents, or any changes in the situation of the prospective
 bidder which will affect the capability of the bidder to undertake the project so that it fails the
 Page 110 of 113
 Manual of Procedures for the Procurement of Infrastructure Projects
 preset eligibility criteria, the Procuring Entity shall consider the said prospective bidder as
-ineligible and shall disqualify it from submitting a bid or from obtaining an award or contract.”
+ineligible and shall disqualify it from submitting a bid or from obtaining an award or contract.ï¿½
 While Contractor A posted a credit line enough to compensate for the difference in its NFCC
-and the project’s ABC, the BAC should not have accepted the credit line because: 1) this is
+and the projectï¿½s ABC, the BAC should not have accepted the credit line because: 1) this is
 tantamount to an improvement in the qualification/bid of Contractor A; and 2) the
 procurement rules allowing submission of a credit line or a cash deposit certificate have been
 amended and no longer applied.
@@ -4545,9 +4545,9 @@ having this step-by-step procedure is that it minimizes discretion of the BAC an
 saves/protects it from having to face dilemmas of this sort.
 In view of the foregoing, the BAC would have to award the contract to the bidder which
 submitted the second lowest bid, Contractor B, among all the others who have been found
-eligible and technically complying. While Contractor B has had a negative slippage of –12% in
+eligible and technically complying. While Contractor B has had a negative slippage of ï¿½12% in
 his other projects, the eligibility requirement on track record only requires that the negative
-slippage, if any, be not more than –15%, or at least two projects with a negative slippage of
+slippage, if any, be not more than ï¿½15%, or at least two projects with a negative slippage of
 at least -10%. Further, while the owner of Contractor B is a first cousin of the BAC Chairman,
 it is still not in violation of 2016 IRR Section 47.1, because the prohibition refers to the
 participation of bidders related to the members of the BAC within the third civil degree. A

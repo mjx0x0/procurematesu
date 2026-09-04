@@ -4,6 +4,9 @@ const nextConfig = {
   distDir: '.next',
   reactStrictMode: true,
   swcMinify: true,
+  experimental: {
+    serverComponentsExternalPackages: ['@xenova/transformers'],
+  },
 };
 
 module.exports = nextConfig;

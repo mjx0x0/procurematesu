@@ -79,6 +79,7 @@ export default function NewPRForm() {
 
   // Pre-fill from URL params (sent by chatbot)
   useEffect(() => {
+    if (!searchParams) return;
     const department = searchParams.get("department");
     const purpose = searchParams.get("purpose");
     const itemsParam = searchParams.get("items");
@@ -101,7 +102,8 @@ export default function NewPRForm() {
             total_cost: (item.quantity || 1) * (item.unit_cost || 0),
           }));
           setItems(newItems);
-          calculateTotal();
+          const total = newItems.reduce((sum, item) => sum + (item.total_cost || 0), 0);
+          setFormData(prev => ({ ...prev, total_amount: total }));
         }
       } catch (e) {}
     }
@@ -304,40 +306,41 @@ export default function NewPRForm() {
   // ============================================================
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <Loader2 className="h-12 w-12 animate-spin text-[#7A1315] mx-auto" />
+          <p className="mt-4 text-stone-600 font-medium">Loading requisition form...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-[#FAF8F5]">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
+      <nav className="bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-stone-600 hover:text-[#7A1315] transition-colors p-1"
+              title="Back to Dashboard"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-                <FileText className="h-5 w-5 text-white" />
+              <div className="bg-[#7A1315] p-2 rounded-xl text-amber-200 border border-amber-400/30 shadow-xs">
+                <FileText className="h-5 w-5" />
               </div>
-              <span className="font-bold text-xl text-gray-900">New Purchase Request</span>
+              <span className="font-bold text-xl text-[#4D0C0D]">New Purchase Request</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowAiDialog(true)}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-purple-600/30 transition-all hover:scale-105 flex items-center gap-2"
+              className="bg-gradient-to-r from-[#B88E13] via-[#D4AF37] to-[#B88E13] hover:from-[#AA820A] hover:to-[#B88E13] text-[#4D0C0D] px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all hover:scale-105 flex items-center gap-2 border border-amber-500/40"
             >
-              <Sparkles className="h-4 w-4" />
+              <Sparkles className="h-4 w-4 text-[#4D0C0D]" />
               Draft with AI
             </button>
           </div>
@@ -346,7 +349,7 @@ export default function NewPRForm() {
 
       {/* Main Form */}
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-stone-200/90 p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-sm">
@@ -391,7 +394,7 @@ export default function NewPRForm() {
                   onChange={(e) =>
                     setFormData({ ...formData, department: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                   required
                 >
                   <option value="">Select department</option>
@@ -418,7 +421,7 @@ export default function NewPRForm() {
                     setFormData({ ...formData, section: e.target.value })
                   }
                   placeholder="e.g., IT Department"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                 />
               </div>
             </div>
@@ -454,7 +457,7 @@ export default function NewPRForm() {
                   setFormData({ ...formData, purpose: e.target.value })
                 }
                 placeholder="Describe the purpose of this purchase request..."
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                 rows={2}
                 required
               />
@@ -469,7 +472,7 @@ export default function NewPRForm() {
                 <button
                   type="button"
                   onClick={addItem}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+                  className="text-[#7A1315] hover:text-[#4D0C0D] text-sm font-semibold flex items-center gap-1"
                 >
                   <Plus className="h-4 w-4" />
                   Add Item
@@ -549,7 +552,7 @@ export default function NewPRForm() {
                             }
                             min="0"
                             step="0.01"
-                            className="w-24 px-2 py-1 border border-gray-200 rounded text-right text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                            className="w-24 px-2 py-1 border border-gray-200 rounded text-right text-sm focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                           />
                         </td>
                         <td className="px-3 py-2 text-right text-sm font-medium text-gray-700">
@@ -572,7 +575,7 @@ export default function NewPRForm() {
                       <td colSpan={4} className="px-3 py-3 text-right font-semibold text-gray-900">
                         TOTAL:
                       </td>
-                      <td className="px-3 py-3 text-right font-bold text-blue-600">
+                      <td className="px-3 py-3 text-right font-bold text-[#7A1315] text-base">
                         ₱{formData.total_amount.toFixed(2)}
                       </td>
                       <td></td>
@@ -601,7 +604,7 @@ export default function NewPRForm() {
                     setFormData({ ...formData, requested_by_designation: e.target.value })
                   }
                   placeholder="Designation (e.g., Department Head)"
-                  className="w-full mt-2 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                  className="w-full mt-2 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                 />
               </div>
               <div>
@@ -615,7 +618,7 @@ export default function NewPRForm() {
                     setFormData({ ...formData, approved_by: e.target.value })
                   }
                   placeholder="Name of approving authority"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                 />
                 <input
                   type="text"
@@ -624,7 +627,7 @@ export default function NewPRForm() {
                     setFormData({ ...formData, approved_by_designation: e.target.value })
                   }
                   placeholder="Designation (e.g., Chancellor)"
-                  className="w-full mt-2 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                  className="w-full mt-2 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                 />
               </div>
             </div>
@@ -633,16 +636,16 @@ export default function NewPRForm() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
+              className="w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white py-3.5 rounded-xl font-bold shadow-md shadow-red-950/20 border border-amber-400/30 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
             >
               {submitting ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Submitting...
+                  <Loader2 className="h-5 w-5 animate-spin text-amber-200" />
+                  Submitting Purchase Request...
                 </>
               ) : (
                 <>
-                  <Save className="h-5 w-5" />
+                  <Save className="h-5 w-5 text-amber-300" />
                   Submit Purchase Request
                 </>
               )}
@@ -657,11 +660,11 @@ export default function NewPRForm() {
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 animate-fade-in-up">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
-                <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-2 rounded-lg">
-                  <Sparkles className="h-5 w-5 text-white" />
+                <div className="bg-[#7A1315] p-2 rounded-xl text-amber-200 border border-amber-400/30 shadow-xs">
+                  <Sparkles className="h-5 w-5" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Draft with AI
+                <h3 className="text-lg font-bold text-[#4D0C0D]">
+                  Draft with Isko BidDo AI
                 </h3>
               </div>
               <button
@@ -673,7 +676,7 @@ export default function NewPRForm() {
             </div>
 
             <p className="text-sm text-gray-600 mb-4">
-              Describe what you need to purchase, and AI will fill the form for you.
+              Describe what items or supplies your department needs, and AI will automatically structure the purchase request items and specifications.
             </p>
 
             <div className="space-y-3">
@@ -681,7 +684,7 @@ export default function NewPRForm() {
                 value={aiInput}
                 onChange={(e) => setAiInput(e.target.value)}
                 placeholder="Example: I need 10 laptops for the CSM department, budget around ₱500,000..."
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white text-sm"
                 rows={4}
               />
 
@@ -689,21 +692,21 @@ export default function NewPRForm() {
                 <button
                   type="button"
                   onClick={() => setAiInput("I need 10 laptops for CSM, budget ₱500,000")}
-                  className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-xs text-gray-600 transition-colors"
+                  className="px-3 py-1 bg-stone-100 hover:bg-red-50 hover:text-[#7A1315] border border-stone-200 rounded-full text-xs text-stone-600 transition-colors"
                 >
                   💻 10 laptops
                 </button>
                 <button
                   type="button"
                   onClick={() => setAiInput("Need 5 printers and 20 reams of paper for the admin office")}
-                  className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-xs text-gray-600 transition-colors"
+                  className="px-3 py-1 bg-stone-100 hover:bg-red-50 hover:text-[#7A1315] border border-stone-200 rounded-full text-xs text-stone-600 transition-colors"
                 >
                   🖨️ Printers & paper
                 </button>
                 <button
                   type="button"
                   onClick={() => setAiInput("Purchase 50 chairs and 20 tables for the new conference room")}
-                  className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-xs text-gray-600 transition-colors"
+                  className="px-3 py-1 bg-stone-100 hover:bg-red-50 hover:text-[#7A1315] border border-stone-200 rounded-full text-xs text-stone-600 transition-colors"
                 >
                   🪑 Furniture
                 </button>
@@ -718,16 +721,16 @@ export default function NewPRForm() {
               <button
                 onClick={handleAiDraft}
                 disabled={aiDrafting || !aiInput.trim()}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-[#7A1315] to-[#8B1518] hover:from-[#630E10] hover:to-[#7A1315] text-white py-3 rounded-xl font-bold shadow-md shadow-red-950/20 border border-amber-400/30 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {aiDrafting ? (
                   <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Drafting...
+                    <Loader2 className="h-5 w-5 animate-spin text-amber-200" />
+                    Drafting with AI...
                   </>
                 ) : (
                   <>
-                    <Send className="h-5 w-5" />
+                    <Send className="h-5 w-5 text-amber-300" />
                     Generate Draft
                   </>
                 )}

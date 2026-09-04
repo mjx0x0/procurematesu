@@ -11,10 +11,10 @@ PREPARING FOR THE PROCUREMENT OF GOODS .........................................
 PREPARING FOR THE PROCUREMENT OF GOODS...................................................... 7
 PROCUREMENT PLANNING ................................................................................. 8
 What are the factors to be considered in planning for the procurement of Goods? .............. 8
-What are “Technical Specifications”?.......................................................................... 10
+What are ï¿½Technical Specificationsï¿½?.......................................................................... 10
 What are the considerations in setting the technical specifications of the goods to be
 procured? .............................................................................................................. 10
-What is the “Approved Budget for the Contract” or the ABC? ......................................... 11
+What is the ï¿½Approved Budget for the Contractï¿½ or the ABC? ......................................... 11
 What are the factors that should be considered in determining the ABC? ........................ 11
 Approved Budget for the Contract as Basis for Award...................................................12
 PREPARING THE BIDDING DOCUMENTS .............................................................. 13
@@ -29,7 +29,7 @@ Methodology: How are the Bidding Documents prepared? ...........................
 What is a Bid Security? ............................................................................................ 15
 What are the forms of Bid Security and the corresponding amounts required? ................. 16
 Who determines the form of the Bid Security to be submitted by bidders? ...................... 16
-What is a Bid Securing Declaration …………………………………………………………………………………………16
+What is a Bid Securing Declaration ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½16
 What is the period of validity of Bids and the corresponding Bid Security? ....................... 17
 In what currency shall the Bid Security be denominated? ............................................. 17
 What happens if a bidder does not submit a Bid Security? ............................................ 17
@@ -97,7 +97,7 @@ What is a Bid?..................................................................
 How should the bids be packaged and submitted?........................................................42
 What are the contents of the two bid envelopes?..........................................................42
 Computation of Discounts.........................................................................................43
-ELIGIBLITY REQUIREMENTS…………………………………………………………………………44
+ELIGIBLITY REQUIREMENTSï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½44
 What is eligibility check?...........................................................................................44
 Who may be eligible to participate in a public bidding for goods? ................................... 44
 Are foreign suppliers allowed to bid? ......................................................................... 46
@@ -159,11 +159,11 @@ What happens if the bidder being considered for award does not accept the award?
 May the HoPe still exercise the cat provided for under section 41 of the IRR after issuance of
 the NOA?................................................................................................................68
 STEP 8 SIGN AND APPROVE THE CONTRACT AND ISSUE THE NOTICE TO
-PROCEED…………………………………………………………………………………69
+PROCEEDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½69
 When must the winning bidder and the Procuring Entity enter into a contract? ................. 69
 What are the Timelines to be considered with respect to contract approval? .................... 69
 When should the Procuring Entity issue the NTP? ........................................................ 69
-When is a contract “effective”? ................................................................................. 69
+When is a contract ï¿½effectiveï¿½? ................................................................................. 69
 Who are the Parties involved in Contract Signing and Approval and Issuance of the NTP? .. 69
 What documents form part of the contract? ................................................................ 70
 Methodology: ......................................................................................................... 70
@@ -183,7 +183,7 @@ iv
 Manual of Procedures for the Procurement of Goods
 What happens if no prospective bidder submits its eligibility requirements and initial
 technical proposal, at the first stage?..........................................................................76
-PROTEST MECHANISM……………………………………………………………….…………………77
+PROTEST MECHANISMï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½77
 What is the remedy of an affected bidder who receives an unfavorable decision from the
 BAC?......................................................................................................................77
 What is the remedy of an affected bidder in the event the request for reconsideration is
@@ -274,14 +274,14 @@ OTHER RULES AND GUIDELINES .....................................................
 Legal Reference .................................................................................................... 121
 Incidental Services ............................................................................................... 121
 Spare Parts ........................................................................................................... 121
-Purchaser’s Responsibilities ..................................................................................... 122
+Purchaserï¿½s Responsibilities ..................................................................................... 122
 Prices ............................................................................................................. 122
-Payment …………………………………………………………………………………………………..……………………………125
+Payment ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½..ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½125
 Taxes and Duties ................................................................................................... 127
 Subcontracts ......................................................................................................... 127
 Standards ............................................................................................................ 128
 Packaging ............................................................................................................. 128
-Insurance ………………………………………………………………………………………………………………………………..128
+Insurance ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½..128
 Transportation ...................................................................................................... 128
 Inspection and Tests .............................................................................................. 129
 Intellectual Property Rights ..................................................................................... 130
@@ -292,7 +292,7 @@ Termination for Convenience ....................................................
 Assignment .......................................................................................................... 132
 Blacklisting ........................................................................................................... 132
 GENERAL PROCUREMENT ACTIVITIES AND TIMELINES ............................. 133
-EARLIEST AND MAXIMUM TIMELINE FOR GOODS…………………………………135
+EARLIEST AND MAXIMUM TIMELINE FOR GOODSï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½135
 CASE STUDY FOR PROCUREMENT OF GOODS ................................................. 135
 vi
 Manual of Procedures for the Procurement of Goods
@@ -339,10 +339,10 @@ FOB Free on Board
 GAA General Appropriations Act
 GCC General Conditions of Contract
 GFI Government Financial Institution
-GOCC Government-owned and/or –controlled corporation
+GOCC Government-owned and/or ï¿½controlled corporation
 GOP Government of the Philippines
 GPPB Government Procurement Policy Board
-GPPB-TSO GPPB – Technical Support Office
+GPPB-TSO GPPB ï¿½ Technical Support Office
 GPRA Government Procurement Reform Act (R.A. 9184)
 IB Invitation to Bid
 ICB International Competitive Bidding
@@ -380,8 +380,8 @@ PhilGEPS/
 G-EPS Philippine Government Electronic Procurement System
 PWI Procurement Watch Inc.
 R.A. Republic Act
-R.A. 9184 Republic Act No. 9184, otherwise known as the “Government Procurement
-Reform Act”
+R.A. 9184 Republic Act No. 9184, otherwise known as the ï¿½Government Procurement
+Reform Actï¿½
 SARO Special Allotment Release Order
 SCC Special Conditions of Contract
 SCRB Single Calculated and Responsive Bid
@@ -404,7 +404,7 @@ Scope of Volume 2
 This Manual seeks to provide its users with clear, concise, and accurate information on the
 public procurement of goods and services, by discussing the steps that need to be taken
 to effect such procurement in the manner prescribed by R.A. 9184, otherwise known as the
-“Government Procurement Reform Act,” and its 2016 IRR. It also discusses important issues
+ï¿½Government Procurement Reform Act,ï¿½ and its 2016 IRR. It also discusses important issues
 that may confront government officials in all stages of goods and services procurement, from
 the preparation of bid documents, to the actual bidding activity, monitoring of contract
 implementation and the final payment to the supplier.
@@ -423,7 +423,7 @@ maintenance of equipment and furniture, as well as trucking, hauling, janitorial
 related or analogous services (e.g. rental of venues and facilities, catering services, conduct
 of trainings and seminars, short term services not considered as consulting services), as well
 as procurement of materials and supplies provided by the Procuring Entity for such services.
-The term “related” or “analogous services” shall include, but not be limited to, lease of office
+The term ï¿½relatedï¿½ or ï¿½analogous servicesï¿½ shall include, but not be limited to, lease of office
 space, media advertisements, health maintenance services, and other services essential to
 the operation of the Procuring Entity. (2016 IRR, Section 5[r])
 Manual of Procedures for the Procurement of Goods and Services
@@ -483,22 +483,22 @@ b. Inventory Items;
 c. Non-Common Use Supplies (which may include equipment or supplies that are
 project-specific); or
 d. Services.
-“Common-Use Supplies and Equipment (CSE)” as defined in the 2016 IRR are those
+ï¿½Common-Use Supplies and Equipment (CSE)ï¿½ as defined in the 2016 IRR are those
 goods, materials, and equipment that are used in the day-to-day operations of
 procuring entities in the performance of their functions. For the purpose of the 2016
 IRR, CSE shall be those included in the Electronic Catalogue of the PhilGEPS (2016
 IRR, Section 5 [g]). CSE should be procured from the PS-DBM on a quarterly basis.
-“Inventory Items” include CSE, goods, and materials that are not available in the PSDBM but are regularly used and kept on stock by the Procuring Entity. Inventory
+ï¿½Inventory Itemsï¿½ include CSE, goods, and materials that are not available in the PSDBM but are regularly used and kept on stock by the Procuring Entity. Inventory
 items that are not CSE may be procured from commercial sources, or suppliers other
 than the DBM-PS. The bulk purchase of these goods may be a good strategy to lower
 costs and achieve administrative efficiency. Likewise, it is a good practice to monitor
 the consumption of these items and identify when re-orders are necessary to ensure
-“round-the-clock” availability and to avoid over-the-counter purchases or purchases
+ï¿½round-the-clockï¿½ availability and to avoid over-the-counter purchases or purchases
 using petty cash funds.
-“Non-Common Use Supplies”
+ï¿½Non-Common Use Suppliesï¿½
 are those goods, materials,
 and equipment that are neither
-“CSE” nor “Inventory Items”,
+ï¿½CSEï¿½ nor ï¿½Inventory Itemsï¿½,
 and may include those goods,
 materials and equipment that
 are required by the Procuring
@@ -513,7 +513,7 @@ similar items are required for different projects, and in order to minimize cost
 may be procured under a single contract. For goods that are available off-the-shelf
 and are of relatively low value, shopping may be resorted to, provided the conditions
 for the use of this alternative mode of procurement are present.
-Let’s make doing things easier
+Letï¿½s make doing things easier
 On using the DBM-PS for procurement
 The Procuring Entity must consider the services of the
 DBM-PS in the procurement of all kinds of CSE. This will
@@ -523,15 +523,15 @@ procurement of high value, highly specialized
 requirements for its more significant projects.
 Page 9 of 128
 Manual of Procedures for the Procurement of Goods and Services
-“Services” refer to general support services, except consulting services and
+ï¿½Servicesï¿½ refer to general support services, except consulting services and
 infrastructure projects, which may be needed in support of the transaction of public
 businesses or in the pursuit of any government undertaking, project or activity.
 These include non-personal or contractual services such as the repair and
 maintenance of equipment and furniture, as well as trucking, hauling, janitorial,
 security and related or analogous services (e.g. rental of venues and facilities,
 catering services, attendance to trainings and seminars, short term services not
-considered as consulting services). The terms “related services” or “analogous
-services” shall include, but not be limited to, lease of office space, media
+considered as consulting services). The terms ï¿½related servicesï¿½ or ï¿½analogous
+servicesï¿½ shall include, but not be limited to, lease of office space, media
 advertisements, health maintenance services, and other services essential to the
 operation of the Procuring Entity.
 2. Availability of the Goods or Services in the Market. The identification of the
@@ -578,7 +578,7 @@ also be a factor in deciding whether to lease or to buy equipment. It may be mor
 economical for the Procuring Entity to consider the leases of equipment that are easily
 rendered obsolete, like IT equipment. (Please refer to the last paragraph on bid
 evaluation on this Manual)
-Let’s make doing things easier
+Letï¿½s make doing things easier
 On Ordering Agreements
 Under the Revised Guidelines on the Use of Ordering
 Agreement, issued through GPPB Resolution No. 01-
@@ -598,21 +598,21 @@ Page 10 of 128
 Manual of Procedures for the Procurement of Goods and Services
 The Procuring Entity shall also take into consideration the warranty requirements for
 goods under Section 62.1 of the 2016 IRR.
-What are “Technical Specifications”?
-The term “technical specifications” refers to the physical description of the goods or services,
-as well as the Procuring Entity’s requirements in terms of the functional, performance,
+What are ï¿½Technical Specificationsï¿½?
+The term ï¿½technical specificationsï¿½ refers to the physical description of the goods or services,
+as well as the Procuring Entityï¿½s requirements in terms of the functional, performance,
 environmental interface and design standard requirements to be met by the goods to be
 manufactured or supplied, or the services to be rendered. The technical specifications must
 include the testing parameters for goods, when such testing is required in the contract.
-“Functional description” is the description of the functions for which the Goods are to be
+ï¿½Functional descriptionï¿½ is the description of the functions for which the Goods are to be
 utilized. For example, a ballpen is expected to write 1.5 km of straight, continuous lines.
-“Performance description” refers to the manner that the Goods are required to perform the
+ï¿½Performance descriptionï¿½ refers to the manner that the Goods are required to perform the
 functions expected of them. For example, a ballpen that writes at 1.5km should do so
 continuously and smoothly, without skipping, and with the color of the ink being consistent.
-“Environmental interface” refers to the environment in which the required functions are
+ï¿½Environmental interfaceï¿½ refers to the environment in which the required functions are
 performed at the desired level. For example, a ballpen should write continuously for 1.5km
 on pad paper or bond paper, but not necessarily on wood or on a white board.
-“Design” refers to the technical design or drawing of the goods being procured. A design
+ï¿½Designï¿½ refers to the technical design or drawing of the goods being procured. A design
 standard is particularly useful in cases where the goods procured are specially manufactured
 for the Procuring Entity. For example, in procuring BDA for the PA, there is a specific pattern
 of color and shade that the BDA should follow.
@@ -650,10 +650,10 @@ comply, except that where such international standards are unavailable or are in
 specified. Although specifications should be based on relevant characteristics and/or performance requirements, and
 references to brand names, catalog numbers, or similar classifications should be avoided, in certain instances, it may be
 necessary to quote a brand name or catalog number of a particular manufacturer to clarify an otherwise incomplete
-specification, the words “or its equivalent” should be added after such reference. The specifications shall then permit the
+specification, the words ï¿½or its equivalentï¿½ should be added after such reference. The specifications shall then permit the
 Page 11 of 128
 Manual of Procedures for the Procurement of Goods and Services
-What is the “Approved Budget for the Contract” or the ABC?
+What is the ï¿½Approved Budget for the Contractï¿½ or the ABC?
 The ABC is the budget for the contract duly approved by the Head of the Procuring Entity, as
 provided for in:
 1. The GAA, continuing and automatic appropriations, in the case of NGAs;
@@ -707,8 +707,8 @@ fit, and based on the findings in its mandatory review, it may revise and agree 
 of technical specifications; and, if necessary, may adjust the amount of the ABC, subject to
 the required approvals under the IRR, and conduct a re-bidding with re-advertisement and/or
 posting.
-Note! The Bureau of Internal Revenue – Revenue Memorandum Circular No. 85-2017,
-provides that: “Sales to the government or any of its political subdivisions, instrumentalities or
+Note! The Bureau of Internal Revenue ï¿½ Revenue Memorandum Circular No. 85-2017,
+provides that: ï¿½Sales to the government or any of its political subdivisions, instrumentalities or
 agencies, including government-owned or controlled corporations (GOCCs), of goods and/or
 services are generally subject to the twelve percent (12%) VAT under Sections 106 and 108 of
 the NIRC, unless the sale transaction is specifically VAT-exempt or VAT zero-rated under the
@@ -718,7 +718,7 @@ The ABC shall be the upper limit or ceiling for bid prices, such that bid prices
 ceiling shall be disqualified outright from further participating in the bidding. The total
 calculated bid prices, as evaluated and corrected for computational errors, and other bid
 modifications, which exceed the ABC shall be disqualified. It must be noted that the rules
-referred to “total calculated bid prices that exceed the ABC” as ground for disqualifying a bid.
+referred to ï¿½total calculated bid prices that exceed the ABCï¿½ as ground for disqualifying a bid.
 Thus, as long as the total calculated bid prices does not exceed the ABC, all items grouped
 together to form one complete Lot that will be awarded to one Bidder shall be considered
 responsive, regardless whether some of the cost of the items of the bid exceed the estimated
@@ -760,7 +760,7 @@ The specifications and other terms in the bidding documents shall reflect minimu
 requirements. A bidder may, therefore, be allowed to submit a superior offer. However, in
 the evaluation of the bids, no premium or bonus must be given as a result of this superior
 offer. This rule is based on the nature of the procedure used to evaluate the technical
-proposals – a “pass/fail” method - such that the presence or absence of the technical
+proposals ï¿½ a ï¿½pass/failï¿½ method - such that the presence or absence of the technical
 requirements is the sole basis for determining technical compliance. After having established
 compliance with the technical specifications, the next factor to consider would then be the
 price or financial bid.
@@ -780,12 +780,12 @@ assured of equal opportunities to obtain additional information on a timely basi
 prospective bidders.
 3. For complex supply contracts, particularly for those requiring refurbishing existing
 equipment, a pre-bid conference may be arranged whereby potential bidders may
-meet with the Procuring Entity’s representatives to seek clarifications (in person or
+meet with the Procuring Entityï¿½s representatives to seek clarifications (in person or
 online). Minutes of the conference should be made available to prospective bidders
 (in hard copy or sent electronically) not later than five (5) days upon written request.
 4. Any additional information, clarification, correction of errors, or modifications of
 bidding documents should be posted at the PhilGEPS website, the website of the
-Procuring Entity and at any conspicuous place within the latter’s premises, within at
+Procuring Entity and at any conspicuous place within the latterï¿½s premises, within at
 least seven (7) calendar days before the deadline for the submission and receipt of
 bids to enable bidders to take appropriate actions. If necessary, the deadline should
 be extended.
@@ -811,7 +811,7 @@ The size and scope of individual contracts will depend on the magnitude, nature,
 of the project, for example:
 1. For projects requiring a variety of goods and works, separate contracts may be
 awarded for the supply and/or installation of different items of equipment and plant
-(“plant” refers to installed equipment, as in a production facility) and for the works.
+(ï¿½plantï¿½ refers to installed equipment, as in a production facility) and for the works.
 Page 15 of 128
 Manual of Procedures for the Procurement of Goods and Services
 2. For a project requiring similar but separate items of equipment or works, bids may be
@@ -845,10 +845,10 @@ to prospective bidders to examine the contents of the Bidding Documents.
 However, in procurements involving and affecting national security, the disclosure of the
 specific components of the procurement documents, such as, the technical specifications,
 requirements and components, shall be dependent upon the HoPE having due regard to the
-nature, classification, sensitivity and confidentiality of the relevant documents vis-à-vis the
+nature, classification, sensitivity and confidentiality of the relevant documents vis-ï¿½-vis the
 purpose and reason for the request.
 Based on the National Intelligence Coordinating Agency (NICA), national security refers to the
-state or condition wherein the country’s national interests, the well-being of its people and
+state or condition wherein the countryï¿½s national interests, the well-being of its people and
 institutions, and its sovereignty and territorial integrity are protected and enhanced.
 What is a Bid Security?
 A bid security is a guarantee that the successful bidder will:
@@ -869,10 +869,10 @@ corresponding amount in accordance with the following schedule:3 (2016 IRR, Sect
 FORM OF BID SECURITY MINIMUM AMOUNT
 (Not Less Than the
 Percentage of the ABC)
-a. Cash, cashier’s check/manager’s check issued by a
+a. Cash, cashierï¿½s check/managerï¿½s check issued by a
 Universal or Commercial Bank.
 For biddings conducted by LGUs, the
-cashier’s/manager’s check may be issued by other
+cashierï¿½s/managerï¿½s check may be issued by other
 banks certified by the BSP as authorized to issue
 such financial instrument.
 b. Bank draft/guarantee or irrevocable letter of credit 2%
@@ -896,7 +896,7 @@ Who determines the form of the Bid Security to be submitted by bidders?
 The bidding documents indicate the allowable forms of bid security and the respective
 amounts thereof, in accordance with Section 27.2 of the 2016 IRR. The bidder may choose
 which among the allowable forms it shall submit.
-To enhance competition and bidder’s participation, and reduce transactional costs in
+To enhance competition and bidderï¿½s participation, and reduce transactional costs in
 procurement activities of the Government, the use of a Bid Securing Declaration is also
 allowed as an alternative to the previous forms of bid security. (See Guidelines on the Use
 of Bid Securing Declaration)
@@ -948,7 +948,7 @@ What is a Performance Security?
 A performance security is a guarantee that the winning bidder will faithfully perform its
 obligations under the contract prepared in accordance with the Bidding Documents. (2016
 IRR, Section 39.1) It must be posted in favor of the Procuring Entity, and will be forfeited
-in the latter’s favor in the event it is established that the winning bidder is in default in any of
+in the latterï¿½s favor in the event it is established that the winning bidder is in default in any of
 its obligations under the contract. (2016 IRR,Section 39.3)
 Page 18 of 128
 Manual of Procedures for the Procurement of Goods and Services
@@ -968,10 +968,10 @@ FORM OF PERFORMANCE SECURITY MINIMUM AMOUNT
 (Not Less Than the
 Percentage of the Total
 Contract Price)
-a. Cash or cashier’s/manager’s check issued by a
+a. Cash or cashierï¿½s/managerï¿½s check issued by a
 Universal or Commercial Bank.
 For biddings conducted by LGUs, the
-cashier’s/manager’s check may be issued by other
+cashierï¿½s/managerï¿½s check may be issued by other
 banks certified by the BSP as authorized to issue such
 financial instrument.
 5% of contract price
@@ -1086,12 +1086,12 @@ the different activities, and the method of procurement for the procurement at h
 7. Reiterate and emphasize the importance of confidentiality, in accordance with Section
 19 of the 2016 IRR, and the applicable sanctions and penalties, as well as agree on
 measures to ensure compliance with the confidentiality rule.
-How’s that again?
-A “fair” evaluation criteria means such
+Howï¿½s that again?
+A ï¿½fairï¿½ evaluation criteria means such
 as are applicable to all similar goods
 offered in the market, and are not tailorfit or customized for a particular
 product/service or brand.
-Let’s make doing things easier
+Letï¿½s make doing things easier
 If a Procuring Entity has to procure similar goods or services, although through different
 public bidding activities, it may opt to hold just one pre-procurement conference to simplify
 or shorten the process.
@@ -1151,7 +1151,7 @@ posting of IBs and other notices, as well as the matching of procurement opportu
 the appropriate supplier; and (ii) the registry of suppliers.
 Page 26 of 128
 Manual of Procedures for the Procurement of Goods and Services
-Let’s make doing things
+Letï¿½s make doing things
 easier
 The Procuring Entity may wish to
 consider authorizing the DBM to
@@ -1195,7 +1195,7 @@ issued a Certification, a user-name and a system-generated password. (Note:
 Procedures covering the various activities that require coordination with the PhilGEPS
 are indicated in the appropriate Sections of this Manual. Reference may also be made
 to Volume 1)
-3. For the procurement of common–use supplies, the procurement unit or office obtains
+3. For the procurement of commonï¿½use supplies, the procurement unit or office obtains
 from the PS-DBM its latest Price List of Common-Use Supplies. It then prepares the
 APR where it will indicate the description, quantity and price of the goods it will
 procure.
@@ -1215,7 +1215,7 @@ appropriate action. (Note: The internal
 procedures of the PS-DBM are embodied
 in their Operations Manual. Reference
 thereto may be made. )
-TIPS: Let’s make doing
+TIPS: Letï¿½s make doing
 things easier
 The Procuring Entity should institute the
 appropriate systems and procedures
@@ -1244,7 +1244,7 @@ SECTION 4
 Instructions on the Procedural
 Steps for the Procurement of
 Goods
-PART ONE – COMPETITIVE BIDDING
+PART ONE ï¿½ COMPETITIVE BIDDING
 Manual of Procedures for the Procurement of Goods and Services
 Page 31 of 152
 Competitive Bidding
@@ -1337,7 +1337,7 @@ prepared to undertake the bidding procedure, it should not hesitate to consider
 moving back the advertisement/posting thereof to allow more time to perfect the
 same);
 2. Continuously on the website of the Procuring Entity concerned, if available, the
-website of the Procuring Entity’s service provider, if any, as provided in the 2016 IRR
+website of the Procuring Entityï¿½s service provider, if any, as provided in the 2016 IRR
 Section 8, the PhilGEPS, and the website prescribed by the foreign
 government/foreign or international financing institution, if applicable,4
  for seven (7)
@@ -1353,7 +1353,7 @@ publish its advertisements in a newspaper of general nationwide circulation.
 For projects with ABCs of P 10 Million and below, the IB should be posted: (2016 IRR
 Section 21.2.1.c)
 1. Continuously on the website of the Procuring Entity concerned, if available, the
-website of the Procuring Entity’s service provider, if any, as provided in the 2016 IRR
+website of the Procuring Entityï¿½s service provider, if any, as provided in the 2016 IRR
 Section 8, the PhilGEPS, and the website prescribed by the foreign
 government/foreign or international financing institution, for seven (7) calendar days
 starting on date of advertisement, if applicable; and
@@ -1363,7 +1363,7 @@ Entity concerned, for seven (7) calendar days.
 
 4
  For NCB contracts funded by ADB, estimated at $500,000 or more, the IB shall be advertised
-concurrently at the general procurement notices section on ADB’s website.
+concurrently at the general procurement notices section on ADBï¿½s website.
 Page 34 of 152
 Manual of Procedures for the Procurement of Goods and Services
 For provincial projects, as described in Section 44 of the 2016 IRR, or programs funded out of
@@ -1391,7 +1391,7 @@ the IB may also be advertised in a local newspaper for the same duration as
 above.
 e. The BAC Secretariat, through its member who is authorized to transact with
 the PhilGEPS, posts the IB in the following websites: the PhilGEPS, that of the
-Procuring Entity or the Procuring Entity’s e-procurement service provider, if
+Procuring Entity or the Procuring Entityï¿½s e-procurement service provider, if
 any, and the website prescribed by the foreign government/foreign or
 international financing institution for the duration required.
 2. For public bidding of contracts with an ABC costing Ten Million Pesos (P10 Million) and
@@ -1481,7 +1481,7 @@ to be bid, if any;
 inquire or secure Supplemental/Bid
 Bulletin(s) as provided for under
 Section 22.5.3 of the 2016 IRR;
-5. Ensured that it is not “blacklisted” or
+5. Ensured that it is not ï¿½blacklistedï¿½ or
 barred from bidding by the GOP or any
 of its agencies, offices, corporations, or
 LGUs, including foreign
@@ -1499,7 +1499,7 @@ verify all the documents submitted;
 8. Ensured that the signatory is the duly authorized representative of the Bidder, and
 granted full power and authority to do, execute and perform any and all acts
 necessary and/or to represent the Bidder in the bidding, with the duly notarized
-Secretary’s Certificate attesting to such fact, if the Bidder is a corporation,
+Secretaryï¿½s Certificate attesting to such fact, if the Bidder is a corporation,
 partnership, cooperative, or joint venture;
 9. Complied with the disclosure provision under Section 47 of RA 9184 in relation to
 other provisions of RA 3019;
@@ -1553,7 +1553,7 @@ Manual of Procedures for the Procurement of Goods and Services
 Step 3 Call A Pre-Bid Conference and, if necessary, Issue
 Supplemental/Bid Bulletins
 What is a Pre-bid Conference?
-The pre-bid conference is the initial forum where the Procuring Entity’s representatives and
+The pre-bid conference is the initial forum where the Procuring Entityï¿½s representatives and
 the prospective bidders discuss the different aspects of the procurement at hand.
 The ground rules that will govern the procurement are discussed during the conference. In
 particular, the participants discuss the technical and financial components of the contract to
@@ -1597,10 +1597,10 @@ How should the participants conduct themselves during the Pre-bid
 Conference and other stages of the procurement process?
 The BAC, BAC Secretariat, TWG, and other officials involved in procurement are expected to
 act in an impartial, courteous and professional manner in all their dealings and interactions
-with the bidders during all stages of the procurement. The bidders’ representatives are
+with the bidders during all stages of the procurement. The biddersï¿½ representatives are
 likewise enjoined to adopt the same professional manner in their dealings with the Procuring
-Entity’s officials. Communications between the parties must, as much as possible, be made in
-writing, except during the pre-bid conference when verbal clarifications may be allowed –
+Entityï¿½s officials. Communications between the parties must, as much as possible, be made in
+writing, except during the pre-bid conference when verbal clarifications may be allowed ï¿½
 keeping in mind, however, that any statement made at the pre-bid conference would not
 modify the terms of the bidding documents, unless such statement is specifically identified in
 writing as an amendment of the documents and issued as a supplemental/bid bulletin.
@@ -1624,7 +1624,7 @@ evaluation criteria, and
 possible causes of failure of the
 bidding.
 2. The BAC chairperson shall also discuss the requirements in the ITB, the replies to the
-bidders’ queries about the requirements, specifications and other conditions of the
+biddersï¿½ queries about the requirements, specifications and other conditions of the
 project, the bid evaluation of all bidders and post-qualification evaluation of the lowest
 calculated bidder. Emphasis should also be given to the warranty requirement of the
 project and the different offenses and penalties provided for in the 2016 IRR of R.A.
@@ -1642,7 +1642,7 @@ bids. In this case, the BAC shall issue its response by issuing a Supplemental/B
 duly signed by the BAC Chairperson, to be made available to all those who have properly
 secured the bidding documents at least seven (7) calendar days before the deadline for the
 submission and receipt of bids. (2016 IRR, Section 22.5.1)
-TIPS: Let’s make doing things
+TIPS: Letï¿½s make doing things
 easier
 The BAC must initiate discussions on contentious
 issues, most especially if the participating
@@ -1670,16 +1670,16 @@ accordance with applicable laws.
 The Procuring Entity may, at its own initiative, also issue Supplemental/Bid Bulletins for
 purposes of clarifying or modifying any provision of the bidding documents not later than
 seven (7) calendar days before the deadline for the submission and receipt of bids. Any
-modification to the bidding documents must be identified as an “AMENDMENT.” (2016 IRR,
+modification to the bidding documents must be identified as an ï¿½AMENDMENT.ï¿½ (2016 IRR,
 Section 22.5.2)
 The BAC should also post the Supplemental/Bid Bulletin on the website of the Procuring Entity
 concerned, if available, the website of its electronic procurement system provider, if any, the
 PhilGEPS, and at any conspicuous place within the premises of the Procuring Entity, within the
-same timetable. It will be the prospective bidders’ responsibility to ask for, and secure, these
+same timetable. It will be the prospective biddersï¿½ responsibility to ask for, and secure, these
 bulletins.
 A supplemental/bid bulletin must contain a brief but comprehensive and accurate summary of
 the issue or issues that it wishes to address. If it was a prospective bidder that raised the
-issue addressed by the bulletin, then it ought to contain a summary of that bidder’s request
+issue addressed by the bulletin, then it ought to contain a summary of that bidderï¿½s request
 for clarification and/or interpretation, without identifying the bidder.
 Bidders who have submitted bids before a supplemental/bid bulletin is issued have to be
 informed in writing and allowed to modify or withdraw their respective bids. (2016 IRR,
@@ -1700,7 +1700,7 @@ by the BAC.
 bidders who have properly secured or purchased the bidding documents, within the
 period prescribed above.
 4. The BAC Secretariat posts the Supplemental/Bid Bulletin in the PhilGEPS, the website
-of the Procuring Entity and that of the latter’s electronic procurement system
+of the Procuring Entity and that of the latterï¿½s electronic procurement system
 provider, if any, and at any conspicuous place within the premises of the Procuring
 Entity, within the same period prescribed in number (3) above.
 Page 41 of 152
@@ -1718,7 +1718,7 @@ Step 4 Receive and Open the Bid Envelopes
 What is a Bid?
 A Bid refers to a signed offer or proposal to undertake a contract submitted by a bidder in
 response to, and in consonance with, the requirements stated in the bidding documents.
-“Bid” is also equivalent to and may be used interchangeably with “Proposal” and “Tender”.
+ï¿½Bidï¿½ is also equivalent to and may be used interchangeably with ï¿½Proposalï¿½ and ï¿½Tenderï¿½.
 (2016 IRR, Section 5[c]) A Bid has two components, the Technical Bid, and the Financial Bid.
 How should the bids be packaged and submitted?
 Bidders must submit their bids through their duly authorized representatives using the forms
@@ -1740,7 +1740,7 @@ Guidelines to be issued by the GPPB;
 7. Technical Specifications, which may include production/delivery schedule, manpower
 requirements, and/or after-sales service/parts, if applicable;
 8. Omnibus Sworn Statement in accordance with Section 25.3 of the 2016 IRR; and
-9. For foreign bidders claiming eligibility by reason of their country’s extension of
+9. For foreign bidders claiming eligibility by reason of their countryï¿½s extension of
 reciprocal rights to Filipinos, a certification from the relevant government office of
 their country stating that Filipinos are allowed to participate in their government
 procurement activities for the same item or product.
@@ -1784,8 +1784,8 @@ Manual of Procedures for the Procurement of Goods and Services
 Eligibility Requirements
 What is an eligibility check?
 It is a procedure to determine if a prospective bidder is eligible to participate in the bidding at
-hand. In determining a prospective bidder’s eligibility, the BAC shall use non-discretionary
-“pass/fail” criterion, as stated in the IB and the ITB. Essentially, this means that the absence,
+hand. In determining a prospective bidderï¿½s eligibility, the BAC shall use non-discretionary
+ï¿½pass/failï¿½ criterion, as stated in the IB and the ITB. Essentially, this means that the absence,
 incompleteness or insufficiency of a document shall make a prospective bidder ineligible to bid
 for the particular procurement.8 (2016 IRR, Section 30.1)
 Who may be eligible to participate in a public bidding for goods?9
@@ -1808,8 +1808,8 @@ a. Filipino ownership or interest of the joint venture concerned must be at leas
 sixty percent (60%); and
 b. In determining the eligibility
 of the joint venture, the
-principle of “collective
-compliance” will be applied to
+principle of ï¿½collective
+complianceï¿½ will be applied to
 its members/principals in the
 sense that each of the
 entities of the joint venture
@@ -1834,7 +1834,7 @@ liability, either with domestic firms and/or with foreign firms, but conditions 
 ventures or other forms of mandatory association between firms are generally not acceptable.
 Why is that?
 Why do we require that the
-bidder’s largest single contract
+bidderï¿½s largest single contract
 be at least 50% of the ABC of
 the contract to be bid?
 We do this because we want to be
@@ -1885,7 +1885,7 @@ by a foreign universal or commercial bank, it
 shall be confirmed or authenticated by a local
 universal or commercial bank.
 What data shall be used in computing the
-bidder’s NFCC?
+bidderï¿½s NFCC?
 For domestic bidders, the value of its
 current assets and liabilities shall based
 on the latest Audited Financial Statements
@@ -1898,7 +1898,7 @@ international financial reporting
 standards.
 What do we mean?
 When is a contract
-“similar” to another?
+ï¿½similarï¿½ to another?
 The Procuring Entity may clarify
 in the Bidding Documents the
 definition or description of what
@@ -1962,7 +1962,7 @@ suppliers, the bidding requirements and conditions, as advertised, shall not be
 
 11 For ADB and WB-funded contracts, to foster competition, firms and individuals from eligible countries are permitted to
 offer goods, works, and services. Any conditions for participation should be limited to those that are essential to ensure
-the firm’s capability to fulfill the contract in question. In connection with any contract to be financed in whole or in part
+the firmï¿½s capability to fulfill the contract in question. In connection with any contract to be financed in whole or in part
 from an IFI loan, the IFI generally does not permit a procuring entity to disqualify a firm for reasons unrelated to its
 capability and resources to successfully perform the contract; nor does it permit a procuring entity to disqualify any
 bidder for such reasons. Consequently, procuring entities should carry out due diligence on the technical and financial
@@ -2002,15 +2002,15 @@ coercive practices by the government.
 What are the eligibility requirements?
 Section 23.1 of the 2016 IRR requires bidders to submit the following eligibility requirements,
 which shall be included in the technical bid envelope, to wit:
-1. Class “A” Documents
+1. Class ï¿½Aï¿½ Documents
 a. Legal Documents
 i. DTI business name registration in the case of Single Proprietorships;
 or SEC Registration Certificate, in the case of Partnerships or
 Corporations; or CDA Registration, in the case of cooperatives;
-ii. Mayor’s/Business Permit issued by the city or municipality where the
+ii. Mayorï¿½s/Business Permit issued by the city or municipality where the
 principal place of business of the prospective bidder is located, or the
 equivalent document for Exclusive Economic Zones or Areas.
-In cases of recently expired Mayor’s/Business permits, it shall be
+In cases of recently expired Mayorï¿½s/Business permits, it shall be
 accepted together with the official receipt as proof that the bidder has
 applied for renewal within the period prescribed by the concerned local
 government unit, provided that the renewed permit shall be submitted
@@ -2025,27 +2025,27 @@ iv. A statement of the prospective bidder of all its ongoing government
 and private contracts, including contracts awarded but not yet started,
 if any, whether similar or not similar in nature and complexity to the
 contract to be bid.
-v. Statement of the bidder’s SLCC similar to the contract to be bid,
+v. Statement of the bidderï¿½s SLCC similar to the contract to be bid,
 except under conditions provided for in Sections 23.4.1.3 and
 23.4.2.5 of the 2016 IRR, within the relevant period as provided in the
 Bidding Documents.
  Both statements mentioned in Items (iv) and (v) should include the
 information required in the PBDs for Procurement of Goods.
 c. Financial Documents
-vi. The prospective bidder’s audited financial statements, showing,
-among others, the prospective bidder’s total and current assets and
-liabilities, stamped “received” by the BIR or its duly accredited and
+vi. The prospective bidderï¿½s audited financial statements, showing,
+among others, the prospective bidderï¿½s total and current assets and
+liabilities, stamped ï¿½receivedï¿½ by the BIR or its duly accredited and
 authorized institutions, for the preceding calendar year which should
 not be earlier than two (2) years from the date of bid submission; and
-vii. The prospective bidder’s computation of its NFCC which shall be
+vii. The prospective bidderï¿½s computation of its NFCC which shall be
 computed using the formula prescribed in Sec. 23.4.1.4 of the 2016
 IRR, or in lieu of this, a committed Line of Credit from a universal or
 commercial bank.
 All bidders shall upload and maintain in PhilGEPS a current and updated file of the
-following Class “A” eligibility documents:
+following Class ï¿½Aï¿½ eligibility documents:
 
 a) Registration Certificate;
-b) Mayor’s/Business Permit;
+b) Mayorï¿½s/Business Permit;
 c) Tax Clearance; and
 e) Audited Financial Statements.
 For Foreign Bidders, the above-mentioned documents may be substituted by the
@@ -2053,23 +2053,23 @@ appropriate equivalent documents in English, if any, issued by the country of th
 bidder concerned. Otherwise, it must be accompanied by a translation of the
 documents in English issued by the relevant foreign government agency, the foreign
 government agency authorized to translate documents, or a registered translator in
-the foreign bidder’s country; and should be authenticated by the appropriate
+the foreign bidderï¿½s country; and should be authenticated by the appropriate
 Philippine foreign service establishment/post or the equivalent office having
-jurisdiction over the foreign bidder’s affairs in the Philippines.
+jurisdiction over the foreign bidderï¿½s affairs in the Philippines.
 These documents should be accompanied by a Sworn Statement in a form
 prescribed by the GPPB stating that the documents submitted are complete and
 authentic copies of the original, and all statements and information provided therein
 are true and correct. Upon receipt of the said documents, the PhilGEPS shall process
-the same in accordance with the guidelines on the Government of the Philippines –
+the same in accordance with the guidelines on the Government of the Philippines ï¿½
 Official Merchants Registry (GoP-OMR).
 (2016 IRR, Section 8.5.2)
-Bidders who are maintaining current and updated Class “A” Eligibility Documents, as
+Bidders who are maintaining current and updated Class ï¿½Aï¿½ Eligibility Documents, as
 above-enumerated, will be issued their PhilGEPS Certificate of Registration and
 Membership. This PhilGEPS Certificate will be required during bid submission, in lieu
-of the same Class “A” Eligibility Documents.
+of the same Class ï¿½Aï¿½ Eligibility Documents.
 Page 49 of 152
 Manual of Procedures for the Procurement of Goods and Services
-2. Class “B” Documents
+2. Class ï¿½Bï¿½ Documents
 a. Valid JVA, if the prospective bidder is a JV that is already in existence. In the
 absence of a JVA, duly notarized statements from all of the potential JV
 partners should be included in the bid, stating that they will enter into and
@@ -2081,23 +2081,23 @@ by any of the JV partners constitutes compliance, provided that, the partner
 responsible to submit the NFCC shall likewise submit the statement of all its
 ongoing contracts and audited financial statements.
 What is the purpose of requiring an NFCC or a committed Line of Credit?
-The NFCC or committed Line of Credit establishes the bidder’s liquidity, its capacity to absorb
+The NFCC or committed Line of Credit establishes the bidderï¿½s liquidity, its capacity to absorb
 the additional obligations in connection with the contract to be bid and to finance its
 implementation/completion. Compliance with this eligibility requirement may be done on the
 alternative, such that submission of any of the two is acceptable for purposes of determining
-a bidder’s eligibility.
+a bidderï¿½s eligibility.
 What are the eligibility requirements of a prospective foreign bidder?
 Foreign manufacturers, suppliers and distributors, when allowed to bid under the
 circumstances mentioned in the 2016 IRR, Section 23.4.1.2 and R.A. 5183, must submit the
 same eligibility requirements as domestic entities. However, the legal documents and the
-audited financial statements under the Class “A” documents, as discussed above, may be
+audited financial statements under the Class ï¿½Aï¿½ documents, as discussed above, may be
 substituted by the appropriate equivalent documents in English, if any, issued by the country
 of the bidder concerned. Otherwise, it must be accompanied by a translation of the
 documents in English issued by the relevant foreign government agency, the foreign
 government agency authorized to translate documents, or a registered translator in the
-foreign bidder’s country; and should be authenticated by the appropriate Philippine foreign
+foreign bidderï¿½s country; and should be authenticated by the appropriate Philippine foreign
 service establishment/post or the equivalent office having jurisdiction over the foreign
-bidder’s affairs in the Philippines.
+bidderï¿½s affairs in the Philippines.
 Are consignment agreements considered procurement contracts for purposes of
 submitting the statements of ongoing contracts and SLCC?
 No. Consignment in its common meaning is an arrangement whereby the goods are sent by
@@ -2132,7 +2132,7 @@ day of posting of the IB up to the submission and receipt of bids, as the bid
 preparation time for prospective bidders. Bids received after the deadline shall not be
 accepted by the BAC.
 2. Upon receipt of the bid envelopes, the BAC Secretariat must stamp the face of the
-outer envelope as “RECEIVED,” indicating thereon the date and time of receipt, and
+outer envelope as ï¿½RECEIVED,ï¿½ indicating thereon the date and time of receipt, and
 have the stamp countersigned by an authorized representative.
 3. Unsealed or unmarked bid envelopes shall be rejected. However, bid envelopes that
 are not properly sealed and marked, as required in the bidding documents, shall be
@@ -2151,14 +2151,14 @@ may consider unavoidable or unforeseen events as justifiable reasons for resched
 the opening of bids.
 Note: The minimum seven day-posting requirement for Supplemental/Bid Bulletins
 does not apply to Notices of Postponement.
-5. The BAC shall open the first bid envelopes in public to determine each bidder’s
+5. The BAC shall open the first bid envelopes in public to determine each bidderï¿½s
 compliance with the documents required to be submitted for eligibility and for the
 technical requirements. The BAC shall check the submitted documents of each bidder
 against a checklist of required documents to ascertain if they are all present, using a
-non-discretionary “pass/fail” criterion. If a bidder submits the required document, it
-shall be rated “passed” for that particular requirement. Bids that fail to include any
-requirement or are incomplete or patently insufficient shall be considered as “failed”.
-Otherwise, the BAC shall rate the said first bid envelope as “passed”. (2016 IRR,
+non-discretionary ï¿½pass/failï¿½ criterion. If a bidder submits the required document, it
+shall be rated ï¿½passedï¿½ for that particular requirement. Bids that fail to include any
+requirement or are incomplete or patently insufficient shall be considered as ï¿½failedï¿½.
+Otherwise, the BAC shall rate the said first bid envelope as ï¿½passedï¿½. (2016 IRR,
 
 12 The bid opening methodology may vary for FAPs. Reference should be made to the FAPs BDS in Section IX of the
 bidding documents issued for the project.
@@ -2178,7 +2178,7 @@ technically complying bidder
 whose submitted technical
 bid including eligibility
 requirements were rated
-“passed.” The second
+ï¿½passed.ï¿½ The second
 envelope of each eligible
 and technically complying
 bidder shall be opened on
@@ -2187,8 +2187,8 @@ circumstances mentioned in
 Section 33 of the 2016 IRR.
 In case any of the requirements in the second envelope is missing, incomplete or
 patently insufficient, and/or if the submitted total bid price exceeds the ABC, the BAC
-shall rate the bid as “failed.” Only bids that are determined to contain all the bid
-requirements for both Technical and Financial components shall be rated “passed” and
+shall rate the bid as ï¿½failed.ï¿½ Only bids that are determined to contain all the bid
+requirements for both Technical and Financial components shall be rated ï¿½passedï¿½ and
 shall be immediately considered for evaluation and comparison. (2016 IRR, Section
 30.2)
 7. The BAC shall ensure the integrity, security and confidentiality of all submitted bids.
@@ -2212,16 +2212,16 @@ issued within seven (7) calendar days from the date of the bid opening to the bi
 themselves, i.e. the principal or registered owners or licensees as shown in the
 PhilGEPS Certificate of Registration submitted in the bids.
 
-How’s that again?
-When is a document deemed “complete”
-and “sufficient”?
-For a document, to be deemed “complete” and
-“sufficient”, it must be complete on its face, that is,
+Howï¿½s that again?
+When is a document deemed ï¿½completeï¿½
+and ï¿½sufficientï¿½?
+For a document, to be deemed ï¿½completeï¿½ and
+ï¿½sufficientï¿½, it must be complete on its face, that is,
 it contains all the information required, and must
 comply with the requirements set out in the bidding
-documents. For example, a Mayor’s Permit should
-be current, and submission of an expired Mayor’s
-Permit is deemed a “non-submission”. Another
+documents. For example, a Mayorï¿½s Permit should
+be current, and submission of an expired Mayorï¿½s
+Permit is deemed a ï¿½non-submissionï¿½. Another
 example of an insufficient submission is a Bid
 Security in an amount below the requirement.
 Page 52 of 152
@@ -2262,7 +2262,7 @@ requesting for reconsideration, the BAC should resolve such request. In the mean
 hold on to the Technical and Financial envelopes of the prospective bidder until the request for
 reconsideration is resolved. In so doing, the BAC, through its Secretariat, may ask in writing
 the bidder to clarify its bid. All responses to requests for clarification shall be in writing. The
-BAC may return the Technical and Financial envelopes if the bidder is declared “failed” and
+BAC may return the Technical and Financial envelopes if the bidder is declared ï¿½failedï¿½ and
 expressly waives his right to file a request for reconsideration. Such waiver shall be made in
 writing, to be executed by the authorized representative of the unsuccessful bidder.
 If its request for reconsideration is denied, the ineligible bidder may protest the decision in
@@ -2274,7 +2274,7 @@ a bidder after it had been declared as eligible?
 Notwithstanding the eligibility of a bidder, the Procuring Entity concerned reserves the right to
 review its qualifications at any stage of the procurement process if it has reasonable grounds
 to believe that a misrepresentation has been made by the said bidder, or that there has been
-a change in the bidder’s capability to undertake the project from the time it submitted its
+a change in the bidderï¿½s capability to undertake the project from the time it submitted its
 Page 53 of 152
 Manual of Procedures for the Procurement of Goods and Services
 eligibility requirements. Should such review uncover any misrepresentation made in the
@@ -2408,7 +2408,7 @@ The following must participate in the bid evaluation process:
 4. The Observers.
 Methodology: How are bids evaluated?13
 1. After the preliminary examination of bids, the BAC, or through the TWG, shall
-immediately conduct a detailed evaluation of all bids rated “passed,” using a nondiscretionary criteria, as stated in the IB and the ITB, which shall include a
+immediately conduct a detailed evaluation of all bids rated ï¿½passed,ï¿½ using a nondiscretionary criteria, as stated in the IB and the ITB, which shall include a
 consideration of the following: (2016 IRR, Section 32.2.1)
 a. The bid must be complete. Unless the ITB specifically allow partial bids, bids
 not addressing or providing all of the required items in the bidding documents
@@ -2483,10 +2483,10 @@ indicated under R.A. 9184 and its 2016 IRR. The Abstract of Bids shall contain t
 following:
 a. Name of the contract and its location, if applicable;
 b. Time, date and place of bid opening; and
-Tip: Let’s make doing
+Tip: Letï¿½s make doing
 things easier
 On clarifications during bid
-evaluation (the “no-contact”
+evaluation (the ï¿½no-contactï¿½
 rule)
 During the bid evaluation stage, the BAC,
 BAC Secretariat and the TWG shall not
@@ -2567,14 +2567,14 @@ supplies grown, produced or manufactured in the Philippines. The Certification s
 form part of the Financial Envelope of the bidder claiming preference.
 Page 59 of 152
 Manual of Procedures for the Procurement of Goods and Services
-2. When the LCB including taxes and customs duties, is a “foreign bid” as defined in C.A.
+2. When the LCB including taxes and customs duties, is a ï¿½foreign bidï¿½ as defined in C.A.
 No. 138 (see definition below), the award shall be made to the bidder who submitted
-the lowest “domestic bid”, provided that:
+the lowest ï¿½domestic bidï¿½, provided that:
 a. the domestic bid is not more than fifteen per centum (15%) in excess of
 the LCB. (Section 3 [e] C.A. No. 138);
 b. the bidder who submitted the lowest domestic bid must pass the postqualification; and
-c. the award to domestic bidder shall be at the amount of the lowest “foreign
-bid”.
+c. the award to domestic bidder shall be at the amount of the lowest ï¿½foreign
+bidï¿½.
 
 An illustrative case is as follows: Foreign Bidder A submitted a bid of P15M which was
 declared as the LCB. Domestic preference was specified in the bidding documents.
@@ -2588,16 +2588,16 @@ The lowest Domestic Bidder B submitted a bid of P17.4M, which is 16% in excess o
 the LCB. If Bidder A is post-qualified, and the items offered pass the necessary
 quality assurance tests, it shall be awarded the contract, despite the domestic
 preference.
-A “foreign bid” means any offer of articles, materials or supplies not manufactured or
+A ï¿½foreign bidï¿½ means any offer of articles, materials or supplies not manufactured or
 to be manufactured in the Philippines, substantially from articles, materials or supplies
 of the growth, production, or manufacture, as the case may be, of the Philippines.
-(Section 2[d], C.A. No. 138) Conversely, a “domestic bid” means any offer of
+(Section 2[d], C.A. No. 138) Conversely, a ï¿½domestic bidï¿½ means any offer of
 unmanufactured articles, materials, or supplies of the growth or production of the
 Philippines, or manufactured articles, materials or supplies manufactured or to be
 manufactured in the Philippines, substantially from articles, materials or supplies of
 the growth, production or manufacture, as the case may be, of the Philippines.
-(Section 2[c] C.A. No. 138) In US jurisprudence, the term “substantially” was
-construed to mean “more than 75%.” Thus, even if a product is manufactured in the
+(Section 2[c] C.A. No. 138) In US jurisprudence, the term ï¿½substantiallyï¿½ was
+construed to mean ï¿½more than 75%.ï¿½ Thus, even if a product is manufactured in the
 Philippines, it may not be considered within the ambit of the preference if its raw
 materials are not substantially sourced from the Philippines.
 3. In the case of FAPs or procurement undertaken by virtue of international treaties or
@@ -2640,7 +2640,7 @@ Step 6 Post-qualify
 What is Post-qualification?
 Post-qualification is the process of verifying, validating and ascertaining all the statements
 made and documents submitted by the bidder with the LCB, which includes ascertaining the
-said bidder’s compliance with the legal, financial and technical requirements of the bid, using
+said bidderï¿½s compliance with the legal, financial and technical requirements of the bid, using
 a non-discretionary criteria as stated in the bidding documents.
 If the LCB passes all the criteria for
 post-qualification, the BAC must
@@ -2657,32 +2657,32 @@ Post-qualification involves the BAC
 verifying, validating and ascertaining
 that the bidder satisfies the following criteria: (2016 IRR, Section 34.3)
 1. Legal Requirements. The post-qualification process under this criterion involves the
-verification, validation and ascertaining of the supplier’s claim that it is not included in
-any government “blacklist,” as well as all the licenses, permits and other documents it
+verification, validation and ascertaining of the supplierï¿½s claim that it is not included in
+any government ï¿½blacklist,ï¿½ as well as all the licenses, permits and other documents it
 submitted in securing the PhilGEPS Certificate of Registration and Membership. The
-bidder’s status with regard to “blacklisting” may be verified by checking the
-Consolidated Blacklisting Report issued by the GPPB, or the “blacklist” of any
+bidderï¿½s status with regard to ï¿½blacklistingï¿½ may be verified by checking the
+Consolidated Blacklisting Report issued by the GPPB, or the ï¿½blacklistï¿½ of any
 government agency.
 2. Technical Requirements. Post-qualification under this criterion means that the BAC
 would have to validate, verify, and ascertain the veracity of the documents submitted
 by a supplier to prove compliance of the goods and services offered with the
 requirements of the contract and bidding documents. This involves the following
 processes:
-i) Verification and validation of the bidder’s stated competence and
+i) Verification and validation of the bidderï¿½s stated competence and
 experience;
 ii) Verification and/or inspection and testing of the goods/product, aftersales and/or maintenance capabilities, in applicable cases, as well as
 checking the following:
 a. Delay in the partial delivery of goods amounting to ten percent (10%)
 of the contract price in its ongoing government and private contracts;
-b. If any of these contracts shows the bidder’s failure to deliver or
+b. If any of these contracts shows the bidderï¿½s failure to deliver or
 perform any or all of the goods or services within the period(s)
 specified in the contract or within any extension thereof granted by
 the Procuring Entity pursuant to a request made by the supplier prior
 to the delay, and such failure amounts to at least ten percent (10%)
 of the contract price; or
-c. Unsatisfactory performance of the supplier’s obligations as per
+c. Unsatisfactory performance of the supplierï¿½s obligations as per
 contract terms and conditions at the time of inspection.
-How’s that again?
+Howï¿½s that again?
 The eligibility check does not ascertain the
 validity and genuineness of the eligibility
 documents submitted by the bidders. Neither
@@ -2702,7 +2702,7 @@ the bidding documents.
 3. Financial Requirements. Under this criterion, the BAC ought to verify, validate and
 ascertain the bid price proposal of the bidder and, the required committed Line of
 Credit in the amount specified and over the period stated in the bidding documents,
-or the bidder’s NFCC to ensure that the bidder can sustain the operating cash flow of
+or the bidderï¿½s NFCC to ensure that the bidder can sustain the operating cash flow of
 the transaction.
 What is the Timeline for the conduct of Post-qualification?
 The post-qualification process must be conducted and completed in not more than twelve
@@ -2735,14 +2735,14 @@ Page 63 of 152
 Manual of Procedures for the Procurement of Goods and Services
 In verifying the information contained in such documents, the BAC/TWG may make
 inquiries with appropriate government agencies and examine the original documents
-kept in the bidder’s place of business. The use of other means for verification and
+kept in the bidderï¿½s place of business. The use of other means for verification and
 validation of such documents may be resorted to by the BAC/TWG, such as the
 Internet and other research methods that yield the same results.
-3. The BAC/TWG conducts a site inspection of the bidder’s place of business and/or
+3. The BAC/TWG conducts a site inspection of the bidderï¿½s place of business and/or
 plant/factory, where applicable.
 4. The BAC/TWG tests samples for compliance with specifications and performance
 levels, where applicable.
-5. The BAC/TWG inquires about the bidder’s performance in relation with other
+5. The BAC/TWG inquires about the bidderï¿½s performance in relation with other
 contracts/transactions as indicated in its eligibility statement (statement of on-going,
 completed or awarded contracts).
 6. If the TWG conducts the post-qualification, it prepares a Post-qualification Report to
@@ -2763,7 +2763,7 @@ bidder shall have three (3) calendar days from receipt of the said notification 
 the BAC, if it so wishes, a reconsideration of its decision. The BAC shall evaluate the request
 for reconsideration, if any, using the same non-discretionary criteria, and shall issue its final
 determination of the said request within seven (7) calendar days from receipt thereof. Similar
-to the cases of bidders deemed to be ineligible and whose bids are rated “failed,” the bidder
+to the cases of bidders deemed to be ineligible and whose bids are rated ï¿½failed,ï¿½ the bidder
 with the LCB who fails to pass post-qualification may likewise file a protest with the payment
 of the corresponding fee in case the BAC denies its request for reconsideration. (Please refer
 to the latter portion of Section 3 of this Manual for further discussions on filing a protest.)
@@ -2802,7 +2802,7 @@ findings in its mandatory review, it may revise and agree on a new set of techni
 specifications; and, if necessary, may adjust the amount of the ABC, subject to the required
 approvals under the IRR.
 If, after two-failed biddings under Section 35 of the IRR, the procuring entity decides to resort
-to Negotiated Procurement (Two-Failed Biddings), Annex “H”, the Guidelines for the
+to Negotiated Procurement (Two-Failed Biddings), Annex ï¿½Hï¿½, the Guidelines for the
 Alternative Methods of Procurement requires the BAC to conduct a mandatory review of the
 terms, conditions, specifications, and cost estimates; and, when necessary, increase the ABC
 provided that it is not more than twenty percent (20%) of the ABC for the last failed bidding.
@@ -2816,7 +2816,7 @@ not precluded from using the information from a previous post-qualification repo
 reference, it is still but necessary on the part of the BAC to re-validate and confirm the report
 based on the requirements of the new project, as the legal, financial and technical capability
 of the bidder may have already changed within the six-month period. Likewise, the happening
-of the grounds for post-disqualification that are hinged on the bidder’s performance on any of
+of the grounds for post-disqualification that are hinged on the bidderï¿½s performance on any of
 its ongoing products may vary within the said 6-month period.
 When may the Procuring Entity exercise its right to reject bids, declare a
 failure of bidding, or not award the contract?
@@ -2869,7 +2869,7 @@ vests in the authority concerned the discretion to ascertain who among the bidde
 lowest responsive bidder or the lowest and best bidder or most advantageous to the best
 interest of the Government. As such, a bidder has no right or cause of action to compel the
 BAC or agency to award the contract to it. The Court further stated that this requires inquiry,
-investigation, comparison, deliberation and decision – a quasi-judicial function which, when
+investigation, comparison, deliberation and decision ï¿½ a quasi-judicial function which, when
 honestly exercised, may not be reviewed by the courts. It should be noted, however, that
 R.A. 9184 Section 41, has placed some limiting qualifiers on the possible contents of the
 Reservation Clause.
@@ -2881,7 +2881,7 @@ or undue pressure on any member of the BAC or any officer or employee of the Pro
 Entity to take such action, and the same favors or tends to favor a particular bidder, he shall
 be meted with the penalties provided in the 2016 IRR, Section 65. (2016 IRR, Sections
 65.1. [e] and [c])
-How’s that again?
+Howï¿½s that again?
 What are the instances where the BAC is
 considered to have failed in following the
 prescribed procedures?
@@ -2941,7 +2941,7 @@ Resolution.
 same to the HoPE.
 4. To facilitate the approval of the award, the BAC shall submit the following supporting
 documents to the HoPE:
-How’s that again?
+Howï¿½s that again?
 What is the maximum period of time
 within which a contract can be
 awarded?
@@ -3040,7 +3040,7 @@ The Procuring Entity signatory is encouraged to sign within the same day as the 
 bidder as there are penalties against delaying, without justifiable cause, the award of the
 contract. (2016 IRR, Section 65.1) Moreover, it would be best for the winning bidder and
 the Head of the Procuring Entity, or its appropriate signing authority, to sign/execute the
-contract together – provided that all contract documents and requirements are complete – so
+contract together ï¿½ provided that all contract documents and requirements are complete ï¿½ so
 that both may personally appear before a Notary Public.
 What are the Timelines to be considered with respect to contract approval?
 When, after contract signing, further approval of a higher authority is required, the
@@ -3054,7 +3054,7 @@ When should the Procuring Entity issue the NTP?
 The NTP must be issued together with a copy or copies of the approved contract to the
 successful bidder within seven (7) calendar days from the date of approval of the contract
 by the appropriate government approving authority. (2016 IRR, Section 37.4.1)
-When is a contract “effective”?
+When is a contract ï¿½effectiveï¿½?
 Unless otherwise specified in the contract, a contract is effective on the date it is signed by
 both parties, i.e. the Procuring Entity and the winning bidder/Supplier. However, all notices
 called for by the terms of the contract are effective only upon receipt of those notices by the
@@ -3075,10 +3075,10 @@ What documents form part of the contract?
 The contract shall include the following:
 1. The Contract Agreement;
 2. Bidding documents;
-3. Winning bidder’s bid, including the Eligibility Requirements, Technical and Financial
-Proposals, and all other documents/statements submitted (e.g. bidder’s response to
+3. Winning bidderï¿½s bid, including the Eligibility Requirements, Technical and Financial
+Proposals, and all other documents/statements submitted (e.g. bidderï¿½s response to
 clarifications on the bid), including corrections to the bid resulting from the Procuring
-Entity’s bid evaluation;
+Entityï¿½s bid evaluation;
 4. Performance Security;
 5. Notice of Award of
 Contract;
@@ -3111,7 +3111,7 @@ c. CAF;
 d. Abstract of Bids;
 e. Resolution of the BAC recommending award;
 f. Approval of award by the appropriate approving authority; and
-TIPS: Let’s make doing things
+TIPS: Letï¿½s make doing things
 easier
 In most procuring entities, particularly the bureaus or
 lower-level offices of national government agencies
@@ -3122,7 +3122,7 @@ may only be authorized to approve contracts up to
 P50M. Contracts exceeding the said amount are
 brought up to the Secretary for approval. Different
 procuring entities have different levels of delegated
-authority, but the principle is essentially the same –
+authority, but the principle is essentially the same ï¿½
 the higher the contract amount, the higher is the
 level of the approving authority. In cases like this,
 the contract is considered approved upon the
@@ -3142,8 +3142,8 @@ Page 71 of 152
 Manual of Procedures for the Procurement of Goods and Services
 g. Other pertinent documents that may be required by existing laws and/or the
 Procuring Entity concerned.
-4. After signing, if the contract needs the approval of a higher authority – such as, for
-bureaus, the Department Secretary, when required – the procurement unit/office
+4. After signing, if the contract needs the approval of a higher authority ï¿½ such as, for
+bureaus, the Department Secretary, when required ï¿½ the procurement unit/office
 transmits the contract and related documents to the approving authority or his
 authorized representative for approval.
 5. The approving authority or his authorized representative acts on the contract within
@@ -3182,7 +3182,7 @@ All Government contracts required by law to be acted upon and/or approved by the
 and any subsequent amendments or supplements thereto, shall be submitted with complete
 documentation to NEDA, through its Director-General, within seven (7) days from approval by
 the Head of Procuring Entity concerned or his duly authorized representative, as the case may
-be, for NEDA’s review and evaluation.
+be, for NEDAï¿½s review and evaluation.
 Page 72 of 152
 Manual of Procedures for the Procurement of Goods and Services
 Government contracts submitted shall be accompanied by a complete execution copy of the
@@ -3290,7 +3290,7 @@ providing for technical and commercial clarifications and adjustments, and in or
 agree on an acceptable technical standard for all bids.
 3. At the second stage, the bidding documents will then be amended, but in revising the
 said bidding documents, the Procuring Entity would have to respect the confidentiality
-of the bidders’ technical proposals used in the first stage, consistent with
+of the biddersï¿½ technical proposals used in the first stage, consistent with
 requirements of transparency and intellectual property rights. After the discussions,
 the bidders shall be given an opportunity to revise or adjust their proposals to
 conform to the standards agreed upon. The bidders shall also be invited to submit
@@ -3324,7 +3324,7 @@ bidders.
 5. The TWG evaluates the
 technical merits of the
 proposals received
-from eligible bidders vis-à-vis the required performance standards, and determines
+from eligible bidders vis-ï¿½-vis the required performance standards, and determines
 the proposals that meet the minimum standards.
 6. The TWG and BAC meet/discuss with the eligible bidders whose Technical Proposals
 meet the minimum required standards stipulated in the bidding documents. The
@@ -3362,7 +3362,7 @@ occur, the Procuring Entity may resort
 to Negotiated Procurement in
 accordance with Section 53.1 of the
 2016 IRR.
-Tip: Let’s make doing things easier
+Tip: Letï¿½s make doing things easier
 On the drawing up of the final technical
 specifications under the Two-Stage
 Competitive Bidding procedure
@@ -3370,7 +3370,7 @@ In drawing up the final technical specifications, the TWG
 and BAC should ensure that the PMO/end-user unit is
 properly consulted, and has agreed to the said
 specifications.
-How’s that again?
+Howï¿½s that again?
 How does the ABC affect a bidder under
 a Two-Stage Competitive Bidding
 procedure?
@@ -3388,7 +3388,7 @@ Manual of Procedures for the Procurement of Goods and Services
  Protest Mechanism
 What is the remedy of an affected bidder who receives an unfavorable
 decision from the BAC?
-The affected bidder may file a request for reconsideration of the BAC’s decision issued at any
+The affected bidder may file a request for reconsideration of the BACï¿½s decision issued at any
 stage of the procurement process, within three (3) calendar days upon receipt of the
 unfavorable decision by written notice or upon verbal notification.
 What is the remedy of the affected bidder in the event that the request for
@@ -3399,7 +3399,7 @@ by the bidder concerned, and the same has been resolved.
 The protest must be filed within seven (7) calendar days from receipt by the bidder concerned
 of the resolution of the BAC denying its request for reconsideration
 How are requests for reconsideration and protests filed and resolved?
-1. The affected bidder files a request for reconsideration of the BAC’s decision within
+1. The affected bidder files a request for reconsideration of the BACï¿½s decision within
 three (3) calendar days upon receipt of written notice or upon verbal notification.
 2. The BAC decides on the request for reconsideration within seven (7) calendar days
 from receipt. The bidder is not allowed to submit additional documents to correct any
@@ -3460,7 +3460,7 @@ executive is final.
 8. The protests should not stay or delay the bidding process, however protests must first
 be resolved before any award is made.
 Note: Similar to resolving protests, requests for reconsideration must also be strictly
-resolved based on the BAC’s records, the provisions of R.A. 9184, its IRR and the
+resolved based on the BACï¿½s records, the provisions of R.A. 9184, its IRR and the
 bidding documents issued for the procurement in question.
 May the affected bidder directly resort to court actions?
 No. Court action may be resorted to only after the protests have been completed, i.e.,
@@ -3470,7 +3470,7 @@ SECTION 4
 Instructions on the Procedural
 Steps for the Procurement of
 Goods
-PART TWO – ALTERNATIVE METHODS OF
+PART TWO ï¿½ ALTERNATIVE METHODS OF
 PROCUREMENT
 Page 80 of 152
 The Alternative Methods for the Procurement of Goods and
@@ -3711,7 +3711,7 @@ advantageous price and contract for the Government.
 6. The BAC proceeds with recommending to the HoPE the award of contract in favor of
 the supplier.
 7. Within a period not exceeding fifteen (15) calendar days from receipt, the HOPE
-approves or disapproves the BAC’s recommendation. In case of approval, the HOPE
+approves or disapproves the BACï¿½s recommendation. In case of approval, the HOPE
 immediately issues the NOA to the Supplier. In case of disapproval, such should be
 based only on valid, reasonable, and justifiable grounds to be expressed in writing,
 addressed to the BAC.
@@ -3737,12 +3737,12 @@ c. Any conspicuous place in the premises of the Procuring Entity;
 within ten (10) days from issuance.
 What are the documentary requirements for Direct Contracting?
 The BAC must require the following documents from Suppliers for Direct Contracting:
-1. Mayor’s/Business Permit
+1. Mayorï¿½s/Business Permit
 2. PhilGEPS Registration Number
 3. Income/Business Tax Returns (for contracts with ABC above PhP500,000)
 The BAC shall indicate in the RFQ or RFP at what stage of the procurement process these
 requirements must be submitted, i.e., submission of offer/s, evaluation of offer/s, before
-issuance of NOA. Procuring Entities already maintaining an updated file of any of the bidder’s
+issuance of NOA. Procuring Entities already maintaining an updated file of any of the bidderï¿½s
 above-mentioned requirements, whether through the PhilGEPS Certificate of Registration and
 Membership or its own records, may no longer require its re-submission.
 Are bid, performance and warranty securities required for Direct
@@ -3799,7 +3799,7 @@ NTP arising
 from the
 original
 contract; and
-Tips: Let’s make things
+Tips: Letï¿½s make things
 easier
 Especially if the procuring entity
 anticipates that it would have to procure
@@ -3807,8 +3807,8 @@ through Repeat Order, it would be helpful
 for the BAC Secretariat or the
 procurement unit to maintain a price
 monitor of goods and services procured.
-How’s that again?
-What is “splitting of contract”?
+Howï¿½s that again?
+What is ï¿½splitting of contractï¿½?
 Splitting of contracts is the act of dividing or breaking up
 government contracts into smaller quantities and amounts. It
 also is the act of dividing contract implementation into artificial
@@ -3864,7 +3864,7 @@ through Repeat Order.
 for the procurement of additional goods.
 5. The BAC recommends to the HoPE the award of contract through Repeat Order.
 6. Within a period not exceeding fifteen (15) calendar days from receipt, the HOPE
-approves or disapproves the BAC’s recommendation. In case of approval, the HOPE
+approves or disapproves the BACï¿½s recommendation. In case of approval, the HOPE
 Page 89 of 152
 Manual of Procedures for the Procurement of Goods and Services
 immediately issues the NOA to the Supplier. In case of disapproval, such should be
@@ -3939,28 +3939,28 @@ Province City Municipality
 6th Class 400,000 200,000 100,000
 Page 91 of 152
 Manual of Procedures for the Procurement of Goods and Services
-Tips: Let’s make doing things easier
+Tips: Letï¿½s make doing things easier
 On planning properly for contingency purchases
 Section 7.1 of the 2016 IRR requires all procurement to be in accordance with the APP, and
 all procuring entities are not allowed to procure anything unless it is included in the APP.
 The requirement extends to those immediate purchases of readily available off-the-shelf
 goods and to contingencies. These purchases include those charged against cash advances,
-or the so-called “over-the-counter” purchases. Procuring entities are not allowed to procure
+or the so-called ï¿½over-the-counterï¿½ purchases. Procuring entities are not allowed to procure
 anything unless it is included in the APP.
 Contingencies or provisions for foreseeable emergencies must therefore be provided for in
 the APP based on historical data. (2016 IRR, Section 7.1) This can be done by allocating
 for such purchases a percentage of the total procurement budget as reflected in the
-procuring entity’s APP. However, it would be advisable for this allocation not to be more
+procuring entityï¿½s APP. However, it would be advisable for this allocation not to be more
 than four percent (4%) of the total appropriations for Maintenance and Other Operating
 Expenses (MOOE) as provided for in the GAA.
 To enable it to plan its purchases more efficiently, and consequently approximate realistic
 levels for the amount that it would need for its contingency purchases or its small
 purchases of ordinary/regular office supplies/equipment, the procuring entity must conduct
-a regular study of its “Over-the-Counter Purchases”. Based on this study, the procuring
+a regular study of its ï¿½Over-the-Counter Purchasesï¿½. Based on this study, the procuring
 entity would be able to identify recurring expenses that could more reasonably be included
 in the APP, and thus determine a more realistic allocation for contingencies.
-The term “ordinary or regular office supplies” should be understood to include those supplies,
-commodities or materials which, depending on the procuring entity’s mandate and nature of
+The term ï¿½ordinary or regular office suppliesï¿½ should be understood to include those supplies,
+commodities or materials which, depending on the procuring entityï¿½s mandate and nature of
 operations, are necessary in the transaction of its official businesses; and consumed in the
 day-to-day operations of said procuring entity. However, office supplies shall not include
 services such as repair and maintenance of equipment and furniture, as well as trucking,
@@ -4036,7 +4036,7 @@ v. The deadline for submission may be extended thrice, if none or less than the
 required number of quotations are received. For ABCs more than Fifty
 Thousand Pesos (?50,000.00), extensions of deadline are posted for a period
 of three (3) calendar days in the PhilGEPS, the website of the Procuring Entity,
-if any, and at any conspicuous place in the Procuring Entity’s premises. In
+if any, and at any conspicuous place in the Procuring Entityï¿½s premises. In
 case no supplier responded after the third extension, the BAC shall conduct a
 mandatory review in accordance with the Consolidated Guidelines for the
 Alternative Methods of Procurement issued by the GPPB.
@@ -4060,12 +4060,12 @@ c. Any conspicuous place in the premises of the Procuring Entity.
 What are the documentary requirements for Shopping?
 The BAC must require the following documents from Suppliers for Shopping under Section
 52.1(b) of the 2016 IRR, only:
-1. Mayor’s/Business Permit
+1. Mayorï¿½s/Business Permit
 2. PhilGEPS Registration Number
 The BAC shall indicate in the RFQ or RFP at what stage of the procurement process these
 requirements must be submitted, i.e., submission of offer/s, evaluation of offer/s, before
 issuance of NOA or prior to payment. Procuring Entities already maintaining an updated file of
-any of the bidder’s above-mentioned requirements, whether through the PhilGEPS Certificate of
+any of the bidderï¿½s above-mentioned requirements, whether through the PhilGEPS Certificate of
 Registration and Membership or its own records, may no longer require its re-submission.
 Are bid, performance and warranty securities required for Shopping?
 
@@ -4236,7 +4236,7 @@ submission of a Certificate of PhilGEPS Registration in accordance with Section
 v. The BAC recommends award of contract to the HOPE in favor of the Supplier
 determined to have the Single or Lowest Calculated and Responsive Quotation
 vi. Within a period not exceeding fifteen (15) calendar days from receipt, the
-HOPE approves or disapproves the BAC’s recommendation. In case of
+HOPE approves or disapproves the BACï¿½s recommendation. In case of
 approval, the HOPE immediately issues the NOA to the Supplier. In case of
 disapproval, such should be based only on valid, reasonable, and justifiable
 grounds to be expressed in writing, addressed to the BAC.
@@ -4302,13 +4302,13 @@ service provider, if any; and
 c. Any conspicuous place in the premises of the Procuring Entity.
 4. For Take-Over Contracts:
 i. The BAC post-qualifies and negotiates with the second lowest calculated
-bidder for the project under consideration at the said bidder’s own original bid
+bidder for the project under consideration at the said bidderï¿½s own original bid
 price, applicable to the remaining works to be done. Authority to negotiate
 contracts for projects under the foregoing exceptional cases is subject to prior
 approval by the HOPE concerned, within their respective limits of approving
 authority.
 ii. If negotiation fails, then the BAC post-qualifies and negotiates with the next
-lowest calculated bidder at the said bidder’s own original bid price.
+lowest calculated bidder at the said bidderï¿½s own original bid price.
 iii. If the negotiation fails another time, the process is repeated until all the
 bidders from the previous bidding have been considered.
 Page 99 of 152
@@ -4321,7 +4321,7 @@ v. In case of successful post-qualification and negotiation, the BAC shall
 recommends to the HOPE the award of contract with the said Supplier.
 
 vi. Within a period not exceeding fifteen (15) calendar days from receipt, the
-HOPE approves or disapproves the BAC’s recommendation. In case of
+HOPE approves or disapproves the BACï¿½s recommendation. In case of
 approval, the HOPE immediately issues the NOA to the Supplier. In case of
 disapproval, such should be based only on valid, reasonable, and justifiable
 grounds to be expressed in writing, addressed to the BAC.
@@ -4390,7 +4390,7 @@ Terms of Reference prepared by the PMO/end-user unit/implementing unit.
 iii. Upon successful negotiation, the BAC recommends the award of contract to
 the HOPE.
 iv. Within a period not exceeding fifteen (15) calendar days from receipt, the
-HOPE approves or disapproves the BAC’s recommendation. In case of
+HOPE approves or disapproves the BACï¿½s recommendation. In case of
 approval, the HOPE immediately issues the NOA to the Supplier. In case of
 disapproval, such should be based only on valid, reasonable, and justifiable
 grounds to be expressed in writing, addressed to the BAC.
@@ -4518,10 +4518,10 @@ consumption
 (20)
  5. Secured parking space (20)
  100
-I. Location and Site Condition × (.20) =
-II. Neighborhood Data × (.20) =
-III. Real property × (.50) =
-IV. Free Services and Facilities × (.10) =
+I. Location and Site Condition ï¿½ (.20) =
+II. Neighborhood Data ï¿½ (.20) =
+III. Real property ï¿½ (.50) =
+IV. Free Services and Facilities ï¿½ (.10) =
 FACTOR VALUE
 Note: Weight of each rating factor may be changed as long as total
 weight per classification is equivalent to 100. Figures in parenthesis
@@ -4537,15 +4537,15 @@ determined after meticulous ocular inspection of the actual condition
 of the real property:
 Reproducti
 on Cost
-= Estimated Unit Construction Cost × (1 –
+= Estimated Unit Construction Cost ï¿½ (1 ï¿½
 Depreciation Rate)
 Formula
 Rate
-= Reproduction Cost × Monthly Capitalization Rate
-Rental Rate = Formula Rate × Factor Value
+= Reproduction Cost ï¿½ Monthly Capitalization Rate
+Rental Rate = Formula Rate ï¿½ Factor Value
 Monthly
 Rental
-= Rentable Area × Rental Rate
+= Rentable Area ï¿½ Rental Rate
 The following weights may be used in arriving at the observed
 depreciation rate:
 Status Depreciation (%)
@@ -4575,7 +4575,7 @@ This method uses the following formula:
 Age of
 Real
 Property
-= Current Year – Year of Construction
+= Current Year ï¿½ Year of Construction
 Depreci
 ation
 Rate
@@ -4583,17 +4583,17 @@ Rate
 Reprodu
 ction
 Cost
-= Estimated Unit Construction Cost × (1 –
+= Estimated Unit Construction Cost ï¿½ (1 ï¿½
 Depreciation Rate)
 Formula
 Rate
-= Reproduction Cost × Monthly Capitalization Rate
+= Reproduction Cost ï¿½ Monthly Capitalization Rate
 Rental
 Rate
-= Formula Rate × Factor Value
+= Formula Rate ï¿½ Factor Value
 Monthly
 Rental
-= Rentable Area × Rental Rate
+= Rentable Area ï¿½ Rental Rate
 Depreciation rate shall be determined using the following Table of
 Structural Depreciation provided by the DPWH:
 AGE ESTIMATED LIFE OF REAL PROPERTY
@@ -4668,7 +4668,7 @@ quotation, the BAC recommends to the HOPE the award of contract in
 favor of the Lessor with the Single or Lowest Calculated and
 Responsive Quotation.
 e. Within a period not exceeding fifteen (15) calendar days from receipt,
-the HOPE approves or disapproves the BAC’s recommendation. In case
+the HOPE approves or disapproves the BACï¿½s recommendation. In case
 of approval, the HOPE immediately issues the NOA to the Lessor. In
 case of disapproval, such should be based only on valid, reasonable,
 and justifiable grounds to be expressed in writing, addressed to the
@@ -4757,7 +4757,7 @@ d. Upon determination of the responsiveness of the quotation, the BAC
 recommends to the HOPE the award of contract in favor of the Lessor
 with the Single or Lowest Calculated and Responsive Quotation.
 e. Within a period not exceeding fifteen (15) calendar days from receipt,
-the HOPE approves or disapproves the BAC’s recommendation. In case
+the HOPE approves or disapproves the BACï¿½s recommendation. In case
 of approval, the HOPE immediately issues the NOA to the Lessor. In
 case of disapproval, such should be based only on valid, reasonable,
 and justifiable grounds to be expressed in writing, addressed to the
@@ -4785,7 +4785,7 @@ except for Negotiated Procurement under Sections 53.1 (Two-Failed Biddings), and
  b. Attractiveness (5)
  c. Security (5)
  e. Catering Services (5)
- f. Client’s satisfactory
+ f. Clientï¿½s satisfactory
 rating
 (5)
  100
@@ -4801,7 +4801,7 @@ Manual of Procedures for the Procurement of Goods and Services
 Types of
 Negotiated
 Procurement
-Mayor’s/
+Mayorï¿½s/
 Business
 Permit
 Professional
@@ -4850,15 +4850,15 @@ Or Venue
 53.10)
 ? ? ?
 Except for
-gov’t
+govï¿½t
 agencies as
 lessors
 For individuals engaged under Sec. 53.6, 53.7 and 53.9 of the IRR of RA 9184, only the BIR
-Certificate of Registration shall be submitted in lieu of DTI Registration and Mayor’s Permit.
+Certificate of Registration shall be submitted in lieu of DTI Registration and Mayorï¿½s Permit.
 The BAC shall indicate in the RFQ or RFP at what stage of the procurement process these
 requirements must be submitted, i.e., submission of offer/s, evaluation of offer/s, before
 issuance of NOA or prior to payment. Procuring Entities already maintaining an updated file of
-any of the bidder’s above-mentioned requirements, whether through the PhilGEPS Certificate of
+any of the bidderï¿½s above-mentioned requirements, whether through the PhilGEPS Certificate of
 Registration and Membership or its own records, may no longer require its re-submission.
 Are bid, performance and warranty securities required for Negotiated
 Procurement?
@@ -4892,7 +4892,7 @@ Guidelines on Contract
 Implementation for the
 Procurement of Goods
 Page 111 of 152
-TIP: Let’s make things easier
+TIP: Letï¿½s make things easier
 The PMO or end-user unit or implementing unit
 should determine the period of contract
 implementation during the procurement
@@ -4902,7 +4902,7 @@ period, it must ensure that the supplier is
 given ample time to undertake any
 preparatory activity/ies necessary for it to
 comply with the conditions of the contract.
-TIP: Let’s make things easier
+TIP: Letï¿½s make things easier
 The PMO or end-user unit must ensure that the
 Chief Accountant of the procuring entity issues
 a CAF for the project. Only with a CAF can the
@@ -4911,14 +4911,14 @@ The Chief Accountant must also sign the
 contract as a witness.
 Contract Implementation for the Procurement of Goods
 Legal Reference
-2016 IRR, Section 42 and Annex “D” provide the rules on contract implementation and
+2016 IRR, Section 42 and Annex ï¿½Dï¿½ provide the rules on contract implementation and
 termination.
 What is covered by Contract Implementation?
 Contract implementation covers the following milestones:
 1. Effectivity of the contract;
-2. Supplier’s performance of its
+2. Supplierï¿½s performance of its
 contractual obligations;
-3. Procuring Entity’s performance
+3. Procuring Entityï¿½s performance
 of its contractual obligations, as
 specified in the contract;
 4. Final acceptance or project
@@ -4955,15 +4955,15 @@ After the lapse of the minimum period, the Procuring Entity must release the ret
 or special bank guarantee, provided that the goods supplied are free from patent and latent
 defects and all the conditions imposed under the contract have been fully met.
 When shall Goods be considered defective?
-Goods are considered defective when they are “unfit for the use for which it is intended,” or
-“its fitness for such use is diminished to such an extent that, had the vendee been aware
-thereof, he would not have acquired it or would have given a lower price for it….” (Civil Code
+Goods are considered defective when they are ï¿½unfit for the use for which it is intended,ï¿½ or
+ï¿½its fitness for such use is diminished to such an extent that, had the vendee been aware
+thereof, he would not have acquired it or would have given a lower price for itï¿½.ï¿½ (Civil Code
 of the Philippines Article 1561). A defect can either be:
 1. A patent defect, which is one that is apparent to the buyer on normal observation. It
 is an apparent or obvious defect. For example, a ballpen that does not write is
 patently defective.
 2. A latent defect, which is one that is not apparent to the buyer by reasonable
-observation. A latent defect is “hidden” or one that is not immediately determinable.
+observation. A latent defect is ï¿½hiddenï¿½ or one that is not immediately determinable.
 For example, a ballpen that writes .75 kilometers instead of the expected 1.5
 kilometers, has a latent defect.
 Both latent and patent defects are covered by the warranty expressly required in R.A. 9184
@@ -5011,7 +5011,7 @@ government;
 c. It is done at no extra cost; and
 d. It is not prejudicial to the losing Bidders in the sense that such change/s could
 not have been foreseen during the conduct of the bidding and would have
-significantly affected the other bidders’ bids;
+significantly affected the other biddersï¿½ bids;
 2. The method of shipment or packing;
 3. The place of delivery;
 4. The place of performance of the services;
@@ -5023,7 +5023,7 @@ Such amendment may or may not result to an increase or a decrease of the contrac
 and/or an extension or reduction of the delivery period. However, the amendment should not
 have the result of changing the subject matter of the contract or the specifications of the
 goods or services, in any material aspect and to such an extent that, if introduced during the
-bidding stage, may have had a significant effect on other bidders’ bids, because this situation
+bidding stage, may have had a significant effect on other biddersï¿½ bids, because this situation
 would actually require another bidding activity, except if the original procurement was done
 through an alternative method that did not involve a bidding.
 When can the Procuring Entity issue an Amendment to Order?
@@ -5044,7 +5044,7 @@ of the goods procured, such as changes in the packaging of the goods, or
 additional items have become necessary to ensure that the goods are
 sufficiently protected from the elements;
 2. When the contract does not reflect the real intention of the parties due to mistake or
-accident, and the amendment is necessary to reflect the parties’ intention; and
+accident, and the amendment is necessary to reflect the partiesï¿½ intention; and
 3. Other analogous circumstances that could affect the conditions of the procurement at
 hand.
 Are corresponding adjustments in contract price and/or delivery schedules
@@ -5057,7 +5057,7 @@ increase in contract price must not exceed ten percent (10%) of the original con
 Otherwise, the procurement should be subject to another bidding, unless the original
 procurement was done using any of the alternative methods that did not involve bidding.
 Moreover, in the adjustment of the price, the supplier and the Procuring Entity must ensure
-that the principle of “no loss, no gain” is applied, such that neither party gains or loses
+that the principle of ï¿½no loss, no gainï¿½ is applied, such that neither party gains or loses
 anything from the resulting price adjustment.
 What rules shall govern price adjustments due to Amendment to Order?
 If the amendment to order consists of additional items, the price adjustment shall be based
@@ -5098,7 +5098,7 @@ with the work/delivery of items in accordance with the amendment. It shall also 
 the procurement unit/office of such approval, and furnish the latter with a copy of the
 amended contract.
 6. The procurement unit/office posts the Amendment to Order in the PhilGEPS, the
-website of the Procuring Entity, and the latter’s electronic procurement service
+website of the Procuring Entity, and the latterï¿½s electronic procurement service
 provider, if any.
 7. The supplier/manufacturer/distributor proceeds with the work/delivery of items in
 accordance with the amended contract.
@@ -5119,13 +5119,13 @@ representative. For an Amendment to Order involving a cumulative amount exceedin
 percent (5%) of the original contract price, no work thereon shall be commenced unless the
 same has been approved by the Head of the Procuring Entity concerned or his duly authorized
 representative. However, the said cumulative amount should not exceed ten percent (10%)
-of the original contract price. (2016 IRR, Annex “D”)
+of the original contract price. (2016 IRR, Annex ï¿½Dï¿½)
 Payment for any work or delivery done in accordance with an Amendment to Order shall not
 be made unless the approval of the Head of the Procuring Entity or his duly authorized
 representative has been secured.
 Page 117 of 152
 Manual of Procedures for the Procurement of Goods and Services
-Tip: Let’s make doing things
+Tip: Letï¿½s make doing things
 easier
 On the resumption of suspended
 contracts
@@ -5139,7 +5139,7 @@ which may not be the intention of the PMO at
 that time.
 Suspension of Delivery
 Legal Reference
-2016 IRR, Annex “D.”
+2016 IRR, Annex ï¿½D.ï¿½
 What are the grounds for suspension of delivery or contract
 implementation?
 The Procuring Entity may suspend the delivery or contract implementation, wholly or partly,
@@ -5148,9 +5148,9 @@ any fortuitous event as defined in the contract.
 Are corresponding adjustments in contract price and/or delivery schedule
 allowed?
 Yes, appropriate adjustments shall be made in the delivery or contract schedule, or contract
-price, or both, and the contract shall be modified accordingly. (2016 IRR, Annex “D”)
+price, or both, and the contract shall be modified accordingly. (2016 IRR, Annex ï¿½Dï¿½)
 When warranted, price adjustments may be made in accordance with the guidelines
-previously discussed in the immediately preceding section on “Amendment to Order.”
+previously discussed in the immediately preceding section on ï¿½Amendment to Order.ï¿½
 When shall the Supplier/
 Manufacturer/ Distributor
 resume delivery and/or
@@ -5203,7 +5203,7 @@ Page 119 of 152
 Manual of Procedures for the Procurement of Goods and Services
 Delays in Delivery and Liquidated Damages
 Legal Reference
-2016 IRR Section 68, Annex “D,” and the Civil Code of the Philippines Art. 2226.
+2016 IRR Section 68, Annex ï¿½D,ï¿½ and the Civil Code of the Philippines Art. 2226.
 What is the rule on the applicable period for the delivery of goods or
 performance of services?
 The supplier/manufacturer/distributor must deliver the goods or perform the services
@@ -5237,7 +5237,7 @@ In case the sum of liquidated damages reaches ten percent (10%) of the contract 
 the Procuring Entity may rescind or terminate the contract, without prejudice to other courses
 of action and remedies open to it. The Procuring Entity may also take over the contract or
 award the same to a qualified supplier through negotiation. In addition to the liquidated
-damages, the erring supplier’s performance security shall also be forfeited.
+damages, the erring supplierï¿½s performance security shall also be forfeited.
 Page 120 of 152
 Manual of Procedures for the Procurement of Goods and Services
 Methodology: How are Liquidated Damages imposed?
@@ -5275,7 +5275,7 @@ warranties about the delay and the corresponding liquidated damages
 imposable.
 Page 121 of 152
 Manual of Procedures for the Procurement of Goods and Services
-Tips: Let’s make doing things
+Tips: Letï¿½s make doing things
 easier
 On incidental services being in the
 contract
@@ -5289,7 +5289,7 @@ ITB. The cost thereof should also be indicated
 in the contract.
 Other Rules and Guidelines
 Legal Reference
-2016 IRR Section 42.1 and Annex “D”.
+2016 IRR Section 42.1 and Annex ï¿½Dï¿½.
 Incidental Services
 What are Incidental Services?
 Incidental Services are those services ancillary to the supply of the goods, such as
@@ -5312,7 +5312,7 @@ the supplied goods, for a period
 of time agreed by the parties,
 provided that this service shall
 not relieve the supplier of any warranty obligations under the Contract;
-5. Training of the Procuring Entity’s personnel, at the supplier’s plant and/or on-site, on
+5. Training of the Procuring Entityï¿½s personnel, at the supplierï¿½s plant and/or on-site, on
 assembly, start-up, operation, maintenance, and/or repair of the supplied goods; and
 6. Any other related services necessary for completion of the project and indicated in the
 contract.
@@ -5350,8 +5350,8 @@ those that are product-specific, shall continue to be manufactured by them withi
 time, e.g., five (5) years, after the bidding date.
 
 The above information shall be included in the Technical Bid.
-Purchaser’s Responsibilities
-What are the Procuring Entity’s responsibilities to the supplier/manufacturer/
+Purchaserï¿½s Responsibilities
+What are the Procuring Entityï¿½s responsibilities to the supplier/manufacturer/
 distributor if the latter requires coordination with other government entities for it to
 be able to perform its contractual obligations?
 Whenever the supply of goods and related services requires that the
@@ -5368,7 +5368,7 @@ based on the rule that the contract, as awarded, should not differ in any materi
 the terms stipulated in the bidding documents, considering that these terms were the basis
 for the comparison of bids. Otherwise, the purpose bidding process would have been
 defeated.
-Tips: Let’s make doing things
+Tips: Letï¿½s make doing things
 easier
 On spare parts
 The procuring entity may include the delivery
@@ -5406,10 +5406,10 @@ submitted by the concerned entity to the NEDA with the endorsement of the Procur
 The burden of proving the occurrence of extraordinary circumstances that will allow for price
 escalation shall rest with the entity requesting for such escalation. NEDA shall only respond
 to such request after receiving the proof and the necessary documentation.
-“Extraordinary circumstances” shall refer to events defined in the Civil Code of the Philippines,
+ï¿½Extraordinary circumstancesï¿½ shall refer to events defined in the Civil Code of the Philippines,
 consistent with the guidelines issued by the GPPB. In particular, the Revised Guidelines for
-Contract Price Escalation issued by the GPPB provide that the term “extraordinary
-circumstances” shall refer to the following Articles of the Civil Code of the Philippines:
+Contract Price Escalation issued by the GPPB provide that the term ï¿½extraordinary
+circumstancesï¿½ shall refer to the following Articles of the Civil Code of the Philippines:
 1. Article 1174, as it pertains to Ordinary Fortuitous Events or those events which could
 be reasonably foreseen but are inevitable, such as, but not limited to the following:
 (a) typhoons; (b) thunderstorms; (c) flooding of lowly areas; and (d) vehicular
@@ -5482,7 +5482,7 @@ months, the request for contract price escalation shall be made after the comple
 of the contract.
 Page 125 of 152
 Manual of Procedures for the Procurement of Goods and Services
-How’s that again?
+Howï¿½s that again?
 On payments upon termination of a
 contract
 Payment on a quantum meruit basis may be
@@ -5492,14 +5492,14 @@ contract termination for any cause other than
 engaging in corrupt, fraudulent, collusive or
 coercive practices, in competing for or in
 executing the contract.
-“Quantum meruit” means “as much as he
-deserves.” It is an equitable doctrine, based on
+ï¿½Quantum meruitï¿½ means ï¿½as much as he
+deserves.ï¿½ It is an equitable doctrine, based on
 the concept that no one who benefits by the labor
 and materials of another should be unjustly
 enriched thereby; under these circumstances, the
 law implies a promise to pay a reasonable
 amount for the labor and materials furnished.
-(Black’s Law Dictionary, Fifth Edition)
+(Blackï¿½s Law Dictionary, Fifth Edition)
 5. Misrepresentation. Any misrepresentation made by the Procuring Entity or the
 supplier in any stage of the processing of a particular request for price escalation shall
 cause the automatic denial/disapproval of said claim.
@@ -5558,7 +5558,7 @@ requirement of down payment is a standard industry practice: (i) hotel and resta
 services; (ii) use of conference/seminar and exhibit areas; and (iii) lease of office
 space;
 b. For procurement of goods required to address contingencies arising from natural or
-man-made calamities in areas where a “State of Calamity” has been declared by
+man-made calamities in areas where a ï¿½State of Calamityï¿½ has been declared by
 appropriate authorities; and
 c. When the supplier submits an irrevocable letter of credit or bank guarantee issued by
 a Universal or Commercial Bank.
@@ -5573,7 +5573,7 @@ has been fully exhausted, unless otherwise approved by the President. (Memorandu
 Order No. 172, dated 19 May 2005)
 When must payment be made?
 Payments must be made promptly by the Procuring Entity, but in no case later than sixty
-(60) days after the supplier’s request/s for payment shall be made in writing, accompanied
+(60) days after the supplierï¿½s request/s for payment shall be made in writing, accompanied
 by an invoice describing, as appropriate, the goods delivered and/or services performed, by
 documents submitted pursuant to the contract, and upon fulfillment of other obligations
 stipulated in the contract, as well as upon inspection and acceptance of the goods by the
@@ -5646,7 +5646,7 @@ What standards shall be applied in determining the quality of the goods supplied
 The goods supplied under the contract must conform to the standards mentioned in the
 technical specifications, which must preferably be Philippine standards, or standards specified
 by the Bureau of Product Standards of the DTI. If there is no Philippine standard applicable,
-the goods must conform to the authoritative standards appropriate to the goods’ country of
+the goods must conform to the authoritative standards appropriate to the goodsï¿½ country of
 origin. Such standards must be the latest issued by the concerned institution.
 Packaging
 What manner of packaging shall be followed by the supplier?
@@ -5655,12 +5655,12 @@ or deterioration during transit to their final destination, as indicated in the 
 accordance with existing industry standards. The packaging must be sufficient to withstand,
 without limitation, rough handling during transit and exposure to extreme temperatures, salt
 and precipitation during transit, and open storage. Packaging case size and weights must
-take into consideration, where appropriate, the distance and remoteness of the goods’ final
+take into consideration, where appropriate, the distance and remoteness of the goodsï¿½ final
 destination and the absence of heavy handling facilities at all points in transit.
 The packaging, marking, and documentation within and outside the packages must comply
 strictly with such special requirements as must be expressly provided for in the contract,
 including additional requirements, if any, and in any subsequent instructions ordered by the
-Procuring Entity. Moreover, the outer packaging must contain a “Packing List” which must
+Procuring Entity. Moreover, the outer packaging must contain a ï¿½Packing Listï¿½ which must
 reflect the actual contents of the package.
 Insurance
 What is the extent of insurance coverage for Goods?
@@ -5687,7 +5687,7 @@ If the supplier is required under the contract to transport the Goods to a speci
 destination within the Philippines, defined as the Project Site, it will arrange and pay for the
 Page 129 of 152
 Manual of Procedures for the Procurement of Goods and Services
-Tips: Let’s make doing things
+Tips: Letï¿½s make doing things
 easier
 On the inspection of delivered goods
 The appropriate Technical Inspection and
@@ -5699,13 +5699,13 @@ same as soon as practicable.
 Pertinent COA regulations on technical inspection
 and acceptance procedures shall be considered in
 the conduct of such inspection and acceptance by
-the procuring entity’s authorized inspectors.
+the procuring entityï¿½s authorized inspectors.
 transport of the goods to such place of destination. It must also pay for insurance and
 storage, and related costs. These costs must be included in the Contract Price.
 The Procuring Entity is encouraged to enlist the assistance of an accredited customs broker or
 forwarder in all importation.
 Inspection and Tests
-What is the scope of the Procuring Entity’s right to inspect and test the Goods
+What is the scope of the Procuring Entityï¿½s right to inspect and test the Goods
 procured?
 The Procuring Entity or its
 representative has the right to
@@ -5724,7 +5724,7 @@ retained for these purposes.
 The inspections and tests may be
 conducted on the premises of the
 supplier or its subcontractor(s), at
-point of delivery, and/or at the goods’
+point of delivery, and/or at the goodsï¿½
 final destination. If conducted on the
 premises of the supplier or its subcontractor(s), all reasonable facilities and assistance,
 including access to drawings and production data, must be provided by the supplier to the
@@ -5737,7 +5737,7 @@ required by the contract but deemed necessary to verify that the characteristics
 performance of the goods comply with the technical specifications, codes and standards under
 the contract. However, the reasonable costs and expenses incurred by the supplier in the
 carrying out of such test and/or inspection will be added to the contract price. Furthermore, if
-such test and/or inspection impedes the progress of manufacturing and/or the supplier’s
+such test and/or inspection impedes the progress of manufacturing and/or the supplierï¿½s
 performance of its other obligations under the contract, due allowance will be made in respect
 of the delivery dates and completion dates and the other obligations so affected. These tests
 shall be conducted by a government testing laboratory, or, where there is none for the
@@ -5754,7 +5754,7 @@ The supplier should agree in the contract that neither the execution of a test a
 inspection of the goods or any part thereof, nor the attendance by the Procuring Entity or its
 Page 130 of 152
 Manual of Procedures for the Procurement of Goods and Services
-How’s that again?
+Howï¿½s that again?
 On contract termination and damages
 Termination of a contract for default is without
 prejudice to other remedies available to the
@@ -5776,7 +5776,7 @@ infringement of patent, trademark, or industrial design rights, the supplier mus
 Procuring Entity free and harmless against such claims. These terms should be expressed in
 the contract.
 Limitations of Liability
-What is the extent of the supplier’s liability for damages?
+What is the extent of the supplierï¿½s liability for damages?
 Except in cases of criminal negligence or willful misconduct, and in the case of infringement of
 intellectual property rights, and unless otherwise specified in the contract, the supplier is
 generally not liable to the Procuring Entity, whether in contract, tort or otherwise, for any
@@ -5830,7 +5830,7 @@ May termination be allowed for reasons other than those attributable to the
 supplier?
 The Procuring Entity, by written notice sent to the supplier, may terminate the contract, in
 whole or in part, at any time for its convenience. The notice of termination shall specify that
-the termination is for the Procuring Entity’s convenience, the extent to which performance of
+the termination is for the Procuring Entityï¿½s convenience, the extent to which performance of
 the supplier under the contract is terminated, and the date upon which such termination
 becomes effective.
 What circumstances may constitute sufficient grounds to terminate a contract for
@@ -5850,11 +5850,11 @@ Also see the Guidelines on Termination of Contracts approved by the GPPB in Reso
 018-2004, dated December 22, 2004.
 What effect shall termination for convenience have on pending deliveries?
 The goods that are complete and ready for shipment within thirty (30) days after the
-supplier’s receipt of notice of termination shall be accepted by the Procuring Entity at the
+supplierï¿½s receipt of notice of termination shall be accepted by the Procuring Entity at the
 contract terms and prices. For the remaining goods, the Procuring Entity may elect:
 Page 132 of 152
 Manual of Procedures for the Procurement of Goods and Services
-How’s that again?
+Howï¿½s that again?
 On the assignment of contractual
 obligations and the entry of nonbidders into the procurement process
 Assignment of contractual obligations or the
@@ -5896,7 +5896,7 @@ Assignment
 May the Supplier assign a contract, or any of its rights or obligations arising from
 the contract, to a third party?
 As a general rule, the supplier may not assign the contract, or any of its rights or obligations
-arising from the contract, to a third party, except with the Procuring Entity’s prior written
+arising from the contract, to a third party, except with the Procuring Entityï¿½s prior written
 consent.
 Blacklisting
 The blacklisting of suppliers must conform to the GPPB Guidelines issued for this purpose. As
@@ -6028,16 +6028,16 @@ was submitted to the BAC Secretariat, which the latter accepted. At 10:15 a.m., 
 were opened. The first four bids submitted on October 24 came from Bidders D, E, F, and G,
 respectively; while the fifth bid submitted on that day came from Bidder H. During the
 preliminary examination of bids, all bids were found compliant with the eligibility
-requirements. The BAC considered Bidder E’s submission of a mere commitment to extend a
-Credit Line when awarded the contract, as substantial compliance to the “committed Line of
-Credit” requirement. All bidders were rated “passed” for all the requirements in the first
+requirements. The BAC considered Bidder Eï¿½s submission of a mere commitment to extend a
+Credit Line when awarded the contract, as substantial compliance to the ï¿½committed Line of
+Creditï¿½ requirement. All bidders were rated ï¿½passedï¿½ for all the requirements in the first
 (technical component) envelope. Consequently, all the second (financial component)
-envelopes were likewise rated “passed.” After reading the financial bids, Bidder H appeared to
+envelopes were likewise rated ï¿½passed.ï¿½ After reading the financial bids, Bidder H appeared to
 have submitted the LCB at PhP 15,000,000.00. Bidder D followed at PhP 16,500,000; while
 Bidders E, F and G submitted bids at PhP 17,000,000, PhP 17,300,000, and PhP17,500,000
 respectively. The Bid Form submitted by Bidder D indicated its bid at PhP 16,500,000 in
-figures, but “Seventeen Million Five Hundred Thousand Pesos” in words. The BAC considered
-the PhP 16,500,000 amount in figures as the correct bid, after confirming with Bidder D’s
+figures, but ï¿½Seventeen Million Five Hundred Thousand Pesosï¿½ in words. The BAC considered
+the PhP 16,500,000 amount in figures as the correct bid, after confirming with Bidder Dï¿½s
 representative who was present during the bid opening.
 After examining the financial bids, the BAC found arithmetical corrections in the Price
 Schedule of Bidder D. The price per item at PhP 15,300.00, inclusive of VAT, when multiplied
@@ -6058,15 +6058,15 @@ Page 140 of 145
 Manual of Procedures for the Procurement Goods and Services
 there was no extension given for the submission of bids. Only the opening of bids was
 re-scheduled on October 25, 2016, and not the deadline for submission of bids.
-2. Bidder E should have been declared ineligible. The 2016 IRR requires a “committed
-Line of Credit”, not a mere commitment issued by a bank to extend a credit line when
+2. Bidder E should have been declared ineligible. The 2016 IRR requires a ï¿½committed
+Line of Creditï¿½, not a mere commitment issued by a bank to extend a credit line when
 the bidder is awarded the contract later on. In view of this, the first envelope of
-Bidder E should have been rated “failed,” and its second envelope must not have been
+Bidder E should have been rated ï¿½failed,ï¿½ and its second envelope must not have been
 opened.
 3. When the Bid Form submitted by Bidder D was read, the BAC should have considered
 the amount in words (Seventeen Million Five Hundred Thousand Pesos) over the
 amount in figures (PhP 16,500,000) as the correct bid.
 4. However, after bid evaluation and correction, the BAC found that the correct bid of
-Bidder D is PhP 15,300,000.00. Considering that Bidder H’s bid must be rejected,
+Bidder D is PhP 15,300,000.00. Considering that Bidder Hï¿½s bid must be rejected,
 Bidder D must be declared the bidder with the LCB. Consequently, the BAC must
 postqualify Bidder D, not Bidder H. 

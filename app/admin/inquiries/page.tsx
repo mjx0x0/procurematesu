@@ -143,12 +143,12 @@ export default function InquiriesPage() {
 
   const getTypeBadge = (type: string) => {
     const colors: Record<string, string> = {
-      general: "bg-blue-100 text-blue-600",
-      pr_status: "bg-purple-100 text-purple-600",
-      ra_12009: "bg-green-100 text-green-600",
-      slot_fill: "bg-orange-100 text-orange-600",
+      general: "bg-red-50 text-[#7A1315] border border-red-200/60",
+      pr_status: "bg-amber-50 text-amber-800 border border-amber-200/60",
+      ra_12009: "bg-emerald-50 text-emerald-800 border border-emerald-200/60",
+      slot_fill: "bg-orange-50 text-orange-800 border border-orange-200/60",
     };
-    return colors[type] || "bg-gray-100 text-gray-600";
+    return colors[type] || "bg-stone-100 text-stone-600";
   };
 
   const exportCSV = () => {
@@ -186,39 +186,39 @@ export default function InquiriesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading inquiries...</p>
+          <Loader2 className="h-12 w-12 animate-spin text-[#7A1315] mx-auto" />
+          <p className="mt-4 text-stone-600 font-medium">Loading inquiries...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-[#FAF8F5]">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
+      <nav className="bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="/admin" className="text-stone-600 hover:text-[#7A1315] transition-colors p-1" title="Back to Admin">
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-                <MessageSquare className="h-5 w-5 text-white" />
+              <div className="bg-[#7A1315] p-2 rounded-xl text-amber-200 border border-amber-400/30 shadow-xs">
+                <MessageSquare className="h-5 w-5" />
               </div>
-              <span className="font-bold text-xl text-gray-900">Inquiry Monitoring</span>
+              <span className="font-bold text-xl text-[#4D0C0D]">Inquiry Monitoring</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 hidden sm:inline">
-              <User className="h-4 w-4 inline mr-1" />
+            <span className="text-xs text-stone-600 hidden sm:inline font-medium">
+              <User className="h-3.5 w-3.5 inline mr-1 text-[#7A1315]" />
               {user?.email}
             </span>
             <button
               onClick={handleLogout}
-              className="text-gray-600 hover:text-red-600 transition-colors"
+              className="text-stone-500 hover:text-red-700 transition-colors p-1"
             >
               <LogOut className="h-5 w-5" />
             </button>
@@ -230,32 +230,32 @@ export default function InquiriesPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Chatbot Inquiries</h1>
-            <p className="text-gray-600 mt-1">
-              {filteredInquiries.length} inquiries found
+            <h1 className="text-2xl font-extrabold text-[#4D0C0D]">Chatbot Inquiries</h1>
+            <p className="text-stone-600 mt-1 text-sm">
+              {filteredInquiries.length} inquiries logged by Isko BidDo Assistant
             </p>
           </div>
           <button
             onClick={exportCSV}
-            className="bg-white/70 backdrop-blur-sm text-gray-700 px-4 py-2 rounded-lg hover:bg-white transition-colors flex items-center gap-2 border border-gray-200"
+            className="bg-white text-stone-700 px-4 py-2 rounded-xl hover:bg-stone-50 hover:border-[#7A1315] transition-colors flex items-center gap-2 border border-stone-300 text-xs font-semibold shadow-2xs"
             disabled={filteredInquiries.length === 0}
           >
-            <Download className="h-4 w-4" />
+            <Download className="h-4 w-4 text-[#7A1315]" />
             Export CSV
           </button>
         </div>
 
         {/* Filters */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/30 mb-6">
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200/90 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
               <input
                 type="text"
                 placeholder="Search by question, response, user, or PR number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
               />
             </div>
             <div className="flex gap-4">
@@ -263,7 +263,7 @@ export default function InquiriesPage() {
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
-                  className="appearance-none pl-4 pr-8 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
+                  className="appearance-none pl-4 pr-8 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                 >
                   <option value="all">All Types</option>
                   <option value="general">General</option>
@@ -271,15 +271,15 @@ export default function InquiriesPage() {
                   <option value="ra_12009">RA 12009</option>
                   <option value="slot_fill">Slot Fill</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none" />
               </div>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
                 <input
                   type="date"
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
+                  className="pl-10 pr-4 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                 />
               </div>
               {dateFilter && (
@@ -361,7 +361,7 @@ export default function InquiriesPage() {
                             setSelectedInquiry(inquiry);
                             setShowDetailModal(true);
                           }}
-                          className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center gap-1"
+                          className="text-[#7A1315] hover:text-[#4D0C0D] font-medium transition-colors inline-flex items-center gap-1"
                         >
                           <Eye className="h-4 w-4" />
                           View

@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { MsuLogo } from "@/components/msu-logo";
 import {
-  FileText, Mail, Lock, ArrowRight, AlertCircle,
+  Mail, Lock, ArrowRight, AlertCircle,
   Eye, EyeOff, CheckCircle, Building2
 } from "lucide-react";
 
@@ -122,82 +123,93 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5] px-4 py-8">
       <div className="w-full max-w-md animate-fade-in-up">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-200">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-1.5 rounded-lg">
-              <FileText className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-bold text-xl text-gray-900">ProcuremateSU</span>
+        {/* Institutional Branding Header */}
+        <div className="text-center mb-6 flex flex-col items-center">
+          <Link href="/" className="inline-block transition-transform hover:scale-105 mb-2" title="Return to Home">
+            <MsuLogo size={96} />
+          </Link>
+          <div className="mt-2">
+            <h1 className="text-2xl font-extrabold text-[#4D0C0D] tracking-tight">
+              Procuremate<span className="text-[#B88E13]">SU</span>
+            </h1>
+            <p className="text-xs font-semibold text-[#7A1315] tracking-wide uppercase mt-0.5">
+              Mindanao State University - General Santos
+            </p>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mt-4">Welcome Back</h2>
-          <p className="text-gray-600 mt-2">Sign in with your MSU-GenSan credentials</p>
+          <p className="text-xs text-stone-600 mt-2">
+            Sign in with your official university credentials
+          </p>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/30">
-          <form onSubmit={handleLogin} className="space-y-6">
+        <div className="bg-white rounded-2xl p-7 shadow-xl border border-stone-200/90">
+          <form onSubmit={handleLogin} className="space-y-5">
             {successMessage && (
-              <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-xl text-sm flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-xl text-xs flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-emerald-600" />
                 <span>{successMessage}</span>
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+              <label className="block text-xs font-semibold text-stone-700 mb-1">
+                University Email Address
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@msugensan.edu.ph"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
+                  placeholder="name@msugensan.edu.ph"
+                  className="w-full pl-9 pr-4 py-2.5 text-sm border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                   required
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-1">
-                <Building2 className="h-3 w-3 inline mr-1" />
-                Use your official university email
+              <p className="text-[11px] text-stone-500 mt-1 flex items-center gap-1">
+                <Building2 className="h-3 w-3 inline text-[#7A1315]" />
+                Use your official @msugensan.edu.ph email
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label className="block text-xs font-semibold text-stone-700 mb-1">
+                Password
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white/70"
+                  placeholder="Enter your account password"
+                  className="w-full pl-9 pr-11 py-2.5 text-sm border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-600" />
                 <span>{error}</span>
               </div>
             )}
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                <span className="text-gray-600">Remember me</span>
+            <div className="flex items-center justify-between text-xs">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" className="rounded border-stone-300 text-[#7A1315] focus:ring-[#7A1315]" />
+                <span className="text-stone-600">Remember me</span>
               </label>
-              <Link href="/auth/forgot-password" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link href="/auth/forgot-password" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">
                 Forgot password?
               </Link>
             </div>
@@ -205,28 +217,56 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
+              className="w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white py-3 rounded-xl font-semibold text-sm shadow-md shadow-red-950/20 hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100 border border-amber-400/30"
             >
               {loading ? (
                 <>
-                  <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
-                  Signing in...
+                  <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                  Authenticating...
                 </>
               ) : (
                 <>
-                  Sign In
-                  <ArrowRight className="h-5 w-5" />
+                  <span>Sign In to Portal</span>
+                  <ArrowRight className="h-4 w-4 text-amber-300" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-center text-gray-500 text-sm">
-              Use your official MSU-GenSan email and password.
+          <div className="mt-5 pt-5 border-t border-stone-200">
+            <div className="bg-red-50/70 border border-red-200/70 rounded-xl p-3 mb-3 text-xs text-[#4D0C0D]">
+              <p className="font-bold text-[#7A1315] mb-1.5 flex items-center justify-between">
+                <span>Quick Access Demo Accounts:</span>
+                <span className="text-[10px] bg-red-100 px-1.5 py-0.5 rounded text-[#7A1315] font-semibold">MSU-GenSan</span>
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail("admin@msugensan.edu.ph");
+                    setPassword("admin123");
+                  }}
+                  className="flex-1 px-2.5 py-1.5 bg-white border border-red-300 rounded-lg text-[#7A1315] font-semibold hover:bg-red-100/50 transition-colors shadow-2xs text-center text-xs"
+                >
+                  Admin Role
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail("faculty@msugensan.edu.ph");
+                    setPassword("faculty123");
+                  }}
+                  className="flex-1 px-2.5 py-1.5 bg-white border border-red-300 rounded-lg text-[#7A1315] font-semibold hover:bg-red-100/50 transition-colors shadow-2xs text-center text-xs"
+                >
+                  Faculty Role
+                </button>
+              </div>
+            </div>
+            <p className="text-center text-stone-500 text-xs">
+              Mindanao State University - General Santos City
             </p>
-            <p className="text-center text-xs text-gray-400 mt-2">
-              By signing in, you agree to the university's data privacy policy.
+            <p className="text-center text-[10px] text-stone-400 mt-1">
+              Procurement Management Office • RA 12009 Compliant
             </p>
           </div>
         </div>

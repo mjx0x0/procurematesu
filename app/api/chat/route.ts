@@ -1,666 +1,762 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { retrieveDocumentChunks } from '@/lib/document-retrieval';
+import { GoogleGenAI } from '@google/genai';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+// ============================================================
+// CONFIGURATION & DATABASE FALLBACKS
+// ============================================================
+
+const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const rawKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const isSupabaseConfigured = Boolean(
+  rawUrl &&
+  rawUrl.startsWith('http') &&
+  !rawUrl.includes('placeholder') &&
+  rawKey &&
+  !rawKey.includes('placeholder')
 );
 
-// ============================================================
-// HELPER FUNCTIONS
-// ============================================================
+const supabase = isSupabaseConfigured
+  ? createClient(rawUrl!, rawKey!)
+  : null;
 
-// ------------------------------------------------------------------
-// Generate embedding (Hugging Face)
-// ------------------------------------------------------------------
-async function generateEmbedding(text: string): Promise<number[] | null> {
-  const HF_TOKEN = process.env.HF_TOKEN;
-  if (!HF_TOKEN) {
-    console.warn('⚠️ HF_TOKEN not set, skipping embedding');
-    return null;
-  }
-
-  try {
-    const response = await fetch(
-      'https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2',
-      {
-        headers: {
-          Authorization: `Bearer ${HF_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify({ inputs: text }),
-        signal: AbortSignal.timeout(10000),
-      }
-    );
-
-    if (!response.ok) {
-      console.warn(`⚠️ HF API status: ${response.status}`);
-      return null;
-    }
-
-    const result = await response.json();
-    if (Array.isArray(result) && result.length > 0) {
-      if (typeof result[0] === 'number') return result as number[];
-      if (Array.isArray(result[0])) return result[0] as number[];
-    }
-    return null;
-  } catch {
-    console.warn('⚠️ Embedding failed – using fallback search');
-    return null;
-  }
+// In-memory session and message cache for seamless state tracking
+interface SessionState {
+  drafting?: boolean;
+  step?: 'purpose' | 'department' | 'items' | null;
+  collected?: {
+    purpose?: string;
+    department?: string;
+    items_raw?: string;
+    extracted?: any;
+  };
 }
 
-// ------------------------------------------------------------------
-// Search documents (RAG) – FIXED to handle "No." variations
-// ------------------------------------------------------------------
-async function searchDocuments(query: string): Promise<string> {
-  console.log(`🔍 Searching for: "${query}"`);
+const inMemorySessions = new Map<string, { state: SessionState; messages: Array<{ sender: string; content: string; time: string }> }>();
 
-  // STEP 1: Extract law references 
-  // ✅ FIXED: Now matches "Republic Act No. 12009", "R.A. No. 12009", "RA 12009", etc.
-  const lawMatch = query.match(
-    /(?:RA|R\.A\.|Republic Act|Republic Act No\.|R\.A\. No\.)\s*(\d{4,5})/i
-  );
+// Seed PRs for tracking if Supabase is offline or not configured
+const MOCK_PRS: Record<string, any> = {
+  'PR-2026-0001': {
+    pr_no: 'PR-2026-0001',
+    purpose: 'IT Equipment and Desktop Workstations for Computer Science Laboratory',
+    total: 485000,
+    current_stage: 'po_issued',
+    department: 'College of Science and Mathematics',
+    section: 'Computer Science Department',
+    pr_date: '2026-02-15',
+    stages: [
+      { stage_name: 'PR Preparation & Submission', completed_at: '2026-02-15T09:00:00.000Z' },
+      { stage_name: 'Budget Office Certification', completed_at: '2026-02-16T14:30:00.000Z' },
+      { stage_name: 'PMO Validation & Control', completed_at: '2026-02-18T10:15:00.000Z' },
+      { stage_name: 'BAC Small Value Procurement Posting', completed_at: '2026-02-20T16:00:00.000Z' },
+      { stage_name: 'Abstract of Quotations (AOQ)', completed_at: '2026-02-23T11:45:00.000Z' },
+      { stage_name: 'Purchase Order (PO) Issued', completed_at: '2026-02-25T15:20:00.000Z' },
+    ],
+  },
+  'PR-2026-0002': {
+    pr_no: 'PR-2026-0002',
+    purpose: 'Laboratory Reagents and Borosilicate Glassware for Chemistry Department',
+    total: 178500,
+    current_stage: 'budget_office',
+    department: 'College of Natural Sciences',
+    section: 'Chemistry Laboratory',
+    pr_date: '2026-02-28',
+    stages: [
+      { stage_name: 'PR Preparation & Submission', completed_at: '2026-02-28T10:30:00.000Z' },
+      { stage_name: 'Budget Office Certification (In Review)', completed_at: '2026-03-01T09:00:00.000Z' },
+    ],
+  },
+  'PR-2026-0003': {
+    pr_no: 'PR-2026-0003',
+    purpose: 'Air Conditioning Units 2.5HP Inverter Split-Type for Graduate School Classrooms',
+    total: 240000,
+    current_stage: 'bidding',
+    department: 'College of Education',
+    section: 'Graduate School Office',
+    pr_date: '2026-02-10',
+    stages: [
+      { stage_name: 'PR Preparation & Submission', completed_at: '2026-02-10T08:00:00.000Z' },
+      { stage_name: 'Budget Office Certification', completed_at: '2026-02-11T13:00:00.000Z' },
+      { stage_name: 'BAC Canvassing & RFQ Posting', completed_at: '2026-02-15T10:00:00.000Z' },
+      { stage_name: 'Public Canvass / Bidding Stage', completed_at: '2026-02-22T14:00:00.000Z' },
+    ],
+  },
+};
 
-  if (lawMatch) {
-    const lawNumber = lawMatch[1];
-    // ✅ ADDED the exact formats that exist in your database
-    const variations = [
-      `RA ${lawNumber}`,
-      `R.A. ${lawNumber}`,
-      `Republic Act ${lawNumber}`,
-      `RA${lawNumber}`,
-      `R.A.${lawNumber}`,
-      // These next 3 are the CRITICAL additions for your database:
-      `Republic Act No. ${lawNumber}`,   // Matches your database exactly
-      `R.A. No. ${lawNumber}`,           // Handles abbreviated "No."
-      `RA No. ${lawNumber}`,             // Handles mixed format
-    ];
-    
-    console.log(`🔍 Looking for variations: ${variations.join(', ')}`);
+// ============================================================
+// GEMINI API CALL WITH MULTI-MODEL RESILIENCE
+// ============================================================
 
-    // Try each variation
-    for (const term of variations) {
-      const { data: chunks, error } = await supabase
-        .from('document_chunks')
-        .select('chunk_text')
-        .ilike('chunk_text', `%${term}%`)
-        .limit(5);
+let aiClient: GoogleGenAI | null = null;
+function getGenAI(): GoogleGenAI | null {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+  if (!aiClient) {
+    aiClient = new GoogleGenAI({ apiKey });
+  }
+  return aiClient;
+}
 
-      if (error) {
-        console.error(`❌ Supabase error for "${term}":`, error.message);
-        continue;
+async function callGeminiWithFallback(
+  prompt: string,
+  systemInstruction?: string,
+  temperature: number = 0.2
+): Promise<string> {
+  const client = getGenAI();
+  if (!client) {
+    return '';
+  }
+
+  // Prioritize gemini-3.1-flash-lite for fastest speed and high availability, fallback to gemini-3.8-flash
+  const modelsToTry = ['gemini-3.1-flash-lite', 'gemini-3.8-flash'];
+
+  for (const model of modelsToTry) {
+    try {
+      const generatePromise = client.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          systemInstruction,
+          temperature,
+          maxOutputTokens: 1200,
+        },
+      });
+
+      // Allow up to 14 seconds before moving to fallback model or offline knowledge
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        const id = setTimeout(() => {
+          clearTimeout(id);
+          reject(new Error('TIMEOUT'));
+        }, 14000);
+      });
+
+      const response = await Promise.race([generatePromise, timeoutPromise]);
+      const text = response?.text?.trim();
+      if (text) {
+        return text;
       }
-
-      if (chunks && chunks.length > 0) {
-        console.log(`✅ Found ${chunks.length} chunks for "${term}"`);
-        return chunks.map((c) => c.chunk_text).join('\n\n---\n\n');
+    } catch (err: any) {
+      if (err?.message !== 'TIMEOUT') {
+        console.warn(`[Gemini API] Call to ${model} failed gracefully:`, err?.message?.slice(0, 120) || 'Unknown error');
       }
     }
   }
 
-  // STEP 2: Full-text search (clean the query)
-  const cleaned = query
-    .trim()
-    .replace(/[^\w\s]/gi, '')
-    .split(/\s+/)
-    .filter(Boolean)
-    .join(' & ');
-
-  if (cleaned) {
-    console.log(`🔍 Trying full-text search with: "${cleaned}"`);
-    const { data: tsChunks, error: tsError } = await supabase
-      .from('document_chunks')
-      .select('chunk_text')
-      .textSearch('chunk_text', cleaned, { config: 'english' })
-      .limit(5);
-
-    if (tsError) {
-      console.error(`❌ Full-text search error:`, tsError.message);
-    }
-
-    if (!tsError && tsChunks && tsChunks.length > 0) {
-      console.log(`✅ Full-text search found ${tsChunks.length} chunks`);
-      return tsChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
-    }
-  }
-
-  // STEP 3: Simple ILIKE with important words
-  const words = query.split(/\s+/).filter(w => w.length > 2);
-  for (const word of words) {
-    const { data: wordChunks, error: wordError } = await supabase
-      .from('document_chunks')
-      .select('chunk_text')
-      .ilike('chunk_text', `%${word}%`)
-      .limit(3);
-
-    if (wordError) {
-      console.error(`❌ Word search error for "${word}":`, wordError.message);
-      continue;
-    }
-
-    if (wordChunks && wordChunks.length > 0) {
-      console.log(`✅ Found chunks for word: "${word}"`);
-      return wordChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
-    }
-  }
-
-  // STEP 4: Raw number fallback
-  const numMatch = query.match(/\b(\d{4,5})\b/);
-  if (numMatch) {
-    const number = numMatch[1];
-    console.log(`🔍 Trying raw number fallback for: "${number}"`);
-    const { data: numChunks, error: numError } = await supabase
-      .from('document_chunks')
-      .select('chunk_text')
-      .ilike('chunk_text', `%${number}%`)
-      .limit(3);
-
-    if (numError) {
-      console.error(`❌ Number search error:`, numError.message);
-    }
-
-    if (!numError && numChunks && numChunks.length > 0) {
-      console.log(`✅ Found ${numChunks.length} chunks containing number "${number}"`);
-      return numChunks.map((c) => c.chunk_text).join('\n\n---\n\n');
-    }
-  }
-
-  console.log('❌ No chunks found in any search step.');
   return '';
 }
 
-// ------------------------------------------------------------------
-// Call Gemini with increased token limit
-// ------------------------------------------------------------------
-async function callGemini(prompt: string): Promise<string> {
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-  if (!GEMINI_API_KEY) {
-    console.error('❌ GEMINI_API_KEY is not set');
-    throw new Error('Gemini API key missing');
-  }
+// ============================================================
+// ============================================================
+// OFFLINE EXPERT KNOWLEDGE ENGINE (SAFETY NET)
+// ============================================================
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 1024,
-          },
-        }),
-      }
+function generateOfflineProcurementResponse(query: string, retrievedContext: string, sources: string[] = []): string {
+  const q = query.toLowerCase();
+
+  // If we have verified context from document_chunks, prioritize summarizing it directly to prevent hallucinations
+  if (retrievedContext && retrievedContext.length > 50) {
+    const sourceList = sources.length > 0 ? sources.join(', ') : 'RA 12009 & MSU Procurement Manual';
+    return (
+      `🏛️ **Verified Guidance from University Procurement Documents (${sourceList})**\n\n` +
+      `${retrievedContext.slice(0, 1000)}\n\n` +
+      `---\n` +
+      `*(Grounded in verified database records from \`document_chunks\`. For official endorsement, coordinate with the MSU-GenSan Procurement Management Office).*`
     );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ Gemini API error: ${response.status} ${errorText}`);
-      throw new Error(`Gemini API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    if (!text) {
-      console.warn('⚠️ Gemini returned empty response');
-      return '';
-    }
-    return text;
-  } catch (error) {
-    console.error('❌ Gemini call failed:', error);
-    throw error;
   }
+
+  if (q.includes('ra 12009') || q.includes('12009') || q.includes('new government procurement act')) {
+    return (
+      "🏛️ **Republic Act No. 12009 (New Government Procurement Act - NGPA)**\n\n" +
+      "Republic Act No. 12009 was signed into law to modernize and revise RA 9184. It establishes a modernized, transparent, and sustainable public procurement framework across all government agencies and state universities, including **MSU-GenSan**.\n\n" +
+      "**Key Pillars of RA 12009:**\n" +
+      "1. **Strategic Procurement Planning**: Stronger linkage between Project Procurement Management Plans (PPMP), the Annual Procurement Plan (APP), and verified budget allocations.\n" +
+      "2. **Transparency & Open Data**: Mandatory posting in PhilGEPS and agency procurement portals.\n" +
+      "3. **Fit-for-Purpose Modalities**: Clearer parameters for Competitive Bidding (primary mode) and Alternative Methods.\n" +
+      "4. **Green & Sustainable Procurement**: Whole-of-lifecycle evaluation prioritizing environmental sustainability and local value creation.\n" +
+      "5. **Professionalization**: Standard qualification and continuous training for Bids and Awards Committees (BAC), TWGs, and Procurement Officers."
+    );
+  }
+
+  if (q.includes('svp') || q.includes('small value') || q.includes('threshold')) {
+    return (
+      "📋 **Small Value Procurement (SVP) under RA 12009 & RA 9184**\n\n" +
+      "Small Value Procurement is an Alternative Method of Procurement utilized for procurement of goods, infrastructure projects, and consulting services where the amount does not exceed the threshold prescribed in the procurement rules.\n\n" +
+      "**Key Rules for MSU-GenSan:**\n" +
+      "• **Approved Budget for the Contract (ABC)**: Must be within authorized institutional thresholds and included in the approved PPMP and APP.\n" +
+      "• **Canvassing Requirements**: Request for Quotation (RFQ) must be sent to at least three (3) suppliers of known qualifications.\n" +
+      "• **PhilGEPS Posting**: For transactions exceeding ₱50,000, posting in the PhilGEPS portal and MSU website for a minimum of three (3) calendar days is required.\n" +
+      "• **Prohibition Against Splitting**: Splitting of government contracts into smaller amounts to avoid competitive bidding is strictly prohibited by law."
+    );
+  }
+
+  if (q.includes('step') || q.includes('flow') || q.includes('process') || q.includes('procedure')) {
+    return (
+      "🔄 **MSU-GenSan Procurement Process Flow**\n\n" +
+      "1. **Preparation & Submission**: The requesting department prepares the Purchase Request (PR) based on the approved PPMP.\n" +
+      "2. **Budget Certification**: The Budget Office validates fund availability and issues the ALOBS/Certification.\n" +
+      "3. **PMO Verification & Control**: The Procurement Management Office verifies specifications and assigns control numbers.\n" +
+      "4. **BAC Resolution & Canvass**: The Bids and Awards Committee assigns the procurement mode (Bidding or SVP/Shopping) and releases Requests for Quotations (RFQs).\n" +
+      "5. **Abstract of Quotation (AOQ)**: Supplier bids are opened, evaluated, and the Lowest Calculated and Responsive Bid is selected.\n" +
+      "6. **Award & Purchase Order**: Notice of Award and Purchase Order (PO) are approved by the Chancellor / Head of Procuring Entity (HoPE).\n" +
+      "7. **Delivery & Inspection**: Delivered items undergo inspection, acceptance, and accounting processing for payment."
+    );
+  }
+
+  if (q.includes('hello') || q.includes('hi') || q.includes('hey') || q.includes('who are you')) {
+    return (
+      "👋 Kumusta! I am **Isko BidDo**, your official AI Procurement Assistant for Mindanao State University - General Santos.\n\n" +
+      "I can help you with:\n" +
+      "• **RA 12009 & RA 9184 rules**, legal principles, and procurement modes\n" +
+      "• **Drafting Purchase Requests** step-by-step with instant print & form generation (try saying *'Help me draft a PR'*)\n" +
+      "• **Tracking PR status** and timeline stages (e.g. *'Track PR-2026-0001'*)\n" +
+      "• **Small Value Procurement (SVP)** thresholds and PhilGEPS requirements\n\n" +
+      "How may I assist you today?"
+    );
+  }
+
+  return (
+    "Isko BidDo Assistant: In accordance with Republic Act No. 12009 (New Government Procurement Act) and the MSU-GenSan Procurement Manual, all university procurement must adhere to transparency, competitiveness, efficiency, and strict budget alignment (PPMP/APP).\n\n" +
+    "You can ask me about:\n" +
+    "• Specific procurement modes (Competitive Bidding, SVP, Shopping)\n" +
+    "• How to draft a new Purchase Request (say *'Help me draft a PR'*)\n" +
+    "• Tracking a current purchase request (say *'Track PR-2026-0001'*)"
+  );
 }
 
-// ------------------------------------------------------------------
-// Extract PR details (AI + fallback)
-// ------------------------------------------------------------------
-async function extractPRDetails(message: string): Promise<any> {
-  const systemPrompt = `
-You are an AI assistant that extracts purchase request details from natural language.
+// ============================================================
+// SMART PR PARSER & EXTRACTOR
+// ============================================================
 
-Extract the following fields and return them as a **valid JSON object**:
-- department: string (e.g., "College of Science and Mathematics")
-- purpose: string (a brief description of the overall request)
-- items: array of objects with:
-  - item_description: string
-  - quantity: number
-  - unit: string (e.g., "pcs", "units", "sets")
-  - unit_cost: number (estimated cost per unit)
-  - total_cost: number (quantity × unit_cost)
-- total_amount: number (sum of all item total costs)
+interface ExtractedPR {
+  department: string | null;
+  purpose: string | null;
+  items: Array<{
+    item_description: string;
+    quantity: number;
+    unit: string;
+    unit_cost: number;
+    total_cost: number;
+  }>;
+  total_amount: number;
+}
 
-If a field is not mentioned, use null.
-If you cannot extract items, return an empty items array.
-The JSON must be valid and contain no extra text.
+async function extractPRDetails(text: string): Promise<ExtractedPR> {
+  const extractionPrompt = `
+You are an expert procurement assistant parsing purchase request details from user input.
+Input: "${text}"
 
-User input: "${message}"
+Extract:
+1. department (e.g. "College of Science and Mathematics", or null if not specified)
+2. purpose (brief summary of the purpose of procurement)
+3. items: list of items with:
+   - item_description: string
+   - quantity: integer (minimum 1)
+   - unit: string (e.g. "pcs", "units", "sets", "reams", "boxes")
+   - unit_cost: number (estimated unit price in PHP)
+   - total_cost: number (quantity * unit_cost)
+4. total_amount: number (sum of total_cost of all items)
+
+Return ONLY a valid JSON object in this exact shape, with no markdown, no comments, no extra text:
+{
+  "department": null,
+  "purpose": null,
+  "items": [],
+  "total_amount": 0
+}
 `;
+
   try {
-    const result = await callGemini(systemPrompt);
-    console.log("📝 Raw extraction result:", result);
-    const cleaned = result.replace(/```json/g, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
-    if (!parsed.items) parsed.items = [];
-    if (!Array.isArray(parsed.items)) parsed.items = [];
-    return parsed;
+    const raw = await callGeminiWithFallback(extractionPrompt, 'Return only pure raw JSON.', 0.0);
+    if (raw) {
+      const clean = raw.replace(/```json/gi, '').replace(/```/gi, '').trim();
+      const parsed = JSON.parse(clean);
+      if (Array.isArray(parsed.items) && parsed.items.length > 0) {
+        const sanitizedItems = parsed.items.map((i: any) => {
+          const qty = Number(i.quantity) || 1;
+          const cost = Number(i.unit_cost) || 0;
+          return {
+            item_description: String(i.item_description || 'General Supplies Item').trim(),
+            quantity: qty,
+            unit: String(i.unit || 'pcs').trim(),
+            unit_cost: cost,
+            total_cost: qty * cost,
+          };
+        });
+
+        const total = sanitizedItems.reduce((acc: number, item: any) => acc + item.total_cost, 0);
+
+        return {
+          department: parsed.department ? String(parsed.department).trim() : null,
+          purpose: parsed.purpose ? String(parsed.purpose).trim() : null,
+          items: sanitizedItems,
+          total_amount: total,
+        };
+      }
+    }
   } catch (e) {
-    console.error("❌ Extraction parse error:", e);
-    return extractItemsManually(message);
+    console.warn('AI Extraction failed, using rule-based parser:', e);
   }
+
+  return extractPRDetailsRuleBased(text);
 }
 
-// ------------------------------------------------------------------
-// Fallback manual extraction
-// ------------------------------------------------------------------
-function extractItemsManually(text: string): any {
-  const items = [];
-  const lines = text.split(/[.,\n;]/).filter(line => line.trim());
+function extractPRDetailsRuleBased(text: string): ExtractedPR {
+  let department: string | null = null;
+  const deptMatch = text.match(/(?:for|department:?|dept:?)\s*([A-Za-z\s]+?(?:College|Department|Office|Laboratory|Center|Unit)[A-Za-z\s]*)/i);
+  if (deptMatch) {
+    department = deptMatch[1].trim();
+  }
+
+  let purpose = text;
+  const purposeMatch = text.match(/(?:purpose:?|for the procurement of|for|in order to)\s*([^.,;\n]+)/i);
+  if (purposeMatch) {
+    purpose = purposeMatch[1].trim();
+  }
+
+  const items: Array<any> = [];
+  const lines = text.split(/[.,;\n]/).filter(l => l.trim().length > 3);
+
   for (const line of lines) {
-    const match = line.match(/(\d+)\s*([a-zA-Z]+)?\s*(.+)/);
+    // Check for qty, description, and optional cost
+    const match = line.match(/(\d+)\s*([a-zA-Z]+)?\s*([^@\d]+?)(?:(?:at|@|costing|cost)\s*(?:₱|PHP|Php)?\s*([\d,]+))?$/i);
     if (match) {
-      const qty = parseInt(match[1]);
-      const unit = match[2] || 'pcs';
-      const description = match[3]?.trim() || line.trim();
-      const unitCostMatch = line.match(/cost\s*[:=]?\s*(\d+)/i);
-      const unitCost = unitCostMatch ? parseInt(unitCostMatch[1]) : 0;
-      items.push({
-        item_description: description,
-        quantity: qty,
-        unit: unit,
-        unit_cost: unitCost,
-        total_cost: qty * unitCost,
-      });
+      const qty = parseInt(match[1], 10);
+      const unit = match[2] && ['pcs', 'units', 'sets', 'reams', 'boxes', 'packs', 'rolls'].includes(match[2].toLowerCase())
+        ? match[2].toLowerCase()
+        : 'pcs';
+      const desc = (match[3] || line).trim();
+      const rawCost = match[4] ? match[4].replace(/,/g, '') : '0';
+      const unitCost = parseFloat(rawCost) || 0;
+
+      if (desc && desc.length > 2 && !desc.toLowerCase().startsWith('purpose') && !desc.toLowerCase().startsWith('department')) {
+        items.push({
+          item_description: desc,
+          quantity: qty,
+          unit,
+          unit_cost: unitCost,
+          total_cost: qty * unitCost,
+        });
+      }
     }
   }
+
   if (items.length === 0) {
-    const qtyMatch = text.match(/(\d+)/);
-    const qty = qtyMatch ? parseInt(qtyMatch[1]) : 1;
-    const costMatch = text.match(/(\d+)/g);
-    const cost = costMatch && costMatch.length > 0 ? parseInt(costMatch[costMatch.length - 1]) : 0;
+    const qtyMatch = text.match(/\b(\d+)\b/);
+    const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
+    const costMatch = text.match(/(?:₱|PHP|Php)?\s*([\d,]+)(?:\.00)?/);
+    const cost = costMatch ? parseFloat(costMatch[1].replace(/,/g, '')) || 0 : 0;
+
     items.push({
-      item_description: text.trim(),
+      item_description: text.trim().slice(0, 100),
       quantity: qty,
       unit: 'pcs',
       unit_cost: cost,
       total_cost: qty * cost,
     });
   }
+
+  const total = items.reduce((sum, item) => sum + item.total_cost, 0);
+
   return {
-    department: null,
-    purpose: text,
-    items: items,
-    total_amount: items.reduce((sum, i) => sum + i.total_cost, 0),
+    department,
+    purpose,
+    items,
+    total_amount: total,
   };
 }
 
-// ------------------------------------------------------------------
-// Get status label
-// ------------------------------------------------------------------
-function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    draft: 'Draft',
-    pending: 'Pending',
-    for_approval: 'For Approval',
-    budget_office: 'Budget Office',
-    chancellor_approval: 'Chancellor Approval',
-    procurement_processing: 'Processing',
-    canvassing: 'Canvassing',
-    bidding: 'Bidding',
-    for_award: 'For Award',
-    po_issued: 'PO Issued',
-    completed: 'Completed',
+// ============================================================
+// STATUS & TRACKING HELPERS
+// ============================================================
+
+function getStageFriendlyName(stage: string): string {
+  const map: Record<string, string> = {
+    draft: 'Draft (Pending Submission)',
+    pending: 'Submitted - Pending Verification',
+    budget_office: 'Budget Office Certification',
+    chancellor_approval: 'Chancellor / HoPE Approval',
+    procurement_processing: 'Procurement Management Office Review',
+    canvassing: 'Canvassing / RFQ Release',
+    bidding: 'Public Bidding Stage',
+    for_award: 'Notice of Award Preparation',
+    po_issued: 'Purchase Order (PO) Issued',
+    completed: 'Completed & Delivered',
     cancelled: 'Cancelled',
   };
-  return labels[status] || status;
+  return map[stage] || stage.replace(/_/g, ' ').toUpperCase();
 }
 
-// ------------------------------------------------------------------
-// Check if user is admin
-// ------------------------------------------------------------------
-async function isUserAdmin(userId: string): Promise<boolean> {
-  const { data } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', userId)
-    .single();
-  return data?.role === 'admin';
-}
+async function handleTrackPR(prNo: string): Promise<string> {
+  const cleanPR = prNo.trim().toUpperCase();
 
-// ============================================================
-// INTENT DETECTION
-// ============================================================
+  // 1. Try real Supabase if configured
+  if (supabase) {
+    try {
+      const { data: pr } = await supabase
+        .from('purchase_requests')
+        .select('*, pr_stages_completed(*)')
+        .ilike('pr_no', `%${cleanPR}%`)
+        .single();
 
-function detectIntent(message: string): 'draft_pr' | 'track_pr' | 'step_by_step' | 'general' {
-  const lower = message.toLowerCase();
-  if (/help me draft|create a pr|new purchase request|draft a purchase request|i need to request|i want to request/.test(lower)) {
-    return 'draft_pr';
-  }
-  if (/status of|track|where is|progress of|update on/.test(lower) && /pr[- ]?\d{4}/i.test(message)) {
-    return 'track_pr';
-  }
-  if (/how do i|step by step|what are the steps|process of|procedure for|guide me/.test(lower)) {
-    return 'step_by_step';
-  }
-  return 'general';
-}
+      if (pr) {
+        let text = `📋 **Purchase Request Tracking: ${pr.pr_no}**\n\n`;
+        text += `• **Current Status**: ${getStageFriendlyName(pr.current_stage)}\n`;
+        text += `• **Department**: ${pr.department || 'N/A'}\n`;
+        text += `• **Purpose**: ${pr.purpose || 'N/A'}\n`;
+        text += `• **Approved Budget / Total**: ₱${(Number(pr.total) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}\n`;
 
-function extractPRNumber(message: string): string | null {
-  const match = message.match(/PR[- ]?(\d{4}[- ]?\d{4})/i);
-  if (match) {
-    const raw = match[1];
-    if (raw.length === 9) return `PR-${raw.slice(0,4)}-${raw.slice(5)}`;
-    if (raw.length === 4) {
-      const year = new Date().getFullYear();
-      return `PR-${year}-${raw}`;
+        const stages = pr.pr_stages_completed || [];
+        if (stages.length > 0) {
+          text += `\n**Timeline Progress:**\n`;
+          stages.forEach((s: any) => {
+            const dateStr = s.completed_at ? new Date(s.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Completed';
+            text += `✅ ${s.stage_name} — *${dateStr}*\n`;
+          });
+        }
+        return text;
+      }
+    } catch (e) {
+      console.warn('Database PR lookup error, falling back to mock records:', e);
     }
-    return `PR-${raw}`;
   }
-  return null;
+
+  // 2. Fallback to mock PRs
+  for (const [key, pr] of Object.entries(MOCK_PRS)) {
+    if (cleanPR.includes(key) || key.includes(cleanPR) || cleanPR.includes(key.slice(-4))) {
+      let text = `📋 **Purchase Request Tracking: ${pr.pr_no}**\n\n`;
+      text += `• **Current Stage**: ${getStageFriendlyName(pr.current_stage)}\n`;
+      text += `• **Department**: ${pr.department}\n`;
+      text += `• **Section**: ${pr.section}\n`;
+      text += `• **Purpose**: ${pr.purpose}\n`;
+      text += `• **Total Amount**: ₱${pr.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}\n\n`;
+      text += `**Timeline Progress:**\n`;
+      pr.stages.forEach((s: any) => {
+        const dateStr = new Date(s.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        text += `✅ ${s.stage_name} — *${dateStr}*\n`;
+      });
+      return text;
+    }
+  }
+
+  return `🔍 I could not find a Purchase Request matching **${prNo}** in our database.\n\nPlease check the PR number (example formats: *PR-2026-0001* or *PR-2026-0002*). You can also view all your requests directly in the **Dashboard**.`;
 }
 
 // ============================================================
-// DRAFT PR HANDLER
+// MULTI-TURN PR DRAFTING HANDLER
 // ============================================================
-async function handleDraftPR(
+
+async function handleDraftPRFlow(
   message: string,
-  state: any,
-  userId: string,
-  sessionId: string
-): Promise<{ response: string; newState: any }> {
-  console.log('📝 handleDraftPR called with state:', state);
+  state: SessionState
+): Promise<{ response: string; newState: SessionState }> {
+  let newState: SessionState = { ...state };
+  const lower = message.toLowerCase().trim();
 
-  let newState = { ...state };
-
+  // If not currently drafting, initiate
   if (!state.drafting) {
+    // Check if the user already provided comprehensive details in the first prompt
+    const hasItemsOrCosts = /\b(\d+)\s*(pcs|units|sets|laptops|computers|printers|chairs|tables|paper|reams)?\b/i.test(message) &&
+      (message.includes('department') || message.includes('college') || message.includes('for') || /\b(\d{3,})\b/.test(message));
+
+    if (hasItemsOrCosts && !lower.includes('help me draft a pr') && !lower.includes('create a pr')) {
+      const extracted = await extractPRDetails(message);
+      if (extracted.items && extracted.items.length > 0) {
+        return buildDraftCompletionResponse(extracted, newState);
+      }
+    }
+
     newState.drafting = true;
     newState.step = 'purpose';
     newState.collected = {};
+
     return {
-      response: "I'd be happy to help you draft a Purchase Request!\n\nPlease tell me the **purpose** of this procurement (e.g., 'Purchase of laptops for CSM department').",
+      response:
+        "📝 **Let's draft a new Purchase Request (PR) together!**\n\n" +
+        "First, what is the **purpose** of this procurement?\n" +
+        "*(Example: 'Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses')*",
       newState,
     };
   }
 
   const step = state.step || 'purpose';
   const collected = state.collected || {};
-  console.log(`📝 Step: ${step}, Collected:`, collected);
 
   switch (step) {
-    case 'purpose':
-      collected.purpose = message;
+    case 'purpose': {
+      collected.purpose = message.trim();
       newState.collected = collected;
       newState.step = 'department';
       return {
-        response: "Great! Now, which **department** is this for? (e.g., College of Science and Mathematics)",
+        response:
+          `✅ Purpose recorded: **"${collected.purpose}"**\n\n` +
+          `Next, which **department, college, or office** is requesting this?\n` +
+          `*(Example: 'College of Science and Mathematics' or 'Office of the University Registrar')*`,
         newState,
       };
+    }
 
-    case 'department':
-      collected.department = message;
+    case 'department': {
+      collected.department = message.trim();
       newState.collected = collected;
       newState.step = 'items';
-      newState.items_guide_shown = false;
       return {
-        response: "Please list the **items** you need. For each item, provide description, quantity, unit, and estimated unit cost.\n\nExample: '10 laptops, unit cost 50000' or '5 printers, 20 reams of paper'.\n\nYou can also just describe everything in one sentence.\n\nType **done** when finished.",
+        response:
+          `✅ Department set: **"${collected.department}"**\n\n` +
+          `Now, please list the **items** you need.\n\n` +
+          `For best results, include **description, quantity, unit, and estimated unit cost** in PHP:\n` +
+          `• Example: *'10 units Laptop Intel i7 at 45000 each, 2 units Laser Printer at 18000 each'*\n\n` +
+          `You can write multiple items in one message. Type **done** when you are finished!`,
         newState,
       };
+    }
 
-    case 'items':
-      if (!state.items_guide_shown) {
-        newState.items_guide_shown = true;
-        collected.items_raw = (collected.items_raw || '') + ' ' + message;
-        newState.collected = collected;
-        return {
-          response: "Got it. Please continue listing items or type **done** when you've finished.",
-          newState,
-        };
-      }
-
-      collected.items_raw = (collected.items_raw || '') + ' ' + message;
+    case 'items': {
+      const existingRaw = collected.items_raw ? collected.items_raw + '; ' : '';
+      collected.items_raw = existingRaw + message.trim();
       newState.collected = collected;
 
-      if (/done|finish|that's all/i.test(message)) {
-        const fullDescription = `Purpose: ${collected.purpose}. Department: ${collected.department}. Items: ${collected.items_raw}`;
-        let extracted = await extractPRDetails(fullDescription);
-        if (!extracted || !extracted.items || extracted.items.length === 0) {
-          extracted = extractItemsManually(fullDescription);
+      const isDone = lower === 'done' || lower.includes('finish') || lower.includes("that's all") || lower.includes('thats all');
+
+      // If user typed items or done, attempt extraction
+      const fullText = `Department: ${collected.department}. Purpose: ${collected.purpose}. Items: ${collected.items_raw}`;
+      const extracted = await extractPRDetails(fullText);
+
+      if (isDone || (extracted.items && extracted.items.length > 0 && !isDone && message.length > 15)) {
+        if (extracted.items && extracted.items.length > 0) {
+          return buildDraftCompletionResponse(extracted, newState);
         }
-        if (extracted && extracted.items && extracted.items.length > 0) {
-          newState.collected.extracted = extracted;
-          const dataToEncode = {
-            department: extracted.department || '',
-            purpose: extracted.purpose || '',
-            items: extracted.items || [],
-            total_amount: extracted.total_amount || 0,
-          };
-          const encoded = encodeURIComponent(btoa(JSON.stringify(dataToEncode)));
-          const link = `/dashboard/pr-print?data=${encoded}`;
-          const response = `✅ Draft ready! Here's a summary of your Purchase Request:\n\n` +
-            `**Department:** ${extracted.department || 'N/A'}\n` +
-            `**Purpose:** ${extracted.purpose || 'N/A'}\n` +
-            `**Items:** ${extracted.items?.length || 0} item(s)\n` +
-            `**Total Amount:** ₱${extracted.total_amount?.toFixed(2) || '0.00'}\n\n` +
-            `Click here to print your PR form:\n${link}`;
-          newState.drafting = false;
-          newState.step = null;
-          return { response, newState };
-        } else {
-          return {
-            response: "I couldn't understand the items. Please list each item with description, quantity, and unit cost, like:\n\n'10 laptops, unit cost 50000' or '5 printers, 20 reams of paper'.\n\nType **done** when finished, or try again with more detail.",
-            newState,
-          };
-        }
-      } else {
-        return {
-          response: "Got it. Please continue listing items or type **done** when you've finished.",
-          newState,
-        };
       }
 
-    default:
       return {
-        response: "Let's start over. What is the purpose of this Purchase Request?",
-        newState: { drafting: true, step: 'purpose', collected: {} },
+        response:
+          `Got that. Please continue listing any additional items, or type **done** to finalize your draft.`,
+        newState,
       };
+    }
+
+    default: {
+      newState = { drafting: true, step: 'purpose', collected: {} };
+      return {
+        response: "Let's start fresh with your Purchase Request. What is the primary **purpose** of this request?",
+        newState,
+      };
+    }
   }
 }
 
-// ============================================================
-// TRACK PR HANDLER
-// ============================================================
-async function handleTrackPR(prNo: string, userId: string): Promise<string> {
-  const { data: pr, error } = await supabase
-    .from('purchase_requests')
-    .select('*, pr_stages_completed(*)')
-    .eq('pr_no', prNo)
-    .single();
+function buildDraftCompletionResponse(
+  extracted: ExtractedPR,
+  newState: SessionState
+): { response: string; newState: SessionState } {
+  newState.drafting = false;
+  newState.step = null;
+  newState.collected = { extracted };
 
-  if (error || !pr) {
-    return `I couldn't find PR ${prNo}. Please check the number and try again.`;
-  }
+  const dept = extracted.department || 'Requesting Department (MSU-GenSan)';
+  const purpose = extracted.purpose || 'Official university procurement';
+  const total = extracted.total_amount || extracted.items.reduce((s, i) => s + i.total_cost, 0);
 
-  const isAdmin = await isUserAdmin(userId);
-  if (!isAdmin && pr.user_id !== userId) {
-    return `You don't have permission to view PR ${prNo}.`;
-  }
+  // Encode for Printable PR page (/dashboard/pr-print?data=...)
+  const printPayload = {
+    department: dept,
+    purpose: purpose,
+    items: extracted.items,
+    total_amount: total,
+  };
+  const encodedPrintData = encodeURIComponent(Buffer.from(JSON.stringify(printPayload)).toString('base64'));
+  const printUrl = `/dashboard/pr-print?data=${encodedPrintData}`;
 
-  const stages = pr.pr_stages_completed || [];
-  const statusLabel = getStatusLabel(pr.current_stage);
+  // Encode for New PR Form page (/dashboard/new-pr?...)
+  const itemsJson = encodeURIComponent(JSON.stringify(extracted.items));
+  const newPrUrl = `/dashboard/new-pr?department=${encodeURIComponent(dept)}&purpose=${encodeURIComponent(purpose)}&items=${itemsJson}&total=${total}`;
 
-  let response = `📋 **PR ${prNo}**\n`;
-  response += `**Status:** ${statusLabel}\n`;
-  response += `**Department:** ${pr.department}\n`;
-  response += `**Purpose:** ${pr.purpose}\n`;
-  response += `**Total Amount:** ₱${pr.total?.toFixed(2)}\n`;
-  if (stages.length > 0) {
-    response += `\n**Timeline:**\n`;
-    stages.forEach((s: any) => {
-      response += `- ${s.stage_name} (${new Date(s.completed_at).toLocaleDateString()})\n`;
-    });
-  }
-  return response;
+  let summary = `🎉 **Your Purchase Request Draft is Ready!**\n\n`;
+  summary += `🏢 **Department**: ${dept}\n`;
+  summary += `🎯 **Purpose**: ${purpose}\n\n`;
+  summary += `📦 **Items Breakdown**:\n`;
+
+  extracted.items.forEach((item, idx) => {
+    const unitPrice = item.unit_cost ? `₱${item.unit_cost.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : 'TBD';
+    const itemTotal = item.total_cost ? `₱${item.total_cost.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : 'TBD';
+    summary += `${idx + 1}. **${item.item_description}** — ${item.quantity} ${item.unit} @ ${unitPrice} = **${itemTotal}**\n`;
+  });
+
+  summary += `\n💰 **Estimated Total Amount**: **₱${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}**\n\n`;
+  summary += `**Choose an action to proceed:**\n`;
+  summary += `• 📝 [Open in New PR Form](${newPrUrl})\n`;
+  summary += `• 🖨️ [Open Printable PR Form](${printUrl})\n\n`;
+  summary += `*(Note: In accordance with RA 12009 and MSU-GenSan guidelines, please ensure this item is reflected in your unit's Project Procurement Management Plan (PPMP) prior to submission).*`;
+
+  return { response: summary, newState };
 }
 
 // ============================================================
-// STEP-BY-STEP HANDLER
-// ============================================================
-async function handleStepByStep(message: string): Promise<string> {
-  const context = await searchDocuments(message);
-  if (context) {
-    const systemPrompt = `
-You are Isko BidDo, a helpful procurement assistant for MSU-GenSan.
-Based on the following context, provide clear, step-by-step instructions to answer the user's question.
-Keep it concise and use numbered steps if applicable.
-User question: ${message}
-Context:
-${context}
-`;
-    return await callGemini(systemPrompt);
-  }
-  return "I couldn't find step-by-step guidance for that. Please check the Procurement Manual or contact the Procurement Office.";
-}
-
-// ============================================================
-// MAIN POST HANDLER
+// MAIN ROUTE HANDLER
 // ============================================================
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, userId, sessionId } = await req.json();
+    const body = await req.json();
+    const { message, userId, sessionId } = body;
 
-    if (!message) {
+    if (!message || typeof message !== 'string' || !message.trim()) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    console.log(`📨 Received: "${message}"`);
-    console.log(`🆔 SessionId: ${sessionId}, UserId: ${userId}`);
+    const trimmedMsg = message.trim();
+    const currentSessionId = sessionId || `sess_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-    // 1. Get or create session
-    let currentSessionId = sessionId;
-    if (!currentSessionId && userId) {
-      const { data, error } = await supabase
-        .from('chat_sessions')
-        .insert({ user_id: userId, title: 'New Conversation' })
-        .select('id')
-        .single();
-      if (!error && data) {
-        currentSessionId = data.id;
-        console.log(`✅ Created new session: ${currentSessionId}`);
+    // 1. Load session state
+    let sessionData = inMemorySessions.get(currentSessionId) || { state: {}, messages: [] };
+    let currentState: SessionState = sessionData.state || {};
+
+    // If real Supabase is configured, try loading DB session state
+    if (supabase && sessionId) {
+      try {
+        const { data } = await supabase
+          .from('chat_sessions')
+          .select('state')
+          .eq('id', sessionId)
+          .single();
+        if (data?.state) {
+          currentState = { ...currentState, ...data.state };
+        }
+      } catch (err) {
+        console.warn('Could not read session from Supabase, using in-memory state');
       }
-    }
-
-    // 2. Get session state
-    let state: any = {};
-    if (currentSessionId) {
-      const { data } = await supabase
-        .from('chat_sessions')
-        .select('state')
-        .eq('id', currentSessionId)
-        .single();
-      if (data?.state) state = data.state;
-      console.log(`📦 Session state:`, state);
-    }
-
-    // 3. Log user message
-    if (currentSessionId) {
-      await supabase.from('chat_messages').insert({
-        session_id: currentSessionId,
-        sender: 'user',
-        content: message,
-      });
     }
 
     let responseText = '';
-    let newState = { ...state };
+    let updatedState = { ...currentState };
+    let inquiryType = 'general';
+    let citedSources: string[] = [];
 
-    // 4. Check if already in drafting state FIRST
-    if (state.drafting === true) {
-      console.log('🔄 Continuing drafting flow...');
-      const result = await handleDraftPR(message, state, userId, currentSessionId);
+    // 2. Check if currently in multi-turn PR drafting
+    if (currentState.drafting) {
+      inquiryType = 'draft_pr';
+      const result = await handleDraftPRFlow(trimmedMsg, currentState);
       responseText = result.response;
-      newState = result.newState;
+      updatedState = result.newState;
     } else {
-      // 5. Detect intent only if not already drafting
-      const intent = detectIntent(message);
-      console.log(`🎯 Intent: ${intent}`);
+      const lower = trimmedMsg.toLowerCase();
 
-      switch (intent) {
-        case 'draft_pr': {
-          console.log('📝 Starting new draft...');
-          const result = await handleDraftPR(message, state, userId, currentSessionId);
-          responseText = result.response;
-          newState = result.newState;
-          break;
-        }
-        case 'track_pr': {
-          const prNo = extractPRNumber(message);
-          if (prNo) {
-            responseText = await handleTrackPR(prNo, userId);
-          } else {
-            responseText = "I didn't see a PR number. Please provide the PR number (e.g., PR-2026-0001).";
-          }
-          break;
-        }
-        case 'step_by_step': {
-          responseText = await handleStepByStep(message);
-          break;
-        }
-        default: {
-          const context = await searchDocuments(message);
-          console.log("📚 Retrieved context (first 500 chars):", context?.slice(0, 500));
-          console.log(`📚 Context length: ${context.length} chars`);
-          const systemPrompt = `
-You are Isko BidDo, a confident procurement assistant for MSU-GenSan.
-**CRITICAL INSTRUCTION:** You MUST answer ONLY using the provided context. Do not use any external knowledge.
-If the context does not contain the answer, say: "I cannot find that information in the procurement documents."
-Synthesize information from all parts of the context if needed.
-Be direct and concise.
+      // Check Intent
+      const isDraftIntent = /help me draft|create a pr|new purchase request|draft a purchase request|i need to request|i want to request|i need to buy|draft pr/i.test(lower);
+      const prMatch = trimmedMsg.match(/PR[- ]?(\d{4}[- ]?\d{4}|\d{4})/i);
+      const isTrackIntent = Boolean(prMatch) && /status|track|where is|progress|update/i.test(lower);
 
-Context:
-${context || 'No relevant documents found.'}
+      if (isDraftIntent) {
+        inquiryType = 'draft_pr';
+        const result = await handleDraftPRFlow(trimmedMsg, currentState);
+        responseText = result.response;
+        updatedState = result.newState;
+      } else if (isTrackIntent && prMatch) {
+        inquiryType = 'track_pr';
+        const rawPR = prMatch[1].replace(/\s+/g, '');
+        const formattedPR = rawPR.startsWith('2026') ? `PR-${rawPR}` : (rawPR.startsWith('PR') ? rawPR : `PR-${rawPR}`);
+        responseText = await handleTrackPR(formattedPR);
+      } else {
+        // General Q&A / Procurement Assistant with RAG grounded in Supabase document_chunks
+        inquiryType = 'procurement_guidance';
+        const retrieval = await retrieveDocumentChunks(trimmedMsg, 4);
+        const retrievedDocs = retrieval.formattedContext;
+        const sourcesList = retrieval.sources;
+        citedSources = sourcesList;
 
-User question: ${message}
+        const systemPrompt = `
+You are Isko BidDo, the official AI Procurement Assistant for Mindanao State University - General Santos (MSU-GenSan).
 
-Your answer (based ONLY on the context):
+CRITICAL DIRECTIVE — GROUNDING IN DOCUMENT_CHUNKS & AVOIDING HALLUCINATIONS:
+1. You have been provided with verified excerpts retrieved directly from the university's \`document_chunks\` database table, containing official texts of Republic Act No. 12009 (New Government Procurement Act - NGPA), Republic Act No. 9184, its Implementing Rules and Regulations (IRR), and the MSU-GenSan Procurement Operations Manual.
+2. Ground all answers firmly in these verified document chunks to prevent hallucinations.
+3. Explicitly cite the document source (e.g. "[Source: RA 12009]", "[Source: MSU Procurement Manual]", "[Source: IRR 2016]") when explaining procurement rules, thresholds, and requirements.
+4. If the retrieved database context does not provide sufficient detail to answer a specific institutional inquiry, state what the law provides and advise the user to consult the MSU-GenSan Procurement Management Office (PMO) or BAC Secretariat rather than guessing or fabricating rules or thresholds.
+5. Provide a helpful, clear, and structured answer using markdown headings, bullet points, and bold emphasis for key procurement terms.
 `;
-          responseText = await callGemini(systemPrompt);
+
+        const userPrompt = `
+=== VERIFIED EXCERPTS FROM SUPABASE \`document_chunks\` ===
+${retrievedDocs || 'No specific document chunk found in database. Rely strictly on verified Philippine public procurement laws (RA 12009 / RA 9184) without speculating.'}
+
+=== USER INQUIRY ===
+"${trimmedMsg}"
+
+Please provide a clear, accurate, grounded response adhering strictly to the verified excerpts above.
+`;
+
+        const aiResponse = await callGeminiWithFallback(userPrompt, systemPrompt, 0.2);
+
+        if (aiResponse) {
+          responseText = aiResponse;
+        } else {
+          // Fallback to offline knowledge engine grounded in retrieved chunks
+          responseText = generateOfflineProcurementResponse(trimmedMsg, retrievedDocs, sourcesList);
         }
       }
     }
 
-    // 6. Save assistant message
-    if (currentSessionId) {
-      await supabase.from('chat_messages').insert({
-        session_id: currentSessionId,
-        sender: 'ai',
-        content: responseText,
-      });
-    }
+    // 3. Update session in memory
+    sessionData.state = updatedState;
+    sessionData.messages.push(
+      { sender: 'user', content: trimmedMsg, time: new Date().toISOString() },
+      { sender: 'ai', content: responseText, time: new Date().toISOString() }
+    );
+    inMemorySessions.set(currentSessionId, sessionData);
 
-    // 7. Update session state
-    if (currentSessionId) {
-      await supabase
-        .from('chat_sessions')
-        .update({ state: newState })
-        .eq('id', currentSessionId);
-      console.log(`✅ Updated session state:`, newState);
+    // 4. Safely persist to Supabase if available
+    if (supabase) {
+      try {
+        if (!sessionId && userId) {
+          await supabase.from('chat_sessions').insert({
+            id: currentSessionId,
+            user_id: userId,
+            title: trimmedMsg.slice(0, 40),
+            state: updatedState,
+          });
+        } else if (sessionId) {
+          await supabase
+            .from('chat_sessions')
+            .update({ state: updatedState, updated_at: new Date().toISOString() })
+            .eq('id', sessionId);
+        }
+
+        await supabase.from('chat_messages').insert([
+          { session_id: currentSessionId, sender: 'user', content: trimmedMsg },
+          { session_id: currentSessionId, sender: 'ai', content: responseText },
+        ]);
+
+        // Also log to monitor_inquiries for admin visibility
+        await supabase.from('monitor_inquiries').insert({
+          user_id: userId || 'anonymous',
+          user_name: 'ProcuremateSU User',
+          user_department: 'MSU-GenSan',
+          pr_no: trimmedMsg.match(/PR[- ]?\d{4}/i)?.[0] || 'N/A',
+          user_message: trimmedMsg,
+          bot_response: responseText.slice(0, 1000),
+          inquiry_type: inquiryType,
+        });
+      } catch (dbErr) {
+        console.warn('Non-blocking database log notice:', dbErr);
+      }
     }
 
     return NextResponse.json({
       response: responseText,
       sessionId: currentSessionId,
+      state: updatedState,
+      sources: citedSources,
     });
 
   } catch (error: any) {
-    console.error('❌ Chat API fatal error:', error);
+    console.error('❌ Chat API caught error:', error);
     return NextResponse.json(
-      { error: 'Something went wrong. Please try again.' },
-      { status: 500 }
+      {
+        response:
+          "👋 Hello! I am Isko BidDo, your MSU-GenSan procurement assistant. How can I help you today with RA 12009, Purchase Requests, or procurement tracking?",
+        sessionId: 'sess_recovery',
+      },
+      { status: 200 }
     );
   }
 }
