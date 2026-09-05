@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import PRPrintContent from "./PRPrintContent";
+import SecurePRPrintContent from "./SecurePRPrintContent";
 
 export default function Page() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
-      <PRPrintContent />
+      <SecurePRPrintContent />
     </Suspense>
   );
 }
