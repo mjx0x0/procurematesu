@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
+import {
+  PROCUREMENT_STAGE_KEYS,
+  PROCUREMENT_STAGE_LABELS,
+  TERMINAL_STAGES,
+} from '@/lib/procurement-process';
 
-const STAGE_FLOW = ['pending','budget_office','chancellor_approval','procurement_processing','canvassing','for_award','po_issued','completed'] as const;
 type Action = 'complete' | 'remark' | 'reject';
-
-const STAGE_LABELS: Record<string, string> = {
-  pending: 'PR Submission', budget_office: 'Budget Clearance', chancellor_approval: 'Chancellor Approval',
-  procurement_processing: 'RFQ Generation', canvassing: 'Abstract of Quotations', for_award: 'BAC Endorsement',
-  po_issued: 'PO Issued', completed: 'Completed', rejected: 'PR Rejected',
-};
 const JSON_HEADERS = { 'Cache-Control': 'no-store' };
 
 export async function POST(req: NextRequest) {
@@ -33,7 +31,7 @@ export async function POST(req: NextRequest) {
     if (!prNo) return NextResponse.json({ error: 'PR number is required.' }, { status: 400, headers: JSON_HEADERS });
     if (!/^PR-[A-Z0-9-]{3,40}$/i.test(prNo)) return NextResponse.json({ error: 'Invalid PR number format.' }, { status: 400, headers: JSON_HEADERS });
     if (remarks.length > 2000) return NextResponse.json({ error: 'Remarks must not exceed 2,000 characters.' }, { status: 400, headers: JSON_HEADERS });
-    if (action === 'complete' && !STAGE_FLOW.includes(newStatus as (typeof STAGE_FLOW)[number])) return NextResponse.json({ error: 'Invalid procurement stage.' }, { status: 400, headers: JSON_HEADERS });
+    if (action === 'complete' && !PROCUREMENT_STAGE_KEYS.includes(newStatus as any)) return NextResponse.json({ error: 'Invalid procurement stage.' }, { status: 400, headers: JSON_HEADERS });
     if ((action === 'remark' || action === 'reject') && !remarks) return NextResponse.json({ error: 'A remark is required for this action.' }, { status: 400, headers: JSON_HEADERS });
 
     const supabase = await createClient();
@@ -51,12 +49,13 @@ export async function POST(req: NextRequest) {
     const { data: pr, error: prError } = await db.from('purchase_requests').select('pr_no, current_stage, current_status').eq('pr_no', prNo).single();
     if (prError || !pr) return NextResponse.json({ error: 'Purchase request not found.' }, { status: 404, headers: JSON_HEADERS });
 
-    if (['completed', 'rejected', 'cancelled'].includes(pr.current_stage)) return NextResponse.json({ error: 'This purchase request is already in a terminal status.' }, { status: 409, headers: JSON_HEADERS });
+    if (TERMINAL_STAGES.includes(pr.current_stage as any)) return NextResponse.json({ error: 'This purchase request is already in a terminal status.' }, { status: 409, headers: JSON_HEADERS });
     const now = new Date().toISOString();
 
     if (action === 'remark') {
+      const currentLabel = PROCUREMENT_STAGE_LABELS[pr.current_stage] || pr.current_stage;
       const { error } = await db.from('pr_stages_completed').insert({
-        pr_no: prNo, stage_name: `${STAGE_LABELS[pr.current_stage] || pr.current_stage} — Remark`,
+        pr_no: prNo, stage_name: `${currentLabel} — Remark`,
         stage_key: pr.current_stage, status: 'remark', completed_at: now, remarks,
       });
       if (error) { console.error('[complete-stage] Remark insert failed:', error.message); return NextResponse.json({ error: 'Failed to save the remark.' }, { status: 500, headers: JSON_HEADERS }); }
@@ -75,14 +74,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, action: 'reject', newStatus: 'rejected' }, { headers: JSON_HEADERS });
     }
 
-    const currentIndex = STAGE_FLOW.indexOf(pr.current_stage as (typeof STAGE_FLOW)[number]);
-    const nextIndex = STAGE_FLOW.indexOf(newStatus as (typeof STAGE_FLOW)[number]);
-    if (currentIndex < 0 || nextIndex !== currentIndex + 1) return NextResponse.json({ error: 'Invalid stage transition.' }, { status: 409, headers: JSON_HEADERS });
+    const currentIndex = PROCUREMENT_STAGE_KEYS.indexOf(pr.current_stage as any);
+    const nextIndex = PROCUREMENT_STAGE_KEYS.indexOf(newStatus as any);
+    if (currentIndex < 0 || nextIndex !== currentIndex + 1) return NextResponse.json({ error: 'Invalid stage transition. The PR must follow the official 20-step procurement sequence.' }, { status: 409, headers: JSON_HEADERS });
 
     const { error: updateError } = await db.from('purchase_requests').update({ current_stage: newStatus, current_status: newStatus, updated_at: now }).eq('pr_no', prNo).eq('current_stage', pr.current_stage);
     if (updateError) return NextResponse.json({ error: 'Failed to update purchase request.' }, { status: 500, headers: JSON_HEADERS });
 
-    const { error: historyError } = await db.from('pr_stages_completed').insert({ pr_no: prNo, stage_name: STAGE_LABELS[newStatus], stage_key: newStatus, status: 'completed', completed_at: now, remarks: remarks || 'No remarks provided.' });
+    const { error: historyError } = await db.from('pr_stages_completed').insert({ pr_no: prNo, stage_name: PROCUREMENT_STAGE_LABELS[newStatus], stage_key: newStatus, status: 'completed', completed_at: now, remarks: remarks || 'No remarks provided.' });
     if (historyError) {
       await db.from('purchase_requests').update({ current_stage: pr.current_stage, current_status: pr.current_status, updated_at: new Date().toISOString() }).eq('pr_no', prNo).eq('current_stage', newStatus);
       return NextResponse.json({ error: 'Stage history could not be recorded. No stage change was kept.' }, { status: 500, headers: JSON_HEADERS });
