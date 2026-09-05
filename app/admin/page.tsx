@@ -25,6 +25,9 @@ import {
   RefreshCw,
   X,
   MessageSquare,
+  Calendar,
+  Check,
+  ArrowRight,
 } from "lucide-react";
 
 interface PR {
@@ -39,6 +42,13 @@ interface PR {
   pr_date: string;
 }
 
+interface StageHistory {
+  stage_name: string;
+  stage_key: string;
+  completed_at: string;
+  remarks?: string;
+}
+
 interface Stats {
   total: number;
   pending: number;
@@ -46,6 +56,31 @@ interface Stats {
   completed: number;
   cancelled: number;
 }
+
+// ============================================================
+// STAGE DEFINITION – matches the images exactly
+// ============================================================
+const STAGES = [
+  { key: "pending", label: "PR Submission" },
+  { key: "budget_office", label: "Budget Clearance" },
+  { key: "chancellor_approval", label: "Chancellor Approval" },
+  { key: "procurement_processing", label: "RFQ Generation" },
+  { key: "canvassing", label: "Abstract of Quotations" },
+  { key: "for_award", label: "BAC Endorsement" },
+  { key: "po_issued", label: "PO Issued" },
+  { key: "completed", label: "Completed" },
+];
+
+const STAGE_STATUS_MAP: Record<string, string> = {
+  pending: "pending",
+  budget_office: "budget_office",
+  chancellor_approval: "chancellor_approval",
+  procurement_processing: "procurement_processing",
+  canvassing: "canvassing",
+  for_award: "for_award",
+  po_issued: "po_issued",
+  completed: "completed",
+};
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -67,6 +102,12 @@ export default function AdminDashboard() {
   const [selectedPR, setSelectedPR] = useState<PR | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  // State for Stage Completion Modal
+  const [showStageModal, setShowStageModal] = useState(false);
+  const [stageToComplete, setStageToComplete] = useState<string | null>(null);
+  const [stageRemarks, setStageRemarks] = useState("");
+  const [stageHistory, setStageHistory] = useState<StageHistory[]>([]);
 
   // Check admin role and load data
   useEffect(() => {
@@ -117,10 +158,10 @@ export default function AdminDashboard() {
       const prList = (prsData as PR[]) || [];
       const total = prList.length;
       const pending = prList.filter((p: PR) => p.current_stage === "draft" || p.current_stage === "pending").length;
-      const in_progress = prList.filter((p: PR) => 
-        p.current_stage !== "draft" && 
-        p.current_stage !== "pending" && 
-        p.current_stage !== "completed" && 
+      const in_progress = prList.filter((p: PR) =>
+        p.current_stage !== "draft" &&
+        p.current_stage !== "pending" &&
+        p.current_stage !== "completed" &&
         p.current_stage !== "cancelled"
       ).length;
       const completed = prList.filter((p: PR) => p.current_stage === "completed").length;
@@ -138,7 +179,7 @@ export default function AdminDashboard() {
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         p.pr_no?.toLowerCase().includes(term) ||
         p.purpose?.toLowerCase().includes(term) ||
         p.department?.toLowerCase().includes(term)
@@ -197,38 +238,91 @@ export default function AdminDashboard() {
     return labels[status] || status;
   };
 
-  const handleStatusUpdate = async (prNo: string, newStatus: string) => {
+  // Load stage history for a PR
+  const loadStageHistory = async (prNo: string) => {
+    const { data, error } = await supabase
+      .from("pr_stages_completed")
+      .select("*")
+      .eq("pr_no", prNo)
+      .order("completed_at", { ascending: true });
+
+    if (!error && data) {
+      setStageHistory(data as StageHistory[]);
+    } else {
+      setStageHistory([]);
+    }
+  };
+
+  // Open detail modal and load history
+  const handleViewDetails = async (pr: PR) => {
+    setSelectedPR(pr);
+    await loadStageHistory(pr.pr_no);
+    setShowDetailModal(true);
+  };
+
+  // Open the stage completion modal
+  const handleOpenStageModal = (stageKey: string) => {
+    setStageToComplete(stageKey);
+    setStageRemarks("");
+    setShowStageModal(true);
+  };
+
+  // Complete a stage with remarks
+  const handleCompleteStage = async () => {
+    if (!selectedPR || !stageToComplete) return;
     if (updatingStatus) return;
+
+    // Validate remarks (optional, but we'll require it)
+    if (!stageRemarks.trim()) {
+      alert("Please add a remark/note for this stage completion.");
+      return;
+    }
+
     setUpdatingStatus(true);
 
     try {
+      const newStatus = stageToComplete;
+
       // Update PR status
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from("purchase_requests")
-        .update({ 
+        .update({
           current_stage: newStatus,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
-        .eq("pr_no", prNo);
+        .eq("pr_no", selectedPR.pr_no);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
-      // Add to stage history
-      await supabase
+      // Add to stage history with remarks
+      const { error: historyError } = await supabase
         .from("pr_stages_completed")
         .insert({
-          pr_no: prNo,
+          pr_no: selectedPR.pr_no,
           stage_name: getStatusLabel(newStatus),
           stage_key: newStatus,
           completed_at: new Date().toISOString(),
+          remarks: stageRemarks.trim(),
         });
 
+      if (historyError) throw historyError;
+
+      // Reload data
       await loadData();
-      setSelectedPR(null);
-      setShowDetailModal(false);
+      await loadStageHistory(selectedPR.pr_no);
+
+      // Update selected PR with new stage
+      setSelectedPR({
+        ...selectedPR,
+        current_stage: newStatus,
+      });
+
+      setShowStageModal(false);
+      setStageToComplete(null);
+      setStageRemarks("");
     } catch (err) {
-      console.error("Status update error:", err);
-      alert("Failed to update status. Please try again.");
+      console.error("Stage update error:", err);
+      alert("Failed to complete stage. Please try again.");
     } finally {
       setUpdatingStatus(false);
     }
@@ -240,10 +334,9 @@ export default function AdminDashboard() {
     }
 
     try {
-      // Delete items first (if any)
       await supabase.from("pr_items").delete().eq("pr_no", prNo);
+      await supabase.from("pr_stages_completed").delete().eq("pr_no", prNo);
 
-      // Delete PR
       const { error } = await supabase
         .from("purchase_requests")
         .delete()
@@ -261,11 +354,39 @@ export default function AdminDashboard() {
 
   const uniqueDepartments = [...new Set(prs.map(p => p.department).filter(Boolean))];
 
+  // Get stage status for the timeline
+  const getStageStatus = (stageKey: string, pr: PR) => {
+    const currentIndex = STAGES.findIndex(s => s.key === pr.current_stage);
+    const stageIndex = STAGES.findIndex(s => s.key === stageKey);
+
+    // Check if this stage is already completed (exists in history)
+    const isCompleted = stageHistory.some(h => h.stage_key === stageKey);
+
+    if (isCompleted) return "completed";
+    if (stageIndex < currentIndex) return "completed";
+    if (stageIndex === currentIndex) return "current";
+    return "pending";
+  };
+
+  // Get the next pending stage (the one the admin should complete)
+  const getNextPendingStage = (pr: PR) => {
+    const currentIndex = STAGES.findIndex(s => s.key === pr.current_stage);
+    // If current stage is the last one, no pending stage
+    if (currentIndex >= STAGES.length - 1) return null;
+    // Next stage is the one after current index
+    return STAGES[currentIndex + 1];
+  };
+
+  // Check if the PR is completed or cancelled
+  const isTerminal = (pr: PR) => {
+    return pr.current_stage === "completed" || pr.current_stage === "cancelled";
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
+      <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[#7A1315] mx-auto" />
+          <Loader2 className="h-12 w-12 animate-spin text-[#7C1D2E] mx-auto" />
           <p className="mt-4 text-stone-600 font-medium">Loading admin dashboard...</p>
         </div>
       </div>
@@ -273,24 +394,24 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
+    <div className="min-h-screen bg-[#F9F7F4]">
       {/* Navigation */}
       <nav className="bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2.5">
-            <div className="bg-[#7A1315] p-2 rounded-xl text-amber-300 border border-amber-400/30 shadow-xs">
-              <FileText className="h-5 w-5 text-amber-200" />
+            <div className="bg-[#7C1D2E] p-2 rounded-xl text-[#D4A843] border border-[#D4A843]/30 shadow-xs">
+              <FileText className="h-5 w-5" />
             </div>
-            <span className="font-bold text-xl text-[#4D0C0D]">
-              Procuremate<span className="text-[#B88E13]">SU</span>
+            <span className="font-bold text-xl text-[#5A1420]">
+              Procuremate<span className="text-[#D4A843]">SU</span>
             </span>
-            <span className="text-xs bg-red-100 text-[#7A1315] font-bold px-2.5 py-0.5 rounded-full border border-red-200">
+            <span className="text-xs bg-red-100 text-[#7C1D2E] font-bold px-2.5 py-0.5 rounded-full border border-red-200">
               Admin Portal
             </span>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-xs text-stone-600 hidden sm:inline font-medium">
-              <User className="h-3.5 w-3.5 inline mr-1 text-[#7A1315]" />
+              <User className="h-3.5 w-3.5 inline mr-1 text-[#7C1D2E]" />
               {user?.email}
             </span>
             <button
@@ -308,14 +429,14 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-[#4D0C0D]">Admin Dashboard</h1>
+            <h1 className="text-3xl font-extrabold text-[#5A1420]">Admin Dashboard</h1>
             <p className="text-stone-600 mt-1">MSU-GenSan Purchase Requests &amp; Modality Oversight</p>
           </div>
           <button
             onClick={() => window.location.reload()}
             className="bg-white text-stone-700 px-4 py-2 rounded-xl hover:bg-stone-50 transition-colors flex items-center gap-2 border border-stone-300 text-sm font-medium shadow-2xs"
           >
-            <RefreshCw className="h-4 w-4 text-[#7A1315]" />
+            <RefreshCw className="h-4 w-4 text-[#7C1D2E]" />
             Refresh
           </button>
         </div>
@@ -325,11 +446,11 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-200/90">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-[#7A1315]">{stats.total}</div>
+                <div className="text-2xl font-bold text-[#7C1D2E]">{stats.total}</div>
                 <div className="text-xs font-semibold text-stone-600">Total PRs</div>
               </div>
               <div className="p-2 bg-red-50 rounded-lg">
-                <FileCheck className="h-5 w-5 text-[#7A1315]" />
+                <FileCheck className="h-5 w-5 text-[#7C1D2E]" />
               </div>
             </div>
           </div>
@@ -377,24 +498,26 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-xl p-5 shadow-sm border border-stone-200/90 text-center col-span-2 sm:col-span-3 lg:col-span-5 flex items-center justify-between">
-            <div className="flex items-center gap-3 text-left">
-              <div className="p-2.5 bg-red-50 text-[#7A1315] rounded-xl">
-                <MessageSquare className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-bold text-[#4D0C0D]">Monitor Chatbot Inquiries</h3>
-                <p className="text-xs text-stone-600">Review faculty &amp; staff inquiries to Isko BidDo regarding procurement rules &amp; PR tracking.</p>
-              </div>
+        </div>
+
+        {/* Monitor Inquiries Card */}
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-stone-200/90 text-center col-span-2 sm:col-span-3 lg:col-span-5 flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3 text-left">
+            <div className="p-2.5 bg-red-50 text-[#7C1D2E] rounded-xl">
+              <MessageSquare className="h-6 w-6" />
             </div>
-            <Link
-              href="/admin/inquiries"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#7A1315] to-[#8B1518] hover:from-[#630E10] hover:to-[#7A1315] text-white rounded-xl text-xs font-semibold transition-all shadow-2xs border border-amber-400/30"
-            >
-              <span>View Inquiries</span>
-              <span>&rarr;</span>
-            </Link>
+            <div>
+              <h3 className="font-bold text-[#5A1420]">Monitor Chatbot Inquiries</h3>
+              <p className="text-xs text-stone-600">Review faculty &amp; staff inquiries to Isko BidDo regarding procurement rules &amp; PR tracking.</p>
+            </div>
           </div>
+          <Link
+            href="/admin/inquiries"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#7C1D2E] to-[#8B1D30] hover:from-[#5A1420] hover:to-[#7C1D2E] text-white rounded-xl text-xs font-semibold transition-all shadow-2xs border border-[#D4A843]/30"
+          >
+            <span>View Inquiries</span>
+            <span>&rarr;</span>
+          </Link>
         </div>
 
         {/* Filters & Search */}
@@ -407,7 +530,7 @@ export default function AdminDashboard() {
                 placeholder="Search by PR number, purpose, or department..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7C1D2E] focus:border-transparent outline-none transition-all bg-white"
               />
             </div>
             <div className="flex gap-4">
@@ -415,7 +538,7 @@ export default function AdminDashboard() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="appearance-none pl-4 pr-8 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
+                  className="appearance-none pl-4 pr-8 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7C1D2E] focus:border-transparent outline-none transition-all bg-white"
                 >
                   <option value="all">All Statuses</option>
                   <option value="draft">Draft</option>
@@ -437,7 +560,7 @@ export default function AdminDashboard() {
                 <select
                   value={departmentFilter}
                   onChange={(e) => setDepartmentFilter(e.target.value)}
-                  className="appearance-none pl-4 pr-8 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
+                  className="appearance-none pl-4 pr-8 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7C1D2E] focus:border-transparent outline-none transition-all bg-white"
                 >
                   <option value="all">All Departments</option>
                   {uniqueDepartments.map((dept) => (
@@ -454,8 +577,8 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-stone-200/90 overflow-hidden">
           <div className="px-6 py-4 border-b border-stone-200 flex justify-between items-center bg-stone-50/50">
             <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#7A1315]" />
-              <h2 className="text-base font-bold text-[#4D0C0D]">Purchase Requests</h2>
+              <FileText className="h-5 w-5 text-[#7C1D2E]" />
+              <h2 className="text-base font-bold text-[#5A1420]">Purchase Requests</h2>
               <span className="text-xs bg-stone-200 px-2 py-0.5 rounded-full font-semibold text-stone-700">({filteredPrs.length})</span>
             </div>
           </div>
@@ -465,7 +588,6 @@ export default function AdminDashboard() {
               <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500">No purchase requests found.</p>
             </div>
-          
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -500,11 +622,8 @@ export default function AdminDashboard() {
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
-                            onClick={() => {
-                              setSelectedPR(pr);
-                              setShowDetailModal(true);
-                            }}
-                            className="text-[#7A1315] hover:text-[#4D0C0D] transition-colors p-1"
+                            onClick={() => handleViewDetails(pr)}
+                            className="text-[#7C1D2E] hover:text-[#5A1420] transition-colors p-1"
                             title="View Details"
                           >
                             <Eye className="h-4 w-4" />
@@ -527,14 +646,21 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Detail Modal */}
+      {/* ============================================================
+          DETAIL MODAL – Stage Timeline (matches your images)
+          ============================================================ */}
       {showDetailModal && selectedPR && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 animate-fade-in-up">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900">
-                {selectedPR.pr_no} – Details
-              </h3>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  PR Details: <span className="text-[#7C1D2E]">{selectedPR.pr_no}</span>
+                </h3>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {selectedPR.department} • ₱{selectedPR.total?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </p>
+              </div>
               <button
                 onClick={() => setShowDetailModal(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -543,76 +669,223 @@ export default function AdminDashboard() {
               </button>
             </div>
 
+            {/* Progress Indicator */}
+            <div className="mb-6">
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>Progress</span>
+                <span>
+                  {STAGES.findIndex(s => s.key === selectedPR.current_stage) + 1} / {STAGES.length}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-[#7C1D2E] h-2 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${((STAGES.findIndex(s => s.key === selectedPR.current_stage) + 1) / STAGES.length) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Stage Timeline */}
+            <div className="space-y-0">
+              {STAGES.map((stage, index) => {
+                const stageStatus = getStageStatus(stage.key, selectedPR);
+                const historyEntry = stageHistory.find(h => h.stage_key === stage.key);
+                const isCompleted = stageStatus === "completed";
+                const isCurrent = stageStatus === "current";
+                const isPending = stageStatus === "pending";
+                const isLast = index === STAGES.length - 1;
+
+                return (
+                  <div key={stage.key} className="relative">
+                    {/* Vertical Line */}
+                    {!isLast && (
+                      <div
+                        className={`absolute left-5 top-10 w-0.5 h-12 ${
+                          isCompleted ? "bg-emerald-500" : "bg-gray-200"
+                        }`}
+                      />
+                    )}
+
+                    <div className="flex items-start gap-4 py-2">
+                      {/* Icon */}
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 z-10 ${
+                          isCompleted
+                            ? "bg-emerald-500 text-white"
+                            : isCurrent
+                            ? "bg-[#D4A843] text-white ring-4 ring-[#D4A843]/30"
+                            : "bg-gray-200 text-gray-400"
+                        }`}
+                      >
+                        {isCompleted ? (
+                          <Check className="h-5 w-5" />
+                        ) : isCurrent ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <div className="h-3 w-3 rounded-full bg-gray-300" />
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 pt-1">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p
+                              className={`font-medium ${
+                                isCompleted
+                                  ? "text-gray-700"
+                                  : isCurrent
+                                  ? "text-[#5A1420] font-bold"
+                                  : "text-gray-400"
+                              }`}
+                            >
+                              {stage.label}
+                            </p>
+                            {historyEntry && (
+                              <p className="text-xs text-gray-400">
+                                {new Date(historyEntry.completed_at).toLocaleString("en-PH", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                                {historyEntry.remarks && (
+                                  <span className="block text-gray-500 text-xs mt-0.5 italic">
+                                    Note: {historyEntry.remarks}
+                                  </span>
+                                )}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Action Button */}
+                          {isCurrent && !isTerminal(selectedPR) && (
+                            <button
+                              onClick={() => handleOpenStageModal(stage.key)}
+                              className="px-4 py-1.5 bg-[#D4A843] hover:bg-[#C49A3A] text-white text-xs font-semibold rounded-lg transition shadow-sm flex items-center gap-1"
+                            >
+                              <ArrowRight className="h-3 w-3" />
+                              Complete Stage
+                            </button>
+                          )}
+
+                          {isCompleted && (
+                            <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                              Completed
+                            </span>
+                          )}
+
+                          {isPending && !isCurrent && (
+                            <span className="text-xs text-gray-400">Pending</span>
+                          )}
+
+                          {isTerminal(selectedPR) && (
+                            <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                              {selectedPR.current_stage === "completed" ? "✅ Done" : "❌ Cancelled"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="pt-6 border-t border-gray-200 flex justify-end">
+              <button
+                onClick={() => setShowDetailModal(false)}
+                className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================
+          COMPLETE STAGE MODAL – with Remarks (matches your second image)
+          ============================================================ */}
+      {showStageModal && stageToComplete && selectedPR && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in-up">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-[#D4A843]/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <CheckCircle className="h-8 w-8 text-[#D4A843]" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">Complete Stage</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {selectedPR.pr_no} • {getStatusLabel(stageToComplete)}
+              </p>
+            </div>
+
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">PR Number</p>
-                  <p className="font-medium">{selectedPR.pr_no}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Date</p>
-                  <p className="font-medium">{new Date(selectedPR.created_at).toLocaleDateString()}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Department</p>
-                  <p className="font-medium">{selectedPR.department}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Requested By</p>
-                  <p className="font-medium">{selectedPR.printed_name || "N/A"}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-500">Purpose</p>
-                  <p className="font-medium">{selectedPR.purpose}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Total Amount</p>
-                  <p className="text-xl font-bold text-[#7A1315]">
-                    ₱{selectedPR.total?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Status</p>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedPR.current_stage)}`}>
-                    {getStatusLabel(selectedPR.current_stage)}
-                  </span>
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  PR Number
+                </label>
+                <p className="text-sm font-medium text-gray-900 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
+                  {selectedPR.pr_no}
+                </p>
               </div>
 
-              <div className="pt-4 border-t border-gray-200">
-                <p className="text-sm font-medium text-gray-700 mb-2">Update Status</p>
-                <div className="flex flex-wrap gap-2">
-                  {["pending", "for_approval", "budget_office", "chancellor_approval", "procurement_processing", "canvassing", "bidding", "for_award", "po_issued", "completed", "cancelled"].map((status) => (
-                    <button
-                      key={status}
-                      onClick={() => handleStatusUpdate(selectedPR.pr_no, status)}
-                      disabled={updatingStatus || selectedPR.current_stage === status}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                        selectedPR.current_stage === status
-                          ? "bg-[#7A1315] text-white shadow-xs"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                      {getStatusLabel(status)}
-                    </button>
-                  ))}
-                </div>
-                {updatingStatus && (
-                  <p className="text-sm text-gray-500 mt-2 flex items-center gap-2">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Stage
+                </label>
+                <p className="text-sm font-medium text-gray-900 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
+                  {getStatusLabel(stageToComplete)}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Notes / Remarks <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={stageRemarks}
+                  onChange={(e) => setStageRemarks(e.target.value)}
+                  placeholder="Enter any notes or comments for this stage completion..."
+                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#D4A843] focus:border-transparent outline-none transition-all bg-white min-h-[100px] resize-y"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Please provide a brief remark for tracking purposes.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-gray-200">
+              <button
+                onClick={() => {
+                  setShowStageModal(false);
+                  setStageToComplete(null);
+                  setStageRemarks("");
+                }}
+                className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCompleteStage}
+                disabled={updatingStatus || !stageRemarks.trim()}
+                className="px-5 py-2 bg-[#D4A843] hover:bg-[#C49A3A] text-white rounded-lg transition shadow-sm flex items-center gap-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {updatingStatus ? (
+                  <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Updating status...
-                  </p>
+                    Completing...
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4" />
+                    Complete Stage
+                  </>
                 )}
-              </div>
-
-              <div className="pt-4 border-t border-gray-200 flex justify-end gap-2">
-                <button
-                  onClick={() => setShowDetailModal(false)}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
+              </button>
             </div>
           </div>
         </div>
