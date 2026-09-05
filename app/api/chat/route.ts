@@ -220,14 +220,12 @@ function generateOfflineProcurementResponse(query: string, retrievedContext: str
     return (
       "📞 **Mindanao State University - General Santos Procurement Management Office (PMO)**\n\n" +
       "Here are the official contact details for procurement inquiries, PR document submissions, and supplier coordination:\n\n" +
-      "• **Office Name**: Procurement Management Office (PMO) & Bids and Awards Committee (BAC) Secretariat\n" +
-      "• **Office Location**: 2nd Floor, Administration Building, Mindanao State University - General Santos City, Fatima, General Santos City, 9500 South Cotabato, Philippines\n" +
-      "• **Official Emails**:\n" +
-      "  - Procurement Office: `procurement@msugensan.edu.ph`\n" +
-      "  - BAC Secretariat: `bac.secretariat@msugensan.edu.ph`\n" +
-      "• **Telephone / Landline**: (083) 552-5190 / (083) 887-2178\n" +
+      "• **Office Name**: Procurement Management Office\n" +
+      "• **Office Location**: STTC, Mindanao State University - General Santos City, Fatima, General Santos City, 9500 South Cotabato, Philippines\n" +
+      "• **Email**: `procurement@msugensan.edu.ph`\n" +
+      "• **Contact No.**: +63 908 810 5634\n" +
       "• **Office Hours**: Monday to Friday, 8:00 AM – 5:00 PM (Philippine Standard Time, excluding non-working holidays)\n" +
-      "• **Head of Procuring Entity (HoPE)**: Atty. Shidik T. Abantas, MDM, LLM (University Chancellor)\n\n" +
+      "• **Head of the Procurement Management Office**: Prof. Nelson P. Benares, Jr.\n\n" +
       "Feel free to coordinate directly with the PMO for hardcopy attachments, canvass evaluations, or PhilGEPS postings."
     );
   }
