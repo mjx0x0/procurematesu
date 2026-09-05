@@ -232,7 +232,7 @@ export default function InquiriesPage() {
           <div>
             <h1 className="text-2xl font-extrabold text-[#4D0C0D]">Chatbot Inquiries</h1>
             <p className="text-stone-600 mt-1 text-sm">
-              {filteredInquiries.length} inquiries logged by AI Procurement Assistant
+              {filteredInquiries.length} inquiries logged by Isko BidDo Assistant
             </p>
           </div>
           <button
