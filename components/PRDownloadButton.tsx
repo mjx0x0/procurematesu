@@ -37,7 +37,7 @@ export default function PRDownloadButton({ pr, items }: { pr: PRData; items: PRI
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const handleDownload = async () => {
-    if (downloading) return;
+    if (downloading || items.length === 0) return;
     setDownloading(true);
     setDownloadError(null);
 
@@ -47,14 +47,14 @@ export default function PRDownloadButton({ pr, items }: { pr: PRData; items: PRI
         import("@/components/PRPDF"),
       ]);
 
-      const document = <PRPDF pr={pr} items={items} /> as ReactElement;
-      const blob = await pdf(document).toBlob();
+      const pdfDocument = <PRPDF pr={pr} items={items} /> as ReactElement;
+      const blob = await pdf(pdfDocument).toBlob();
       const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
+      const anchor = window.document.createElement("a");
       anchor.href = url;
       anchor.download = `PR-${pr.pr_no || "Purchase-Request"}.pdf`;
       anchor.style.display = "none";
-      document.body.appendChild(anchor);
+      window.document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -68,12 +68,7 @@ export default function PRDownloadButton({ pr, items }: { pr: PRData; items: PRI
 
   return (
     <div className="relative">
-      <button
-        type="button"
-        onClick={handleDownload}
-        disabled={downloading || items.length === 0}
-        className="bg-gradient-to-r from-[#7A1315] to-[#8B1518] hover:from-[#630E10] hover:to-[#7A1315] text-white px-4 py-2 rounded-xl hover:shadow-lg transition-all hover:scale-105 flex items-center gap-2 text-sm font-semibold border border-amber-400/30 disabled:opacity-60 disabled:hover:scale-100"
-      >
+      <button type="button" onClick={handleDownload} disabled={downloading || items.length === 0} className="bg-gradient-to-r from-[#7A1315] to-[#8B1518] hover:from-[#630E10] hover:to-[#7A1315] text-white px-4 py-2 rounded-xl hover:shadow-lg transition-all hover:scale-105 flex items-center gap-2 text-sm font-semibold border border-amber-400/30 disabled:opacity-60 disabled:hover:scale-100">
         {downloading ? <Loader2 className="h-4 w-4 animate-spin text-amber-300" /> : <FileDown className="h-4 w-4 text-amber-300" />}
         {downloading ? "Generating PR..." : "Download PR Form"}
       </button>
