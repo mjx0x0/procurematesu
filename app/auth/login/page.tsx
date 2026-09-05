@@ -40,80 +40,58 @@ export default function LoginPage() {
       return;
     }
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: cleanEmail,
       password,
     });
 
-    if (authError) {
-      let msg = authError.message;
+    if (authError || !authData.user) {
+      let msg = authError?.message || "Unable to sign in.";
       if (msg.includes("Email not confirmed")) {
         msg = "Your email address has not been confirmed. Please check your inbox or contact the admin.";
       } else if (msg.includes("Invalid login credentials")) {
         msg = "The email or password you entered is incorrect. Please try again.";
-      } else if (msg.includes("User not found")) {
-        msg = "No account found with this email. Please contact the admin.";
       }
       setError(msg);
       setLoading(false);
       return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setError("User not found. Please try again.");
-      setLoading(false);
-      return;
-    }
-
+    const user = authData.user;
     const { data: userData, error: userError } = await supabase
       .from("users")
       .select("role, is_active")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (userError) {
       console.error("Login profile lookup failed:", userError);
-      if (userError.code === "PGRST116") {
-        const { error: insertError } = await supabase
-          .from("users")
-          .insert({
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || user.email,
-            role: "end_user",
-            is_active: true,
-          });
-
-        if (insertError) {
-          console.error("Failed to create user record:", insertError);
-          await supabase.auth.signOut();
-          setError("Your account profile could not be created. Please contact the administrator.");
-          setLoading(false);
-          return;
-        }
-
-        router.push("/dashboard");
-        return;
-      }
-
       await supabase.auth.signOut();
-      setError("Unable to verify your account. Please try again or contact the administrator.");
+      setError("Unable to verify your account. Please contact the administrator.");
       setLoading(false);
       return;
     }
 
-    if (userData?.is_active === false) {
+    // Do not auto-create profiles during login. Account provisioning and
+    // authorization must be controlled by the institution/admin.
+    if (!userData) {
+      await supabase.auth.signOut();
+      setError("Your university account is not provisioned for ProcuremateSU. Please contact the administrator.");
+      setLoading(false);
+      return;
+    }
+
+    if (userData.is_active === false) {
       await supabase.auth.signOut();
       setError("Your account is inactive. Please contact the administrator.");
       setLoading(false);
       return;
     }
 
-    if (userData?.role === "admin") {
-      router.push("/admin");
+    if (userData.role === "admin") {
+      router.replace("/admin");
     } else {
-      router.push("/dashboard");
+      router.replace("/dashboard");
     }
   };
 
@@ -174,11 +152,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-between text-xs">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input type="checkbox" className="rounded border-stone-300 text-[#7A1315] focus:ring-[#7A1315]" />
-                <span className="text-stone-600">Remember me</span>
-              </label>
+            <div className="flex items-center justify-end text-xs">
               <Link href="/auth/forgot-password" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">Forgot password?</Link>
             </div>
 
