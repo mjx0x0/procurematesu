@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { MsuLogo } from "@/components/msu-logo";
-import {
-  Mail, Lock, ArrowRight, AlertCircle,
-  Eye, EyeOff, CheckCircle, Building2
-} from "lucide-react";
+import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff, CheckCircle, Building2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,102 +27,77 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    if (!email || !password) {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !password) {
       setError("Please fill in all fields.");
       setLoading(false);
       return;
     }
 
-    if (!email.endsWith("@msugensan.edu.ph")) {
+    if (!cleanEmail.endsWith("@msugensan.edu.ph")) {
       setError("Only @msugensan.edu.ph email addresses are allowed.");
       setLoading(false);
       return;
     }
 
-    // 1. Authenticate
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: cleanEmail,
       password,
     });
 
-    if (authError) {
-      let msg = authError.message;
+    if (authError || !authData.user) {
+      let msg = authError?.message || "Unable to sign in.";
       if (msg.includes("Email not confirmed")) {
         msg = "Your email address has not been confirmed. Please check your inbox or contact the admin.";
       } else if (msg.includes("Invalid login credentials")) {
         msg = "The email or password you entered is incorrect. Please try again.";
-      } else if (msg.includes("User not found")) {
-        msg = "No account found with this email. Please contact the admin.";
       }
       setError(msg);
       setLoading(false);
       return;
     }
 
-    // 2. Get user and role
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setError("User not found. Please try again.");
+    const user = authData.user;
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("role, is_active")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (userError) {
+      console.error("Login profile lookup failed:", userError);
+      await supabase.auth.signOut();
+      setError("Unable to verify your account. Please contact the administrator.");
       setLoading(false);
       return;
     }
 
-    console.log("✅ Logged in user:", user.email);
-
-    // 3. Fetch user role from `users` table
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError) {
-      console.error("❌ Error fetching user role:", userError);
-      // If user record doesn't exist, create one with default role
-      if (userError.code === "PGRST116") { // record not found
-        const { error: insertError } = await supabase
-          .from("users")
-          .insert({
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || user.email,
-            role: "end_user",
-            is_active: true,
-          });
-        if (insertError) {
-          console.error("❌ Failed to create user record:", insertError);
-        } else {
-          console.log("✅ Created user record with role 'end_user'");
-        }
-        // Redirect to dashboard (default for non-admin)
-        router.push("/dashboard");
-        setLoading(false);
-        return;
-      } else {
-        // Other error – redirect to dashboard as fallback
-        router.push("/dashboard");
-        setLoading(false);
-        return;
-      }
+    // Do not auto-create profiles during login. Account provisioning and
+    // authorization must be controlled by the institution/admin.
+    if (!userData) {
+      await supabase.auth.signOut();
+      setError("Your university account is not provisioned for ProcuremateSU. Please contact the administrator.");
+      setLoading(false);
+      return;
     }
 
-    console.log("✅ User role:", userData?.role);
+    if (userData.is_active === false) {
+      await supabase.auth.signOut();
+      setError("Your account is inactive. Please contact the administrator.");
+      setLoading(false);
+      return;
+    }
 
-    // 4. Redirect based on role
-    if (userData?.role === "admin") {
-      console.log("✅ Redirecting to /admin");
-      router.push("/admin");
+    if (userData.role === "admin") {
+      router.replace("/admin");
     } else {
-      console.log("✅ Redirecting to /dashboard");
-      router.push("/dashboard");
+      router.replace("/dashboard");
     }
-    setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5] px-4 py-8">
       <div className="w-full max-w-md animate-fade-in-up">
-        {/* Institutional Branding Header */}
         <div className="text-center mb-6 flex flex-col items-center">
           <Link href="/" className="inline-block transition-transform hover:scale-105 mb-2" title="Return to Home">
             <MsuLogo size={96} />
@@ -138,9 +110,7 @@ export default function LoginPage() {
               Mindanao State University - General Santos
             </p>
           </div>
-          <p className="text-xs text-stone-600 mt-2">
-            Sign in with your official university credentials
-          </p>
+          <p className="text-xs text-stone-600 mt-2">Sign in with your official university credentials</p>
         </div>
 
         <div className="bg-white rounded-2xl p-7 shadow-xl border border-stone-200/90">
@@ -153,19 +123,10 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1">
-                University Email Address
-              </label>
+              <label className="block text-xs font-semibold text-stone-700 mb-1">University Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@msugensan.edu.ph"
-                  className="w-full pl-9 pr-4 py-2.5 text-sm border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
-                  required
-                />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@msugensan.edu.ph" className="w-full pl-9 pr-4 py-2.5 text-sm border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white" required />
               </div>
               <p className="text-[11px] text-stone-500 mt-1 flex items-center gap-1">
                 <Building2 className="h-3 w-3 inline text-[#7A1315]" />
@@ -174,24 +135,11 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1">
-                Password
-              </label>
+              <label className="block text-xs font-semibold text-stone-700 mb-1">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your account password"
-                  className="w-full pl-9 pr-11 py-2.5 text-sm border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
-                >
+                <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your account password" className="w-full pl-9 pr-11 py-2.5 text-sm border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white" required />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
@@ -204,31 +152,15 @@ export default function LoginPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-between text-xs">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input type="checkbox" className="rounded border-stone-300 text-[#7A1315] focus:ring-[#7A1315]" />
-                <span className="text-stone-600">Remember me</span>
-              </label>
-              <Link href="/auth/forgot-password" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">
-                Forgot password?
-              </Link>
+            <div className="flex items-center justify-end text-xs">
+              <Link href="/auth/forgot-password" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">Forgot password?</Link>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white py-3 rounded-xl font-semibold text-sm shadow-md shadow-red-950/20 hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100 border border-amber-400/30"
-            >
+            <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white py-3 rounded-xl font-semibold text-sm shadow-md shadow-red-950/20 hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100 border border-amber-400/30">
               {loading ? (
-                <>
-                  <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                  Authenticating...
-                </>
+                <><span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />Authenticating...</>
               ) : (
-                <>
-                  <span>Sign In to Portal</span>
-                  <ArrowRight className="h-4 w-4 text-amber-300" />
-                </>
+                <><span>Sign In to Portal</span><ArrowRight className="h-4 w-4 text-amber-300" /></>
               )}
             </button>
           </form>
