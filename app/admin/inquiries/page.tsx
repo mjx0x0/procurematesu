@@ -255,7 +255,7 @@ export default function InquiriesPage() {
                 placeholder="Search by question, response, user, or PR number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none transition-all bg-white text-gray-900 placeholder:text-stone-400"
               />
             </div>
             <div className="flex gap-4">
@@ -263,7 +263,7 @@ export default function InquiriesPage() {
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
-                  className="appearance-none pl-4 pr-8 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
+                  className="appearance-none pl-4 pr-8 py-2.5 text-sm border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none transition-all bg-white text-gray-900 font-medium"
                 >
                   <option value="all">All Types</option>
                   <option value="general">General</option>
@@ -279,7 +279,7 @@ export default function InquiriesPage() {
                   type="date"
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  className="pl-10 pr-4 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all bg-white"
+                  className="pl-10 pr-4 py-2.5 text-sm border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none transition-all bg-white text-gray-900 font-medium"
                 />
               </div>
               {dateFilter && (

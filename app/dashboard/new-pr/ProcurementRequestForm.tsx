@@ -217,38 +217,38 @@ export default function ProcurementRequestForm() {
             {error && <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm">{error}</div>}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">PR Number</label><input value="Auto-generated" disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500" /></div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Date</label><input type="date" value={new Date().toISOString().split("T")[0]} disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500" /></div>
+              <div><label className="block text-sm font-medium text-gray-700 mb-1">PR Number</label><input value="Auto-generated" disabled className="w-full px-4 py-2 border border-stone-200 rounded-lg bg-stone-50 text-stone-500 font-medium" /></div>
+              <div><label className="block text-sm font-medium text-gray-700 mb-1">Date</label><input type="date" value={new Date().toISOString().split("T")[0]} disabled className="w-full px-4 py-2 border border-stone-200 rounded-lg bg-stone-50 text-stone-500 font-medium" /></div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Department <span className="text-red-500">*</span></label>
-                <input type="text" value={form.department} onChange={e => setForm({ ...form, department: e.target.value })} placeholder="Enter your department (e.g., College of Education)" required className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none bg-white" />
+                <input type="text" value={form.department} onChange={e => setForm({ ...form, department: e.target.value })} placeholder="Enter your department (e.g., College of Education)" required className="w-full px-4 py-2.5 border border-stone-300 rounded-lg bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none" />
                 <p className="text-xs text-stone-500 mt-1">Enter the department/unit you belong to. There are no preset choices.</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Section <span className="text-stone-400 font-normal">(Optional)</span></label>
-                <input type="text" value={form.section} onChange={e => setForm({ ...form, section: e.target.value })} placeholder="Enter section if applicable" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none bg-white" />
+                <input type="text" value={form.section} onChange={e => setForm({ ...form, section: e.target.value })} placeholder="Enter section if applicable" className="w-full px-4 py-2.5 border border-stone-300 rounded-lg bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none" />
                 <p className="text-xs text-stone-500 mt-1">You may leave this blank.</p>
               </div>
             </div>
 
-            <div><label className="block text-sm font-medium text-gray-700 mb-1">SAI No.</label><input value="Auto-generated" disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500" /></div>
-            <div><label className="block text-sm font-medium text-gray-700 mb-1">ALOBs No.</label><input value="Auto-generated" disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500" /></div>
+            <div><label className="block text-sm font-medium text-gray-700 mb-1">SAI No.</label><input value="Auto-generated" disabled className="w-full px-4 py-2 border border-stone-200 rounded-lg bg-stone-50 text-stone-500 font-medium" /></div>
+            <div><label className="block text-sm font-medium text-gray-700 mb-1">ALOBs No.</label><input value="Auto-generated" disabled className="w-full px-4 py-2 border border-stone-200 rounded-lg bg-stone-50 text-stone-500 font-medium" /></div>
 
-            <div><label className="block text-sm font-medium text-gray-700 mb-1">Purpose / Description <span className="text-red-500">*</span></label><textarea value={form.purpose} onChange={e => setForm({ ...form, purpose: e.target.value })} placeholder="Describe the purpose of this purchase request..." rows={2} required className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none bg-white" /></div>
+            <div><label className="block text-sm font-medium text-gray-700 mb-1">Purpose / Description <span className="text-red-500">*</span></label><textarea value={form.purpose} onChange={e => setForm({ ...form, purpose: e.target.value })} placeholder="Describe the purpose of this purchase request..." rows={3} required className="w-full px-4 py-2.5 border border-stone-300 rounded-lg bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none" /></div>
 
             <div>
               <div className="flex justify-between items-center mb-3"><label className="text-sm font-medium text-gray-700">Items</label><button type="button" onClick={addItem} className="text-[#7A1315] font-semibold text-sm flex items-center gap-1"><Plus className="h-4 w-4" />Add Item</button></div>
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse"><thead><tr className="bg-gray-50"><th className="p-2 text-left text-xs text-gray-500">Description</th><th className="p-2 text-center text-xs text-gray-500">Qty</th><th className="p-2 text-center text-xs text-gray-500">Unit</th><th className="p-2 text-right text-xs text-gray-500">Unit Cost</th><th className="p-2 text-right text-xs text-gray-500">Total</th><th /></tr></thead><tbody className="divide-y divide-gray-100">
                   {items.map((item, index) => <tr key={item.id}>
-                    <td className="p-2"><input value={item.description} onChange={e => updateItem(index, { description: e.target.value })} placeholder="Item description..." className="w-full px-2 py-1 border border-gray-200 rounded text-sm" /></td>
-                    <td className="p-2"><input type="number" min="1" value={item.qty} onChange={e => updateItem(index, { qty: Math.max(1, Number(e.target.value) || 1) })} className="w-16 px-2 py-1 border border-gray-200 rounded text-center text-sm" /></td>
-                    <td className="p-2"><input value={item.unit} onChange={e => updateItem(index, { unit: e.target.value })} placeholder="pcs" className="w-16 px-2 py-1 border border-gray-200 rounded text-center text-sm" /></td>
-                    <td className="p-2"><input type="number" min="0" step="0.01" value={item.unit_cost} onChange={e => updateItem(index, { unit_cost: Math.max(0, Number(e.target.value) || 0) })} className="w-24 px-2 py-1 border border-gray-200 rounded text-right text-sm" /></td>
-                    <td className="p-2 text-right text-sm font-medium">₱{(item.qty * item.unit_cost).toFixed(2)}</td>
+                    <td className="p-2"><input value={item.description} onChange={e => updateItem(index, { description: e.target.value })} placeholder="Item description..." className="w-full px-3 py-1.5 border border-stone-300 rounded-lg bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none text-sm" /></td>
+                    <td className="p-2"><input type="number" min="1" value={item.qty} onChange={e => updateItem(index, { qty: Math.max(1, Number(e.target.value) || 1) })} className="w-16 px-2 py-1.5 border border-stone-300 rounded-lg bg-white text-gray-900 text-center text-sm focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none" /></td>
+                    <td className="p-2"><input value={item.unit} onChange={e => updateItem(index, { unit: e.target.value })} placeholder="pcs" className="w-16 px-2 py-1.5 border border-stone-300 rounded-lg bg-white text-gray-900 placeholder:text-stone-400 text-center text-sm focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none" /></td>
+                    <td className="p-2"><input type="number" min="0" step="0.01" value={item.unit_cost} onChange={e => updateItem(index, { unit_cost: Math.max(0, Number(e.target.value) || 0) })} className="w-24 px-2 py-1.5 border border-stone-300 rounded-lg bg-white text-gray-900 text-right text-sm focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none" /></td>
+                    <td className="p-2 text-right text-sm font-semibold text-gray-900">₱{(item.qty * item.unit_cost).toFixed(2)}</td>
                     <td className="p-2 text-center"><button type="button" onClick={() => removeItem(index)} disabled={items.length === 1} className="text-gray-400 hover:text-red-600 disabled:opacity-30"><Trash2 className="h-4 w-4" /></button></td>
                   </tr>)}
                 </tbody><tfoot><tr className="bg-gray-50"><td colSpan={4} className="p-3 text-right font-semibold">TOTAL:</td><td className="p-3 text-right font-bold text-[#7A1315]">₱{total.toFixed(2)}</td><td /></tr></tfoot></table>
@@ -258,9 +258,9 @@ export default function ProcurementRequestForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
               <div>
                 <label className="block text-sm font-semibold text-stone-800 mb-1">Requested By (Actual Full Name) <span className="text-red-500">*</span></label>
-                <input required value={userName} onChange={e => setUserName(e.target.value)} placeholder="Enter your actual full name" className="w-full px-4 py-2.5 border border-stone-300 rounded-lg" />
+                <input required value={userName} onChange={e => setUserName(e.target.value)} placeholder="Enter your actual full name" className="w-full px-4 py-2.5 border border-stone-300 rounded-lg bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none" />
                 <p className="text-xs text-stone-500 mt-1">Use your real name, not your email address.</p>
-                <input value={form.requested_by_designation} onChange={e => setForm({ ...form, requested_by_designation: e.target.value })} placeholder="Designation (optional)" className="w-full mt-2 px-4 py-2 border border-gray-200 rounded-lg" />
+                <input value={form.requested_by_designation} onChange={e => setForm({ ...form, requested_by_designation: e.target.value })} placeholder="Designation (optional)" className="w-full mt-2 px-4 py-2 border border-stone-300 rounded-lg bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none" />
               </div>
               <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
                 <p className="text-sm font-semibold text-stone-800">Approved By</p>
@@ -279,7 +279,7 @@ export default function ProcurementRequestForm() {
       {showAi && <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4"><div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div className="flex justify-between items-center mb-4"><div className="flex items-center gap-2"><div className="bg-[#7A1315] p-2 rounded-xl text-amber-200"><Sparkles className="h-5 w-5" /></div><h3 className="text-lg font-bold text-[#4D0C0D]">Draft with AI Procurement Assistant</h3></div><button onClick={() => setShowAi(false)} className="text-gray-400"><X className="h-5 w-5" /></button></div>
         <p className="text-sm text-gray-600 mb-4">Describe what you need and AI will structure the purchase request for you.</p>
-        <textarea value={aiInput} onChange={e => setAiInput(e.target.value)} rows={4} placeholder="Example: I need 10 laptops for the College of Engineering..." className="w-full px-4 py-3 border border-gray-200 rounded-lg" />
+        <textarea value={aiInput} onChange={e => setAiInput(e.target.value)} rows={4} placeholder="Example: I need 10 laptops for the College of Engineering..." className="w-full px-4 py-3 border border-stone-300 rounded-lg bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none" />
         <button onClick={handleAiDraft} disabled={aiLoading || !aiInput.trim()} className="mt-4 w-full bg-[#7A1315] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50">{aiLoading ? <><Loader2 className="h-5 w-5 animate-spin" />Drafting...</> : <><Send className="h-5 w-5 text-amber-300" />Generate Draft</>}</button>
       </div></div>}
     </div>

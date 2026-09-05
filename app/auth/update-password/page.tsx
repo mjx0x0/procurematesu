@@ -84,7 +84,7 @@ export default function UpdatePasswordPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter new password"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-stone-300 rounded-xl bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none transition-all"
                     required
                     minLength={8}
                   />
@@ -102,7 +102,7 @@ export default function UpdatePasswordPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm new password"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-stone-300 rounded-xl bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none transition-all"
                     required
                     minLength={8}
                   />

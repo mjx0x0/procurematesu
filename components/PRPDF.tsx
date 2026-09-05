@@ -1,3 +1,4 @@
+import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 // Styles matching the official MSU General Santos City Purchase Request template
@@ -120,8 +121,7 @@ const styles = StyleSheet.create({
   },
   thTextItalic: {
     fontSize: 8.5,
-    fontFamily: "Helvetica-Bold",
-    fontStyle: "italic",
+    fontFamily: "Helvetica-BoldOblique",
     textAlign: "center",
     color: "#000000",
     paddingVertical: 3,
@@ -269,8 +269,7 @@ const styles = StyleSheet.create({
   },
   purposeLabel: {
     fontSize: 9,
-    fontFamily: "Helvetica-Bold",
-    fontStyle: "italic",
+    fontFamily: "Helvetica-BoldOblique",
     marginRight: 6,
   },
   purposeText: {
@@ -395,8 +394,10 @@ interface PRPDFProps {
   }>;
 }
 
-export default function PRPDF({ pr, items }: PRPDFProps) {
-  const totalAmount = items.reduce((sum, item) => sum + item.total_cost, 0);
+export default function PRPDF({ pr = {}, items = [] }: PRPDFProps) {
+  const safeItems = Array.isArray(items) ? items : [];
+  const safePr = pr || {};
+  const totalAmount = (Number(safePr.total) > 0 ? Number(safePr.total) : 0) || safeItems.reduce((sum, item) => sum + (Number(item?.total_cost) || (Number(item?.unit_cost || 0) * Number(item?.quantity || 0))), 0);
 
   // Format date helper
   const formatDate = (dateStr?: string | null) => {
@@ -410,16 +411,16 @@ export default function PRPDF({ pr, items }: PRPDFProps) {
     }
   };
 
-  const formattedPrDate = formatDate(pr.pr_date || pr.created_at);
-  const formattedSaiDate = formatDate(pr.sai_date || pr.pr_date || pr.created_at);
-  const formattedAlobsDate = formatDate(pr.alobs_date || pr.pr_date || pr.created_at);
+  const formattedPrDate = formatDate(safePr.pr_date || safePr.created_at);
+  const formattedSaiDate = formatDate(safePr.sai_date || safePr.pr_date || safePr.created_at);
+  const formattedAlobsDate = formatDate(safePr.alobs_date || safePr.pr_date || safePr.created_at);
 
   // Maintain minimum 5 blank rows after items to preserve standard physical PR sheet height
   const minRows = 5;
-  const blankRowsCount = Math.max(0, minRows - items.length);
+  const blankRowsCount = Math.max(0, minRows - safeItems.length);
 
   return (
-    <Document title={`PR-${pr.pr_no || "MSU-Gensan"}`} author="Mindanao State University - General Santos City">
+    <Document title={`PR-${safePr.pr_no || "MSU-Gensan"}`} author="Mindanao State University - General Santos City">
       <Page size="A4" style={styles.page}>
         {/* Main Boxed Container */}
         <View style={styles.formBorder}>
@@ -435,11 +436,11 @@ export default function PRPDF({ pr, items }: PRPDFProps) {
             <View style={styles.metaLeftCol}>
               <View style={styles.metaFieldRow}>
                 <Text style={styles.metaLabel}>Department</Text>
-                <Text style={styles.metaUnderlineVal}>{pr.department || ""}</Text>
+                <Text style={styles.metaUnderlineVal}>{safePr.department || ""}</Text>
               </View>
               <View style={styles.metaFieldRow}>
                 <Text style={styles.metaLabel}>Section</Text>
-                <Text style={styles.metaUnderlineVal}>{pr.section || ""}</Text>
+                <Text style={styles.metaUnderlineVal}>{safePr.section || ""}</Text>
               </View>
             </View>
 
@@ -449,7 +450,7 @@ export default function PRPDF({ pr, items }: PRPDFProps) {
               <View style={styles.metaSplitRow}>
                 <View style={styles.metaSubColLeft}>
                   <Text style={styles.metaLabel}>PR No.</Text>
-                  <Text style={styles.metaUnderlineVal}>{pr.pr_no || ""}</Text>
+                  <Text style={styles.metaUnderlineVal}>{safePr.pr_no || ""}</Text>
                 </View>
                 <View style={styles.metaSubColRight}>
                   <Text style={styles.metaLabel}>Date</Text>
@@ -506,17 +507,17 @@ export default function PRPDF({ pr, items }: PRPDFProps) {
           </View>
 
           {/* Table Items */}
-          {items.map((item, idx) => (
+          {safeItems.map((item, idx) => (
             <View key={idx} style={styles.tableRow}>
               <Text style={styles.cellQty}>{item.quantity}</Text>
               <Text style={styles.cellUnit}>{item.unit || "pcs"}</Text>
               <Text style={styles.cellDesc}>{item.item_description}</Text>
               <Text style={styles.cellStock}>{item.stock_no || ""}</Text>
               <Text style={styles.cellUnitCost}>
-                {item.unit_cost ? item.unit_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}
+                {Number(item.unit_cost) > 0 ? Number(item.unit_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}
               </Text>
               <Text style={styles.cellTotalCost}>
-                {item.total_cost ? item.total_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}
+                {Number(item.total_cost) > 0 ? Number(item.total_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}
               </Text>
             </View>
           ))}
@@ -549,7 +550,7 @@ export default function PRPDF({ pr, items }: PRPDFProps) {
           <View style={styles.purposeRow}>
             <View style={styles.purposeLeft}>
               <Text style={styles.purposeLabel}>Purpose</Text>
-              <Text style={styles.purposeText}>{pr.purpose || ""}</Text>
+              <Text style={styles.purposeText}>{safePr.purpose || ""}</Text>
             </View>
             <Text style={styles.purposeTotalVal}>
               {totalAmount > 0
@@ -579,25 +580,25 @@ export default function PRPDF({ pr, items }: PRPDFProps) {
               <View style={styles.sigFieldRow}>
                 <Text style={styles.sigFieldLabel}>Printed Name</Text>
                 <Text style={styles.sigFieldValue}>
-                  {(pr.printed_name && pr.printed_name.includes("@")
-                    ? pr.printed_name.split("@")[0].replace(/[._]/g, " ")
-                    : (pr.printed_name || "")
+                  {(safePr.printed_name && safePr.printed_name.includes("@")
+                    ? safePr.printed_name.split("@")[0].replace(/[._]/g, " ")
+                    : (safePr.printed_name || "")
                   ).toUpperCase()}
                 </Text>
               </View>
               <View style={styles.sigFieldRow}>
                 <Text style={styles.sigFieldLabel}>Designation</Text>
-                <Text style={styles.sigFieldValue}>{pr.designation || ""}</Text>
+                <Text style={styles.sigFieldValue}>{safePr.designation || ""}</Text>
               </View>
             </View>
 
             {/* Right Column: APPROVED BY (Chancellor Atty. Shidik T. Abantas, MDM, LLM) */}
             <View style={styles.sigBodyRight}>
               <Text style={styles.approverName}>
-                {pr.approved_by || "Atty. Shidik T. Abantas, MDM, LLM"}
+                {safePr.approved_by || "Atty. Shidik T. Abantas, MDM, LLM"}
               </Text>
               <Text style={styles.approverDesignation}>
-                {pr.approved_by_designation || "Chancellor"}
+                {safePr.approved_by_designation || "Chancellor"}
               </Text>
             </View>
           </View>
