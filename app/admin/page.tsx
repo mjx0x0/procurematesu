@@ -262,35 +262,31 @@ export default function AdminDashboard() {
     try {
       const newStatus = stageToComplete;
 
-      // 1. Update PR status
-      const { error: updateError } = await supabase
-        .from("purchase_requests")
-        .update({
-          current_stage: newStatus,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("pr_no", selectedPR.pr_no);
-
-      if (updateError) throw updateError;
-
-      // 2. Insert into stage history with remarks
-      const { error: historyError } = await supabase
-        .from("pr_stages_completed")
-        .insert({
-          pr_no: selectedPR.pr_no,
-          stage_name: getStatusLabel(newStatus),
-          stage_key: newStatus,
-          completed_at: new Date().toISOString(),
+      // ✅ Call our NEW API route instead of Supabase directly
+      const response = await fetch('/api/admin/complete-stage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prNo: selectedPR.pr_no,
+          newStatus: newStatus,
+          stageLabel: getStatusLabel(newStatus),
           remarks: stageRemarks.trim(),
-        });
+        }),
+      });
 
-      if (historyError) throw historyError;
+      const result = await response.json();
 
-      // 3. Reload data
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to complete stage');
+      }
+
+      // Reload data
       await loadData();
       await loadStageHistory(selectedPR.pr_no);
 
-      // 4. Update selected PR with new stage
+      // Update selected PR with new stage
       setSelectedPR({
         ...selectedPR,
         current_stage: newStatus,
@@ -299,15 +295,18 @@ export default function AdminDashboard() {
       setShowStageModal(false);
       setStageToComplete(null);
       setStageRemarks("");
+
+      // ✅ Optional: Show success message
+      alert(`✅ Stage "${getStatusLabel(newStatus)}" completed successfully!`);
+
     } catch (err: any) {
       console.error("❌ Stage update error DETAILS:", err);
-      // Show the actual error message in the alert for debugging
       alert(`Failed to complete stage. Error: ${err.message || err}`);
     } finally {
       setUpdatingStatus(false);
     }
   };
-
+  
   const handleDeletePR = async (prNo: string) => {
     if (!confirm(`Are you sure you want to delete PR ${prNo}? This action cannot be undone.`)) {
       return;
