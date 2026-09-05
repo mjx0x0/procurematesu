@@ -1,33 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // First authenticate with the user's normal Supabase session/cookies.
+    const authClient = await createServerClient();
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile, error: profileError } = await supabase
+    // Use the service-role client only AFTER authentication. This avoids a
+    // common failure where RLS prevents the server route from reading the
+    // user's own PRs, while the query remains strictly scoped to user.id.
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    if (!serviceRoleKey || !supabaseUrl) {
+      console.error('[my-prs] Supabase server configuration is incomplete.');
+      return NextResponse.json({ error: 'Unable to load your purchase requests.' }, { status: 500 });
+    }
+
+    const db = createAdminClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    const { data: profile, error: profileError } = await db
       .from('users')
       .select('is_active, role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (profileError || !profile || profile.is_active === false) {
+    if (profileError) {
+      console.error('[my-prs] Failed to load user profile:', profileError.message);
+      return NextResponse.json({ error: 'Unable to verify your account.' }, { status: 500 });
+    }
+
+    if (!profile || profile.is_active === false) {
       return NextResponse.json({ error: 'Account is not authorized.' }, { status: 403 });
     }
 
-    // End users may only receive PRs belonging to their own authenticated account.
-    // Admins are intentionally excluded from this endpoint because this flow is
-    // specifically for the end-user chatbot's "Track my PR" action.
     if (profile.role === 'admin') {
-      return NextResponse.json({ prs: [] });
+      return NextResponse.json({ prs: [] }, { headers: { 'Cache-Control': 'no-store' } });
     }
 
-    const { data: prs, error } = await supabase
+    const { data: prs, error } = await db
       .from('purchase_requests')
       .select('pr_no, purpose, total, current_stage, created_at, department')
       .eq('user_id', user.id)
