@@ -17,6 +17,7 @@ const QUICK_PROMPTS = [
   "What is RA 12009?",
   "Help me draft a PR",
   "Track PR-2026-0001",
+  "Procurement Office Contacts",
   "Small Value Procurement (SVP)",
 ];
 
@@ -68,11 +69,12 @@ export function Chatbot() {
           id: "welcome",
           role: "assistant",
           content:
-            "👋 Kumusta! I am **Isko BidDo**, your AI Procurement Assistant for Mindanao State University - General Santos.\n\n" +
+            "👋 Kumusta! I am your **AI Procurement Assistant for Mindanao State University - General Santos**.\n\n" +
             "I can help you with:\n" +
             "• **RA 12009 & RA 9184 guidelines** and procurement principles\n" +
             "• **Drafting Purchase Requests** step-by-step with instant print & form generation (try *'Help me draft a PR'*)\n" +
             "• **Tracking PR status** and timeline history (e.g. *'Track PR-2026-0001'*)\n" +
+            "• **Contact details** of the MSU-GenSan Procurement Management Office and BAC Secretariat\n" +
             "• **Small Value Procurement (SVP)** rules and PhilGEPS requirements\n\n" +
             "How can I assist you today?",
           timestamp: new Date(),
@@ -164,11 +166,11 @@ export function Chatbot() {
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-6 right-6 bg-gradient-to-r from-[#7A1315] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105 z-50 flex items-center gap-2.5 group border border-amber-400/30"
-          aria-label="Open Isko BidDo AI Assistant"
+          aria-label="Open AI Procurement Assistant"
         >
           <Bot className="h-6 w-6 text-amber-300" />
           <span className="hidden sm:inline font-semibold text-sm pr-1 group-hover:inline transition-all text-amber-100">
-            Ask Isko BidDo
+            AI Procurement Assistant
           </span>
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
         </button>
@@ -189,12 +191,12 @@ export function Chatbot() {
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-white text-sm">Isko BidDo</span>
+                  <span className="font-bold text-white text-sm">AI Procurement Assistant</span>
                   <span className="text-[10px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-1.5 py-0.2 rounded-full">
                     Online
                   </span>
                 </div>
-                <p className="text-[10px] text-amber-100/75">MSU-GenSan Procurement Assistant</p>
+                <p className="text-[10px] text-amber-100/75">Mindanao State University - General Santos</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -261,7 +263,7 @@ export function Chatbot() {
                         <span className="w-2 h-2 bg-[#91191C] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
                         <span className="w-2 h-2 bg-[#D4AF37] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
-                      <span className="text-xs text-gray-500">Isko BidDo is searching document chunks...</span>
+                      <span className="text-xs text-gray-500">Searching verified procurement rules...</span>
                     </div>
                   </div>
                 )}

@@ -68,11 +68,12 @@ export default function ChatbotDashboard() {
           id: "welcome",
           role: "assistant",
           content:
-            "👋 Kumusta! I am **Isko BidDo**, your official AI Procurement Assistant for Mindanao State University - General Santos.\n\n" +
+            "👋 Kumusta! I am your official **AI Procurement Assistant for Mindanao State University - General Santos**.\n\n" +
             "I can assist you with:\n" +
             "• **Republic Act No. 12009 (New Government Procurement Act)** and RA 9184 IRR\n" +
             "• **Drafting Purchase Requests** step-by-step with instant print & form generation (try clicking *'Help me draft a PR'* below)\n" +
             "• **Tracking PR status** and timeline stages (e.g. *'Track PR-2026-0001'*)\n" +
+            "• **Contact Details** of the MSU-GenSan Procurement Management Office and BAC Secretariat\n" +
             "• **Alternative Procurement Modalities** (Small Value Procurement, Shopping, Direct Contracting)\n\n" +
             "How may I assist your procurement needs today?",
           timestamp: new Date(),
@@ -202,12 +203,12 @@ export default function ChatbotDashboard() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-lg text-[#4D0C0D] leading-tight">Isko BidDo</span>
+                  <span className="font-bold text-base sm:text-lg text-[#4D0C0D] leading-tight">AI Procurement Assistant</span>
                   <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full border border-emerald-200">
                     Online
                   </span>
                 </div>
-                <p className="text-xs text-gray-500">MSU-GenSan Procurement AI Assistant</p>
+                <p className="text-xs text-gray-500">Mindanao State University - General Santos</p>
               </div>
             </div>
           </div>
@@ -248,7 +249,7 @@ export default function ChatbotDashboard() {
                         <span className="w-2 h-2 bg-[#91191C] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                         <span className="w-2 h-2 bg-[#D4AF37] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                       </div>
-                      <span className="text-xs">Isko BidDo is searching document chunks...</span>
+                      <span className="text-xs">Searching verified procurement rules...</span>
                     </div>
                   ) : (
                     <>

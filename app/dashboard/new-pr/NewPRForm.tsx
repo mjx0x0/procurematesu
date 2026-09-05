@@ -693,7 +693,7 @@ export default function NewPRForm() {
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <h3 className="text-lg font-bold text-[#4D0C0D]">
-                  Draft with Isko BidDo AI
+                  Draft with AI Procurement Assistant
                 </h3>
               </div>
               <button

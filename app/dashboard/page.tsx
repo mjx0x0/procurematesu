@@ -211,7 +211,7 @@ export default function DashboardPage() {
               className="bg-white hover:bg-red-50 text-[#7A1315] border border-red-200/80 px-5 py-2.5 rounded-xl font-semibold shadow-2xs transition-all flex items-center gap-2 whitespace-nowrap"
             >
               <Bot className="h-4 w-4 text-[#B88E13]" />
-              Ask Isko BidDo
+              AI Assistant
             </Link>
             <Link
               href="/dashboard/new-pr"

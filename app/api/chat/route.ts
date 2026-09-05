@@ -203,24 +203,55 @@ function generateOfflineProcurementResponse(query: string, retrievedContext: str
     );
   }
 
+  if (
+    q.includes('contact') ||
+    q.includes('phone') ||
+    q.includes('telephone') ||
+    q.includes('email') ||
+    q.includes('call') ||
+    q.includes('location') ||
+    q.includes('address') ||
+    q.includes('procurement office') ||
+    q.includes('bac secretariat') ||
+    q.includes('reach') ||
+    q.includes('hotline') ||
+    q.includes('number')
+  ) {
+    return (
+      "📞 **Mindanao State University - General Santos Procurement Management Office (PMO)**\n\n" +
+      "Here are the official contact details for procurement inquiries, PR document submissions, and supplier coordination:\n\n" +
+      "• **Office Name**: Procurement Management Office (PMO) & Bids and Awards Committee (BAC) Secretariat\n" +
+      "• **Office Location**: 2nd Floor, Administration Building, Mindanao State University - General Santos City, Fatima, General Santos City, 9500 South Cotabato, Philippines\n" +
+      "• **Official Emails**:\n" +
+      "  - Procurement Office: `procurement@msugensan.edu.ph`\n" +
+      "  - BAC Secretariat: `bac.secretariat@msugensan.edu.ph`\n" +
+      "• **Telephone / Landline**: (083) 552-5190 / (083) 887-2178\n" +
+      "• **Office Hours**: Monday to Friday, 8:00 AM – 5:00 PM (Philippine Standard Time, excluding non-working holidays)\n" +
+      "• **Head of Procuring Entity (HoPE)**: Atty. Shidik T. Abantas, MDM, LLM (University Chancellor)\n\n" +
+      "Feel free to coordinate directly with the PMO for hardcopy attachments, canvass evaluations, or PhilGEPS postings."
+    );
+  }
+
   if (q.includes('hello') || q.includes('hi') || q.includes('hey') || q.includes('who are you')) {
     return (
-      "👋 Kumusta! I am **Isko BidDo**, your official AI Procurement Assistant for Mindanao State University - General Santos.\n\n" +
+      "👋 Kumusta! I am your official **AI Procurement Assistant for Mindanao State University - General Santos**.\n\n" +
       "I can help you with:\n" +
       "• **RA 12009 & RA 9184 rules**, legal principles, and procurement modes\n" +
       "• **Drafting Purchase Requests** step-by-step with instant print & form generation (try saying *'Help me draft a PR'*)\n" +
       "• **Tracking PR status** and timeline stages (e.g. *'Track PR-2026-0001'*)\n" +
+      "• **Contact details** of the Procurement Management Office and BAC Secretariat\n" +
       "• **Small Value Procurement (SVP)** thresholds and PhilGEPS requirements\n\n" +
       "How may I assist you today?"
     );
   }
 
   return (
-    "Isko BidDo Assistant: In accordance with Republic Act No. 12009 (New Government Procurement Act) and the MSU-GenSan Procurement Manual, all university procurement must adhere to transparency, competitiveness, efficiency, and strict budget alignment (PPMP/APP).\n\n" +
+    "AI Procurement Assistant for Mindanao State University - General Santos: In accordance with Republic Act No. 12009 (New Government Procurement Act) and the MSU-GenSan Procurement Manual, all university procurement must adhere to transparency, competitiveness, efficiency, and strict budget alignment (PPMP/APP).\n\n" +
     "You can ask me about:\n" +
     "• Specific procurement modes (Competitive Bidding, SVP, Shopping)\n" +
     "• How to draft a new Purchase Request (say *'Help me draft a PR'*)\n" +
-    "• Tracking a current purchase request (say *'Track PR-2026-0001'*)"
+    "• Tracking a current purchase request (say *'Track PR-2026-0001'*)\n" +
+    "• Official contact details of the MSU-GenSan Procurement Office"
   );
 }
 
@@ -665,14 +696,21 @@ export async function POST(req: NextRequest) {
         citedSources = sourcesList;
 
         const systemPrompt = `
-You are Isko BidDo, the official AI Procurement Assistant for Mindanao State University - General Santos (MSU-GenSan).
+You are the official AI Procurement Assistant for Mindanao State University - General Santos (MSU-GenSan).
 
-CRITICAL DIRECTIVE — GROUNDING IN DOCUMENT_CHUNKS & AVOIDING HALLUCINATIONS:
+CRITICAL DIRECTIVES:
 1. You have been provided with verified excerpts retrieved directly from the university's \`document_chunks\` database table, containing official texts of Republic Act No. 12009 (New Government Procurement Act - NGPA), Republic Act No. 9184, its Implementing Rules and Regulations (IRR), and the MSU-GenSan Procurement Operations Manual.
 2. Ground all answers firmly in these verified document chunks to prevent hallucinations.
 3. Explicitly cite the document source (e.g. "[Source: RA 12009]", "[Source: MSU Procurement Manual]", "[Source: IRR 2016]") when explaining procurement rules, thresholds, and requirements.
-4. If the retrieved database context does not provide sufficient detail to answer a specific institutional inquiry, state what the law provides and advise the user to consult the MSU-GenSan Procurement Management Office (PMO) or BAC Secretariat rather than guessing or fabricating rules or thresholds.
-5. Provide a helpful, clear, and structured answer using markdown headings, bullet points, and bold emphasis for key procurement terms.
+4. If the user asks for the contact details, address, phone number, email, or office location of the MSU-GenSan Procurement Management Office or BAC Secretariat, provide these verified official details:
+   - **Office**: Procurement Management Office (PMO) & Bids and Awards Committee (BAC) Secretariat
+   - **Location**: 2nd Floor, Administration Building, Mindanao State University - General Santos City, Fatima, General Santos City, 9500 South Cotabato, Philippines
+   - **Email**: procurement@msugensan.edu.ph / bac.secretariat@msugensan.edu.ph
+   - **Telephone / Landline**: (083) 552-5190 / (083) 887-2178
+   - **Office Hours**: Monday to Friday, 8:00 AM – 5:00 PM (PST)
+   - **Head of Procuring Entity (HoPE)**: Atty. Shidik T. Abantas, MDM, LLM (University Chancellor)
+5. If the retrieved database context does not provide sufficient detail to answer a specific institutional inquiry, state what the law provides and advise the user to coordinate directly with the MSU-GenSan Procurement Management Office (PMO) or BAC Secretariat using the contact details above.
+6. Provide a helpful, clear, and structured answer using markdown headings, bullet points, and bold emphasis for key procurement terms.
 `;
 
         const userPrompt = `
@@ -753,7 +791,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
     return NextResponse.json(
       {
         response:
-          "👋 Hello! I am Isko BidDo, your MSU-GenSan procurement assistant. How can I help you today with RA 12009, Purchase Requests, or procurement tracking?",
+          "👋 Hello! I am your AI Procurement Assistant for Mindanao State University - General Santos. How can I help you today with RA 12009, Purchase Requests, contact details, or procurement tracking?",
         sessionId: 'sess_recovery',
       },
       { status: 200 }
