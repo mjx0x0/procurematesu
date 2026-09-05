@@ -26,7 +26,7 @@ export function ActionFeedbackModal({ open, tone = "success", title, message, on
   const Icon = config.icon;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4" style={{ zIndex: 100 }} role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="absolute inset-0 bg-[#160d19]/65 backdrop-blur-sm animate-in fade-in duration-200" />
       <div className="relative w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 animate-in zoom-in-95 slide-in-from-bottom-2 duration-200">
         <div className={`h-1.5 w-full ${config.accent}`} />

@@ -47,7 +47,7 @@ export default function PRDownloadButton({ pr, items }: { pr: PRData; items: PRI
         import("@/components/PRPDF"),
       ]);
 
-      const pdfDocument = <PRPDF pr={pr} items={items} /> as ReactElement;
+      const pdfDocument = (<PRPDF pr={pr} items={items} /> as unknown) as ReactElement<import("@react-pdf/renderer").DocumentProps>;
       const blob = await pdf(pdfDocument).toBlob();
       const url = URL.createObjectURL(blob);
       const anchor = window.document.createElement("a");

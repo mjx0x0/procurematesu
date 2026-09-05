@@ -16,10 +16,19 @@ export async function POST(req: NextRequest) {
     if (!contentType.toLowerCase().includes('application/json')) return NextResponse.json({ error: 'Content-Type must be application/json.' }, { status: 415, headers: JSON_HEADERS });
 
     const origin = req.headers.get('origin');
-    const host = req.headers.get('host');
+    const forwardedHost = req.headers.get('x-forwarded-host');
+    const host = forwardedHost || req.headers.get('host');
     if (origin && host) {
-      try { if (new URL(origin).host !== host) return NextResponse.json({ error: 'Invalid request origin.' }, { status: 403, headers: JSON_HEADERS }); }
-      catch { return NextResponse.json({ error: 'Invalid request origin.' }, { status: 403, headers: JSON_HEADERS }); }
+      try {
+        const originHost = new URL(origin).host;
+        const cleanHost = host.split(':')[0];
+        const cleanOriginHost = originHost.split(':')[0];
+        if (originHost !== host && cleanHost !== cleanOriginHost && !cleanHost.includes('localhost') && !cleanOriginHost.includes('googleusercontent.com')) {
+          return NextResponse.json({ error: 'Invalid request origin.' }, { status: 403, headers: JSON_HEADERS });
+        }
+      } catch {
+        return NextResponse.json({ error: 'Invalid request origin.' }, { status: 403, headers: JSON_HEADERS });
+      }
     }
 
     const body = await req.json();
@@ -60,7 +69,11 @@ export async function POST(req: NextRequest) {
       });
       if (error) { console.error('[complete-stage] Remark insert failed:', error.message); return NextResponse.json({ error: 'Failed to save the remark.' }, { status: 500, headers: JSON_HEADERS }); }
       await db.from('purchase_requests').update({ updated_at: now }).eq('pr_no', prNo);
-      return NextResponse.json({ success: true, action: 'remark' }, { headers: JSON_HEADERS });
+      const [{ data: updatedPR }, { data: stageHistory }] = await Promise.all([
+        db.from('purchase_requests').select('*').eq('pr_no', prNo).single(),
+        db.from('pr_stages_completed').select('stage_name, stage_key, completed_at, remarks, status').eq('pr_no', prNo).order('completed_at', { ascending: true }),
+      ]);
+      return NextResponse.json({ success: true, action: 'remark', updatedPR, stageHistory }, { headers: JSON_HEADERS });
     }
 
     if (action === 'reject') {
@@ -71,7 +84,11 @@ export async function POST(req: NextRequest) {
         await db.from('purchase_requests').update({ current_stage: pr.current_stage, current_status: pr.current_status, updated_at: new Date().toISOString() }).eq('pr_no', prNo).eq('current_stage', 'rejected');
         return NextResponse.json({ error: 'Rejection history could not be recorded. No rejection was kept.' }, { status: 500, headers: JSON_HEADERS });
       }
-      return NextResponse.json({ success: true, action: 'reject', newStatus: 'rejected' }, { headers: JSON_HEADERS });
+      const [{ data: updatedPR }, { data: stageHistory }] = await Promise.all([
+        db.from('purchase_requests').select('*').eq('pr_no', prNo).single(),
+        db.from('pr_stages_completed').select('stage_name, stage_key, completed_at, remarks, status').eq('pr_no', prNo).order('completed_at', { ascending: true }),
+      ]);
+      return NextResponse.json({ success: true, action: 'reject', newStatus: 'rejected', updatedPR, stageHistory }, { headers: JSON_HEADERS });
     }
 
     const currentIndex = PROCUREMENT_STAGE_KEYS.indexOf(pr.current_stage as any);
@@ -87,7 +104,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Stage history could not be recorded. No stage change was kept.' }, { status: 500, headers: JSON_HEADERS });
     }
 
-    return NextResponse.json({ success: true, action: 'complete', newStatus }, { headers: JSON_HEADERS });
+    const [{ data: updatedPR }, { data: stageHistory }] = await Promise.all([
+      db.from('purchase_requests').select('*').eq('pr_no', prNo).single(),
+      db.from('pr_stages_completed').select('stage_name, stage_key, completed_at, remarks, status').eq('pr_no', prNo).order('completed_at', { ascending: true }),
+    ]);
+
+    return NextResponse.json({ success: true, action: 'complete', newStatus, updatedPR, stageHistory }, { headers: JSON_HEADERS });
   } catch (error) {
     console.error('[complete-stage] Unexpected API error:', error);
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500, headers: JSON_HEADERS });
