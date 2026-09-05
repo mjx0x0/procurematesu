@@ -232,43 +232,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          <div className="mt-5 pt-5 border-t border-stone-200">
-            <div className="bg-red-50/70 border border-red-200/70 rounded-xl p-3 mb-3 text-xs text-[#4D0C0D]">
-              <p className="font-bold text-[#7A1315] mb-1.5 flex items-center justify-between">
-                <span>Quick Access Demo Accounts:</span>
-                <span className="text-[10px] bg-red-100 px-1.5 py-0.5 rounded text-[#7A1315] font-semibold">MSU-GenSan</span>
-              </p>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail("admin@msugensan.edu.ph");
-                    setPassword("admin123");
-                  }}
-                  className="flex-1 px-2.5 py-1.5 bg-white border border-red-300 rounded-lg text-[#7A1315] font-semibold hover:bg-red-100/50 transition-colors shadow-2xs text-center text-xs"
-                >
-                  Admin Role
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail("faculty@msugensan.edu.ph");
-                    setPassword("faculty123");
-                  }}
-                  className="flex-1 px-2.5 py-1.5 bg-white border border-red-300 rounded-lg text-[#7A1315] font-semibold hover:bg-red-100/50 transition-colors shadow-2xs text-center text-xs"
-                >
-                  Faculty Role
-                </button>
-              </div>
-            </div>
-            <p className="text-center text-stone-500 text-xs">
-              Mindanao State University - General Santos City
-            </p>
-            <p className="text-center text-[10px] text-stone-400 mt-1">
-              Procurement Management Office • RA 12009 Compliant
-            </p>
-          </div>
         </div>
       </div>
     </div>
