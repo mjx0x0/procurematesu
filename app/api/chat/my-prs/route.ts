@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 
+// This route depends on the authenticated Supabase cookie, so it must run
+// dynamically for each request rather than being treated as static output.
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // First authenticate with the user's normal Supabase session/cookies.
