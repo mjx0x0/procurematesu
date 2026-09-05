@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import FixedApproverPRForm from "./FixedApproverPRForm";
+import ProcurementRequestForm from "./ProcurementRequestForm";
 
 export default function Page() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading form...</div>}>
-      <FixedApproverPRForm />
+      <ProcurementRequestForm />
     </Suspense>
   );
 }
