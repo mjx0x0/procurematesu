@@ -8,6 +8,15 @@ import {
   Send, Bot, Loader2, ArrowLeft, Trash2, Copy, Check, Sparkles
 } from "lucide-react";
 
+interface PRChoice {
+  pr_no: string;
+  purpose: string;
+  total: number;
+  current_stage: string;
+  created_at: string;
+  department?: string;
+}
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -15,12 +24,13 @@ interface Message {
   timestamp: Date;
   isLoading?: boolean;
   sources?: string[];
+  prOptions?: PRChoice[];
 }
 
 const SUGGESTIONS = [
   "What is RA 12009?",
   "Help me draft a PR",
-  "Track PR-2026-0001",
+  "Track my PR",
   "How does Small Value Procurement work?",
   "Explain the bidding process",
   "MSU-GenSan Procurement Flow",
@@ -72,7 +82,7 @@ export default function ChatbotDashboard() {
             "I can assist you with:\n" +
             "• **Republic Act No. 12009 (New Government Procurement Act)** and RA 9184 IRR\n" +
             "• **Drafting Purchase Requests** step-by-step with instant print & form generation (try clicking *'Help me draft a PR'* below)\n" +
-            "• **Tracking PR status** and timeline stages (e.g. *'Track PR-2026-0001'*)\n" +
+            "• **Tracking PR status** — say *'Track my PR'* and I will show your submitted PRs to choose from\n" +
             "• **Contact Details** of the MSU-GenSan Procurement Management Office and BAC Secretariat\n" +
             "• **Alternative Procurement Modalities** (Small Value Procurement, Shopping, Direct Contracting)\n\n" +
             "How may I assist your procurement needs today?",
@@ -82,6 +92,55 @@ export default function ChatbotDashboard() {
     };
     checkAuth();
   }, [router]);
+
+  const addAssistantMessage = (content: string, prOptions?: PRChoice[]) => {
+    setMessages(prev => [...prev, {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      role: 'assistant',
+      content,
+      timestamp: new Date(),
+      prOptions,
+    }]);
+  };
+
+  const isTrackMyPRRequest = (text: string) => {
+    const lower = text.toLowerCase().replace(/[’']/g, "'").trim();
+    return /\btrack\s+(my|all|submitted)\s+(pr|prs|purchase\s+requests?)\b/.test(lower) ||
+      /\btrack\s+my\s+purchase\s+request\b/.test(lower) ||
+      /\bshow\s+(me\s+)?my\s+(pr|prs|purchase\s+requests?)\b/.test(lower) ||
+      /\bmy\s+(pr|prs|purchase\s+requests?)\s+(status|tracking|progress)\b/.test(lower);
+  };
+
+  const loadMyPRs = async () => {
+    const response = await fetch('/api/chat/my-prs', {
+      method: 'GET',
+      cache: 'no-store',
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data?.error || 'Unable to load your purchase requests.');
+    }
+
+    return Array.isArray(data.prs) ? data.prs as PRChoice[] : [];
+  };
+
+  const handleTrackMyPR = async () => {
+    const prs = await loadMyPRs();
+
+    if (prs.length === 0) {
+      addAssistantMessage(
+        "📋 **You don't have any submitted Purchase Requests yet.**\n\n" +
+        "Once you submit a PR, you can say **\"Track my PR\"** here and choose which request you want to track."
+      );
+      return;
+    }
+
+    addAssistantMessage(
+      `📋 **Which Purchase Request would you like to track?**\n\nI found **${prs.length} submitted PR${prs.length === 1 ? '' : 's'}** under your account. Select one below.`,
+      prs
+    );
+  };
 
   const handleSend = async (messageToSend?: string) => {
     const text = (messageToSend || input).trim();
@@ -96,6 +155,21 @@ export default function ChatbotDashboard() {
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setLoading(true);
+
+    // "Track my PR" is handled locally through the authenticated endpoint so
+    // the user gets a list containing only their own submitted PRs.
+    if (isTrackMyPRRequest(text)) {
+      try {
+        await handleTrackMyPR();
+      } catch (error) {
+        console.error('Track my PR error:', error);
+        addAssistantMessage('❌ I could not load your submitted Purchase Requests right now. Please try again.');
+      } finally {
+        setLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 100);
+      }
+      return;
+    }
 
     const loadingId = (Date.now() + 1).toString();
     setMessages(prev => [...prev, {
@@ -151,6 +225,70 @@ export default function ChatbotDashboard() {
     }
   };
 
+  const handlePRSelection = async (prNo: string) => {
+    if (loading) return;
+
+    setLoading(true);
+    try {
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: `Track ${prNo}`,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, userMessage]);
+
+      const loadingId = `${Date.now()}-track`;
+      setMessages(prev => [...prev, {
+        id: loadingId,
+        role: 'assistant',
+        content: '...',
+        timestamp: new Date(),
+        isLoading: true,
+      }]);
+
+      // The selected PR came from the authenticated user's own PR list.
+      // Keep the existing chatbot tracking response/timeline presentation.
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `Track ${prNo}`,
+          userId: user?.id,
+          sessionId: sessionId,
+        }),
+      });
+      const data = await response.json();
+
+      setMessages(prev => prev.map(msg =>
+        msg.id === loadingId
+          ? {
+              ...msg,
+              content: data.response || `I could not retrieve the status for ${prNo}.`,
+              sources: Array.isArray(data.sources) && data.sources.length > 0 ? data.sources : undefined,
+              isLoading: false,
+            }
+          : msg
+      ));
+
+      if (data.sessionId) setSessionId(data.sessionId);
+    } catch (error) {
+      console.error('PR selection tracking error:', error);
+      setMessages(prev => prev.map(msg =>
+        msg.isLoading
+          ? {
+              ...msg,
+              content: '❌ We encountered a temporary connection issue while tracking that PR. Please try again.',
+              isLoading: false,
+            }
+          : msg
+      ));
+    } finally {
+      setLoading(false);
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -174,6 +312,24 @@ export default function ChatbotDashboard() {
     navigator.clipboard.writeText(content);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      draft: "Draft",
+      pending: "Pending",
+      for_approval: "For Approval",
+      budget_office: "Budget Office",
+      chancellor_approval: "Chancellor Approval",
+      procurement_processing: "Processing",
+      canvassing: "Canvassing",
+      bidding: "Bidding",
+      for_award: "For Award",
+      po_issued: "PO Issued",
+      completed: "Completed",
+      cancelled: "Cancelled",
+    };
+    return labels[status] || status.replace(/_/g, ' ');
   };
 
   if (!isAuthenticated) {
@@ -254,6 +410,33 @@ export default function ChatbotDashboard() {
                   ) : (
                     <>
                       <ChatMessageContent content={msg.content} isUser={msg.role === 'user'} />
+
+                      {msg.prOptions && msg.prOptions.length > 0 && (
+                        <div className="mt-3 space-y-2">
+                          {msg.prOptions.map((pr) => (
+                            <button
+                              key={pr.pr_no}
+                              onClick={() => handlePRSelection(pr.pr_no)}
+                              disabled={loading}
+                              className="w-full text-left bg-[#FAF8F5] hover:bg-red-50 border border-stone-200 hover:border-red-200 rounded-xl p-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <div className="flex items-center justify-between gap-3">
+                                <span className="font-bold text-sm text-[#7A1315]">{pr.pr_no}</span>
+                                <span className="text-[10px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full bg-white border border-stone-200 text-gray-600">
+                                  {getStatusLabel(pr.current_stage)}
+                                </span>
+                              </div>
+                              <p className="text-xs text-gray-700 mt-1 line-clamp-2">{pr.purpose || 'Purchase Request'}</p>
+                              <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[10px] text-gray-500">
+                                {pr.department && <span>{pr.department}</span>}
+                                <span>₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <span>{new Date(pr.created_at).toLocaleDateString()}</span>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
                       {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
                         <div className="mt-2.5 pt-2 border-t border-gray-200/60 flex items-center flex-wrap gap-1.5">
                           <span className="text-[11px] text-gray-500 font-medium">📚 Grounded in verified documents:</span>
@@ -320,7 +503,7 @@ export default function ChatbotDashboard() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask about RA 12009, PR drafting, or say 'Help me draft a PR'..."
+                placeholder="Ask about RA 12009, PR drafting, or say 'Track my PR'..."
                 className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7A1315] focus:border-transparent outline-none transition-all text-sm"
                 disabled={loading}
               />
