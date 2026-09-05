@@ -8,24 +8,19 @@ import {
   FileText,
   LogOut,
   User,
-  Users,
   FileCheck,
   Clock,
   Loader2,
-  PlusCircle,
   Eye,
   Search,
-  Filter,
   ChevronDown,
   CheckCircle,
   XCircle,
   AlertCircle,
-  Edit,
   Trash2,
   RefreshCw,
   X,
   MessageSquare,
-  Calendar,
   Check,
   ArrowRight,
 } from "lucide-react";
@@ -70,17 +65,6 @@ const STAGES = [
   { key: "po_issued", label: "PO Issued" },
   { key: "completed", label: "Completed" },
 ];
-
-const STAGE_STATUS_MAP: Record<string, string> = {
-  pending: "pending",
-  budget_office: "budget_office",
-  chancellor_approval: "chancellor_approval",
-  procurement_processing: "procurement_processing",
-  canvassing: "canvassing",
-  for_award: "for_award",
-  po_issued: "po_issued",
-  completed: "completed",
-};
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -143,7 +127,6 @@ export default function AdminDashboard() {
 
   const loadData = async () => {
     try {
-      // Get all PRs
       const { data: prsData, error: prsError } = await supabase
         .from("purchase_requests")
         .select("*")
@@ -154,7 +137,6 @@ export default function AdminDashboard() {
       setPrs(prsData || []);
       setFilteredPrs(prsData || []);
 
-      // Calculate stats
       const prList = (prsData as PR[]) || [];
       const total = prList.length;
       const pending = prList.filter((p: PR) => p.current_stage === "draft" || p.current_stage === "pending").length;
@@ -173,10 +155,8 @@ export default function AdminDashboard() {
     }
   };
 
-  // Apply filters
   useEffect(() => {
     let filtered = [...prs];
-
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(p =>
@@ -185,15 +165,12 @@ export default function AdminDashboard() {
         p.department?.toLowerCase().includes(term)
       );
     }
-
     if (statusFilter !== "all") {
       filtered = filtered.filter(p => p.current_stage === statusFilter);
     }
-
     if (departmentFilter !== "all") {
       filtered = filtered.filter(p => p.department === departmentFilter);
     }
-
     setFilteredPrs(filtered);
   }, [searchTerm, statusFilter, departmentFilter, prs]);
 
@@ -238,7 +215,6 @@ export default function AdminDashboard() {
     return labels[status] || status;
   };
 
-  // Load stage history for a PR
   const loadStageHistory = async (prNo: string) => {
     const { data, error } = await supabase
       .from("pr_stages_completed")
@@ -253,26 +229,29 @@ export default function AdminDashboard() {
     }
   };
 
-  // Open detail modal and load history
   const handleViewDetails = async (pr: PR) => {
     setSelectedPR(pr);
     await loadStageHistory(pr.pr_no);
     setShowDetailModal(true);
   };
 
-  // Open the stage completion modal
+  // ✅ FIX: Get the NEXT stage to complete, not the current one
+  const getNextPendingStage = (pr: PR) => {
+    const currentIndex = STAGES.findIndex(s => s.key === pr.current_stage);
+    if (currentIndex >= STAGES.length - 1) return null;
+    return STAGES[currentIndex + 1];
+  };
+
   const handleOpenStageModal = (stageKey: string) => {
     setStageToComplete(stageKey);
     setStageRemarks("");
     setShowStageModal(true);
   };
 
-  // Complete a stage with remarks
   const handleCompleteStage = async () => {
     if (!selectedPR || !stageToComplete) return;
     if (updatingStatus) return;
 
-    // Validate remarks (optional, but we'll require it)
     if (!stageRemarks.trim()) {
       alert("Please add a remark/note for this stage completion.");
       return;
@@ -283,7 +262,7 @@ export default function AdminDashboard() {
     try {
       const newStatus = stageToComplete;
 
-      // Update PR status
+      // 1. Update PR status
       const { error: updateError } = await supabase
         .from("purchase_requests")
         .update({
@@ -294,7 +273,7 @@ export default function AdminDashboard() {
 
       if (updateError) throw updateError;
 
-      // Add to stage history with remarks
+      // 2. Insert into stage history with remarks
       const { error: historyError } = await supabase
         .from("pr_stages_completed")
         .insert({
@@ -307,11 +286,11 @@ export default function AdminDashboard() {
 
       if (historyError) throw historyError;
 
-      // Reload data
+      // 3. Reload data
       await loadData();
       await loadStageHistory(selectedPR.pr_no);
 
-      // Update selected PR with new stage
+      // 4. Update selected PR with new stage
       setSelectedPR({
         ...selectedPR,
         current_stage: newStatus,
@@ -320,9 +299,10 @@ export default function AdminDashboard() {
       setShowStageModal(false);
       setStageToComplete(null);
       setStageRemarks("");
-    } catch (err) {
-      console.error("Stage update error:", err);
-      alert("Failed to complete stage. Please try again.");
+    } catch (err: any) {
+      console.error("❌ Stage update error DETAILS:", err);
+      // Show the actual error message in the alert for debugging
+      alert(`Failed to complete stage. Error: ${err.message || err}`);
     } finally {
       setUpdatingStatus(false);
     }
@@ -354,30 +334,16 @@ export default function AdminDashboard() {
 
   const uniqueDepartments = [...new Set(prs.map(p => p.department).filter(Boolean))];
 
-  // Get stage status for the timeline
   const getStageStatus = (stageKey: string, pr: PR) => {
+    const isCompleted = stageHistory.some(h => h.stage_key === stageKey);
+    if (isCompleted) return "completed";
     const currentIndex = STAGES.findIndex(s => s.key === pr.current_stage);
     const stageIndex = STAGES.findIndex(s => s.key === stageKey);
-
-    // Check if this stage is already completed (exists in history)
-    const isCompleted = stageHistory.some(h => h.stage_key === stageKey);
-
-    if (isCompleted) return "completed";
-    if (stageIndex < currentIndex) return "completed";
     if (stageIndex === currentIndex) return "current";
+    if (stageIndex < currentIndex) return "completed";
     return "pending";
   };
 
-  // Get the next pending stage (the one the admin should complete)
-  const getNextPendingStage = (pr: PR) => {
-    const currentIndex = STAGES.findIndex(s => s.key === pr.current_stage);
-    // If current stage is the last one, no pending stage
-    if (currentIndex >= STAGES.length - 1) return null;
-    // Next stage is the one after current index
-    return STAGES[currentIndex + 1];
-  };
-
-  // Check if the PR is completed or cancelled
   const isTerminal = (pr: PR) => {
     return pr.current_stage === "completed" || pr.current_stage === "cancelled";
   };
@@ -541,17 +507,9 @@ export default function AdminDashboard() {
                   className="appearance-none pl-4 pr-8 py-2.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#7C1D2E] focus:border-transparent outline-none transition-all bg-white"
                 >
                   <option value="all">All Statuses</option>
-                  <option value="draft">Draft</option>
-                  <option value="pending">Pending</option>
-                  <option value="for_approval">For Approval</option>
-                  <option value="budget_office">Budget Office</option>
-                  <option value="chancellor_approval">Chancellor Approval</option>
-                  <option value="procurement_processing">Processing</option>
-                  <option value="canvassing">Canvassing</option>
-                  <option value="bidding">Bidding</option>
-                  <option value="for_award">For Award</option>
-                  <option value="po_issued">PO Issued</option>
-                  <option value="completed">Completed</option>
+                  {STAGES.map(s => (
+                    <option key={s.key} value={s.key}>{s.label}</option>
+                  ))}
                   <option value="cancelled">Cancelled</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none" />
@@ -647,7 +605,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* ============================================================
-          DETAIL MODAL – Stage Timeline (matches your images)
+          DETAIL MODAL – Stage Timeline
           ============================================================ */}
       {showDetailModal && selectedPR && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
@@ -696,10 +654,10 @@ export default function AdminDashboard() {
                 const isCurrent = stageStatus === "current";
                 const isPending = stageStatus === "pending";
                 const isLast = index === STAGES.length - 1;
+                const nextStage = getNextPendingStage(selectedPR);
 
                 return (
                   <div key={stage.key} className="relative">
-                    {/* Vertical Line */}
                     {!isLast && (
                       <div
                         className={`absolute left-5 top-10 w-0.5 h-12 ${
@@ -709,7 +667,6 @@ export default function AdminDashboard() {
                     )}
 
                     <div className="flex items-start gap-4 py-2">
-                      {/* Icon */}
                       <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 z-10 ${
                           isCompleted
@@ -728,7 +685,6 @@ export default function AdminDashboard() {
                         )}
                       </div>
 
-                      {/* Content */}
                       <div className="flex-1 pt-1">
                         <div className="flex items-center justify-between">
                           <div>
@@ -761,10 +717,10 @@ export default function AdminDashboard() {
                             )}
                           </div>
 
-                          {/* Action Button */}
-                          {isCurrent && !isTerminal(selectedPR) && (
+                          {/* ✅ FIX: Only show "Complete Stage" if there is a NEXT stage */}
+                          {isCurrent && !isTerminal(selectedPR) && nextStage && (
                             <button
-                              onClick={() => handleOpenStageModal(stage.key)}
+                              onClick={() => handleOpenStageModal(nextStage.key)}
                               className="px-4 py-1.5 bg-[#D4A843] hover:bg-[#C49A3A] text-white text-xs font-semibold rounded-lg transition shadow-sm flex items-center gap-1"
                             >
                               <ArrowRight className="h-3 w-3" />
@@ -808,7 +764,7 @@ export default function AdminDashboard() {
       )}
 
       {/* ============================================================
-          COMPLETE STAGE MODAL – with Remarks (matches your second image)
+          COMPLETE STAGE MODAL – with Remarks
           ============================================================ */}
       {showStageModal && stageToComplete && selectedPR && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
