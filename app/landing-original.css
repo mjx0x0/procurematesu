@@ -1,0 +1,14 @@
+/* Landing-page-only compatibility overrides.
+   Keeps the original landing page visual treatment while allowing the
+   shared application theme to remain unchanged elsewhere. */
+body::before {
+  display: none !important;
+}
+
+/* The original ProcuremateSU wordmark uses the application's clean sans-serif
+   rather than the editorial serif used by dashboard headings. */
+.landing-original-wordmark {
+  font-family: var(--font-inter), Inter, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+}
