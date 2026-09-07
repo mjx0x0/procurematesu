@@ -6,6 +6,8 @@ import { POST as legacyChatPOST } from '@/app/api/chat/route';
 const NEW_TOPIC_PATTERN = /\b(what is|what are|how does|how do|explain|tell me about|where is|where can|when is|who is|contact|ra\s*12009|ra\s*9184|small value|svp|bidding|procurement flow|procurement office|new purchase request|draft (?:a )?pr|create (?:a )?pr|track my pr|show me my pr)\b/i;
 const DRAFT_CONTINUATION_PATTERN = /\b(purpose|department|office|section|item|items|quantity|unit|price|cost|budget|supplier|description|yes|no|correct|continue|next)\b/i;
 const PR_PATTERN = /\bPR[- ]?(\d{4}[- ]?\d{4}|\d{4})\b/i;
+const PR_ACCESS_PATTERN = /\b(track|show|view|see|open|display|details?|status|progress|update|history|timeline)\b/i;
+const OTHER_USER_PR_PATTERN = /\b(another|other|someone\s+else|somebody\s+else|different)\s+(user|person|account|requester)|\b(?:someone\s+else'?s|another\s+user'?s|other\s+user'?s)\b/i;
 
 function shouldResetDrafting(message: string) {
   return NEW_TOPIC_PATTERN.test(message) && !DRAFT_CONTINUATION_PATTERN.test(message);
@@ -22,8 +24,6 @@ function buildSafeContext(history: unknown) {
     )
     .slice(-12)
     .map((entry) => {
-      // Memory is for the model, not the intent parser. Mask PR/status trigger
-      // phrases so old tracking turns cannot hijack a new unrelated question.
       const safe = entry.content
         .replace(/PR-[A-Z0-9-]{3,40}/gi, '[purchase request reference]')
         .replace(/\btrack\b/gi, 'follow up')
@@ -48,29 +48,23 @@ export async function POST(request: NextRequest) {
         })
       : null;
 
-    // Support both Bearer token and cookie authentication
     let user = null;
     const authHeader = request.headers.get('authorization');
     if (authHeader && authHeader.startsWith('Bearer ') && db) {
       const token = authHeader.replace('Bearer ', '').trim();
       const { data: tokenAuth, error: tokenError } = await db.auth.getUser(token);
-      if (!tokenError && tokenAuth?.user) {
-        user = tokenAuth.user;
-      }
+      if (!tokenError && tokenAuth?.user) user = tokenAuth.user;
     }
 
-    let authClient = await createServerClient();
+    const authClient = await createServerClient();
     if (!user) {
       const { data: cookieAuth, error: authError } = await authClient.auth.getUser();
-      if (!authError && cookieAuth?.user) {
-        user = cookieAuth.user;
-      }
+      if (!authError && cookieAuth?.user) user = cookieAuth.user;
     }
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const clientToUse = db || authClient;
-
     const { data: profile, error: profileError } = await clientToUse
       .from('users')
       .select('is_active, role')
@@ -98,25 +92,41 @@ export async function POST(request: NextRequest) {
     if (sessionError || !session) return NextResponse.json({ error: 'Chat session not found.' }, { status: 404 });
     if (session.is_active === false) return NextResponse.json({ error: 'This conversation is closed. Start a new chat.' }, { status: 409 });
 
-    // Explicitly starting a different topic must leave an old PR-drafting flow.
     if (session.state?.drafting && shouldResetDrafting(message)) {
       await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
     }
 
-    // A PR number in a tracking request: if not admin, must belong to the authenticated user.
+    // Every request that attempts to access a specific PR must be authorized.
+    // Never let the language model or mock data decide whether another user's PR is visible.
     const prMatch = message.match(PR_PATTERN);
-    if (prMatch && /\b(track|status|where is|progress|update)\b/i.test(message)) {
-      const raw = prMatch[1].replace(/\s+/g, '');
+    const isPRAccessRequest = Boolean(prMatch) && PR_ACCESS_PATTERN.test(message);
+    if (isPRAccessRequest) {
+      const raw = prMatch![1].replace(/\s+/g, '');
       const normalized = raw.startsWith('2026') ? `PR-${raw}` : `PR-${raw.replace(/^PR/i, '')}`;
+
       if (profile.role !== 'admin') {
-        const { data: ownedPR } = await clientToUse
+        const { data: ownedPR, error: ownershipError } = await clientToUse
           .from('purchase_requests')
           .select('pr_no')
           .eq('pr_no', normalized)
           .eq('user_id', user.id)
           .maybeSingle();
-        if (!ownedPR) return NextResponse.json({ error: 'That Purchase Request is not associated with your account.' }, { status: 403 });
+
+        if (ownershipError || !ownedPR) {
+          return NextResponse.json(
+            { error: 'Access denied. That Purchase Request is not associated with your account.' },
+            { status: 403 }
+          );
+        }
       }
+    }
+
+    // Explicitly reject requests that ask for another user's procurement data.
+    if (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message)) {
+      return NextResponse.json(
+        { error: 'Access denied. You can only view Purchase Requests associated with your account.' },
+        { status: 403 }
+      );
     }
 
     const safeContext = buildSafeContext(history);
