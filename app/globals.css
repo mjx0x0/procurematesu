@@ -24,6 +24,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Distinctive MSU-GenSan institutional hairline. */
 body::before {
   content: '';
   position: fixed;
@@ -34,6 +35,7 @@ body::before {
   background: linear-gradient(90deg, var(--msu-maroon-deep) 0%, var(--msu-maroon) 62%, var(--msu-gold) 62%, var(--msu-gold-bright) 100%);
 }
 
+/* Restrained paper texture instead of a generic flat background. */
 body::after {
   content: '';
   position: fixed;
@@ -73,6 +75,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   transition: background-color 5000s ease-in-out 0s;
 }
 
+/* Warm editorial surfaces for existing dashboard/admin cards. */
 .bg-\[\#FAF8F5\], .bg-\[\#F9F7F4\] { background: var(--paper) !important; }
 .bg-white.rounded-xl, .bg-white.rounded-2xl { box-shadow: 0 8px 28px rgba(53,7,8,.055), 0 1px 2px rgba(53,7,8,.04); }
 .bg-\[\#7A1315\], .bg-\[\#7C1D2E\] { box-shadow: inset 0 0 0 1px rgba(212,175,55,.18); }
@@ -80,159 +83,6 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 .display-serif { font-family: 'DM Serif Display', Georgia, serif; }
 .msu-section-marker { position: relative; padding-left: 14px; }
 .msu-section-marker::before { content: ''; position: absolute; left: 0; top: .25em; bottom: .25em; width: 3px; border-radius: 3px; background: linear-gradient(var(--msu-maroon), var(--msu-gold)); }
-
-/* --------------------------------------------------------------------------
-   Dashboard visual language
-   Scoped to the existing end-user dashboard root. No application logic or
-   form markup is changed by these rules.
-   -------------------------------------------------------------------------- */
-.min-h-screen.bg-\[\#FAF8F5\] > nav {
-  background: rgba(255,252,247,.94) !important;
-  border-bottom: 1px solid rgba(122,19,21,.14) !important;
-  box-shadow: 0 4px 18px rgba(53,7,8,.055) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-.min-h-screen.bg-\[\#FAF8F5\] > nav > div { min-height: 48px; }
-.min-h-screen.bg-\[\#FAF8F5\] > nav .bg-\[\#7A1315\] {
-  border-radius: 9px !important;
-  box-shadow: 0 5px 12px rgba(122,19,21,.16), inset 0 0 0 1px rgba(212,175,55,.28) !important;
-}
-.min-h-screen.bg-\[\#FAF8F5\] main h1 {
-  font-family: 'DM Serif Display', Georgia, serif;
-  font-weight: 400 !important;
-  letter-spacing: -.025em !important;
-}
-.min-h-screen.bg-\[\#FAF8F5\] main > div:first-child {
-  position: relative;
-  padding: 22px 24px;
-  border: 1px solid rgba(122,19,21,.10);
-  border-radius: 18px;
-  background: linear-gradient(120deg, rgba(255,255,255,.84), rgba(250,246,238,.62));
-  box-shadow: 0 10px 30px rgba(53,7,8,.045);
-  overflow: hidden;
-}
-.min-h-screen.bg-\[\#FAF8F5\] main > div:first-child::after {
-  content: 'MSU • PROCUREMENT MANAGEMENT';
-  position: absolute;
-  right: 22px;
-  bottom: 13px;
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: .22em;
-  color: rgba(122,19,21,.16);
-  pointer-events: none;
-}
-.min-h-screen.bg-\[\#FAF8F5\] main > div:nth-child(2) > div {
-  position: relative;
-  overflow: hidden;
-  border-color: rgba(122,19,21,.10) !important;
-  border-radius: 15px !important;
-  box-shadow: 0 8px 22px rgba(53,7,8,.045) !important;
-}
-.min-h-screen.bg-\[\#FAF8F5\] main > div:nth-child(2) > div::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: linear-gradient(to bottom, var(--msu-maroon), var(--msu-gold));
-}
-.min-h-screen.bg-\[\#FAF8F5\] main > div:nth-child(3) {
-  border: 1px solid rgba(122,19,21,.12) !important;
-  border-radius: 18px !important;
-  box-shadow: 0 14px 36px rgba(53,7,8,.055) !important;
-}
-.min-h-screen.bg-\[\#FAF8F5\] main > div:nth-child(3) > div:first-child {
-  background: linear-gradient(90deg, #FBF8F2, #F5EEE3) !important;
-  border-bottom-color: rgba(122,19,21,.11) !important;
-}
-.min-h-screen.bg-\[\#FAF8F5\] main > div:nth-child(3) thead {
-  background: #F4EEE5 !important;
-}
-.min-h-screen.bg-\[\#FAF8F5\] main > div:nth-child(3) tbody tr:hover {
-  background: rgba(122,19,21,.035) !important;
-}
-.min-h-screen.bg-\[\#FAF8F5\] main > div:nth-child(3) tbody td:first-child {
-  position: relative;
-}
-.min-h-screen.bg-\[\#FAF8F5\] main > div:nth-child(3) tbody td:first-child::before {
-  content: '';
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  margin: 0 8px 2px 0;
-  border-radius: 50%;
-  background: var(--msu-gold);
-  box-shadow: 0 0 0 3px rgba(184,142,19,.12);
-}
-
-/* --------------------------------------------------------------------------
-   Admin visual language
-   Scoped only to the existing admin root, preserving all workflow actions,
-   filters, realtime subscriptions, modals, and database behavior.
-   -------------------------------------------------------------------------- */
-.min-h-screen.bg-\[\#F9F7F4\] > nav {
-  background: rgba(77,12,13,.97) !important;
-  border-bottom: 2px solid rgba(212,175,55,.45) !important;
-  box-shadow: 0 8px 22px rgba(53,7,8,.16) !important;
-}
-.min-h-screen.bg-\[\#F9F7F4\] > nav b { color: #FFF9EF !important; }
-.min-h-screen.bg-\[\#F9F7F4\] > nav .bg-\[\#7C1D2E\] {
-  background: #350708 !important;
-  box-shadow: inset 0 0 0 1px rgba(212,175,55,.30) !important;
-}
-.min-h-screen.bg-\[\#F9F7F4\] > nav .text-stone-600 { color: rgba(255,247,233,.74) !important; }
-.min-h-screen.bg-\[\#F9F7F4\] > nav button { color: rgba(255,247,233,.72) !important; }
-.min-h-screen.bg-\[\#F9F7F4\] > nav button:hover { color: #F4D98A !important; background: rgba(255,255,255,.08) !important; }
-.min-h-screen.bg-\[\#F9F7F4\] main > div:first-child {
-  padding: 22px 24px;
-  border: 1px solid rgba(122,19,21,.12);
-  border-radius: 18px;
-  background: linear-gradient(120deg, rgba(255,255,255,.88), rgba(250,246,238,.66));
-  box-shadow: 0 10px 30px rgba(53,7,8,.045);
-}
-.min-h-screen.bg-\[\#F9F7F4\] main h1 {
-  font-family: 'DM Serif Display', Georgia, serif;
-  font-weight: 400 !important;
-  letter-spacing: -.02em;
-}
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(2) > div {
-  border-color: rgba(122,19,21,.11) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 7px 20px rgba(53,7,8,.045) !important;
-  position: relative;
-  overflow: hidden;
-}
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(2) > div:first-child { border-top: 3px solid var(--msu-maroon) !important; }
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(2) > div:nth-child(2) { border-top: 3px solid #B88E13 !important; }
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(2) > div:nth-child(3) { border-top: 3px solid #C46D2B !important; }
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(2) > div:nth-child(4) { border-top: 3px solid #278A70 !important; }
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(2) > div:nth-child(5) { border-top: 3px solid #B43A3D !important; }
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(3),
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(4) {
-  border-color: rgba(122,19,21,.12) !important;
-  border-radius: 18px !important;
-  box-shadow: 0 12px 30px rgba(53,7,8,.05) !important;
-}
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(3) {
-  background: rgba(255,253,249,.88) !important;
-  backdrop-filter: blur(8px);
-}
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(4) > div:first-child,
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(3) > div:first-child {
-  background: linear-gradient(90deg, #FBF8F2, #F4EDE1) !important;
-}
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(4) thead,
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(3) thead { background: #F2EBE0 !important; }
-.min-h-screen.bg-\[\#F9F7F4\] main > div:nth-child(4) tbody tr:hover { background: rgba(122,19,21,.035) !important; }
-
-/* Shared institutional controls. */
-.min-h-screen.bg-\[\#FAF8F5\] a[href="/dashboard/new-pr"],
-.min-h-screen.bg-\[\#F9F7F4\] button.bg-gradient-to-r {
-  box-shadow: 0 7px 15px rgba(122,19,21,.14), inset 0 0 0 1px rgba(212,175,55,.24) !important;
-}
-.min-h-screen.bg-\[\#FAF8F5\] a:hover,
-.min-h-screen.bg-\[\#F9F7F4\] a:hover { transition: color .18s ease, background-color .18s ease, box-shadow .18s ease, transform .18s ease; }
 
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-track { background: #EFE9DF; }
