@@ -33,7 +33,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-900/10 border border-red-900/20 text-[#7A1315] text-xs font-bold uppercase tracking-wider">
               <span>Procurement Management System</span>
             </div>
-            <h1 className="landing-original-wordmark text-4xl sm:text-5xl text-[#4D0C0D]">
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-[#4D0C0D] tracking-tight">
               Procuremate<span className="text-[#B88E13]">SU</span>
             </h1>
             <p className="text-sm font-semibold text-[#7A1315] tracking-wide uppercase">
