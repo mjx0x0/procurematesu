@@ -13,28 +13,15 @@ function shouldResetDrafting(message: string) {
   return NEW_TOPIC_PATTERN.test(message) && !DRAFT_CONTINUATION_PATTERN.test(message);
 }
 
-function buildSafeContext(history: unknown) {
-  if (!Array.isArray(history) || history.length === 0) return '';
-
-  const recent = history
-    .filter((entry): entry is { role: string; content: string } =>
-      Boolean(entry) && typeof entry === 'object' &&
-      typeof (entry as { role?: unknown }).role === 'string' &&
-      typeof (entry as { content?: unknown }).content === 'string'
-    )
-    .slice(-12)
-    .map((entry) => {
-      const safe = entry.content
-        .replace(/PR-[A-Z0-9-]{3,40}/gi, '[purchase request reference]')
-        .replace(/\btrack\b/gi, 'follow up')
-        .replace(/\bstatus\b/gi, 'progress detail')
-        .slice(0, 1500);
-      return `${entry.role === 'assistant' ? 'Assistant' : 'User'}: ${safe}`;
-    });
-
-  return recent.length
-    ? `Conversation context from earlier turns. Use this only to understand references in the current message; do not continue an old task unless the current message clearly asks for it:\n${recent.join('\n\n')}`
-    : '';
+// Context is intentionally disabled at this boundary. The frontend already keeps the
+// visible conversation history, while the server keeps the authenticated session state.
+// Re-injecting the rendered transcript here caused recursive "Conversation context"
+// blocks to become part of the next user message.
+function extractCurrentUserMessage(message: string): string {
+  const marker = /(?:^|\n)Current user message:\s*/i;
+  const match = message.match(marker);
+  if (!match || match.index === undefined) return message.trim();
+  return message.slice(match.index + match[0].length).trim();
 }
 
 export async function POST(request: NextRequest) {
@@ -75,9 +62,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const message = typeof body?.message === 'string' ? body.message.trim() : '';
+    const rawMessage = typeof body?.message === 'string' ? body.message.trim() : '';
+    const message = extractCurrentUserMessage(rawMessage);
     const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : '';
-    const history = Array.isArray(body?.history) ? body.history : [];
 
     if (!message || message.length > 12000 || !sessionId) {
       return NextResponse.json({ error: 'Message and session are required.' }, { status: 400 });
@@ -93,11 +80,14 @@ export async function POST(request: NextRequest) {
     if (session.is_active === false) return NextResponse.json({ error: 'This conversation is closed. Start a new chat.' }, { status: 409 });
 
     if (session.state?.drafting && shouldResetDrafting(message)) {
-      await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
+      await clientToUse
+        .from('chat_sessions')
+        .update({ state: {}, updated_at: new Date().toISOString() })
+        .eq('id', sessionId)
+        .eq('user_id', user.id);
     }
 
     // Every request that attempts to access a specific PR must be authorized.
-    // Never let the language model or mock data decide whether another user's PR is visible.
     const prMatch = message.match(PR_PATTERN);
     const isPRAccessRequest = Boolean(prMatch) && PR_ACCESS_PATTERN.test(message);
     if (isPRAccessRequest) {
@@ -121,7 +111,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Explicitly reject requests that ask for another user's procurement data.
     if (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message)) {
       return NextResponse.json(
         { error: 'Access denied. You can only view Purchase Requests associated with your account.' },
@@ -129,15 +118,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const safeContext = buildSafeContext(history);
-    const engineMessage = safeContext
-      ? `${safeContext}\n\nCurrent user message (this is the only message that should determine the current intent):\n${message}`
-      : message;
-
+    // Pass ONLY the current user question to the legacy response engine.
+    // Never pass the previous rendered transcript, which prevents exponential context growth.
     const trustedRequest = new NextRequest(request.url, {
       method: 'POST',
       headers: request.headers,
-      body: JSON.stringify({ message: engineMessage, sessionId, userId: user.id }),
+      body: JSON.stringify({ message, sessionId, userId: user.id }),
     });
 
     return legacyChatPOST(trustedRequest);
