@@ -39,11 +39,39 @@ function buildSafeContext(history: unknown) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authClient = await createServerClient();
-    const { data: { user }, error: authError } = await authClient.auth.getUser();
-    if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-    const { data: profile, error: profileError } = await authClient
+    const db = (serviceRoleKey && supabaseUrl)
+      ? createSupabaseAdminClient(supabaseUrl, serviceRoleKey, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        })
+      : null;
+
+    // Support both Bearer token and cookie authentication
+    let user = null;
+    const authHeader = request.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ') && db) {
+      const token = authHeader.replace('Bearer ', '').trim();
+      const { data: tokenAuth, error: tokenError } = await db.auth.getUser(token);
+      if (!tokenError && tokenAuth?.user) {
+        user = tokenAuth.user;
+      }
+    }
+
+    let authClient = await createServerClient();
+    if (!user) {
+      const { data: cookieAuth, error: authError } = await authClient.auth.getUser();
+      if (!authError && cookieAuth?.user) {
+        user = cookieAuth.user;
+      }
+    }
+
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const clientToUse = db || authClient;
+
+    const { data: profile, error: profileError } = await clientToUse
       .from('users')
       .select('is_active, role')
       .eq('id', user.id)
@@ -61,7 +89,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message and session are required.' }, { status: 400 });
     }
 
-    const { data: session, error: sessionError } = await authClient
+    const { data: session, error: sessionError } = await clientToUse
       .from('chat_sessions')
       .select('id, user_id, is_active, state')
       .eq('id', sessionId)
@@ -72,21 +100,23 @@ export async function POST(request: NextRequest) {
 
     // Explicitly starting a different topic must leave an old PR-drafting flow.
     if (session.state?.drafting && shouldResetDrafting(message)) {
-      await authClient.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
+      await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
     }
 
-    // A PR number in a tracking request must belong to the authenticated user.
+    // A PR number in a tracking request: if not admin, must belong to the authenticated user.
     const prMatch = message.match(PR_PATTERN);
     if (prMatch && /\b(track|status|where is|progress|update)\b/i.test(message)) {
       const raw = prMatch[1].replace(/\s+/g, '');
       const normalized = raw.startsWith('2026') ? `PR-${raw}` : `PR-${raw.replace(/^PR/i, '')}`;
-      const { data: ownedPR } = await authClient
-        .from('purchase_requests')
-        .select('pr_no')
-        .eq('pr_no', normalized)
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (!ownedPR) return NextResponse.json({ error: 'That Purchase Request is not associated with your account.' }, { status: 403 });
+      if (profile.role !== 'admin') {
+        const { data: ownedPR } = await clientToUse
+          .from('purchase_requests')
+          .select('pr_no')
+          .eq('pr_no', normalized)
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (!ownedPR) return NextResponse.json({ error: 'That Purchase Request is not associated with your account.' }, { status: 403 });
+      }
     }
 
     const safeContext = buildSafeContext(history);

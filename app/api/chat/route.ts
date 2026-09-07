@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { GoogleGenAI } from '@google/genai';
+import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 
 // ============================================================
 // CONFIGURATION & DATABASE FALLBACKS
@@ -674,6 +675,7 @@ export async function POST(req: NextRequest) {
       const isDraftIntent = /help me draft|create a pr|new purchase request|draft a purchase request|i need to request|i want to request|i need to buy|draft pr/i.test(lower);
       const prMatch = trimmedMsg.match(/PR[- ]?(\d{4}[- ]?\d{4}|\d{4})/i);
       const isTrackIntent = Boolean(prMatch) && /status|track|where is|progress|update/i.test(lower);
+      const isListMyPRsIntent = /\b(track\s+(my|all|submitted)\s+(pr|prs|purchase\s+requests?)|track\s+my\s+purchase\s+request|show\s+(me\s+)?my\s+(pr|prs|purchase\s+requests?)|my\s+(pr|prs|purchase\s+requests?)\s+(status|tracking|progress))\b/i.test(lower);
 
       if (isDraftIntent) {
         inquiryType = 'draft_pr';
@@ -685,6 +687,39 @@ export async function POST(req: NextRequest) {
         const rawPR = prMatch[1].replace(/\s+/g, '');
         const formattedPR = rawPR.startsWith('2026') ? `PR-${rawPR}` : (rawPR.startsWith('PR') ? rawPR : `PR-${rawPR}`);
         responseText = await handleTrackPR(formattedPR);
+      } else if (isListMyPRsIntent) {
+        inquiryType = 'track_pr';
+        if (supabase) {
+          try {
+            let q = supabase
+              .from('purchase_requests')
+              .select('pr_no, purpose, total, current_stage, created_at, department')
+              .order('created_at', { ascending: false });
+            if (userId) {
+              q = q.eq('user_id', userId);
+            }
+            const { data: userPrs } = await q.limit(10);
+            if (userPrs && userPrs.length > 0) {
+              responseText = `📋 **Here are your submitted Purchase Requests:**\n\n` +
+                userPrs.map((pr: any, idx: number) => {
+                  const stageName = PROCUREMENT_STAGE_LABELS[pr.current_stage] || pr.current_stage?.replace(/_/g, ' ') || 'In Progress';
+                  const amount = Number(pr.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+                  return `${idx + 1}. **${pr.pr_no}** — ${pr.purpose || 'Official Procurement'}\n` +
+                    `   • Current Stage: **${stageName}**\n` +
+                    `   • Total Amount: ₱${amount}\n` +
+                    `   • Type **"Track ${pr.pr_no}"** or tap below to view complete timeline.`;
+                }).join('\n\n');
+            } else {
+              responseText = `📋 **You don't have any submitted Purchase Requests yet.**\n\n` +
+                `Once you submit a Purchase Request, say **"Track my PR"** and I will display your real-time tracking status here.`;
+            }
+          } catch (loadErr) {
+            console.warn('[chat] Failed to query PRs for user, falling back to general tracking message', loadErr);
+            responseText = `📋 **Purchase Request Tracking**\n\nPlease provide your Purchase Request Number (e.g., **"Track PR-2026-0001"**) to view its current stage and timeline.`;
+          }
+        } else {
+          responseText = `📋 **Purchase Request Tracking**\n\nPlease provide your Purchase Request Number (e.g., **"Track PR-2026-0001"**) to view its current stage and timeline.`;
+        }
       } else {
         // General Q&A / Procurement Assistant with RAG grounded in Supabase document_chunks
         inquiryType = 'procurement_guidance';
