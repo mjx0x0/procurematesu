@@ -157,39 +157,46 @@ export default function ProcurementRequestForm() {
     setSubmitting(true);
     setError(null);
     try {
-      await supabase.auth.updateUser({ data: { full_name: userName.trim() } });
-      const { data: prData, error: prError } = await supabase
-        .from("purchase_requests")
-        .insert({
-          user_id: userId,
+      await supabase.auth.updateUser({ data: { full_name: userName.trim() } }).catch(() => {});
+
+      const validItems = items.filter(item => item.description.trim()).map(item => ({
+        description: item.description.trim(),
+        qty: item.qty,
+        unit: item.unit.trim() || "pcs",
+        unit_cost: item.unit_cost,
+        total_cost: item.qty * item.unit_cost,
+      }));
+
+      // Get current auth session token for Bearer authentication
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+
+      // Call dedicated, atomic PR creation endpoint that bypasses RLS sequence collisions
+      const res = await fetch("/api/pr/create", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({
           department: form.department.trim(),
           section: form.section.trim() || null,
           purpose: form.purpose.trim(),
           total,
           printed_name: userName.trim(),
           designation: form.requested_by_designation.trim() || null,
-          current_stage: "draft",
-          pr_date: new Date().toISOString().split("T")[0],
-          sai_no: null,
-          alobs_no: null,
-        })
-        .select()
-        .single();
+          items: validItems,
+        }),
+      });
 
-      if (prError || !prData) throw new Error(prError?.message || "Failed to create the purchase request.");
+      const resData = await res.json();
 
-      const rows = items.filter(item => item.description.trim()).map(item => ({
-        pr_no: prData.pr_no,
-        item_description: item.description.trim(),
-        quantity: item.qty,
-        unit: item.unit.trim() || "pcs",
-        unit_cost: item.unit_cost,
-        total_cost: item.qty * item.unit_cost,
-      }));
-      const { error: itemsError } = await supabase.from("pr_items").insert(rows);
-      if (itemsError) throw new Error("PR was created, but the item details could not be saved.");
+      if (!res.ok || resData.error || !resData.pr) {
+        throw new Error(resData?.error || "Failed to create the purchase request.");
+      }
 
-      router.push(`/dashboard/pr/${prData.pr_no}`);
+      router.push(`/dashboard/pr/${resData.pr.pr_no}`);
     } catch (err: any) {
       setError(err?.message || "An unexpected error occurred.");
       setSubmitting(false);

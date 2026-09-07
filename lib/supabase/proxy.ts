@@ -55,6 +55,9 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   if (!claims && !isPublicPath(pathname)) {
+    if (pathname.startsWith("/api/")) {
+      return response;
+    }
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     url.searchParams.set("error", "unauthorized");

@@ -261,63 +261,52 @@ export default function NewPRForm() {
         data: { full_name: userName.trim() }
       }).catch(() => {});
 
-      // 1. Insert purchase request – keep SAI and ALOBS empty per official procurement workflow
-      const { data: prData, error: prError } = await supabase
-        .from("purchase_requests")
-        .insert({
-          user_id: userId,
+      const validItems = items
+        .filter(item => item.description.trim())
+        .map((item) => ({
+          item_description: item.description.trim(),
+          quantity: item.qty,
+          unit: item.unit || "pcs",
+          unit_cost: item.unit_cost || 0,
+          total_cost: item.total_cost || (item.qty * (item.unit_cost || 0)),
+        }));
+
+      // Get current auth session token for Bearer authentication
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+
+      // Call dedicated, atomic PR creation endpoint that bypasses RLS sequence collisions
+      const res = await fetch("/api/pr/create", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({
           department: formData.department,
           section: formData.section || null,
           purpose: formData.purpose,
           total: formData.total_amount,
           printed_name: userName.trim(),
           designation: formData.requested_by_designation || null,
-          current_stage: "draft",
-          pr_date: new Date().toISOString().split("T")[0],
-          sai_no: null,
-          alobs_no: null,
-        })
-        .select()
-        .single();
+          items: validItems,
+        }),
+      });
 
-      if (prError) {
-        console.error("❌ PR insert error:", prError);
-        setError(`Failed to create PR: ${prError.message}`);
+      const resData = await res.json();
+
+      if (!res.ok || resData.error || !resData.pr) {
+        console.error("❌ PR create error:", resData?.error);
+        setError(`Failed to create PR: ${resData?.error || "Unknown error"}`);
         setSubmitting(false);
         return;
       }
 
-      console.log("✅ Inserted PR:", prData);
+      console.log("✅ Inserted PR:", resData.pr);
 
-      // 2. Insert items
-      if (prData) {
-        const itemsToInsert = items
-          .filter(item => item.description.trim())
-          .map((item) => ({
-            pr_no: prData.pr_no,
-            item_description: item.description,
-            quantity: item.qty,
-            unit: item.unit || "pcs",
-            unit_cost: item.unit_cost || 0,
-            total_cost: item.total_cost || (item.qty * item.unit_cost),
-          }));
-
-        if (itemsToInsert.length > 0) {
-          const { error: itemsError } = await supabase
-            .from("pr_items")
-            .insert(itemsToInsert);
-
-          if (itemsError) {
-            console.error("❌ Items insert error:", itemsError);
-            setError("PR created but items could not be saved.");
-            setSubmitting(false);
-            return;
-          }
-        }
-
-        // 3. Redirect to the PR detail page
-        router.push(`/dashboard/pr/${prData.pr_no}`);
-      }
+      // Redirect to the PR detail page
+      router.push(`/dashboard/pr/${resData.pr.pr_no}`);
     } catch (err) {
       console.error("❌ Submit error:", err);
       setError("An unexpected error occurred.");
