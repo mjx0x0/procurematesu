@@ -1,83 +1,236 @@
 import Link from "next/link";
-import { ArrowRight, Lock } from "lucide-react";
-import { MsuLogo } from "@/components/msu-logo";
+import { FileText, Search, Bot, Shield, Clock, CheckCircle } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col justify-between selection:bg-[#7A1315] selection:text-amber-200">
-      {/* Top Institutional Header Bar */}
-      <header className="w-full bg-[#4D0C0D] text-amber-100/90 border-b border-amber-500/20 py-2.5 px-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between text-xs sm:text-sm">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-semibold text-white tracking-wide">
-              Mindanao State University - General Santos
-            </span>
-          </div>
-          <span className="text-[11px] sm:text-xs text-amber-200/80 hidden sm:inline font-medium">
-            Fatima, General Santos City • RA 12009 (NGPA)
-          </span>
-        </div>
-      </header>
-
-      {/* Main Center Content: University Logo, System Title, Brief Description, Sign In Button */}
-      <main className="flex-1 flex items-center justify-center px-4 py-12 sm:py-16">
-        <div className="max-w-xl w-full mx-auto text-center flex flex-col items-center">
-          {/* MSU GenSan Official Logo */}
-          <div className="mb-6 animate-fade-in-up">
-            <MsuLogo size={150} />
-          </div>
-
-          {/* System Title */}
-          <div className="space-y-2 mb-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-900/10 border border-red-900/20 text-[#7A1315] text-xs font-bold uppercase tracking-wider">
-              <span>Procurement Management System</span>
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-50">
+      {/* Navigation Bar */}
+      <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <FileText className="h-8 w-8 text-blue-600" />
+              <span className="ml-2 text-xl font-bold text-gray-900">ProcuremateSU</span>
+              <span className="ml-2 text-sm text-gray-500 font-medium">| MSU-GenSan</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-[#4D0C0D] tracking-tight">
-              Procuremate<span className="text-[#B88E13]">SU</span>
-            </h1>
-            <p className="text-sm font-semibold text-[#7A1315] tracking-wide uppercase">
-              Digital Procurement Logbook &amp; Assistant
-            </p>
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/auth/login"
+                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/auth/sign-up"
+                className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+              >
+                Get Started
+              </Link>
+            </div>
           </div>
+        </div>
+      </nav>
 
-          {/* Brief Description */}
-          <p className="text-base sm:text-lg text-stone-700 leading-relaxed max-w-lg mb-8">
-            The official procurement management and requisition tracking portal for 
-            Mindanao State University - General Santos, ensuring seamless processing 
-            and compliance with the New Government Procurement Act (Republic Act No. 12009).
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-6">
+            <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
+            Now Available for MSU-GenSan
+          </div>
+          <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
+            Digital Procurement
+            <span className="text-blue-600"> Logbook</span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
+            Streamline your procurement process with AI-powered assistance.
+            Track purchase requests, get guidance, and ensure compliance with RA 12009.
           </p>
-
-          {/* Button for Sign In */}
-          <div className="w-full max-w-sm flex flex-col items-center gap-3">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/auth/sign-up"
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30"
+            >
+              Start Your First Request
+            </Link>
             <Link
               href="/auth/login"
-              className="w-full inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white font-semibold text-base py-3.5 px-8 rounded-xl shadow-lg shadow-red-950/25 hover:shadow-xl hover:shadow-red-950/35 hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 border border-amber-400/30"
-              id="sign-in-button"
+              className="bg-white text-gray-700 px-8 py-3 rounded-lg text-lg font-medium border border-gray-300 hover:bg-gray-50 transition-colors"
             >
-              <Lock className="w-4 h-4 text-amber-300" />
-              <span>Sign In to Portal</span>
-              <ArrowRight className="w-4 h-4 text-amber-300" />
+              Sign In
             </Link>
-
-            <p className="text-xs text-stone-500">
-              Sign in using your official <span className="font-semibold text-[#7A1315]">@msugensan.edu.ph</span> account
-            </p>
           </div>
         </div>
-      </main>
+      </section>
 
-      {/* Institutional Footer */}
-      <footer className="w-full border-t border-stone-200/80 bg-white/70 py-4 px-4 text-center text-xs text-stone-500">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>
-            &copy; {new Date().getFullYear()} Mindanao State University - General Santos. All rights reserved.
-          </p>
-          <p className="text-stone-400">
-            Republic Act No. 12009 • BAC &amp; Procurement Management Office
-          </p>
+      {/* Features Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Everything You Need for Efficient Procurement
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Powered by AI and designed for compliance with the New Government Procurement Act (RA 12009)
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <FileText className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Digital Logbook
+              </h3>
+              <p className="text-gray-600">
+                Centralized recording and tracking of all Purchase Requests with complete audit trails.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Bot className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                AI Inquiry Support
+              </h3>
+              <p className="text-gray-600">
+                Get instant answers to procurement questions. Draft PRs with AI-assisted slot-filling.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Search className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Real-Time Tracking
+              </h3>
+              <p className="text-gray-600">
+                Monitor your Purchase Request status from submission to completion, with live updates.
+              </p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Shield className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                RA 12009 Compliant
+              </h3>
+              <p className="text-gray-600">
+                Built to align with the New Government Procurement Act and university procurement policies.
+              </p>
+            </div>
+
+            {/* Feature 5 */}
+            <div className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Clock className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Faster Processing
+              </h3>
+              <p className="text-gray-600">
+                Reduce processing delays with automated workflows and streamlined communication.
+              </p>
+            </div>
+
+            {/* Feature 6 */}
+            <div className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <CheckCircle className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Transparency & Accountability
+              </h3>
+              <p className="text-gray-600">
+                Complete visibility into procurement decisions with auditable logs and documentation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              How It Works
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Simple steps to get your procurement process started
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                1
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Sign Up</h3>
+              <p className="text-gray-600 text-sm">
+                Create your account using your MSU-GenSan email.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                2
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Draft Request</h3>
+              <p className="text-gray-600 text-sm">
+                Fill out the Purchase Request form with AI assistance.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                3
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Track Progress</h3>
+              <p className="text-gray-600 text-sm">
+                Monitor your request status in real-time.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                4
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Get Approved</h3>
+              <p className="text-gray-600 text-sm">
+                Receive notifications when your request is processed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center">
+              <FileText className="h-6 w-6 text-blue-600" />
+              <span className="ml-2 text-sm font-medium text-gray-700">
+                ProcuremateSU &copy; 2026
+              </span>
+            </div>
+            <div className="text-sm text-gray-500 mt-4 md:mt-0">
+              <span>Mindanao State University - General Santos</span>
+              <span className="mx-2">|</span>
+              <span>Digital Procurement Logbook with AI Inquiry Support</span>
+            </div>
+          </div>
         </div>
       </footer>
-    </div>
+    </main>
   );
 }
