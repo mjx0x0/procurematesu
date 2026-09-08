@@ -189,7 +189,7 @@ export default function PRDetailPage() {
           </div>
         </section>
 
-        <section className="pr-timeline bg-white rounded-xl p-6 shadow-sm border border-stone-200 mt-8 mb-8 print:hidden">
+        <div className="pr-timeline bg-white rounded-xl p-6 shadow-sm border border-stone-200 mt-8 mb-8 print:hidden">
           <div className="flex items-end justify-between gap-4 pb-4 mb-5 border-b border-stone-200">
             <div>
               <p className="text-[9px] font-bold tracking-[0.24em] uppercase text-[#B88E13] mb-1">MSU • PROCUREMENT FLOW</p>
@@ -258,7 +258,7 @@ export default function PRDetailPage() {
               })}
             </div>
           )}
-        </section>
+        </div>
 
         <div className="text-xs text-stone-500 flex items-center gap-2 print:hidden"><FileCheck className="h-4 w-4" />The Download PR Form button generates only the official Purchase Request form as a PDF.</div>
       </main>
