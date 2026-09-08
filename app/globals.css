@@ -24,7 +24,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Restrained paper texture instead of a generic flat background. */
 body::after {
   content: '';
   position: fixed;
@@ -102,19 +101,15 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 .z-100 { z-index: 100 !important; }
 
 /* ============================================================
-   PR PROCESSING TIMELINE
-   Keeps the existing data/logic intact while giving the history
-   a cleaner institutional process-log presentation.
+   PR PROCESSING TIMELINE — clean process-log treatment
    ============================================================ */
-
 main > section:nth-of-type(2) {
   position: relative;
   overflow: hidden;
   padding: 22px 22px 24px !important;
   border: 1px solid #E4D6C5 !important;
   border-radius: 18px !important;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.96), rgba(250,247,241,.94)) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.97), rgba(250,247,241,.94)) !important;
   box-shadow: 0 14px 34px rgba(53,7,8,.065), inset 0 1px 0 rgba(255,255,255,.9) !important;
 }
 
@@ -157,16 +152,20 @@ main > section:nth-of-type(2) > h3::after {
 }
 
 main > section:nth-of-type(2) > div.relative {
-  padding: 2px 0 2px 0;
+  position: relative;
+  padding: 2px 0;
 }
 
+/* The rail is deliberately inset so it starts/ends at the first/last node,
+   avoiding the floating line fragment seen above the first event. */
 main > section:nth-of-type(2) > div.relative > div.absolute {
   left: 19px !important;
-  top: 15px !important;
-  bottom: 15px !important;
+  top: 26px !important;
+  bottom: 26px !important;
   width: 2px !important;
-  background: linear-gradient(180deg, #7A1315 0%, #B88E13 48%, #E2D8C9 100%) !important;
-  opacity: .8;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #7A1315 0%, #B88E13 52%, #D8CCBA 100%) !important;
+  opacity: .72;
 }
 
 main > section:nth-of-type(2) > div.relative > div.flex {
@@ -176,10 +175,7 @@ main > section:nth-of-type(2) > div.relative > div.flex {
   margin-bottom: 10px !important;
   padding: 0;
 }
-
-main > section:nth-of-type(2) > div.relative > div.flex:last-child {
-  margin-bottom: 0 !important;
-}
+main > section:nth-of-type(2) > div.relative > div.flex:last-child { margin-bottom: 0 !important; }
 
 main > section:nth-of-type(2) > div.relative > div.flex > div.relative {
   flex: 0 0 40px;
@@ -195,14 +191,6 @@ main > section:nth-of-type(2) > div.relative > div.flex > div.relative > div {
   box-shadow: 0 0 0 1px rgba(122,19,21,.10), 0 5px 13px rgba(53,7,8,.10);
 }
 
-main > section:nth-of-type(2) > div.relative > div.flex > div.relative > div::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.55);
-}
-
 main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 {
   min-width: 0;
   padding: 13px 16px 12px !important;
@@ -213,7 +201,6 @@ main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 {
   box-shadow: 0 3px 12px rgba(53,7,8,.045);
   transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
-
 main > section:nth-of-type(2) > div.relative > div.flex:hover > div.flex-1 {
   transform: translateX(3px);
   border-color: #D9C7B5;
@@ -224,20 +211,17 @@ main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div {
   gap: 7px !important;
   align-items: baseline;
 }
-
 main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div > span:first-child {
   font-size: 13px;
   font-weight: 750;
   color: #321617;
   letter-spacing: -.005em;
 }
-
 main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div > span:last-child {
   font-size: 11px;
   color: #8A8178;
   white-space: nowrap;
 }
-
 main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > p {
   margin-top: 6px !important;
   padding-top: 6px;
@@ -247,13 +231,44 @@ main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > p {
   line-height: 1.45;
 }
 
+/* Remarks are history annotations, not another completed process step.
+   Keep them visible but subordinate to the actual stage event. */
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 {
+  padding: 9px 13px 9px !important;
+  border-left-color: #C89A22;
+  border-style: dashed;
+  background: #FFFBF1;
+  box-shadow: none;
+}
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.relative > div {
+  width: 28px !important;
+  height: 28px !important;
+  margin-top: 7px;
+  border-width: 3px;
+  box-shadow: 0 0 0 1px rgba(184,142,19,.13);
+}
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1::before {
+  content: 'REMARK';
+  display: block;
+  margin-bottom: 3px;
+  color: #9A7410;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div > span:first-child {
+  font-size: 12px;
+}
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > p {
+  margin-top: 4px !important;
+  padding-top: 4px;
+}
+
 @media (max-width: 640px) {
-  main > section:nth-of-type(2) {
-    padding: 18px 14px 18px !important;
-  }
+  main > section:nth-of-type(2) { padding: 18px 14px 18px !important; }
   main > section:nth-of-type(2)::before { display: none; }
   main > section:nth-of-type(2) > h3::after { display: none; }
-  main > section:nth-of-type(2) > div.relative > div.absolute { left: 17px !important; }
+  main > section:nth-of-type(2) > div.relative > div.absolute { left: 17px !important; top: 24px !important; bottom: 24px !important; }
   main > section:nth-of-type(2) > div.relative > div.flex > div.relative { flex-basis: 36px; }
   main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 { padding: 11px 12px !important; }
   main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div { flex-direction: column; gap: 3px !important; }
