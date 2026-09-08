@@ -130,7 +130,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   color: #4D0C0D !important;
 }
 
-/* The process is a single ordered column. No overlapping rails or floating nodes. */
+/* One vertical ordered column: every card is exactly one procurement stage. */
 .pr-timeline > div:last-child {
   position: relative;
   display: flex;
@@ -153,26 +153,27 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   box-shadow: none !important;
 }
 
-/* Vertical process line. It sits only between stage rows. */
+/* Single continuous process rail */
 .pr-timeline > div:last-child > article::before {
   content: '';
   position: absolute;
+  z-index: 0;
   left: 37px;
   top: 0;
   bottom: 0;
   width: 1px;
   background: #DCCFBF;
 }
-.pr-timeline > div:last-child > article:first-child::before { top: 30px; }
-.pr-timeline > div:last-child > article:last-child::before { bottom: calc(100% - 42px); }
+.pr-timeline > div:last-child > article:first-child::before { top: 28px; }
+.pr-timeline > div:last-child > article:last-child::before { bottom: calc(100% - 40px); }
 
-/* Stage number column */
+/* Number column */
 .pr-timeline > div:last-child > article > div:first-child {
   position: relative;
   z-index: 2;
   width: 76px !important;
-  min-height: 84px;
-  padding: 17px 0 17px !important;
+  min-height: 82px;
+  padding: 17px 0 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -181,37 +182,32 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   border: 0 !important;
 }
 
-.pr-timeline > div:last-child > article > div:first-child::before {
-  content: '';
-  position: absolute;
-  top: 21px;
-  width: 28px;
-  height: 28px;
+/* Hide the small "Stage" caption but retain the real stage number. */
+.pr-timeline > div:last-child > article > div:first-child > span:first-child { display: none !important; }
+.pr-timeline > div:last-child > article > div:first-child > span:nth-child(2) {
+  position: relative;
+  z-index: 3;
+  width: 30px;
+  height: 30px;
+  margin: 4px 0 0;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
   border: 3px solid #FFFDFC;
   border-radius: 50%;
   background: #7A1315;
   box-shadow: 0 0 0 1px #B88E13, 0 3px 9px rgba(53,7,8,.13);
+  color: #fff !important;
+  font-size: 9px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
 }
 
-.pr-timeline > div:last-child > article > div:first-child::after {
-  content: attr(data-stage);
-  position: absolute;
-  top: 28px;
-  z-index: 3;
-  color: #fff;
-  font-size: 8px;
-  line-height: 14px;
-  font-weight: 900;
-}
-
-/* Hide the old Stage / number block content; the process number is represented by the node. */
-.pr-timeline > div:last-child > article > div:first-child > * { visibility: hidden; }
-
-/* Main process record */
+/* Main process card */
 .pr-timeline > div:last-child > article > div:nth-child(2) {
   min-width: 0;
-  margin: 8px 0 8px !important;
-  padding: 15px 17px !important;
+  margin: 8px 0 !important;
+  padding: 14px 17px !important;
   border: 1px solid #E6DED4 !important;
   border-left: 3px solid #7A1315 !important;
   border-radius: 10px !important;
@@ -223,18 +219,13 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   align-items: center !important;
   gap: 12px !important;
 }
-
-.pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child > div:first-child p {
-  display: none !important;
-}
-
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child > div:first-child p { display: none !important; }
 .pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child > div:first-child h4 {
   font-size: 13px !important;
   line-height: 1.35 !important;
   color: #321617 !important;
 }
 
-/* Completed pill */
 .pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child > div:last-child {
   flex-shrink: 0;
   white-space: nowrap;
@@ -246,7 +237,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   font-size: 9px !important;
 }
 
-/* Stage's primary remark */
+/* Primary remark stays inside its own stage. */
 .pr-timeline > div:last-child > article > div:nth-child(2) > div:nth-child(2) {
   margin-top: 9px !important;
   padding: 7px 10px !important;
@@ -266,7 +257,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   font-size: 10px !important;
 }
 
-/* Additional remarks are compact entries directly under their stage. */
+/* Additional remarks remain subordinate to their parent stage. */
 .pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child {
   margin-top: 8px !important;
   padding-top: 8px !important;
@@ -278,9 +269,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   font-size: 7px !important;
   letter-spacing: .15em !important;
 }
-.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child > div {
-  display: block !important;
-}
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child > div { display: block !important; }
 .pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child > div > div {
   padding: 2px 0 !important;
   display: flex !important;
@@ -307,18 +296,14 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   color: #A0968D !important;
 }
 
-/* Don't render an empty additional-remarks section as visual noise. */
-.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child:empty { display: none !important; }
-
 @media (max-width: 640px) {
   .pr-timeline { padding: 17px 12px !important; }
   .pr-timeline > div:first-child > div:last-child { display: none !important; }
   .pr-timeline > div:last-child > article { grid-template-columns: 48px minmax(0, 1fr) !important; }
   .pr-timeline > div:last-child > article::before { left: 23px; }
-  .pr-timeline > div:last-child > article:first-child::before { top: 30px; }
+  .pr-timeline > div:last-child > article:first-child::before { top: 26px; }
   .pr-timeline > div:last-child > article > div:first-child { width: 48px !important; }
-  .pr-timeline > div:last-child > article > div:first-child::before { width: 24px; height: 24px; top: 20px; }
-  .pr-timeline > div:last-child > article > div:first-child::after { top: 26px; }
+  .pr-timeline > div:last-child > article > div:first-child > span:nth-child(2) { width: 26px; height: 26px; font-size: 8px !important; }
   .pr-timeline > div:last-child > article > div:nth-child(2) { padding: 12px !important; }
   .pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child { align-items: flex-start !important; flex-direction: column !important; }
   .pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child > div:last-child { white-space: normal; }
