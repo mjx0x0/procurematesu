@@ -2,26 +2,40 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
+import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
 
 const NEW_TOPIC_PATTERN = /\b(what is|what are|how does|how do|explain|tell me about|where is|where can|when is|who is|contact|ra\s*12009|ra\s*9184|small value|svp|bidding|procurement flow|procurement office|new purchase request|draft (?:a )?pr|create (?:a )?pr|track my pr|show me my pr)\b/i;
 const DRAFT_CONTINUATION_PATTERN = /\b(purpose|department|office|section|item|items|quantity|unit|price|cost|budget|supplier|description|yes|no|correct|continue|next)\b/i;
 const PR_PATTERN = /\bPR[- ]?(\d{4}[- ]?\d{4}|\d{4})\b/i;
 const PR_ACCESS_PATTERN = /\b(track|show|view|see|open|display|details?|status|progress|update|history|timeline)\b/i;
 const OTHER_USER_PR_PATTERN = /\b(another|other|someone\s+else|somebody\s+else|different)\s+(user|person|account|requester)|\b(?:someone\s+else'?s|another\s+user'?s|other\s+user'?s)\b/i;
+const PROCUREMENT_FLOW_PATTERN = /\b(?:MSU(?:[- ]?GenSan)?|Mindanao\s+State\s+University(?:\s*[-–—]\s*General\s+Santos)?|General\s+Santos)\b.{0,80}\b(?:procurement|purchas(?:e|ing)|PR|process|flow|procedure|steps?|stages?)\b|\b(?:procurement|purchasing|PR)\s+(?:flow|process|procedure|steps?|stages?)\b/i;
 
 function shouldResetDrafting(message: string) {
   return NEW_TOPIC_PATTERN.test(message) && !DRAFT_CONTINUATION_PATTERN.test(message);
 }
 
-// Context is intentionally disabled at this boundary. The frontend already keeps the
-// visible conversation history, while the server keeps the authenticated session state.
-// Re-injecting the rendered transcript here caused recursive "Conversation context"
-// blocks to become part of the next user message.
 function extractCurrentUserMessage(message: string): string {
   const marker = /(?:^|\n)Current user message:\s*/i;
   const match = message.match(marker);
   if (!match || match.index === undefined) return message.trim();
   return message.slice(match.index + match[0].length).trim();
+}
+
+function buildProcurementFlowResponse() {
+  const lines = PROCUREMENT_STAGES.map(
+    (stage) => `${stage.number}. **${stage.label}** — ${stage.description}`
+  ).join('\n');
+
+  return (
+    `🏛️ **MSU-General Santos 20-Stage Procurement Flow**\n\n` +
+    `Here is the official **20-stage procurement workflow used in ProcuremateSU**, from receipt of the Purchase Request through monitoring and documentation.\n\n` +
+    `${lines}\n\n` +
+    `### Key posting thresholds\n` +
+    `• **₱50,000 and above:** applicable RFQ posting to PhilGEPS\n` +
+    `• **₱200,000 and above:** applicable SVP posting threshold noted in the MSU workflow\n\n` +
+    `The exact stage descriptions above are taken from ProcuremateSU's centralized procurement-process definition, so the chatbot and PR tracking use the same 20-stage terminology.`
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -87,6 +101,16 @@ export async function POST(request: NextRequest) {
         .eq('user_id', user.id);
     }
 
+    // Authoritative MSU-GenSan workflow response. This is intentionally handled
+    // before the general AI engine so the 20 stages cannot be shortened or
+    // replaced by a generic procurement flow from model memory.
+    if (PROCUREMENT_FLOW_PATTERN.test(message)) {
+      return NextResponse.json({
+        response: buildProcurementFlowResponse(),
+        sources: ['ProcuremateSU 20-stage procurement process'],
+      });
+    }
+
     // Every request that attempts to access a specific PR must be authorized.
     const prMatch = message.match(PR_PATTERN);
     const isPRAccessRequest = Boolean(prMatch) && PR_ACCESS_PATTERN.test(message);
@@ -118,8 +142,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Pass ONLY the current user question to the legacy response engine.
-    // Never pass the previous rendered transcript, which prevents exponential context growth.
     const trustedRequest = new NextRequest(request.url, {
       method: 'POST',
       headers: request.headers,
