@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -72,8 +73,6 @@ export default function LoginPage() {
       return;
     }
 
-    // Do not auto-create profiles during login. Account provisioning and
-    // authorization must be controlled by the institution/admin.
     if (!userData) {
       await supabase.auth.signOut();
       setError("Your university account is not provisioned for ProcuremateSU. Please contact the administrator.");
@@ -88,16 +87,15 @@ export default function LoginPage() {
       return;
     }
 
-    if (userData.role === "admin") {
-      router.replace("/admin");
-    } else {
-      router.replace("/dashboard");
-    }
+    // Keep the existing redirect logic; only add a visual transition while it happens.
+    setRedirecting(true);
+    setLoading(false);
+    router.replace(userData.role === "admin" ? "/admin" : "/dashboard");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5] px-4 py-8">
-      <div className="w-full max-w-md animate-fade-in-up">
+      <div className={`w-full max-w-md transition-all duration-500 ${redirecting ? "scale-[0.98] opacity-0" : "animate-fade-in-up"}`}>
         <div className="text-center mb-6 flex flex-col items-center">
           <Link href="/" className="inline-block transition-transform hover:scale-105 mb-2" title="Return to Home">
             <MsuLogo size={96} />
@@ -156,9 +154,9 @@ export default function LoginPage() {
               <Link href="/auth/forgot-password" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">Forgot password?</Link>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white py-3 rounded-xl font-semibold text-sm shadow-md shadow-red-950/20 hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100 border border-amber-400/30">
+            <button type="submit" disabled={loading || redirecting} className="w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white py-3 rounded-xl font-semibold text-sm shadow-md shadow-red-950/20 hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100 border border-amber-400/30">
               {loading ? (
-                <><span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />Authenticating...</>
+                <><span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />Signing in...</>
               ) : (
                 <><span>Sign In to Portal</span><ArrowRight className="h-4 w-4 text-amber-300" /></>
               )}
@@ -166,6 +164,27 @@ export default function LoginPage() {
           </form>
         </div>
       </div>
+
+      {redirecting && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#FAF8F5]/95 backdrop-blur-sm animate-[fadeIn_250ms_ease-out]">
+          <div className="flex flex-col items-center text-center">
+            <div className="relative flex items-center justify-center mb-5">
+              <span className="absolute h-20 w-20 rounded-full border border-[#B88E13]/30 animate-ping" />
+              <span className="absolute h-16 w-16 rounded-full border-2 border-[#7A1315]/15 border-t-[#7A1315] animate-spin" />
+              <div className="relative h-12 w-12 rounded-full bg-white shadow-md border border-stone-200 flex items-center justify-center">
+                <MsuLogo size={34} />
+              </div>
+            </div>
+            <p className="text-sm font-bold text-[#4D0C0D] tracking-wide">Signing you in</p>
+            <p className="text-xs text-stone-500 mt-1">Preparing your ProcuremateSU workspace...</p>
+            <div className="mt-4 flex gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#7A1315] animate-bounce [animation-delay:-0.3s]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#B88E13] animate-bounce [animation-delay:-0.15s]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#7A1315] animate-bounce" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
