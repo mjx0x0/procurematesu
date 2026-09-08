@@ -156,8 +156,6 @@ main > section:nth-of-type(2) > div.relative {
   padding: 2px 0;
 }
 
-/* The rail is deliberately inset so it starts/ends at the first/last node,
-   avoiding the floating line fragment seen above the first event. */
 main > section:nth-of-type(2) > div.relative > div.absolute {
   left: 19px !important;
   top: 26px !important;
@@ -231,37 +229,94 @@ main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > p {
   line-height: 1.45;
 }
 
-/* Remarks are history annotations, not another completed process step.
-   Keep them visible but subordinate to the actual stage event. */
+/* ============================================================
+   REMARKS — compact annotations grouped visually beneath stages
+   ============================================================ */
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) {
+  gap: 10px !important;
+  margin-bottom: 3px !important;
+  padding-left: 9px;
+}
+
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.relative {
+  flex-basis: 31px;
+  align-items: flex-start;
+}
+
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.relative > div {
+  width: 18px !important;
+  height: 18px !important;
+  margin-top: 7px;
+  border: 2px solid #FFFDF9;
+  box-shadow: 0 0 0 1px rgba(184,142,19,.42);
+  background: #FFF4D6 !important;
+}
+
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.relative > div svg {
+  width: 11px !important;
+  height: 11px !important;
+  color: #B88E13 !important;
+}
+
 main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 {
-  padding: 9px 13px 9px !important;
-  border-left-color: #C89A22;
-  border-style: dashed;
-  background: #FFFBF1;
+  padding: 7px 11px 8px !important;
+  border: 0 !important;
+  border-left: 2px solid #D4AF37 !important;
+  border-radius: 0 8px 8px 0 !important;
+  background: rgba(251,246,232,.72) !important;
+  box-shadow: none !important;
+}
+
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1:hover {
+  transform: none;
+  border-color: #D4AF37 !important;
   box-shadow: none;
 }
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.relative > div {
-  width: 28px !important;
-  height: 28px !important;
-  margin-top: 7px;
-  border-width: 3px;
-  box-shadow: 0 0 0 1px rgba(184,142,19,.13);
-}
+
 main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1::before {
   content: 'REMARK';
-  display: block;
-  margin-bottom: 3px;
+  display: inline-block;
+  margin-right: 8px;
   color: #9A7410;
-  font-size: 8px;
+  font-size: 7px;
+  line-height: 1;
   font-weight: 800;
   letter-spacing: .16em;
+  vertical-align: middle;
 }
+
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div {
+  display: inline-flex;
+  gap: 6px !important;
+  align-items: baseline;
+  vertical-align: middle;
+}
+
 main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div > span:first-child {
-  font-size: 12px;
+  font-size: 10px;
+  font-weight: 650;
+  color: #5A4140;
 }
+
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div > span:last-child {
+  font-size: 9px;
+  color: #9A8C7F;
+  white-space: nowrap;
+}
+
 main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > p {
-  margin-top: 4px !important;
-  padding-top: 4px;
+  display: block;
+  margin: 3px 0 0 !important;
+  padding: 3px 0 0 !important;
+  border-top: 1px dashed #E6D7B6;
+  color: #75695D;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+/* Consecutive remarks read as one annotation cluster rather than separate cards. */
+main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) + div.flex:has(.bg-amber-100) {
+  margin-top: -3px;
 }
 
 @media (max-width: 640px) {
@@ -273,6 +328,10 @@ main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div
   main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 { padding: 11px 12px !important; }
   main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div { flex-direction: column; gap: 3px !important; }
   main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div > span:last-child { white-space: normal; }
+  main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) { padding-left: 3px; gap: 7px !important; }
+  main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 { padding: 7px 9px !important; }
+  main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div { flex-direction: row; }
+  main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div > span:last-child { white-space: normal; }
 }
 
 @media (prefers-reduced-motion: reduce) {
