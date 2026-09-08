@@ -101,239 +101,229 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 .z-100 { z-index: 100 !important; }
 
 /* ============================================================
-   PR PROCESSING TIMELINE — clean process-log treatment
+   PR PROCESSING TIMELINE — clean ordered process history
    ============================================================ */
-main > section:nth-of-type(2) {
+.pr-timeline {
   position: relative;
   overflow: hidden;
-  padding: 22px 22px 24px !important;
-  border: 1px solid #E4D6C5 !important;
+  padding: 24px !important;
+  border: 1px solid #E4D8C9 !important;
   border-radius: 18px !important;
-  background: linear-gradient(180deg, rgba(255,255,255,.97), rgba(250,247,241,.94)) !important;
-  box-shadow: 0 14px 34px rgba(53,7,8,.065), inset 0 1px 0 rgba(255,255,255,.9) !important;
+  background: #FFFDFC !important;
+  box-shadow: 0 12px 30px rgba(53,7,8,.055) !important;
 }
 
-main > section:nth-of-type(2)::before {
-  content: 'MSU • PROCUREMENT PROCESS';
-  position: absolute;
-  top: 19px;
-  right: 22px;
-  font-size: 8px;
-  line-height: 1;
-  letter-spacing: .28em;
-  font-weight: 800;
-  color: rgba(122,19,21,.38);
+.pr-timeline > div:first-child {
+  margin: 0 0 22px !important;
+  padding: 0 0 16px !important;
+  border-bottom: 1px solid #E9E0D5 !important;
 }
 
-main > section:nth-of-type(2) > h3 {
+.pr-timeline > div:first-child > div:first-child p {
+  margin-bottom: 4px !important;
+  font-size: 8px !important;
+  letter-spacing: .22em !important;
+}
+
+.pr-timeline > div:first-child > div:first-child h3 {
+  font-size: 16px !important;
+  color: #4D0C0D !important;
+}
+
+/* The process is a single ordered column. No overlapping rails or floating nodes. */
+.pr-timeline > div:last-child {
   position: relative;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0 0 18px !important;
-  padding: 0 0 15px;
-  border-bottom: 1px solid #EADFD1;
-  font-size: 15px;
-  letter-spacing: -.01em;
+  flex-direction: column;
+  gap: 0 !important;
+  counter-reset: procurement-stage;
 }
 
-main > section:nth-of-type(2) > h3::after {
-  content: 'STAGE HISTORY';
-  margin-left: auto;
-  margin-right: 108px;
-  padding: 5px 9px;
-  border: 1px solid rgba(184,142,19,.38);
-  border-radius: 999px;
-  background: #FBF6E8;
-  color: #8E6A08;
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: .16em;
-}
-
-main > section:nth-of-type(2) > div.relative {
+.pr-timeline > div:last-child > article {
   position: relative;
-  padding: 2px 0;
-}
-
-main > section:nth-of-type(2) > div.relative > div.absolute {
-  left: 19px !important;
-  top: 26px !important;
-  bottom: 26px !important;
-  width: 2px !important;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #7A1315 0%, #B88E13 52%, #D8CCBA 100%) !important;
-  opacity: .72;
-}
-
-main > section:nth-of-type(2) > div.relative > div.flex {
-  position: relative;
-  align-items: stretch;
-  gap: 13px !important;
-  margin-bottom: 10px !important;
-  padding: 0;
-}
-main > section:nth-of-type(2) > div.relative > div.flex:last-child { margin-bottom: 0 !important; }
-
-main > section:nth-of-type(2) > div.relative > div.flex > div.relative {
-  flex: 0 0 40px;
-  display: flex;
-  justify-content: center;
-}
-
-main > section:nth-of-type(2) > div.relative > div.flex > div.relative > div {
-  width: 34px !important;
-  height: 34px !important;
-  margin-top: 9px;
-  border: 4px solid #FFFDF9;
-  box-shadow: 0 0 0 1px rgba(122,19,21,.10), 0 5px 13px rgba(53,7,8,.10);
-}
-
-main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 {
-  min-width: 0;
-  padding: 13px 16px 12px !important;
-  border: 1px solid #E8DFD4;
-  border-left: 3px solid #7A1315;
-  border-radius: 12px !important;
-  background: rgba(255,255,255,.92);
-  box-shadow: 0 3px 12px rgba(53,7,8,.045);
-  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-}
-main > section:nth-of-type(2) > div.relative > div.flex:hover > div.flex-1 {
-  transform: translateX(3px);
-  border-color: #D9C7B5;
-  box-shadow: 0 7px 18px rgba(53,7,8,.075);
-}
-
-main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div {
-  gap: 7px !important;
-  align-items: baseline;
-}
-main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div > span:first-child {
-  font-size: 13px;
-  font-weight: 750;
-  color: #321617;
-  letter-spacing: -.005em;
-}
-main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div > span:last-child {
-  font-size: 11px;
-  color: #8A8178;
-  white-space: nowrap;
-}
-main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > p {
-  margin-top: 6px !important;
-  padding-top: 6px;
-  border-top: 1px dashed #E6DDD1;
-  color: #6D625A;
-  font-size: 11px;
-  line-height: 1.45;
-}
-
-/* ============================================================
-   REMARKS — compact annotations grouped visually beneath stages
-   ============================================================ */
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) {
-  gap: 10px !important;
-  margin-bottom: 3px !important;
-  padding-left: 9px;
-}
-
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.relative {
-  flex-basis: 31px;
-  align-items: flex-start;
-}
-
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.relative > div {
-  width: 18px !important;
-  height: 18px !important;
-  margin-top: 7px;
-  border: 2px solid #FFFDF9;
-  box-shadow: 0 0 0 1px rgba(184,142,19,.42);
-  background: #FFF4D6 !important;
-}
-
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.relative > div svg {
-  width: 11px !important;
-  height: 11px !important;
-  color: #B88E13 !important;
-}
-
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 {
-  padding: 7px 11px 8px !important;
+  display: grid !important;
+  grid-template-columns: 76px minmax(0, 1fr) !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
   border: 0 !important;
-  border-left: 2px solid #D4AF37 !important;
-  border-radius: 0 8px 8px 0 !important;
-  background: rgba(251,246,232,.72) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   box-shadow: none !important;
 }
 
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1:hover {
-  transform: none;
-  border-color: #D4AF37 !important;
-  box-shadow: none;
+/* Vertical process line. It sits only between stage rows. */
+.pr-timeline > div:last-child > article::before {
+  content: '';
+  position: absolute;
+  left: 37px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #DCCFBF;
+}
+.pr-timeline > div:last-child > article:first-child::before { top: 30px; }
+.pr-timeline > div:last-child > article:last-child::before { bottom: calc(100% - 42px); }
+
+/* Stage number column */
+.pr-timeline > div:last-child > article > div:first-child {
+  position: relative;
+  z-index: 2;
+  width: 76px !important;
+  min-height: 84px;
+  padding: 17px 0 17px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  background: transparent !important;
+  border: 0 !important;
 }
 
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1::before {
-  content: 'REMARK';
-  display: inline-block;
-  margin-right: 8px;
-  color: #9A7410;
-  font-size: 7px;
-  line-height: 1;
-  font-weight: 800;
-  letter-spacing: .16em;
-  vertical-align: middle;
+.pr-timeline > div:last-child > article > div:first-child::before {
+  content: '';
+  position: absolute;
+  top: 21px;
+  width: 28px;
+  height: 28px;
+  border: 3px solid #FFFDFC;
+  border-radius: 50%;
+  background: #7A1315;
+  box-shadow: 0 0 0 1px #B88E13, 0 3px 9px rgba(53,7,8,.13);
 }
 
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div {
-  display: inline-flex;
-  gap: 6px !important;
-  align-items: baseline;
-  vertical-align: middle;
+.pr-timeline > div:last-child > article > div:first-child::after {
+  content: attr(data-stage);
+  position: absolute;
+  top: 28px;
+  z-index: 3;
+  color: #fff;
+  font-size: 8px;
+  line-height: 14px;
+  font-weight: 900;
 }
 
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div > span:first-child {
-  font-size: 10px;
-  font-weight: 650;
-  color: #5A4140;
+/* Hide the old Stage / number block content; the process number is represented by the node. */
+.pr-timeline > div:last-child > article > div:first-child > * { visibility: hidden; }
+
+/* Main process record */
+.pr-timeline > div:last-child > article > div:nth-child(2) {
+  min-width: 0;
+  margin: 8px 0 8px !important;
+  padding: 15px 17px !important;
+  border: 1px solid #E6DED4 !important;
+  border-left: 3px solid #7A1315 !important;
+  border-radius: 10px !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 7px rgba(53,7,8,.035) !important;
 }
 
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div > span:last-child {
-  font-size: 9px;
-  color: #9A8C7F;
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child {
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child > div:first-child p {
+  display: none !important;
+}
+
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child > div:first-child h4 {
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+  color: #321617 !important;
+}
+
+/* Completed pill */
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child > div:last-child {
+  flex-shrink: 0;
   white-space: nowrap;
+  background: #F0FAF3 !important;
+  border-color: #CDE9D5 !important;
+  color: #287447 !important;
+  border-radius: 999px !important;
+  padding: 5px 9px !important;
+  font-size: 9px !important;
 }
 
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > p {
-  display: block;
-  margin: 3px 0 0 !important;
-  padding: 3px 0 0 !important;
-  border-top: 1px dashed #E6D7B6;
-  color: #75695D;
-  font-size: 10px;
-  line-height: 1.35;
+/* Stage's primary remark */
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:nth-child(2) {
+  margin-top: 9px !important;
+  padding: 7px 10px !important;
+  border-left: 2px solid #B88E13 !important;
+  border-radius: 0 5px 5px 0 !important;
+  background: #FCF9F2 !important;
+}
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:nth-child(2) p:first-child {
+  display: inline-block !important;
+  margin: 0 7px 0 0 !important;
+  color: #9A7410 !important;
+  font-size: 7px !important;
+}
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:nth-child(2) p:last-child {
+  display: inline !important;
+  color: #75695D !important;
+  font-size: 10px !important;
 }
 
-/* Consecutive remarks read as one annotation cluster rather than separate cards. */
-main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) + div.flex:has(.bg-amber-100) {
-  margin-top: -3px;
+/* Additional remarks are compact entries directly under their stage. */
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child {
+  margin-top: 8px !important;
+  padding-top: 8px !important;
+  border-top: 1px dashed #E6DDD1 !important;
 }
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child > p {
+  margin-bottom: 5px !important;
+  color: #9A7410 !important;
+  font-size: 7px !important;
+  letter-spacing: .15em !important;
+}
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child > div {
+  display: block !important;
+}
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child > div > div {
+  padding: 2px 0 !important;
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 7px !important;
+}
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child > div > div > span:first-child {
+  width: 5px !important;
+  height: 5px !important;
+  margin-top: 0 !important;
+  background: #B88E13 !important;
+}
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child > div > div > div {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+}
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child > div > div > div > span:first-child {
+  font-size: 10px !important;
+  color: #625851 !important;
+}
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child > div > div > div > span:last-child {
+  font-size: 9px !important;
+  color: #A0968D !important;
+}
+
+/* Don't render an empty additional-remarks section as visual noise. */
+.pr-timeline > div:last-child > article > div:nth-child(2) > div:last-child:empty { display: none !important; }
 
 @media (max-width: 640px) {
-  main > section:nth-of-type(2) { padding: 18px 14px 18px !important; }
-  main > section:nth-of-type(2)::before { display: none; }
-  main > section:nth-of-type(2) > h3::after { display: none; }
-  main > section:nth-of-type(2) > div.relative > div.absolute { left: 17px !important; top: 24px !important; bottom: 24px !important; }
-  main > section:nth-of-type(2) > div.relative > div.flex > div.relative { flex-basis: 36px; }
-  main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 { padding: 11px 12px !important; }
-  main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div { flex-direction: column; gap: 3px !important; }
-  main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 > div > span:last-child { white-space: normal; }
-  main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) { padding-left: 3px; gap: 7px !important; }
-  main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 { padding: 7px 9px !important; }
-  main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div { flex-direction: row; }
-  main > section:nth-of-type(2) > div.relative > div.flex:has(.bg-amber-100) > div.flex-1 > div > span:last-child { white-space: normal; }
+  .pr-timeline { padding: 17px 12px !important; }
+  .pr-timeline > div:first-child > div:last-child { display: none !important; }
+  .pr-timeline > div:last-child > article { grid-template-columns: 48px minmax(0, 1fr) !important; }
+  .pr-timeline > div:last-child > article::before { left: 23px; }
+  .pr-timeline > div:last-child > article:first-child::before { top: 30px; }
+  .pr-timeline > div:last-child > article > div:first-child { width: 48px !important; }
+  .pr-timeline > div:last-child > article > div:first-child::before { width: 24px; height: 24px; top: 20px; }
+  .pr-timeline > div:last-child > article > div:first-child::after { top: 26px; }
+  .pr-timeline > div:last-child > article > div:nth-child(2) { padding: 12px !important; }
+  .pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child { align-items: flex-start !important; flex-direction: column !important; }
+  .pr-timeline > div:last-child > article > div:nth-child(2) > div:first-child > div:last-child { white-space: normal; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  main > section:nth-of-type(2) > div.relative > div.flex > div.flex-1 { transition: none; }
+  .pr-timeline * { transition: none !important; }
 }
