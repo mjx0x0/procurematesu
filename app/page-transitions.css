@@ -1,0 +1,135 @@
+/* Seamless navigation: use the native View Transitions API where supported,
+   with a graceful fade fallback elsewhere. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(.22, .61, .36, 1);
+}
+
+::view-transition-old(root) { animation-name: procuremate-page-out; }
+::view-transition-new(root) { animation-name: procuremate-page-in; }
+
+@keyframes procuremate-page-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: .94; transform: translateY(-4px); }
+}
+
+@keyframes procuremate-page-in {
+  from { opacity: .96; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation-duration: 1ms; }
+}
+
+/* --------------------------------------------------------------------------
+   Procurement timeline
+   The existing timeline data/logic remains unchanged. These rules turn the
+   existing stage history into an institutional process-map visual.
+   -------------------------------------------------------------------------- */
+main > section:has(> h3) {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 96% 8%, rgba(184,142,19,.10), transparent 23%),
+    linear-gradient(135deg, #fffdfa 0%, #f8f3eb 100%) !important;
+  border: 1px solid rgba(122,19,21,.13) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 16px 38px rgba(53,7,8,.065) !important;
+}
+
+main > section:has(> h3)::before {
+  content: 'MSU • PROCUREMENT FLOW';
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .22em;
+  color: rgba(122,19,21,.24);
+  pointer-events: none;
+}
+
+main > section:has(> h3) > h3 {
+  display: flex;
+  align-items: center;
+  padding-bottom: 15px;
+  margin-bottom: 22px !important;
+  border-bottom: 1px solid rgba(122,19,21,.10);
+  font-size: 1.05rem;
+  letter-spacing: -.01em;
+}
+
+main > section:has(> h3) > h3::after {
+  content: '20 STAGES';
+  margin-left: auto;
+  padding: 5px 9px;
+  border: 1px solid rgba(184,142,19,.38);
+  border-radius: 999px;
+  background: rgba(184,142,19,.08);
+  color: #8A6810;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+main > section:has(> h3) > div:last-child {
+  position: relative;
+}
+
+/* Continuous process rail behind the existing stage entries. */
+main > section:has(> h3) > div:last-child::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 12px;
+  bottom: 12px;
+  width: 2px;
+  background: linear-gradient(to bottom, #7A1315 0%, #B88E13 52%, rgba(184,142,19,.16) 100%);
+  border-radius: 99px;
+}
+
+main > section:has(> h3) > div:last-child > div {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 12px;
+  padding: 13px 15px 13px 0;
+  border: 1px solid rgba(122,19,21,.09);
+  border-radius: 14px;
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 5px 16px rgba(53,7,8,.035);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+main > section:has(> h3) > div:last-child > div:hover {
+  transform: translateX(3px);
+  border-color: rgba(122,19,21,.20);
+  box-shadow: 0 9px 22px rgba(53,7,8,.07);
+}
+
+/* The first compact marker/circle in each existing stage row becomes the
+   process-map node. */
+main > section:has(> h3) > div:last-child > div > div:first-child {
+  position: relative;
+  z-index: 2;
+}
+
+main > section:has(> h3) > div:last-child > div > div:first-child > div,
+main > section:has(> h3) > div:last-child > div > div:first-child > span {
+  box-shadow: 0 0 0 5px #f8f3eb;
+}
+
+main > section:has(> h3) > div:last-child > div:nth-child(1) > div:first-child > div,
+main > section:has(> h3) > div:last-child > div:nth-child(2) > div:first-child > div,
+main > section:has(> h3) > div:last-child > div:nth-child(3) > div:first-child > div {
+  box-shadow: 0 0 0 5px #f8f3eb, 0 0 18px rgba(184,142,19,.18);
+}
+
+@media (max-width: 640px) {
+  main > section:has(> h3)::before { display: none; }
+  main > section:has(> h3) > h3::after { font-size: 8px; padding: 4px 7px; }
+  main > section:has(> h3) > div:last-child::before { left: 15px; }
+  main > section:has(> h3) > div:last-child > div { padding-right: 10px; }
+}
