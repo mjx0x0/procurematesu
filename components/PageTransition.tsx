@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function PageTransition() {
+  const router = useRouter();
+
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0) return;
@@ -27,14 +30,13 @@ export default function PageTransition() {
       event.preventDefault();
 
       startViewTransition(() => {
-        window.history.pushState({}, "", url.href);
-        window.dispatchEvent(new PopStateEvent("popstate"));
+        router.push(`${url.pathname}${url.search}${url.hash}`);
       });
     };
 
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
-  }, []);
+  }, [router]);
 
   return null;
 }
