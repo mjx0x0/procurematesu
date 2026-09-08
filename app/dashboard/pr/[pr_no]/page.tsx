@@ -6,7 +6,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import PRDownloadButton from "@/components/PRDownloadButton";
 import { MsuLogo } from "@/components/msu-logo";
-import { PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
+import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { ArrowLeft, CheckCircle, Clock, FileCheck, FileText, Loader2, XCircle } from "lucide-react";
 
 interface PurchaseRequest {
@@ -44,6 +44,14 @@ interface Item {
   stock_no?: string | null;
   unit_cost: number;
   total_cost: number;
+}
+
+interface TimelineGroup {
+  key: string;
+  stageNumber: number;
+  stageName: string;
+  stage?: Stage;
+  remarks: Stage[];
 }
 
 export default function PRDetailPage() {
@@ -106,6 +114,49 @@ export default function PRDetailPage() {
   const statusClass = (status: string) => status === "completed" ? "bg-green-100 text-green-700" : status === "rejected" || status === "cancelled" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700";
   const totalAmount = items.reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
 
+  const timelineGroups: TimelineGroup[] = (() => {
+    const groups = new Map<string, TimelineGroup>();
+    const getStageInfo = (stage: Stage) => {
+      const cleanedName = stage.stage_name.replace(/\s+—\s+Remark\s*$/i, "").trim();
+      const processStage = stage.stage_key
+        ? PROCUREMENT_STAGES.find((item) => item.key === stage.stage_key)
+        : PROCUREMENT_STAGES.find((item) => item.label === cleanedName || item.shortLabel === cleanedName);
+      return {
+        key: processStage?.key || stage.stage_key || cleanedName.toLowerCase().replace(/[^a-z0-9]+/g, "_"),
+        number: processStage?.number || 999,
+        label: processStage?.label || cleanedName,
+      };
+    };
+
+    for (const stage of stages) {
+      const info = getStageInfo(stage);
+      const isRemark = stage.status === "remark" || /\s—\sRemark\s*$/i.test(stage.stage_name);
+      const existing = groups.get(info.key);
+
+      if (!existing) {
+        groups.set(info.key, {
+          key: info.key,
+          stageNumber: info.number,
+          stageName: info.label,
+          stage: isRemark ? undefined : stage,
+          remarks: isRemark ? [stage] : [],
+        });
+      } else if (isRemark) {
+        existing.remarks.push(stage);
+      } else {
+        existing.stage = stage;
+        existing.stageName = info.label;
+      }
+    }
+
+    return Array.from(groups.values()).sort((a, b) => {
+      if (a.stageNumber !== b.stageNumber) return a.stageNumber - b.stageNumber;
+      const aTime = a.stage?.completed_at || a.remarks[0]?.completed_at || "";
+      const bTime = b.stage?.completed_at || b.remarks[0]?.completed_at || "";
+      return new Date(aTime).getTime() - new Date(bTime).getTime();
+    });
+  })();
+
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><Loader2 className="h-9 w-9 animate-spin text-[#7A1315]" /></div>;
   if (error || !pr) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><div className="text-center"><XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" /><h2 className="text-xl font-bold text-stone-900">{error || "PR Not Found"}</h2><Link href="/dashboard" className="text-[#7A1315] font-semibold mt-3 inline-block">Back to Dashboard</Link></div></div>;
 
@@ -138,9 +189,75 @@ export default function PRDetailPage() {
           </div>
         </section>
 
-        <section className="bg-white rounded-xl p-6 shadow-sm border border-stone-200 mt-8 mb-8 print:hidden">
-          <h3 className="font-bold text-[#4D0C0D] mb-4 flex items-center gap-2"><Clock className="h-5 w-5 text-[#7A1315]" />Processing Timeline</h3>
-          {stages.length === 0 ? <div className="text-center py-8 text-gray-500">No stages recorded yet.</div> : <div className="relative"><div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200"/>{stages.map(stage => { const note = stage.remarks || stage.notes; const isRemark = stage.status === "remark"; return <div key={stage.id} className="flex gap-4 mb-6 last:mb-0"><div className="relative z-10"><div className={`w-10 h-10 rounded-full flex items-center justify-center ${isRemark ? "bg-amber-100" : "bg-green-100"}`}><CheckCircle className={`h-5 w-5 ${isRemark ? "text-amber-600" : "text-green-600"}`} /></div></div><div className="flex-1"><div className="flex flex-col sm:flex-row sm:items-center gap-2"><span className="font-medium text-gray-900">{stage.stage_name}</span><span className="text-sm text-gray-500">{new Date(stage.completed_at).toLocaleString()}</span></div>{note && <p className="text-sm text-gray-600 mt-1">{note}</p>}</div></div>; })}</div>}
+        <section className="pr-timeline bg-white rounded-xl p-6 shadow-sm border border-stone-200 mt-8 mb-8 print:hidden">
+          <div className="flex items-end justify-between gap-4 pb-4 mb-5 border-b border-stone-200">
+            <div>
+              <p className="text-[9px] font-bold tracking-[0.24em] uppercase text-[#B88E13] mb-1">MSU • PROCUREMENT FLOW</p>
+              <h3 className="font-bold text-[#4D0C0D] flex items-center gap-2"><Clock className="h-5 w-5 text-[#7A1315]" />Processing Timeline</h3>
+            </div>
+            <div className="hidden sm:flex items-center gap-2 rounded-full border border-[#D8C58E] bg-[#FBF7EA] px-3 py-1.5 text-[9px] font-extrabold tracking-[0.16em] text-[#8E6A08] uppercase">
+              <span>{timelineGroups.length}</span> recorded stage{timelineGroups.length === 1 ? "" : "s"}
+            </div>
+          </div>
+
+          {stages.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-stone-300 bg-stone-50 py-10 text-center text-sm text-stone-500">No stages recorded yet.</div>
+          ) : (
+            <div className="space-y-4">
+              {timelineGroups.map((group) => {
+                const event = group.stage;
+                return (
+                  <article key={group.key} className="relative rounded-xl border border-stone-200 bg-[#FFFEFC] overflow-hidden shadow-[0_2px_10px_rgba(53,7,8,0.04)]">
+                    <div className="flex items-start">
+                      <div className="w-[68px] shrink-0 self-stretch bg-[#FBF7F0] border-r border-stone-200 flex flex-col items-center justify-start pt-5">
+                        <span className="text-[9px] font-extrabold tracking-[0.16em] text-[#9A7410] uppercase">Stage</span>
+                        <span className="mt-1 text-2xl leading-none font-black text-[#7A1315]">{group.stageNumber < 999 ? group.stageNumber : "—"}</span>
+                      </div>
+
+                      <div className="flex-1 min-w-0 p-4 sm:p-5">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-stone-400 mb-1">Process stage</p>
+                            <h4 className="font-bold text-[14px] leading-snug text-[#321617]">{group.stageName}</h4>
+                          </div>
+                          {event && (
+                            <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-green-50 border border-green-200 px-2.5 py-1 text-[10px] font-semibold text-green-700">
+                              <CheckCircle className="h-3.5 w-3.5" />
+                              Completed · {new Date(event.completed_at).toLocaleString()}
+                            </div>
+                          )}
+                        </div>
+
+                        {event?.remarks || event?.notes ? (
+                          <div className="mt-4 rounded-lg border-l-2 border-[#7A1315] bg-[#FAF7F2] px-3.5 py-2.5">
+                            <p className="text-[9px] font-extrabold tracking-[0.16em] uppercase text-[#9A7410] mb-1">Stage remark</p>
+                            <p className="text-xs leading-relaxed text-stone-600">{event.remarks || event.notes}</p>
+                          </div>
+                        ) : null}
+
+                        {group.remarks.length > 0 && (
+                          <div className="mt-4 pt-3 border-t border-dashed border-stone-200">
+                            <p className="text-[9px] font-extrabold tracking-[0.16em] uppercase text-[#9A7410] mb-2">Additional remarks</p>
+                            <div className="space-y-1.5">
+                              {group.remarks.map((remark) => (
+                                <div key={remark.id} className="flex items-start gap-2 text-xs text-stone-600">
+                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#B88E13]" />
+                                  <div className="min-w-0 flex-1">
+                                    <span className="leading-relaxed">{remark.remarks || remark.notes || "No remarks provided."}</span>
+                                    <span className="ml-2 text-[10px] text-stone-400">{new Date(remark.completed_at).toLocaleString()}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         <div className="text-xs text-stone-500 flex items-center gap-2 print:hidden"><FileCheck className="h-4 w-4" />The Download PR Form button generates only the official Purchase Request form as a PDF.</div>
