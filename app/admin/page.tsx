@@ -20,6 +20,7 @@ import {
   Search,
   Trash2,
   User,
+  Users,
   X,
   XCircle,
   AlertCircle,
@@ -438,6 +439,12 @@ export default function AdminDashboard() {
             </p>
           </div>
           <div className="flex gap-2">
+            <Link
+              href="/admin/users"
+              className="px-4 py-2 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7C1D2E] hover:bg-red-50 flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" /> User Approvals
+            </Link>
             <Link
               href="/admin/inquiries"
               className="px-4 py-2 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7C1D2E] hover:bg-red-50 flex items-center gap-2"
@@ -946,4 +953,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
