@@ -7,13 +7,10 @@ const PUBLIC_PATHS = [
   "/auth/signup",
   "/auth/forgot-password",
   "/auth/reset-password",
-  "/auth/confirm",
 ];
 
 function isPublicPath(pathname: string) {
-  return PUBLIC_PATHS.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`),
-  );
+  return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 }
 
 export async function updateSession(request: NextRequest) {
@@ -21,9 +18,7 @@ export async function updateSession(request: NextRequest) {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    if (isPublicPath(request.nextUrl.pathname)) {
-      return NextResponse.next();
-    }
+    if (isPublicPath(request.nextUrl.pathname)) return NextResponse.next();
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     url.searchParams.set("error", "configuration");
@@ -31,20 +26,13 @@ export async function updateSession(request: NextRequest) {
   }
 
   let response = NextResponse.next({ request });
-
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
+      getAll() { return request.cookies.getAll(); },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => {
-          request.cookies.set(name, value);
-        });
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
-        });
+        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
       },
     },
   });
@@ -54,9 +42,7 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   if (!claims && !isPublicPath(pathname)) {
-    if (pathname.startsWith("/api/")) {
-      return response;
-    }
+    if (pathname.startsWith("/api/")) return response;
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     url.searchParams.set("error", "unauthorized");
