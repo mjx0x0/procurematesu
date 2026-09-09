@@ -20,10 +20,8 @@ export default function LoginPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const success = params.get("success");
-    const verified = params.get("verified");
     const authError = params.get("error");
     if (success) setSuccessMessage(success);
-    if (verified === "1") setSuccessMessage("Your email has been verified. Your account still requires administrator approval before you can access ProcuremateSU.");
     if (authError === "account") setError("Your account is not active or has not been approved for ProcuremateSU.");
   }, []);
 
@@ -38,25 +36,16 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-
     if (!cleanEmail.endsWith("@msugensan.edu.ph")) {
       setError("Only @msugensan.edu.ph email addresses are allowed.");
       setLoading(false);
       return;
     }
 
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: cleanEmail,
-      password,
-    });
-
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
     if (authError || !authData.user) {
       let msg = authError?.message || "Unable to sign in.";
-      if (msg.includes("Email not confirmed")) {
-        msg = "Your email address has not been confirmed. Please check your inbox or contact the admin.";
-      } else if (msg.includes("Invalid login credentials")) {
-        msg = "The email or password you entered is incorrect. Please try again.";
-      }
+      if (msg.includes("Invalid login credentials")) msg = "The email or password you entered is incorrect. Please try again.";
       setError(msg);
       setLoading(false);
       return;
@@ -76,28 +65,24 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-
     if (!userData) {
       await supabase.auth.signOut();
       setError("Your university account is not provisioned for ProcuremateSU. Please contact the administrator.");
       setLoading(false);
       return;
     }
-
     if (userData.status === "pending") {
       await supabase.auth.signOut();
-      setError("Your registration is pending administrator approval. Please verify your email and wait for an authorized administrator to approve your account.");
+      setError("Your registration is pending administrator approval. Please wait for an authorized administrator to approve your account.");
       setLoading(false);
       return;
     }
-
     if (userData.status === "rejected") {
       await supabase.auth.signOut();
       setError("Your ProcuremateSU registration was rejected. Please contact the administrator if you believe this is an error.");
       setLoading(false);
       return;
     }
-
     if (userData.is_active === false || userData.status !== "approved") {
       await supabase.auth.signOut();
       setError("Your account is inactive or not approved for ProcuremateSU. Please contact the administrator.");
@@ -114,95 +99,33 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5] px-4 py-8">
       <div className={`w-full max-w-md transition-all duration-500 ${redirecting ? "scale-[0.98] opacity-0" : "animate-fade-in-up"}`}>
         <div className="text-center mb-6 flex flex-col items-center">
-          <Link href="/" className="inline-block transition-transform hover:scale-105 mb-2" title="Return to Home">
-            <MsuLogo size={96} />
-          </Link>
+          <Link href="/" className="inline-block transition-transform hover:scale-105 mb-2" title="Return to Home"><MsuLogo size={96} /></Link>
           <div className="mt-2">
-            <h1 className="text-2xl font-extrabold text-[#4D0C0D] tracking-tight">
-              Procuremate<span className="text-[#B88E13]">SU</span>
-            </h1>
-            <p className="text-xs font-semibold text-[#7A1315] tracking-wide uppercase mt-0.5">
-              Mindanao State University - General Santos
-            </p>
+            <h1 className="text-2xl font-extrabold text-[#4D0C0D] tracking-tight">Procuremate<span className="text-[#B88E13]">SU</span></h1>
+            <p className="text-xs font-semibold text-[#7A1315] tracking-wide uppercase mt-0.5">Mindanao State University - General Santos</p>
           </div>
           <p className="text-xs text-stone-600 mt-2">Sign in with your official university credentials</p>
         </div>
 
         <div className="bg-white rounded-2xl p-7 shadow-xl border border-stone-200/90">
           <form onSubmit={handleLogin} className="space-y-5">
-            {successMessage && (
-              <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-xl text-xs flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-emerald-600" />
-                <span>{successMessage}</span>
-              </div>
-            )}
-
+            {successMessage && <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-xl text-xs flex items-start gap-2"><CheckCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-emerald-600" /><span>{successMessage}</span></div>}
             <div>
               <label className="block text-xs font-semibold text-stone-700 mb-1">University Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@msugensan.edu.ph" className="w-full pl-9 pr-4 py-2.5 text-sm border border-stone-300 rounded-xl bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none transition-all" required />
-              </div>
-              <p className="text-[11px] text-stone-500 mt-1 flex items-center gap-1">
-                <Building2 className="h-3 w-3 inline text-[#7A1315]" />
-                Use your official @msugensan.edu.ph email
-              </p>
+              <div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" /><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@msugensan.edu.ph" className="w-full pl-9 pr-4 py-2.5 text-sm border border-stone-300 rounded-xl bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none transition-all" required /></div>
+              <p className="text-[11px] text-stone-500 mt-1 flex items-center gap-1"><Building2 className="h-3 w-3 inline text-[#7A1315]" />Use your official @msugensan.edu.ph email</p>
             </div>
-
             <div>
               <label className="block text-xs font-semibold text-stone-700 mb-1">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
-                <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your account password" className="w-full pl-9 pr-11 py-2.5 text-sm border border-stone-300 rounded-xl bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none transition-all" required />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
+              <div className="relative"><Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" /><input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your account password" className="w-full pl-9 pr-11 py-2.5 text-sm border border-stone-300 rounded-xl bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none transition-all" required /><button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div>
             </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-600" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <div className="flex items-center justify-between text-xs">
-              <Link href="/auth/signup" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">Create an account</Link>
-              <Link href="/auth/forgot-password" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">Forgot password?</Link>
-            </div>
-
-            <button type="submit" disabled={loading || redirecting} className="w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white py-3 rounded-xl font-semibold text-sm shadow-md shadow-red-950/20 hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100 border border-amber-400/30">
-              {loading ? (
-                <><span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />Signing in...</>
-              ) : (
-                <><span>Sign In to Portal</span><ArrowRight className="h-4 w-4 text-amber-300" /></>
-              )}
-            </button>
+            {error && <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-start gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-600" /><span>{error}</span></div>}
+            <div className="flex items-center justify-between text-xs"><Link href="/auth/signup" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">Create an account</Link><Link href="/auth/forgot-password" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">Forgot password?</Link></div>
+            <button type="submit" disabled={loading || redirecting} className="w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white py-3 rounded-xl font-semibold text-sm shadow-md shadow-red-950/20 hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100 border border-amber-400/30">{loading ? <><span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />Signing in...</> : <><span>Sign In to Portal</span><ArrowRight className="h-4 w-4 text-amber-300" /></>}</button>
           </form>
         </div>
       </div>
-
-      {redirecting && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#FAF8F5]/95 backdrop-blur-sm animate-[fadeIn_250ms_ease-out]">
-          <div className="flex flex-col items-center text-center">
-            <div className="relative flex items-center justify-center mb-5">
-              <span className="absolute h-20 w-20 rounded-full border border-[#B88E13]/30 animate-ping" />
-              <span className="absolute h-16 w-16 rounded-full border-2 border-[#7A1315]/15 border-t-[#7A1315] animate-spin" />
-              <div className="relative h-12 w-12 rounded-full bg-white shadow-md border border-stone-200 flex items-center justify-center">
-                <MsuLogo size={34} />
-              </div>
-            </div>
-            <p className="text-sm font-bold text-[#4D0C0D] tracking-wide">Signing you in</p>
-            <p className="text-xs text-stone-500 mt-1">Preparing your ProcuremateSU workspace...</p>
-            <div className="mt-4 flex gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#7A1315] animate-bounce [animation-delay:-0.3s]" />
-              <span className="h-1.5 w-1.5 rounded-full bg-[#B88E13] animate-bounce [animation-delay:-0.15s]" />
-              <span className="h-1.5 w-1.5 rounded-full bg-[#7A1315] animate-bounce" />
-            </div>
-          </div>
-        </div>
-      )}
+      {redirecting && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#FAF8F5]/95 backdrop-blur-sm animate-[fadeIn_250ms_ease-out]"><div className="flex flex-col items-center text-center"><div className="relative flex items-center justify-center mb-5"><span className="absolute h-20 w-20 rounded-full border border-[#B88E13]/30 animate-ping" /><span className="absolute h-16 w-16 rounded-full border-2 border-[#7A1315]/15 border-t-[#7A1315] animate-spin" /><div className="relative h-12 w-12 rounded-full bg-white shadow-md border border-stone-200 flex items-center justify-center"><MsuLogo size={34} /></div></div><p className="text-sm font-bold text-[#4D0C0D] tracking-wide">Signing you in</p><p className="text-xs text-stone-500 mt-1">Preparing your ProcuremateSU workspace...</p><div className="mt-4 flex gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#7A1315] animate-bounce [animation-delay:-0.3s]" /><span className="h-1.5 w-1.5 rounded-full bg-[#B88E13] animate-bounce [animation-delay:-0.15s]" /><span className="h-1.5 w-1.5 rounded-full bg-[#7A1315] animate-bounce" /></div></div></div>}
     </div>
   );
 }
