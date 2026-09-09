@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase/client";
 import { MsuLogo } from "@/components/msu-logo";
 import { Mail, Lock, User, ArrowRight, AlertCircle, Eye, EyeOff, CheckCircle } from "lucide-react";
 
@@ -24,12 +23,16 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setResendMessage(null);
 
     const cleanName = fullName.trim();
     const cleanEmail = email.trim().toLowerCase();
@@ -63,36 +66,54 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const { data, error: signupError } = await supabase.auth.signUp({
-        email: cleanEmail,
-        password,
-        options: {
-          data: { full_name: cleanName },
-          emailRedirectTo: `${window.location.origin}/auth/login?verified=1`,
-        },
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName: cleanName, email: cleanEmail, password }),
       });
 
-      if (signupError) {
-        const message = signupError.message.toLowerCase();
-        if (message.includes("already registered") || message.includes("already been registered")) {
-          setError("This institutional email is already registered. Please sign in instead.");
-        } else if (message.includes("password")) {
-          setError(signupError.message);
-        } else {
-          setError("Unable to create the account. Please try again.");
-        }
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setError(result?.error || "Unable to create the account. Please try again.");
         return;
       }
 
-      // If email confirmation is disabled, Supabase may return a session immediately.
-      // New registrations are still pending/inactive, so never leave a new user signed in.
-      if (data.session) await supabase.auth.signOut();
+      setRegisteredEmail(cleanEmail);
       setSuccess(true);
     } catch (err) {
       console.error("Registration failed:", err);
       setError("Unable to create the account. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (!registeredEmail || resending) return;
+    setResending(true);
+    setResendMessage(null);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: registeredEmail }),
+      });
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setError(result?.error || "Unable to send the verification email. Please try again later.");
+        return;
+      }
+
+      setResendMessage("Verification email sent again. Please check your inbox and spam folder.");
+    } catch (err) {
+      console.error("Verification resend failed:", err);
+      setError("Unable to send the verification email. Please try again later.");
+    } finally {
+      setResending(false);
     }
   };
 
@@ -115,9 +136,31 @@ export default function SignupPage() {
             </div>
             <h2 className="text-lg font-bold text-[#4D0C0D]">Registration Submitted</h2>
             <p className="text-sm text-stone-600 mt-2 leading-relaxed">
-              Check your MSU-Gensan email and confirm your email address. Your ProcuremateSU account will remain pending until an authorized administrator approves it.
+              Your account was created successfully. A verification email was requested for <strong className="text-stone-800">{registeredEmail}</strong>. Please confirm your email address before signing in. Your ProcuremateSU account will remain pending until an authorized administrator approves it.
             </p>
-            <Link href="/auth/login" className="mt-6 w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] text-white py-3 rounded-xl font-semibold text-sm shadow-md border border-amber-400/30 flex items-center justify-center gap-2">
+            <div className="mt-4 text-xs text-stone-500">
+              If you do not see the email, check your spam/junk folder or resend it below.
+            </div>
+            {resendMessage && (
+              <div className="mt-3 bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-xl text-xs">
+                {resendMessage}
+              </div>
+            )}
+            {error && (
+              <div className="mt-3 bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-start gap-2 text-left">
+                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-600" />
+                <span>{error}</span>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resending}
+              className="mt-5 w-full bg-white text-[#7A1315] py-2.5 rounded-xl font-semibold text-sm border border-[#7A1315]/30 hover:bg-[#7A1315]/5 transition-all disabled:opacity-50"
+            >
+              {resending ? "Sending verification email..." : "Resend Verification Email"}
+            </button>
+            <Link href="/auth/login" className="mt-3 w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] text-white py-3 rounded-xl font-semibold text-sm shadow-md border border-amber-400/30 flex items-center justify-center gap-2">
               Continue to Sign In <ArrowRight className="h-4 w-4 text-amber-300" />
             </Link>
           </div>
