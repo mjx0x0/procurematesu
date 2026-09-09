@@ -20,7 +20,11 @@ export default function LoginPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const success = params.get("success");
+    const verified = params.get("verified");
+    const authError = params.get("error");
     if (success) setSuccessMessage(success);
+    if (verified === "1") setSuccessMessage("Your email has been verified. Your account still requires administrator approval before you can access ProcuremateSU.");
+    if (authError === "account") setError("Your account is not active or has not been approved for ProcuremateSU.");
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -61,7 +65,7 @@ export default function LoginPage() {
     const user = authData.user;
     const { data: userData, error: userError } = await supabase
       .from("users")
-      .select("role, is_active")
+      .select("role, is_active, status")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -80,14 +84,27 @@ export default function LoginPage() {
       return;
     }
 
-    if (userData.is_active === false) {
+    if (userData.status === "pending") {
       await supabase.auth.signOut();
-      setError("Your account is inactive. Please contact the administrator.");
+      setError("Your registration is pending administrator approval. Please verify your email and wait for an authorized administrator to approve your account.");
       setLoading(false);
       return;
     }
 
-    // Keep the existing redirect logic; only add a visual transition while it happens.
+    if (userData.status === "rejected") {
+      await supabase.auth.signOut();
+      setError("Your ProcuremateSU registration was rejected. Please contact the administrator if you believe this is an error.");
+      setLoading(false);
+      return;
+    }
+
+    if (userData.is_active === false || userData.status !== "approved") {
+      await supabase.auth.signOut();
+      setError("Your account is inactive or not approved for ProcuremateSU. Please contact the administrator.");
+      setLoading(false);
+      return;
+    }
+
     setRedirecting(true);
     setLoading(false);
     router.replace(userData.role === "admin" ? "/admin" : "/dashboard");
@@ -150,7 +167,8 @@ export default function LoginPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-end text-xs">
+            <div className="flex items-center justify-between text-xs">
+              <Link href="/auth/signup" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">Create an account</Link>
               <Link href="/auth/forgot-password" className="text-[#7A1315] hover:text-[#4D0C0D] font-semibold">Forgot password?</Link>
             </div>
 
