@@ -7,7 +7,9 @@ import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
 
 const NEW_TOPIC_PATTERN = /\b(what is|what are|how does|how do|explain|tell me about|where is|where can|when is|who is|contact|ra\s*12009|ra\s*9184|small value|svp|bidding|procurement flow|procurement office|new purchase request|draft (?:a )?pr|create (?:a )?pr|track my pr|show me my pr)\b/i;
 const DRAFT_CONTINUATION_PATTERN = /\b(purpose|department|office|section|item|items|quantity|unit|price|cost|budget|supplier|description|yes|no|correct|continue|next)\b/i;
-const STOP_DRAFTING_PATTERN = /\b(stop|cancel|quit|exit|abort|end|never mind|nevermind|forget it|don't|do not)\b.{0,30}\b(draft|drafting|purchase request|pr|form)\b|\b(stop|cancel|quit|exit|abort|end)\s+(?:the\s+)?(?:draft|drafting|pr|purchase\s+request|form)\b|\bnevermind\b/i;
+// Treat both standalone cancellation commands ("cancel", "stop") and natural phrases
+// ("cancel drafting", "stop the PR", "never mind") as explicit draft cancellation.
+const STOP_DRAFTING_PATTERN = /^(?:stop|cancel|quit|exit|abort|end)\s*[.!?]*$|^(?:stop|cancel|quit|exit|abort|end)\s+(?:the\s+)?(?:draft|drafting|pr|purchase\s+request|form)\s*[.!?]*$|\b(?:stop|cancel|quit|exit|abort|end)\b.{0,40}\b(?:draft|drafting|purchase\s+request|pr|form)\b|\b(?:never\s*mind|nevermind|forget\s+it)\b/i;
 const PR_PATTERN = /\bPR[- ]?(\d{4}[- ]?\d{4}|\d{4})\b/i;
 const PR_ACCESS_PATTERN = /\b(track|show|view|see|open|display|details?|status|progress|update|history|timeline|next)\b/i;
 const OTHER_USER_PR_PATTERN = /\b(another|other|someone\s+else|somebody\s+else|different)\s+(user|person|account|requester)|\b(?:someone\s+else'?s|another\s+user'?s|other\s+user'?s)\b/i;
@@ -63,7 +65,9 @@ export async function POST(request: NextRequest) {
 
     const draftState = (session.state || {}) as { drafting?: boolean; step?: string | null; collected?: any };
     if (draftState.drafting) {
-      if (STOP_DRAFTING_PATTERN.test(message)) {
+      // Cancellation is checked BEFORE slot validation so commands like "cancel" or
+      // "stop" can never be rejected as an invalid answer to the current slot.
+      if (STOP_DRAFTING_PATTERN.test(message.trim())) {
         await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
         return NextResponse.json({ response: '🛑 **PR drafting stopped.**\n\nI did not create or submit a Purchase Request. Your draft has been cancelled.\n\nWhenever you are ready, you can say **"Help me draft a PR"** to start again.', sources: ['PR drafting session'] });
       }
