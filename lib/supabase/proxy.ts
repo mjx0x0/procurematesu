@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const PUBLIC_PATHS = [
   "/",
   "/auth/login",
+  "/auth/signup",
   "/auth/forgot-password",
   "/auth/reset-password",
 ];
@@ -18,7 +19,6 @@ export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  // Protected routes fail closed if the Supabase configuration is missing.
   if (!supabaseUrl || !supabaseKey) {
     if (isPublicPath(request.nextUrl.pathname)) {
       return NextResponse.next();
@@ -48,8 +48,6 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  // Keep this immediately after client creation so expired sessions are
-  // refreshed correctly and the refreshed cookies reach the browser.
   const { data: claimsData } = await supabase.auth.getClaims();
   const claims = claimsData?.claims;
   const pathname = request.nextUrl.pathname;
@@ -67,11 +65,11 @@ export async function updateSession(request: NextRequest) {
   if (claims && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
     const { data: profile, error } = await supabase
       .from("users")
-      .select("role, is_active")
+      .select("role, is_active, status")
       .eq("id", claims.sub)
       .maybeSingle();
 
-    if (error || !profile || profile.is_active === false) {
+    if (error || !profile || profile.is_active === false || profile.status !== "approved") {
       await supabase.auth.signOut();
       const url = request.nextUrl.clone();
       url.pathname = "/auth/login";
