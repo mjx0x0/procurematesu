@@ -5,7 +5,7 @@ import { useRouter }from "next/navigation";
 import Link from "next/link";
 import { Chatbot } from "@/components/chatbot/Chatbot";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
-import { FileText, LogOut, User, PlusCircle, Eye, Clock, CheckCircle, Loader2, Bot, Shield } from "lucide-react";
+import { FileText, LogOut, User, PlusCircle, Eye, Clock, CheckCircle, Loader2, Bot, Shield, ShieldCheck } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
 interface PurchaseRequest { pr_no: string; purpose: string; total: number; current_stage: string; created_at: string; department: string; }
@@ -107,6 +107,13 @@ export default function DashboardPage() {
                 <span>Admin Panel</span>
               </Link>
             )}
+            <Link
+              href="/dashboard/transparency"
+              className="flex-1 sm:flex-initial bg-white hover:bg-red-50 text-[#7A1315] border border-red-200/80 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-2xs transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+            >
+              <ShieldCheck className="h-4 w-4 text-[#B88E13]" />
+              <span>Transparency</span>
+            </Link>
             <Link
               href="/dashboard/chatbot"
               className="flex-1 sm:flex-initial bg-white hover:bg-red-50 text-[#7A1315] border border-red-200/80 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-2xs transition-all flex items-center justify-center gap-2 whitespace-nowrap"
