@@ -23,23 +23,23 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: {
-    default: "MSU GenSan Procurement System",
-    template: "%s | MSU GenSan Procurement System",
+    default: "MSU GenSan Procurement Management System",
+    template: "%s | MSU GenSan Procurement Management System",
   },
   description: "Digital procurement management system for Mindanao State University - General Santos, with purchase request tracking, transparency information, and Gab AI assistance.",
   keywords: ["procurement", "MSU-GenSan", "RA 12009", "purchase request", "Gab AI", "Mindanao State University", "General Santos", "government procurement", "e-procurement"],
-  authors: [{ name: "MSU GenSan Procurement System" }],
+  authors: [{ name: "MSU GenSan Procurement Management System" }],
   openGraph: {
-    title: "MSU GenSan Procurement System",
+    title: "MSU GenSan Procurement Management System",
     description: "Digital procurement management for Mindanao State University - General Santos.",
     type: "website",
     url: defaultUrl,
-    siteName: "MSU GenSan Procurement System",
+    siteName: "MSU GenSan Procurement Management System",
     locale: "en_PH",
   },
   twitter: {
     card: "summary_large_image",
-    title: "MSU GenSan Procurement System",
+    title: "MSU GenSan Procurement Management System",
     description: "Digital procurement management for MSU GenSan with Gab AI assistance.",
   },
   icons: {
