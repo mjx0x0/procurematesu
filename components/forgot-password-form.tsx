@@ -25,11 +25,8 @@ export function ForgotPasswordForm({
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // ✅ Import Supabase dynamically (only on client side)
     const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
-    
     setIsLoading(true);
     setError(null);
 
@@ -56,8 +53,7 @@ export function ForgotPasswordForm({
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive
-              a password reset email.
+              If you registered using your email and password, you will receive a password reset email.
             </p>
           </CardContent>
         </Card>
@@ -65,24 +61,14 @@ export function ForgotPasswordForm({
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your
-              password
-            </CardDescription>
+            <CardDescription>Type in your email and we&apos;ll send you a link to reset your password</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleForgotPassword}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+                  <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
                 {error && <p className="text-sm text-red-500">{error}</p>}
                 <Button type="submit" className="w-full bg-gradient-to-r from-[#7A1315] to-[#91191C] hover:from-[#630E10] hover:to-[#7A1315] text-white font-semibold border border-amber-400/30 shadow-xs" disabled={isLoading}>
@@ -90,13 +76,7 @@ export function ForgotPasswordForm({
                 </Button>
               </div>
               <div className="mt-4 text-center text-sm text-stone-600">
-                Already have an account?{" "}
-                <Link
-                  href="/auth/login"
-                  className="font-semibold text-[#7A1315] hover:underline"
-                >
-                  Sign in
-                </Link>
+                Already have an account? <Link href="/" className="font-semibold text-[#7A1315] hover:underline">Sign in on the home page</Link>
               </div>
             </form>
           </CardContent>
