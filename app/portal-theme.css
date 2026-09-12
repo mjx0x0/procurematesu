@@ -1,0 +1,225 @@
+/* ProcuremateSU portal UI layer.
+   This stylesheet is intentionally scoped to .portal-shell/.admin-shell so official
+   PR and RFQ pages remain visually untouched. */
+
+.portal-shell,
+.admin-shell {
+  --portal-bg: #f4f5f7;
+  --portal-maroon: #73090d;
+  --portal-maroon-deep: #520609;
+  --portal-red: #a50b17;
+  --portal-gold: #d7a915;
+  --portal-ink: #171717;
+  --portal-muted: #68707a;
+  --portal-line: #e1e4e8;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 85% 0%, rgba(215,169,21,.055), transparent 25rem),
+    linear-gradient(180deg, #f6f7f8 0%, #f2f3f5 100%) !important;
+  color: var(--portal-ink);
+  font-size: 13px;
+}
+
+.portal-shell .app-sidebar,
+.admin-shell .app-sidebar { font-family: 'Inter', sans-serif; }
+
+.portal-shell > nav,
+.admin-shell > nav {
+  min-height: 52px;
+  margin-left: 0;
+  z-index: 50;
+}
+
+.portal-shell main,
+.admin-shell main {
+  width: 100%;
+  max-width: none !important;
+  margin: 0;
+  padding: 24px clamp(18px, 3vw, 36px) 40px !important;
+}
+
+.portal-shell main > .max-w-7xl,
+.admin-shell main > .max-w-7xl {
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.portal-shell main > div > div:first-child,
+.admin-shell main > div > div:first-child {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: linear-gradient(110deg, #64070b 0%, #820b12 56%, #6b170d 100%) !important;
+  border: 1px solid rgba(215,169,21,.18) !important;
+  box-shadow: 0 14px 32px rgba(73,5,8,.12);
+  padding: 18px 20px !important;
+}
+
+.portal-shell main > div > div:first-child::after,
+.admin-shell main > div > div:first-child::after {
+  content: '';
+  position: absolute;
+  right: -90px;
+  top: -120px;
+  width: 300px;
+  height: 260px;
+  background: rgba(215,169,21,.09);
+  transform: rotate(12deg);
+  pointer-events: none;
+}
+
+.portal-shell main > div > div:first-child h1,
+.admin-shell main > div > div:first-child h1 {
+  color: #fff !important;
+  font-size: clamp(1.35rem, 2vw, 1.7rem) !important;
+  letter-spacing: -.035em;
+}
+
+.portal-shell main > div > div:first-child p,
+.admin-shell main > div > div:first-child p {
+  color: rgba(255,255,255,.70) !important;
+  font-size: .72rem;
+  line-height: 1.55;
+}
+
+.portal-shell main > div > div:first-child > div,
+.admin-shell main > div > div:first-child > div { position: relative; z-index: 1; }
+
+.portal-shell .bg-white.rounded-xl,
+.portal-shell .bg-white.rounded-2xl,
+.admin-shell .bg-white.rounded-xl,
+.admin-shell .bg-white.rounded-2xl {
+  background: rgba(255,255,255,.98) !important;
+  border: 1px solid var(--portal-line) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 7px 22px rgba(32,37,43,.055) !important;
+}
+
+.portal-shell main > div > .grid,
+.admin-shell main > div > .grid { gap: 12px; }
+
+.portal-shell main > div > .grid > div,
+.admin-shell main > div > .grid > div {
+  min-height: 84px;
+  padding: 14px 15px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.portal-shell main > div > .grid > div::after,
+.admin-shell main > div > .grid > div::after {
+  content: '';
+  position: absolute;
+  right: -18px;
+  bottom: -28px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(115,9,13,.045);
+}
+
+.portal-shell main h2,
+.admin-shell main h2 {
+  color: #171717 !important;
+  font-size: .92rem !important;
+  font-weight: 750 !important;
+  letter-spacing: -.018em;
+}
+
+.portal-shell main h3,
+.admin-shell main h3 { font-size: .82rem !important; }
+
+.portal-shell main p,
+.admin-shell main p,
+.portal-shell main td,
+.admin-shell main td { font-size: .72rem; }
+
+.portal-shell main th,
+.admin-shell main th {
+  font-size: .62rem !important;
+  text-transform: uppercase;
+  letter-spacing: .075em;
+  color: #737b85 !important;
+}
+
+.portal-shell main table,
+.admin-shell main table { border-collapse: separate; border-spacing: 0; }
+.portal-shell main tbody tr:hover,
+.admin-shell main tbody tr:hover { background: #fff8f8 !important; }
+
+.portal-shell .text-\[\#4D0C0D\],
+.portal-shell .text-\[\#5A1420\],
+.portal-shell .text-\[\#7A1315\],
+.admin-shell .text-\[\#4D0C0D\],
+.admin-shell .text-\[\#5A1420\],
+.admin-shell .text-\[\#7C1D2E\],
+.admin-shell .text-\[\#7A1315\] { color: var(--portal-maroon) !important; }
+
+.portal-shell .text-amber-600,
+.portal-shell .text-amber-700,
+.admin-shell .text-amber-600,
+.admin-shell .text-amber-700 { color: #a97700 !important; }
+
+.portal-shell a[class*="bg-gradient"],
+.portal-shell .ui-button-primary,
+.admin-shell a[class*="bg-gradient"],
+.admin-shell .ui-button-primary {
+  background: linear-gradient(135deg, #a50b17, #76070c) !important;
+  border-color: rgba(215,169,21,.35) !important;
+}
+
+.portal-shell button[class*="bg-gradient"],
+.admin-shell button[class*="bg-gradient"] {
+  background: linear-gradient(135deg, #a50b17, #76070c) !important;
+  border-color: rgba(215,169,21,.35) !important;
+}
+
+.portal-shell .bg-red-50,
+.admin-shell .bg-red-50 { background: #fff3f3 !important; }
+.portal-shell .bg-amber-50,
+.admin-shell .bg-amber-50 { background: #fff9e9 !important; }
+
+.portal-shell nav,
+.admin-shell nav {
+  background: rgba(255,255,255,.97) !important;
+  border-bottom: 1px solid #e3e5e8 !important;
+  box-shadow: 0 1px 0 rgba(0,0,0,.02), 0 7px 20px rgba(32,37,43,.045) !important;
+  backdrop-filter: blur(14px);
+}
+
+.portal-shell nav > div,
+.admin-shell nav > div { max-width: 1180px; }
+
+.portal-shell nav .text-xl,
+.admin-shell nav .text-xl { font-size: .95rem !important; }
+
+.portal-shell nav .bg-\[\#7A1315\],
+.admin-shell nav .bg-\[\#7C1D2E\] {
+  background: var(--portal-maroon) !important;
+  border-color: rgba(215,169,21,.35) !important;
+}
+
+.portal-shell .app-sidebar + * { min-width: 0; }
+
+@media (min-width: 1024px) {
+  .portal-shell > nav,
+  .admin-shell > nav { margin-left: 171px; }
+  .portal-shell main,
+  .admin-shell main { margin-left: 171px; width: calc(100% - 171px); }
+}
+
+@media (max-width: 1023px) {
+  .portal-shell main,
+  .admin-shell main { padding-top: 18px !important; }
+}
+
+@media (max-width: 640px) {
+  .portal-shell main,
+  .admin-shell main { padding-inline: 12px !important; }
+  .portal-shell main > div > div:first-child,
+  .admin-shell main > div > div:first-child { padding: 15px !important; border-radius: 12px; }
+  .portal-shell main > div > .grid,
+  .admin-shell main > div > .grid { gap: 8px; }
+  .portal-shell main > div > .grid > div,
+  .admin-shell main > div > .grid > div { min-height: 72px; padding: 11px !important; }
+}
