@@ -6,6 +6,7 @@ import RFQStagePopup from "@/components/RFQStagePopup";
 import AppThemeShell from "@/components/AppThemeShell";
 import "./globals.css";
 import "./portal-theme.css";
+import "./portal-premium.css";
 import "./page-transitions.css";
 
 const inter = Inter({
@@ -22,24 +23,24 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: {
-    default: "ProcuremateSU | Digital Procurement Logbook for MSU-GenSan",
-    template: "%s | ProcuremateSU",
+    default: "MSU GenSan Procurement System",
+    template: "%s | MSU GenSan Procurement System",
   },
-  description: "AI-powered procurement system for Mindanao State University - General Santos. Streamline purchase requests, track status, and ensure RA 12009 compliance.",
-  keywords: ["procurement", "MSU-GenSan", "RA 12009", "digital logbook", "AI assistant", "purchase request", "Mindanao State University", "General Santos", "government procurement", "e-procurement"],
-  authors: [{ name: "ProcuremateSU Team", url: "https://procurematesu.vercel.app" }],
+  description: "Digital procurement management system for Mindanao State University - General Santos, with purchase request tracking, transparency information, and Gab AI assistance.",
+  keywords: ["procurement", "MSU-GenSan", "RA 12009", "purchase request", "Gab AI", "Mindanao State University", "General Santos", "government procurement", "e-procurement"],
+  authors: [{ name: "MSU GenSan Procurement System" }],
   openGraph: {
-    title: "ProcuremateSU | Digital Procurement Logbook for MSU-GenSan",
-    description: "Streamline your procurement process with AI-powered assistance at MSU-GenSan.",
+    title: "MSU GenSan Procurement System",
+    description: "Digital procurement management for Mindanao State University - General Santos.",
     type: "website",
-    url: "https://procurematesu.vercel.app",
-    siteName: "ProcuremateSU",
+    url: defaultUrl,
+    siteName: "MSU GenSan Procurement System",
     locale: "en_PH",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ProcuremateSU | Digital Procurement Logbook for MSU-GenSan",
-    description: "AI-powered procurement system for MSU-GenSan. Streamline purchase requests and ensure RA 12009 compliance.",
+    title: "MSU GenSan Procurement System",
+    description: "Digital procurement management for MSU GenSan with Gab AI assistance.",
   },
   icons: {
     icon: [{ url: "/favicon.ico", sizes: "any" }, { url: "/icon.png", type: "image/png" }],
