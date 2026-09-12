@@ -6,8 +6,10 @@ import { useEffect } from "react";
 export default function SystemBranding() {
   useEffect(() => {
     const replacements: Record<string, string> = {
-      ProcuremateSU: "MSU Gensan Procurement System",
-      "Procuremate SU": "MSU Gensan Procurement System",
+      ProcuremateSU: "MSU GenSan Procurement Management System",
+      "Procuremate SU": "MSU GenSan Procurement Management System",
+      "MSU Gensan Procurement System": "MSU GenSan Procurement Management System",
+      "MSU GenSan Procurement System": "MSU GenSan Procurement Management System",
       "AI Assistant": "Gab AI",
       "Ask AI": "Ask Gab AI",
     };
