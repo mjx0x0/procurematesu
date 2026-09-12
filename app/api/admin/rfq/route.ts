@@ -2,22 +2,6 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 const GENERATION_STAGE = "rfq_generation";
-const AVAILABLE_RFQ_STAGES = new Set([
-  "rfq_generation",
-  "rfq_evaluation",
-  "rfq_printing",
-  "philgeps_posting",
-  "aoq_preparation",
-  "aoq_evaluation",
-  "awarded_aoq_received",
-  "po_generation_evaluation",
-  "pmo_director_po_validation",
-  "budget_po_endorsement",
-  "approved_po_received",
-  "po_release_supplier",
-  "spmo_endorsement",
-  "monitoring_documentation",
-]);
 
 function normalizePrNo(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -25,13 +9,14 @@ function normalizePrNo(value: unknown) {
 
 async function requireActiveAdmin() {
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    return { supabase, user: null, response: NextResponse.json({ error: "Authentication required." }, { status: 401 }) };
+    return {
+      supabase,
+      user: null,
+      response: NextResponse.json({ error: "Authentication required." }, { status: 401 }),
+    };
   }
 
   const { data: profile, error: profileError } = await supabase
@@ -129,10 +114,7 @@ export async function POST(request: Request) {
 
   if (pr.current_stage !== GENERATION_STAGE) {
     return NextResponse.json(
-      {
-        error:
-          `RFQ generation is only available at Step 7 (Generation of Requests for Quotations (RFQs)). This PR is currently at ${pr.current_stage || "an undefined stage"}.`,
-      },
+      { error: "RFQ generation is only available while this Purchase Request is at Step 7: Generation of Requests for Quotations (RFQs)." },
       { status: 409 }
     );
   }
