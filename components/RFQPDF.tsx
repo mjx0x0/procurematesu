@@ -23,7 +23,7 @@ export interface RFQPdfItem {
   total_cost: number;
 }
 
-// Verbatim text taken from the uploaded MSU-Gensan RFQ workbook.
+// Verbatim text taken from the uploaded official MSU-Gensan RFQ workbook.
 const TERMS = [
   "1. Mayor's/Business Permit",
   "2. Philgeps Registration Certificate",
@@ -38,7 +38,7 @@ const TERMS = [
   "11. Partial bid is allowed, evaluation, comparison and contract award shall be made PER ITEM; partial bid is not allowed; the goods are grouped in a single lot, evaluation, comparison, and contract award shall be made PER LOT",
 ] as const;
 
-// Proportions are based on the uploaded workbook's B:H column widths.
+// Proportions are derived from the official XLSX column widths B:H.
 const C = {
   item: "7.5%",
   qty: "10.0%",
@@ -49,11 +49,10 @@ const C = {
   total: "16.0%",
 };
 
-const commonBorder = { borderColor: "#000000" } as const;
+const blackBorder = { borderColor: "#000000" } as const;
 
 const styles = StyleSheet.create({
   page: {
-    size: "LETTER",
     paddingTop: 18,
     paddingBottom: 18,
     paddingLeft: 24,
@@ -67,63 +66,65 @@ const styles = StyleSheet.create({
   header: {
     minHeight: 63,
     borderBottomWidth: 1.2,
-    ...commonBorder,
+    ...blackBorder,
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
-    paddingLeft: 66,
+    paddingLeft: 62,
   },
   logo: { position: "absolute", left: 14, top: 10, width: 45, height: 45, objectFit: "contain" },
   university: { fontSize: 12, fontFamily: "Helvetica-Bold" },
   city: { fontSize: 9.5, fontFamily: "Helvetica-Bold", marginTop: 2 },
-  title: { fontSize: 12.5, fontFamily: "Helvetica-Bold", marginTop: 9, textTransform: "uppercase" },
-  metadata: { flexDirection: "row", minHeight: 77, borderBottomWidth: 1.2, ...commonBorder },
-  supplierBlock: { width: "73.6%", borderRightWidth: 1.2, ...commonBorder, paddingLeft: 8, paddingTop: 3 },
-  supplierLine: { width: "56%", flexDirection: "row", alignItems: "flex-end", minHeight: 21 },
+  title: { fontSize: 12.5, fontFamily: "Helvetica-Bold", marginTop: 9 },
+  metadata: { flexDirection: "row", minHeight: 77, borderBottomWidth: 1.2, ...blackBorder },
+  supplierBlock: { width: "73.6%", borderRightWidth: 1.2, ...blackBorder, paddingLeft: 8, paddingTop: 3 },
+  supplierLine: { width: "94%", flexDirection: "row", alignItems: "flex-end", minHeight: 21 },
   supplierLabel: { fontSize: 8.6 },
-  underline: { flex: 1, height: 14, borderBottomWidth: 0.75, ...commonBorder, marginLeft: 3 },
-  metaRight: { width: "26.4%", paddingLeft: 6, paddingRight: 6, paddingTop: 4, paddingBottom: 3 },
+  underline: { flex: 1, height: 14, borderBottomWidth: 0.75, ...blackBorder, marginLeft: 3 },
+  metaRight: { width: "26.4%", paddingLeft: 5, paddingRight: 4, paddingTop: 4, paddingBottom: 3 },
   metaLine: { flexDirection: "row", alignItems: "flex-end", minHeight: 15.5 },
-  metaLabel: { width: 71, fontSize: 7.7 },
-  metaValue: { flex: 1, minHeight: 12, borderBottomWidth: 0.75, ...commonBorder, fontSize: 7.4, paddingLeft: 2, paddingBottom: 1 },
-  instruction: { minHeight: 26, borderBottomWidth: 0.75, ...commonBorder, paddingHorizontal: 6, justifyContent: "center", fontSize: 7.3 },
+  metaLabel: { width: 70, fontSize: 7.7 },
+  metaValue: { flex: 1, minHeight: 12, borderBottomWidth: 0.75, ...blackBorder, fontSize: 7.4, paddingLeft: 2, paddingBottom: 1 },
+  instruction: { minHeight: 26, borderBottomWidth: 0.75, ...blackBorder, paddingHorizontal: 6, justifyContent: "center", fontSize: 7.3 },
   terms: { paddingLeft: 8, paddingRight: 8, paddingTop: 5, paddingBottom: 5 },
   termsTitle: { fontFamily: "Helvetica-Bold", fontSize: 8.2, marginBottom: 3.5 },
   term: { fontSize: 6.65, lineHeight: 1.09, marginBottom: 1.15 },
   truly: { fontFamily: "Helvetica-Bold", fontSize: 8.2, marginTop: 2 },
   signatoryName: { fontFamily: "Helvetica-Bold", fontSize: 10.7, textAlign: "center", marginTop: 4.5 },
   signatoryRole: { fontSize: 8.8, textAlign: "center", marginTop: 1 },
-  tableTop: { flexDirection: "row", minHeight: 18, borderTopWidth: 1.35, borderBottomWidth: 0.6, ...commonBorder },
-  tableBottom: { flexDirection: "row", minHeight: 18, borderBottomWidth: 1.25, ...commonBorder },
-  hCell: { alignItems: "center", justifyContent: "center", paddingHorizontal: 1, paddingVertical: 1 },
+  tableRow: { flexDirection: "row", alignItems: "stretch", borderBottomWidth: 0.75, ...blackBorder },
+  topCell: { minHeight: 18, alignItems: "center", justifyContent: "center", paddingHorizontal: 1, paddingVertical: 1 },
   hText: { fontFamily: "Helvetica-Bold", fontSize: 7.2, textAlign: "center" },
-  bodyRow: { flexDirection: "row", minHeight: 24, borderBottomWidth: 0.75, ...commonBorder, alignItems: "stretch" },
-  bodyCell: { paddingHorizontal: 2.5, paddingVertical: 3, fontSize: 7.0, justifyContent: "center" },
+  itemRow: { minHeight: 24, flexDirection: "row", alignItems: "stretch", borderBottomWidth: 0.75, ...blackBorder },
+  itemCell: { paddingHorizontal: 2.5, paddingVertical: 3, fontSize: 7.0, justifyContent: "center" },
   center: { textAlign: "center" },
   right: { textAlign: "right" },
-  nothingRow: { flexDirection: "row", minHeight: 18, borderBottomWidth: 0.75, ...commonBorder, alignItems: "stretch" },
-  nothingText: { flex: 1, alignSelf: "center", textAlign: "center", fontFamily: "Helvetica-Bold", fontSize: 7.6, paddingVertical: 2 },
-  purposeRow: { flexDirection: "row", minHeight: 18, borderBottomWidth: 0.75, ...commonBorder, alignItems: "center" },
-  purposeLabel: { width: "25%", borderRightWidth: 1.2, ...commonBorder, paddingLeft: 7, fontSize: 7.6 },
-  purposeValue: { width: "75%", paddingLeft: 4, paddingRight: 4, fontSize: 7.5 },
-  totalRow: { flexDirection: "row", minHeight: 20, borderBottomWidth: 0.75, ...commonBorder, alignItems: "center" },
-  totalLabel: { width: "62%", paddingLeft: 30, fontFamily: "Helvetica-Bold", fontSize: 8.0 },
-  totalValue: { width: "22%", borderRightWidth: 1.2, ...commonBorder, textAlign: "right", paddingRight: 4, fontSize: 7.7, fontFamily: "Helvetica-Bold" },
-  totalEmpty: { width: "16%" },
-  instructionsRow: { flexDirection: "row", minHeight: 20, borderBottomWidth: 0.9, ...commonBorder, alignItems: "center" },
-  instructionsLabel: { width: "29%", fontFamily: "Helvetica-Bold", fontSize: 8.0, textAlign: "center" },
-  instructionsText: { width: "71%", borderLeftWidth: 1.2, ...commonBorder, fontFamily: "Helvetica-Oblique", fontSize: 7.7, paddingLeft: 5 },
+  nothingRow: { minHeight: 18, flexDirection: "row", alignItems: "stretch", borderBottomWidth: 0.75, ...blackBorder },
+  nothingTextCell: { width: C.tech, borderRightWidth: 1.2, ...blackBorder, justifyContent: "center", alignItems: "center" },
+  nothingText: { fontFamily: "Helvetica-Bold", fontSize: 7.6, textAlign: "center" },
+  purposeRow: { minHeight: 18, flexDirection: "row", alignItems: "center", borderBottomWidth: 0.75, ...blackBorder },
+  purposeLabel: { width: "10%", fontSize: 7.6, paddingLeft: 4 },
+  purposeValue: { width: "65.8%", fontSize: 7.6, paddingLeft: 2, paddingRight: 2, borderRightWidth: 1.2, ...blackBorder },
+  purposeRightBlank: { width: "24.2%" },
+  totalRow: { minHeight: 20, flexDirection: "row", alignItems: "center", borderBottomWidth: 0.75, ...blackBorder },
+  totalLabel: { width: "17.8%", fontFamily: "Helvetica-Bold", fontSize: 8.0, textAlign: "center" },
+  totalBlank: { width: "20%", borderRightWidth: 1.2, ...blackBorder },
+  totalValue: { width: "37.5%", fontFamily: "Helvetica-Bold", fontSize: 7.7, textAlign: "right", paddingRight: 4, borderRightWidth: 1.2, ...blackBorder },
+  totalRest: { width: "24.7%" },
+  instructionsRow: { minHeight: 20, flexDirection: "row", alignItems: "center", borderBottomWidth: 0.9, ...blackBorder },
+  instructionsLabel: { width: "29.2%", fontFamily: "Helvetica-Bold", fontSize: 8.0, textAlign: "center" },
+  instructionsText: { width: "70.8%", borderLeftWidth: 1.2, ...blackBorder, fontFamily: "Helvetica-Oblique", fontSize: 7.7, paddingLeft: 5 },
   note: { textAlign: "right", fontSize: 7.7, paddingRight: 5, paddingTop: 4, paddingBottom: 2 },
   supplierFields: { minHeight: 52, flexDirection: "row", justifyContent: "flex-end", paddingTop: 4, paddingRight: 5, paddingBottom: 4 },
   supplierFieldsInner: { width: "39%" },
   detailLine: { flexDirection: "row", alignItems: "flex-end", minHeight: 14 },
   detailLabel: { fontSize: 7.7 },
-  detailUnderline: { flex: 1, height: 11, borderBottomWidth: 0.75, ...commonBorder, marginLeft: 2 },
+  detailUnderline: { flex: 1, height: 11, borderBottomWidth: 0.75, ...blackBorder, marginLeft: 2 },
   statement: { paddingHorizontal: 7, fontSize: 7.7, lineHeight: 1.22 },
   signatureArea: { minHeight: 47, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", paddingLeft: 7, paddingRight: 5, paddingTop: 7, paddingBottom: 3 },
-  canvasser: { width: "45%", textAlign: "center", fontSize: 7.7, borderBottomWidth: 0.75, ...commonBorder, paddingBottom: 2 },
+  canvasser: { width: "45%", textAlign: "center", fontSize: 7.7, borderBottomWidth: 0.75, ...blackBorder, paddingBottom: 2 },
   bidder: { width: "41%" },
-  bidderLine: { height: 14, borderBottomWidth: 0.75, ...commonBorder },
+  bidderLine: { height: 14, borderBottomWidth: 0.75, ...blackBorder },
   small: { fontSize: 7.5, paddingTop: 1 },
 });
 
@@ -138,7 +139,7 @@ function formatDate(value: string | null | undefined) {
   return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
-function Cell({ width, right = true, style, children }: { width: string; right?: boolean; style?: any; children?: React.ReactNode }) {
+function Cell({ width, children, right = true, style }: { width: string; children?: React.ReactNode; right?: boolean; style?: any }) {
   return <View style={[{ width, ...(right ? { borderRightWidth: 1.2, borderColor: "#000000" } : {}) }, style]}>{children}</View>;
 }
 
@@ -185,44 +186,33 @@ export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfI
             <Text style={styles.signatoryRole}>{signerRole}</Text>
           </View>
 
-          <View style={styles.tableTop}>
-            <Cell width={C.item} style={styles.hCell}><Text style={styles.hText}>Item</Text></Cell>
-            <Cell width={C.qty} style={styles.hCell}><Text style={styles.hText}>QTY</Text></Cell>
-            <Cell width={C.abc} style={styles.hCell}><Text style={styles.hText}>ABC</Text></Cell>
-            <Cell width={C.tech} style={styles.hCell}><Text style={styles.hText}>Technical Specifications</Text></Cell>
-            <Cell width={`${parseFloat(C.unit) + parseFloat(C.unitPrice)}%`} style={styles.hCell}><Text style={styles.hText}>Unit Price</Text></Cell>
-            <View style={[styles.hCell, { width: C.total }]}><Text style={styles.hText}>Total Amount</Text></View>
+          <View style={styles.tableRow}>
+            <Cell width={C.item} style={styles.topCell}><Text style={styles.hText}>Item</Text></Cell>
+            <Cell width={C.qty} style={styles.topCell}><Text style={styles.hText}>QTY</Text></Cell>
+            <Cell width={C.abc} style={styles.topCell}><Text style={styles.hText}>ABC</Text></Cell>
+            <Cell width={C.tech} style={styles.topCell}><Text style={styles.hText}>Technical Specifications</Text></Cell>
+            <Cell width={`${parseFloat(C.unit) + parseFloat(C.unitPrice)}%`} style={styles.topCell}><Text style={styles.hText}>Unit Price</Text></Cell>
+            <View style={[styles.topCell, { width: C.total }]}><Text style={styles.hText}>Total Amount</Text></View>
           </View>
 
-          <View style={styles.tableBottom}>
+          <View style={styles.tableRow}>
             <View style={{ width: C.item, borderRightWidth: 1.2, borderColor: "#000000" }} />
             <View style={{ width: C.qty, borderRightWidth: 1.2, borderColor: "#000000" }} />
             <View style={{ width: C.abc, borderRightWidth: 1.2, borderColor: "#000000" }} />
             <View style={{ width: C.tech, borderRightWidth: 1.2, borderColor: "#000000" }} />
-            <View style={[styles.hCell, { width: C.unit, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text style={styles.hText}>UNIT</Text></View>
-            <View style={[styles.hCell, { width: C.unitPrice, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text style={styles.hText}>UNIT PRICE</Text></View>
-            <View style={[styles.hCell, { width: C.total }]}><Text style={styles.hText}>TOTAL AMOUNT</Text></View>
-          </View>
-
-          <View style={styles.bodyRow}>
-            <View style={{ width: C.item, borderRightWidth: 1.2, borderColor: "#000000" }} />
-            <View style={{ width: C.qty, borderRightWidth: 1.2, borderColor: "#000000" }} />
-            <View style={{ width: C.abc, borderRightWidth: 1.2, borderColor: "#000000" }} />
-            <View style={{ width: C.tech, borderRightWidth: 1.2, borderColor: "#000000" }}><Text style={{ fontSize: 7, color: "#000000", textAlign: "center", paddingTop: 2 }}> (To be filled up by the suppliers)</Text></View>
-            <View style={{ width: C.unit, borderRightWidth: 1.2, borderColor: "#000000" }} />
-            <View style={{ width: C.unitPrice, borderRightWidth: 1.2, borderColor: "#000000" }} />
+            <View style={{ width: `${parseFloat(C.unit) + parseFloat(C.unitPrice)}%`, borderRightWidth: 1.2, borderColor: "#000000", minHeight: 18, justifyContent: "center", alignItems: "center" }}><Text style={{ fontSize: 7.1, textAlign: "center" }}>(To be filled up by the suppliers)</Text></View>
             <View style={{ width: C.total }} />
           </View>
 
           {safeItems.map((item, index) => (
-            <View style={styles.bodyRow} key={`${item.item_description}-${index}`}>
-              <View style={[styles.bodyCell, { width: C.item, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text>{item.item_description}</Text></View>
-              <View style={[styles.bodyCell, { width: C.qty, borderRightWidth: 1.2, borderColor: "#000000" }, styles.center]}><Text>{item.quantity || ""}</Text></View>
-              <View style={[styles.bodyCell, { width: C.abc, borderRightWidth: 1.2, borderColor: "#000000" }, styles.right]}><Text>{item.total_cost ? money(item.total_cost) : ""}</Text></View>
-              <View style={[styles.bodyCell, { width: C.tech, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text>{item.item_description}</Text></View>
-              <View style={[styles.bodyCell, { width: C.unit, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text></Text></View>
-              <View style={[styles.bodyCell, { width: C.unitPrice, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text></Text></View>
-              <View style={[styles.bodyCell, { width: C.total }, styles.right]}><Text></Text></View>
+            <View style={styles.itemRow} key={`${item.item_description}-${index}`}>
+              <View style={[styles.itemCell, { width: C.item, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text>{item.item_description}</Text></View>
+              <View style={[styles.itemCell, { width: C.qty, borderRightWidth: 1.2, borderColor: "#000000" }, styles.center]}><Text>{item.quantity || ""}</Text></View>
+              <View style={[styles.itemCell, { width: C.abc, borderRightWidth: 1.2, borderColor: "#000000" }, styles.right]}><Text>{item.total_cost ? money(item.total_cost) : ""}</Text></View>
+              <View style={[styles.itemCell, { width: C.tech, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text></Text></View>
+              <View style={[styles.itemCell, { width: C.unit, borderRightWidth: 1.2, borderColor: "#000000" }, styles.center]}><Text>{item.unit || ""}</Text></View>
+              <View style={[styles.itemCell, { width: C.unitPrice, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text></Text></View>
+              <View style={[styles.itemCell, { width: C.total }, styles.right]}><Text></Text></View>
             </View>
           ))}
 
@@ -230,15 +220,16 @@ export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfI
             <View style={{ width: C.item, borderRightWidth: 1.2, borderColor: "#000000" }} />
             <View style={{ width: C.qty, borderRightWidth: 1.2, borderColor: "#000000" }} />
             <View style={{ width: C.abc, borderRightWidth: 1.2, borderColor: "#000000" }} />
-            <View style={styles.nothingText}><Text>***NOTHING FOLLOWS***</Text></View>
+            <View style={styles.nothingTextCell}><Text style={styles.nothingText}>***NOTHING FOLLOWS***</Text></View>
             <View style={{ width: C.unit, borderRightWidth: 1.2, borderColor: "#000000" }} />
             <View style={{ width: C.unitPrice, borderRightWidth: 1.2, borderColor: "#000000" }} />
             <View style={{ width: C.total }} />
           </View>
 
-          <View style={styles.purposeRow}><Text style={styles.purposeLabel}>(Purpose)</Text><Text style={styles.purposeValue}>{rfq.purpose}</Text></View>
-          <View style={styles.purposeRow}><Text style={styles.purposeLabel}>(Office)</Text><Text style={styles.purposeValue}>{rfq.office}</Text></View>
-          <View style={styles.totalRow}><Text style={styles.totalLabel}>TOTAL ABC</Text><Text style={styles.totalValue}>{money(total)}</Text><View style={styles.totalEmpty} /></View>
+          <View style={styles.purposeRow}><Text style={styles.purposeLabel}>(Purpose)</Text><Text style={styles.purposeValue}>{rfq.purpose}</Text><View style={styles.purposeRightBlank} /></View>
+          <View style={styles.purposeRow}><Text style={styles.purposeLabel}>(Office)</Text><Text style={styles.purposeValue}>{rfq.office}</Text><View style={styles.purposeRightBlank} /></View>
+
+          <View style={styles.totalRow}><Text style={styles.totalLabel}>TOTAL ABC</Text><View style={styles.totalBlank} /><Text style={styles.totalValue}>{money(total)}</Text><View style={styles.totalRest} /></View>
           <View style={styles.instructionsRow}><Text style={styles.instructionsLabel}>Instructions:</Text><Text style={styles.instructionsText}>See attached Specifications/important Instructions for items.</Text></View>
           <Text style={styles.note}>(Please provide complete information below)</Text>
 
