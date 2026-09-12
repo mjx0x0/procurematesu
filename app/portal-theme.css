@@ -23,8 +23,8 @@
 .portal-shell .app-sidebar,
 .admin-shell .app-sidebar { font-family: 'Inter', sans-serif; }
 
-.portal-shell > nav,
-.admin-shell > nav {
+.portal-shell > div > nav,
+.admin-shell > div > nav {
   min-height: 52px;
   margin-left: 0;
   z-index: 50;
@@ -179,31 +179,29 @@
 .portal-shell .bg-amber-50,
 .admin-shell .bg-amber-50 { background: #fff9e9 !important; }
 
-.portal-shell nav,
-.admin-shell nav {
+.portal-shell > div > nav,
+.admin-shell > div > nav {
   background: rgba(255,255,255,.97) !important;
   border-bottom: 1px solid #e3e5e8 !important;
   box-shadow: 0 1px 0 rgba(0,0,0,.02), 0 7px 20px rgba(32,37,43,.045) !important;
   backdrop-filter: blur(14px);
 }
 
-.portal-shell nav > div,
-.admin-shell nav > div { max-width: 1180px; }
+.portal-shell > div > nav > div,
+.admin-shell > div > nav > div { max-width: 1180px; }
 
-.portal-shell nav .text-xl,
-.admin-shell nav .text-xl { font-size: .95rem !important; }
+.portal-shell > div > nav .text-xl,
+.admin-shell > div > nav .text-xl { font-size: .95rem !important; }
 
-.portal-shell nav .bg-\[\#7A1315\],
-.admin-shell nav .bg-\[\#7C1D2E\] {
+.portal-shell > div > nav .bg-\[\#7A1315\],
+.admin-shell > div > nav .bg-\[\#7C1D2E\] {
   background: var(--portal-maroon) !important;
   border-color: rgba(215,169,21,.35) !important;
 }
 
-.portal-shell .app-sidebar + * { min-width: 0; }
-
 @media (min-width: 1024px) {
-  .portal-shell > nav,
-  .admin-shell > nav { margin-left: 171px; }
+  .portal-shell > div > nav,
+  .admin-shell > div > nav { margin-left: 171px; }
   .portal-shell main,
   .admin-shell main { margin-left: 171px; width: calc(100% - 171px); }
 }
