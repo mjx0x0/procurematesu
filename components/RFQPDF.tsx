@@ -23,7 +23,6 @@ export interface RFQPdfItem {
   total_cost: number;
 }
 
-// Text reproduced from the official MSU-Gensan RFQ workbook supplied for this feature.
 const TERMS = [
   "1. Mayor's/Business Permit",
   "2. Philgeps Registration Certificate",
@@ -48,7 +47,8 @@ const C = {
   unitPrice: "10.2%",
   total: "16.0%",
 };
-const SUPPLIER_UNIT_PRICE = "18.7%"; // F:G merged in the source form.
+const BASE_LEFT = "65.3%"; // B:E in the official source form.
+const SUPPLIER_COLUMNS = "34.7%"; // F:H merged in the official source form for row 29.
 
 const styles = StyleSheet.create({
   page: {
@@ -75,9 +75,8 @@ const styles = StyleSheet.create({
   title: { fontFamily: "Helvetica-Bold", fontSize: 12.5 },
   supplierRow: { flexDirection: "row", minHeight: 67, borderBottomWidth: 0.75, borderColor: "#000000" },
   supplierBlock: { width: "73.6%", paddingLeft: 8, paddingTop: 3 },
-  supplierLine: { flexDirection: "row", alignItems: "flex-end", minHeight: 19, width: "52%" },
+  supplierLine: { flexDirection: "row", alignItems: "flex-end", minHeight: 19 },
   supplierLabel: { fontSize: 8.4 },
-  underline: { flex: 1, height: 13, borderBottomWidth: 0.75, borderColor: "#000000", marginLeft: 3 },
   quoteBlock: { width: "26.4%", borderLeftWidth: 1.2, borderColor: "#000000", paddingLeft: 6, paddingTop: 7, paddingRight: 4 },
   quoteLine: { flexDirection: "row", alignItems: "flex-end", minHeight: 17 },
   quoteLabel: { width: 67, fontSize: 7.7 },
@@ -90,41 +89,39 @@ const styles = StyleSheet.create({
   signerName: { fontSize: 10.8, fontFamily: "Helvetica-Bold", textAlign: "center", marginTop: 4 },
   signerRole: { fontSize: 8.8, textAlign: "center", marginTop: 1 },
   tableHeader: { flexDirection: "row", borderTopWidth: 1.4, borderBottomWidth: 0.75, borderColor: "#000000", minHeight: 19 },
-  th: { alignItems: "center", justifyContent: "center", paddingHorizontal: 1, paddingVertical: 1 },
-  thText: { fontFamily: "Helvetica-Bold", fontSize: 7.25, textAlign: "center" },
   supplierNoteRow: { flexDirection: "row", minHeight: 18, borderBottomWidth: 0.75, borderColor: "#000000" },
-  supplierNote: { width: SUPPLIER_UNIT_PRICE, alignItems: "center", justifyContent: "center", borderRightWidth: 1.2, borderColor: "#000000" },
-  itemHeaderCell: { minHeight: 18, alignItems: "center", justifyContent: "center", paddingHorizontal: 1 },
+  th: { minHeight: 19, alignItems: "center", justifyContent: "center", paddingHorizontal: 1, paddingVertical: 1 },
+  thText: { fontFamily: "Helvetica-Bold", fontSize: 7.2, textAlign: "center" },
+  subHeaderRow: { flexDirection: "row", minHeight: 18, borderBottomWidth: 1.25, borderColor: "#000000" },
+  subHeader: { minHeight: 18, alignItems: "center", justifyContent: "center", paddingHorizontal: 1, paddingVertical: 1 },
   itemHeaderText: { fontFamily: "Helvetica-Bold", fontSize: 7.25, textAlign: "center" },
-  itemRow: { flexDirection: "row", minHeight: 24, borderBottomWidth: 0.75, borderColor: "#000000", alignItems: "stretch" },
+  itemRow: { minHeight: 24, flexDirection: "row", borderBottomWidth: 0.75, borderColor: "#000000", alignItems: "stretch" },
   cell: { paddingHorizontal: 2.5, paddingVertical: 3, justifyContent: "center", fontSize: 7 },
   rightBorder: { borderRightWidth: 1.2, borderColor: "#000000" },
   center: { textAlign: "center" },
   right: { textAlign: "right" },
-  nothingRow: { flexDirection: "row", minHeight: 18, borderBottomWidth: 0.75, borderColor: "#000000", alignItems: "stretch" },
+  nothingRow: { minHeight: 18, flexDirection: "row", borderBottomWidth: 0.75, borderColor: "#000000", alignItems: "stretch" },
   nothingCenter: { width: C.specs, borderRightWidth: 1.2, borderColor: "#000000", justifyContent: "center", alignItems: "center" },
   nothingText: { fontFamily: "Helvetica-Bold", fontSize: 7.7, textAlign: "center" },
-  purposeRow: { flexDirection: "row", minHeight: 18, borderBottomWidth: 0.75, borderColor: "#000000", alignItems: "center" },
-  purposeSpacerLeft: { width: "17.8%" },
-  purposeValue: { width: "37.5%", borderRightWidth: 1.2, borderColor: "#000000", fontSize: 7.6, textAlign: "center", paddingHorizontal: 2 },
-  purposeRest: { width: "44.7%" },
-  totalRow: { flexDirection: "row", minHeight: 20, borderBottomWidth: 0.75, borderColor: "#000000", alignItems: "center" },
+  purposeRow: { minHeight: 18, flexDirection: "row", borderBottomWidth: 0.75, borderColor: "#000000", alignItems: "center" },
+  totalRow: { minHeight: 20, flexDirection: "row", borderBottomWidth: 0.75, borderColor: "#000000", alignItems: "center" },
   totalLabel: { width: "17.5%", borderRightWidth: 1.2, borderColor: "#000000", fontFamily: "Helvetica-Bold", fontSize: 8, textAlign: "center" },
-  totalBlank: { width: "30%", borderRightWidth: 1.2, borderColor: "#000000" },
-  totalValue: { width: "37.5%", borderRightWidth: 1.2, borderColor: "#000000", fontFamily: "Helvetica-Bold", fontSize: 7.7, textAlign: "right", paddingRight: 4 },
-  totalRest: { width: "15%" },
-  instructionsRow: { flexDirection: "row", minHeight: 20, borderBottomWidth: 0.9, borderColor: "#000000", alignItems: "center" },
-  instructionsLabel: { width: "25.7%", borderRightWidth: 1.2, borderColor: "#000000", fontFamily: "Helvetica-Bold", fontSize: 8, textAlign: "center" },
-  instructionsText: { width: "74.3%", fontFamily: "Helvetica-Oblique", fontSize: 7.7, paddingLeft: 5 },
+  totalBlank: { width: C.abc, borderRightWidth: 1.2, borderColor: "#000000" },
+  totalValue: { width: "56.2%", borderRightWidth: 1.2, borderColor: "#000000", fontFamily: "Helvetica-Bold", fontSize: 7.7, textAlign: "right", paddingRight: 4 },
+  totalRest: { width: C.total },
+  instructionsRow: { minHeight: 20, flexDirection: "row", borderBottomWidth: 0.9, borderColor: "#000000", alignItems: "center" },
+  instructionsLabel: { width: "27.8%", borderRightWidth: 1.2, borderColor: "#000000", fontFamily: "Helvetica-Bold", fontSize: 8, textAlign: "center" },
+  instructionsText: { width: "72.2%", fontFamily: "Helvetica-Oblique", fontSize: 7.7, paddingLeft: 5 },
   note: { textAlign: "right", fontSize: 7.7, paddingRight: 5, paddingTop: 4, paddingBottom: 2 },
   supplierFields: { minHeight: 52, flexDirection: "row", justifyContent: "flex-end", paddingRight: 4, paddingTop: 4 },
-  supplierInner: { width: "35%" },
+  supplierInner: { width: "34.7%" },
   detailLine: { flexDirection: "row", alignItems: "flex-end", minHeight: 14 },
   detailLabel: { fontSize: 7.8 },
   detailUnderline: { flex: 1, height: 11, borderBottomWidth: 0.75, borderColor: "#000000", marginLeft: 2 },
   statement: { paddingHorizontal: 7, fontSize: 7.65, lineHeight: 1.22 },
   signatureArea: { minHeight: 54, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", paddingLeft: 5, paddingRight: 4, paddingTop: 8, paddingBottom: 3 },
-  canvasser: { width: "50%", paddingLeft: "20%", fontSize: 7.6, textAlign: "center", borderBottomWidth: 0.75, borderColor: "#000000", paddingBottom: 2 },
+  canvasser: { width: "50%", paddingLeft: "20%", fontSize: 7.6, textAlign: "center" },
+  canvasserRule: { borderBottomWidth: 0.75, borderColor: "#000000", paddingBottom: 2 },
   bidder: { width: "40%" },
   bidderLine: { height: 14, borderBottomWidth: 0.75, borderColor: "#000000" },
   small: { fontSize: 7.5, paddingTop: 1 },
@@ -141,13 +138,16 @@ function formatDate(value: string | null | undefined) {
   return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
+function FixedCell({ width, children, style }: { width: string; children?: React.ReactNode; style?: any }) {
+  return <View style={[{ width, borderRightWidth: 1.2, borderColor: "#000000" }, style]}>{children}</View>;
+}
+
 export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfItem[] }) {
   const logoSrc = typeof window !== "undefined" ? `${window.location.origin}/msu-logo.png` : "/msu-logo.png";
   const signer = rfq.template_type === "less_than_50k" ? "ENGR. NELSON P. BENARES, JR." : "RANDY P. ASTURIAS, D.Eng.";
   const signerRole = rfq.template_type === "less_than_50k" ? "Director, Procurement Management Office" : "BAC Chairman";
   const safeItems = items.length ? items : [{ item_description: "", quantity: 0, unit: "", unit_cost: 0, total_cost: 0 }];
   const total = Number(rfq.total || 0) || items.reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
-  const rowWidths = { item: C.item, qty: C.qty, abc: C.abc, specs: C.specs, unit: C.unit, unitPrice: C.unitPrice, total: C.total };
 
   return (
     <Document title={`RFQ-${rfq.pr_no}`} author="Mindanao State University - General Santos City">
@@ -192,30 +192,28 @@ export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfI
           </View>
 
           <View style={styles.tableHeader}>
-            {[
-              [rowWidths.item, "Item", true],
-              [rowWidths.qty, "QTY", true],
-              [rowWidths.abc, "ABC", true],
-              [rowWidths.specs, "Technical Specifications", true],
-              [SUPPLIER_UNIT_PRICE, "Unit Price", true],
-              [rowWidths.total, "Total Amount", false],
-            ].map(([width, text, right], index) => <View key={index} style={[styles.th, { width }, right ? styles.rightBorder : {}]}><Text style={styles.thText}>{text}</Text></View>)}
+            <View style={[styles.th, { width: C.item }, styles.rightBorder]}><Text style={styles.thText}>Item</Text></View>
+            <View style={[styles.th, { width: C.qty }, styles.rightBorder]}><Text style={styles.thText}>QTY</Text></View>
+            <View style={[styles.th, { width: C.abc }, styles.rightBorder]}><Text style={styles.thText}>ABC</Text></View>
+            <View style={[styles.th, { width: C.specs }, styles.rightBorder]}><Text style={styles.thText}>Technical Specifications</Text></View>
+            <View style={[styles.th, { width: SUPPLIER_UNIT_PRICE }, styles.rightBorder]}><Text style={styles.thText}>Unit Price</Text></View>
+            <View style={[styles.th, { width: C.total }]}><Text style={styles.thText}>Total Amount</Text></View>
           </View>
 
           <View style={styles.supplierNoteRow}>
-            <View style={[{ width: "81.3%" }, styles.rightBorder]} />
+            <View style={[{ width: BASE_LEFT }, styles.rightBorder]} />
             <View style={styles.supplierNote}><Text style={{ fontSize: 7.1, textAlign: "center" }}>(To be filled up by the suppliers)</Text></View>
             <View style={{ width: C.total }} />
           </View>
 
-          <View style={styles.tableRow}>
-            <View style={[styles.itemHeaderCell, { width: C.item }, styles.rightBorder]} />
-            <View style={[styles.itemHeaderCell, { width: C.qty }, styles.rightBorder]} />
-            <View style={[styles.itemHeaderCell, { width: C.abc }, styles.rightBorder]} />
-            <View style={[styles.itemHeaderCell, { width: C.specs }, styles.rightBorder]} />
-            <View style={[styles.itemHeaderCell, { width: C.unit, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text style={styles.itemHeaderText}>UNIT</Text></View>
-            <View style={[styles.itemHeaderCell, { width: C.unitPrice, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text style={styles.itemHeaderText}>UNIT PRICE</Text></View>
-            <View style={[styles.itemHeaderCell, { width: C.total }]}><Text style={styles.itemHeaderText}>TOTAL AMOUNT</Text></View>
+          <View style={styles.subHeaderRow}>
+            <View style={[styles.subHeader, { width: C.item }, styles.rightBorder]} />
+            <View style={[styles.subHeader, { width: C.qty }, styles.rightBorder]} />
+            <View style={[styles.subHeader, { width: C.abc }, styles.rightBorder]} />
+            <View style={[styles.subHeader, { width: C.specs }, styles.rightBorder]} />
+            <View style={[styles.subHeader, { width: C.unit }, styles.rightBorder]}><Text style={styles.itemHeaderText}>UNIT</Text></View>
+            <View style={[styles.subHeader, { width: C.unitPrice }, styles.rightBorder]}><Text style={styles.itemHeaderText}>UNIT PRICE</Text></View>
+            <View style={[styles.subHeader, { width: C.total }]}><Text style={styles.itemHeaderText}>TOTAL AMOUNT</Text></View>
           </View>
 
           {safeItems.map((item, index) => (
@@ -241,14 +239,14 @@ export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfI
           </View>
 
           <View style={styles.purposeRow}>
-            <View style={styles.purposeSpacerLeft} />
+            <View style={{ width: BASE_LEFT, borderRightWidth: 1.2, borderColor: "#000000", minHeight: 18 }} />
             <Text style={styles.purposeValue}>(Purpose) {rfq.purpose}</Text>
-            <View style={styles.purposeRest} />
+            <View style={{ width: "34.7%" }} />
           </View>
           <View style={styles.purposeRow}>
-            <View style={styles.purposeSpacerLeft} />
+            <View style={{ width: BASE_LEFT, borderRightWidth: 1.2, borderColor: "#000000", minHeight: 18 }} />
             <Text style={styles.purposeValue}>(Office) {rfq.office}</Text>
-            <View style={styles.purposeRest} />
+            <View style={{ width: "34.7%" }} />
           </View>
 
           <View style={styles.totalRow}>
@@ -277,7 +275,10 @@ export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfI
           <Text style={styles.statement}>After having carefully read and accepted your General Conditions, I/We quote you on the item at prices noted above.</Text>
 
           <View style={styles.signatureArea}>
-            <Text style={styles.canvasser}>__________________________________{"\n"}Signature over printed name of canvasser</Text>
+            <View style={styles.canvasser}>
+              <Text style={styles.canvasserRule}>__________________________________</Text>
+              <Text style={styles.small}>Signature over printed name of canvasser</Text>
+            </View>
             <View style={styles.bidder}>
               <View style={styles.bidderLine} />
               <Text style={styles.small}>Signature over printed name of bidder</Text>
