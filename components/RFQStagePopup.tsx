@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { AlertCircle, FileText, Loader2, X } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import RFQEditorModal from "@/components/RFQEditorModal";
 
@@ -28,7 +28,6 @@ export default function RFQStagePopup() {
   const pathname = usePathname();
   const [step7PRs, setStep7PRs] = useState<Step7PR[]>([]);
   const [openPrNo, setOpenPrNo] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [dismissed, setDismissed] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
@@ -38,33 +37,16 @@ export default function RFQStagePopup() {
     const { data: profile } = await supabase.from("users").select("role,status,is_active").eq("id", user.id).maybeSingle();
     if (profile?.role !== "admin" || profile.status !== "approved" || profile.is_active !== true) return;
 
-    const { data: prs } = await supabase
-      .from("purchase_requests")
-      .select("pr_no,purpose")
-      .eq("current_stage", "rfq_generation")
-      .order("created_at", { ascending: false });
+    const { data: prs } = await supabase.from("purchase_requests").select("pr_no,purpose").eq("current_stage", "rfq_generation").order("created_at", { ascending: false });
+    const pending: Step7PR[] = [];
 
-    const pending: Step7PRs[] = [];
     for (const pr of (prs || []) as Step7PR[]) {
       let response = await fetch(`/api/admin/rfq?prNo=${encodeURIComponent(pr.prNo)}`, { credentials: "include", cache: "no-store" });
-
-      // Repair any older Step-7 PR that reached RFQ generation before automatic
-      // RFQ creation was installed. POST is idempotent because pr_no is unique.
       if (response.status === 404) {
-        await fetch("/api/admin/rfq", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prNo: pr.prNo }),
-        });
+        await fetch("/api/admin/rfq", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prNo: pr.prNo }) });
         response = await fetch(`/api/admin/rfq?prNo=${encodeURIComponent(pr.prNo)}`, { credentials: "include", cache: "no-store" });
       }
-
-      if (!response.ok) {
-        pending.push(pr);
-        continue;
-      }
-
+      if (!response.ok) { pending.push(pr); continue; }
       const data = await response.json();
       if (!isRFQFormComplete(data.formData)) pending.push(pr);
     }
@@ -75,21 +57,12 @@ export default function RFQStagePopup() {
   }, [pathname, openPrNo, dismissed]);
 
   useEffect(() => {
-    let alive = true;
-    const run = async () => {
-      if (!alive) return;
-      setLoading(true);
-      try { await refresh(); } finally { if (alive) setLoading(false); }
-    };
-    void run();
-
-    const channel = supabase
-      .channel("rfq-generation-popup")
+    void refresh();
+    const channel = supabase.channel("rfq-generation-popup")
       .on("postgres_changes", { event: "*", schema: "public", table: "purchase_requests" }, () => { void refresh(); })
       .on("postgres_changes", { event: "*", schema: "public", table: "rfqs" }, () => { void refresh(); })
       .subscribe();
-
-    return () => { alive = false; void supabase.removeChannel(channel); };
+    return () => { void supabase.removeChannel(channel); };
   }, [pathname, refresh]);
 
   const closeEditor = () => {
@@ -100,10 +73,7 @@ export default function RFQStagePopup() {
     window.setTimeout(() => { void refresh(); }, 250);
   };
 
-  const openEditor = (prNo: string) => {
-    setDismissed(null);
-    setOpenPrNo(prNo);
-  };
+  const openEditor = (prNo: string) => { setDismissed(null); setOpenPrNo(prNo); };
 
   if (!pathname?.startsWith("/admin") || !step7PRs.length) return null;
 
@@ -116,27 +86,12 @@ export default function RFQStagePopup() {
             <div className="min-w-0 flex-1">
               <p className="font-bold text-amber-900">RFQ Form Required — Step 7</p>
               <p className="text-xs text-amber-800 mt-1">Complete the RFQ before the Purchase Request can advance to Step 8: RFQ Evaluation.</p>
-              <div className="mt-3 space-y-2">
-                {step7PRs.map((pr) => (
-                  <button key={pr.prNo} type="button" onClick={() => openEditor(pr.prNo)} className="w-full text-left rounded-xl border border-amber-200 bg-white px-3 py-2 hover:bg-amber-100/60 transition-colors">
-                    <span className="block text-xs font-extrabold text-[#7C1D2E]">{pr.prNo}</span>
-                    <span className="block text-xs text-stone-600 truncate">{pr.purpose || "Purchase Request"}</span>
-                  </button>
-                ))}
-              </div>
+              <div className="mt-3 space-y-2">{step7PRs.map((pr) => <button key={pr.prNo} type="button" onClick={() => openEditor(pr.prNo)} className="w-full text-left rounded-xl border border-amber-200 bg-white px-3 py-2 hover:bg-amber-100/60 transition-colors"><span className="block text-xs font-extrabold text-[#7C1D2E]">{pr.prNo}</span><span className="block text-xs text-stone-600 truncate">{pr.purpose || "Purchase Request"}</span></button>)}</div>
             </div>
           </div>
         </div>
       )}
-
-      {openPrNo && <RFQEditorModal
-        prNo={openPrNo}
-        onClose={closeEditor}
-        onSaved={() => {
-          setDismissed(null);
-          window.setTimeout(() => { void refresh(); }, 250);
-        }}
-      />}
+      {openPrNo && <RFQEditorModal prNo={openPrNo} onClose={closeEditor} onSaved={() => { setDismissed(null); window.setTimeout(() => { void refresh(); }, 250); }} />}
     </>
   );
 }
