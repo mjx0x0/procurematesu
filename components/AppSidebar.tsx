@@ -3,20 +3,27 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { BarChart3, Bot, FilePlus2, FileText, LogOut, MessageSquare, ShieldCheck, Users, ClipboardCheck } from "lucide-react";
+import { BarChart3, Bot, FilePlus2, FileText, LogOut, MessageSquare, ShieldCheck, Users, ClipboardCheck, type LucideIcon } from "lucide-react";
 
 interface AppSidebarProps {
   mode: "user" | "admin";
 }
 
-const userItems = [
+type SidebarItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  badge?: string;
+};
+
+const userItems: SidebarItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
   { href: "/dashboard/chatbot", label: "Ask Gab AI", icon: Bot, badge: "AI" },
   { href: "/dashboard/transparency", label: "Transparency", icon: ShieldCheck },
   { href: "/dashboard/new-pr", label: "Create Purchase Request", icon: FilePlus2 },
 ];
 
-const adminItems = [
+const adminItems: SidebarItem[] = [
   { href: "/admin", label: "Dashboard", icon: BarChart3 },
   { href: "/admin/users", label: "User Approvals", icon: Users },
   { href: "/admin/inquiries", label: "Inquiries", icon: MessageSquare },
