@@ -10,6 +10,8 @@ import {
 type Action = 'complete' | 'remark' | 'reject';
 const JSON_HEADERS = { 'Cache-Control': 'no-store' };
 const RFQ_GENERATION_STAGE = 'rfq_generation';
+const RFQ_EVALUATION_STAGE = 'rfq_evaluation';
+const RFQ_PRINTING_STAGE = 'rfq_printing';
 
 type RFQRecord = {
   id: string;
@@ -20,9 +22,23 @@ type RFQRecord = {
   location: string;
   rfq_date: string;
   generated_by: string;
+  form_data?: any;
   created_at: string;
   updated_at: string;
 };
+
+function isRFQFormComplete(formData: any) {
+  if (!formData || typeof formData !== 'object') return false;
+  const requiredText = ['reference_no', 'project_name', 'location', 'rfq_date', 'purpose', 'office', 'instructions'];
+  if (requiredText.some((key) => typeof formData[key] !== 'string' || !formData[key].trim())) return false;
+  if (!Array.isArray(formData.items) || formData.items.length === 0) return false;
+  return formData.items.every((item: any) =>
+    Number(item?.quantity) > 0 &&
+    Number(item?.abc) > 0 &&
+    typeof item?.technical_specifications === 'string' && item.technical_specifications.trim() &&
+    typeof item?.supplier_unit === 'string' && item.supplier_unit.trim()
+  );
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -61,8 +77,8 @@ export async function POST(req: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) return NextResponse.json({ error: 'Authentication required.' }, { status: 401, headers: JSON_HEADERS });
 
-    const { data: profile, error: profileError } = await supabase.from('users').select('role, is_active').eq('id', user.id).single();
-    if (profileError || profile?.role !== 'admin' || profile?.is_active === false) return NextResponse.json({ error: 'Administrator access required.' }, { status: 403, headers: JSON_HEADERS });
+    const { data: profile, error: profileError } = await supabase.from('users').select('role, status, is_active').eq('id', user.id).single();
+    if (profileError || profile?.role !== 'admin' || profile?.status !== 'approved' || profile?.is_active !== true) return NextResponse.json({ error: 'Administrator access required.' }, { status: 403, headers: JSON_HEADERS });
 
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -109,6 +125,35 @@ export async function POST(req: NextRequest) {
     const nextIndex = PROCUREMENT_STAGE_KEYS.indexOf(newStatus as any);
     if (currentIndex < 0 || nextIndex !== currentIndex + 1) return NextResponse.json({ error: 'Invalid stage transition. The PR must follow the official 20-step procurement sequence.' }, { status: 409, headers: JSON_HEADERS });
 
+    // Step 7: an RFQ record is mandatory before the PR can leave the generation stage.
+    if (pr.current_stage === RFQ_GENERATION_STAGE && newStatus === RFQ_EVALUATION_STAGE) {
+      const { data: rfq, error: rfqError } = await db
+        .from('rfqs')
+        .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,form_data,created_at,updated_at')
+        .eq('pr_no', prNo)
+        .maybeSingle();
+
+      if (rfqError) {
+        console.error('[complete-stage] RFQ validation lookup failed:', rfqError.message);
+        return NextResponse.json({ error: 'Unable to verify the RFQ form. Please open the RFQ form, complete it, and save it before proceeding.' }, { status: 500, headers: JSON_HEADERS });
+      }
+      if (!rfq) {
+        return NextResponse.json({ error: 'RFQ form is required before Step 8. Open the RFQ form, fill in the required sections, and save it first.' }, { status: 409, headers: JSON_HEADERS });
+      }
+      if (!isRFQFormComplete(rfq.form_data)) {
+        return NextResponse.json({ error: 'RFQ form is incomplete. Please open Step 7 RFQ Generation, complete all required administrative fields and item details, then save the RFQ before proceeding to Step 8: RFQ Evaluation.' }, { status: 409, headers: JSON_HEADERS });
+      }
+    }
+
+    // Step 9 remains locked behind Step 8 because the normal sequential transition
+    // check above only permits rfq_evaluation -> rfq_printing.
+    if (pr.current_stage === RFQ_EVALUATION_STAGE && newStatus === RFQ_PRINTING_STAGE) {
+      const { data: rfq, error: rfqError } = await db.from('rfqs').select('id,form_data').eq('pr_no', prNo).maybeSingle();
+      if (rfqError || !rfq || !isRFQFormComplete(rfq.form_data)) {
+        return NextResponse.json({ error: 'RFQ evaluation cannot be completed because the saved RFQ form is missing or incomplete. Open the RFQ, verify it, and save any corrections before proceeding to Step 9: RFQ Printing.' }, { status: 409, headers: JSON_HEADERS });
+      }
+    }
+
     let generatedRFQ: RFQRecord | null = null;
     let createdRFQ = false;
 
@@ -118,7 +163,7 @@ export async function POST(req: NextRequest) {
     if (newStatus === RFQ_GENERATION_STAGE) {
       const { data: existingRFQ, error: existingRFQError } = await db
         .from('rfqs')
-        .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,created_at,updated_at')
+        .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,form_data,created_at,updated_at')
         .eq('pr_no', prNo)
         .maybeSingle();
 
@@ -142,7 +187,7 @@ export async function POST(req: NextRequest) {
             location: '',
             generated_by: user.id,
           })
-          .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,created_at,updated_at')
+          .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,form_data,created_at,updated_at')
           .single();
 
         if (rfqError || !newRFQ) {
