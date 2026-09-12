@@ -9,6 +9,7 @@ import RFQEditorModal from "@/components/RFQEditorModal";
 interface Step7PR {
   prNo: string;
   purpose: string;
+  complete: boolean;
 }
 
 function isRFQFormComplete(formData: any) {
@@ -38,24 +39,24 @@ export default function RFQStagePopup() {
     if (profile?.role !== "admin" || profile.status !== "approved" || profile.is_active !== true) return;
 
     const { data: prs } = await supabase.from("purchase_requests").select("pr_no,purpose").eq("current_stage", "rfq_generation").order("created_at", { ascending: false });
-    const pending: Step7PR[] = [];
+    const rows: Step7PR[] = [];
 
     for (const row of prs || []) {
-      const pr: Step7PR = { prNo: String((row as any).pr_no || ""), purpose: String((row as any).purpose || "") };
-      if (!pr.prNo) continue;
-      let response = await fetch(`/api/admin/rfq?prNo=${encodeURIComponent(pr.prNo)}`, { credentials: "include", cache: "no-store" });
+      const prNo = String((row as any).pr_no || "");
+      if (!prNo) continue;
+      let response = await fetch(`/api/admin/rfq?prNo=${encodeURIComponent(prNo)}`, { credentials: "include", cache: "no-store" });
       if (response.status === 404) {
-        await fetch("/api/admin/rfq", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prNo: pr.prNo }) });
-        response = await fetch(`/api/admin/rfq?prNo=${encodeURIComponent(pr.prNo)}`, { credentials: "include", cache: "no-store" });
+        await fetch("/api/admin/rfq", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prNo }) });
+        response = await fetch(`/api/admin/rfq?prNo=${encodeURIComponent(prNo)}`, { credentials: "include", cache: "no-store" });
       }
-      if (!response.ok) { pending.push(pr); continue; }
-      const data = await response.json();
-      if (!isRFQFormComplete(data.formData)) pending.push(pr);
+      const data = response.ok ? await response.json() : null;
+      rows.push({ prNo, purpose: String((row as any).purpose || ""), complete: Boolean(data && isRFQFormComplete(data.formData)) });
     }
 
-    setStep7PRs(pending);
-    if (!openPrNo && !dismissed && pending.length) setOpenPrNo(pending[0].prNo);
-    if (openPrNo && !pending.some((item) => item.prNo === openPrNo)) setOpenPrNo(null);
+    setStep7PRs(rows);
+    const incomplete = rows.find((item) => !item.complete);
+    if (!openPrNo && !dismissed && incomplete) setOpenPrNo(incomplete.prNo);
+    if (openPrNo && !rows.some((item) => item.prNo === openPrNo)) setOpenPrNo(null);
   }, [pathname, openPrNo, dismissed]);
 
   useEffect(() => {
@@ -82,13 +83,13 @@ export default function RFQStagePopup() {
   return (
     <>
       {!openPrNo && (
-        <div className="fixed bottom-5 right-5 z-[90] w-[min(380px,calc(100vw-2rem))] rounded-2xl border border-amber-300 bg-amber-50 shadow-xl p-4">
+        <div className="fixed bottom-5 right-5 z-[90] w-[min(420px,calc(100vw-2rem))] rounded-2xl border border-amber-300 bg-amber-50 shadow-xl p-4">
           <div className="flex items-start gap-3">
             <div className="rounded-xl bg-amber-100 p-2 text-amber-700"><AlertCircle className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1">
-              <p className="font-bold text-amber-900">RFQ Form Required — Step 7</p>
-              <p className="text-xs text-amber-800 mt-1">Complete the RFQ before the Purchase Request can advance to Step 8: RFQ Evaluation.</p>
-              <div className="mt-3 space-y-2">{step7PRs.map((pr) => <button key={pr.prNo} type="button" onClick={() => openEditor(pr.prNo)} className="w-full text-left rounded-xl border border-amber-200 bg-white px-3 py-2 hover:bg-amber-100/60 transition-colors"><span className="block text-xs font-extrabold text-[#7C1D2E]">{pr.prNo}</span><span className="block text-xs text-stone-600 truncate">{pr.purpose || "Purchase Request"}</span></button>)}</div>
+              <p className="font-bold text-amber-900">RFQ — Step 7: Generation</p>
+              <p className="text-xs text-amber-800 mt-1">Open the official RFQ form for any PR currently at Step 7. An incomplete form blocks advancement to Step 8.</p>
+              <div className="mt-3 space-y-2">{step7PRs.map((pr) => <button key={pr.prNo} type="button" onClick={() => openEditor(pr.prNo)} className="w-full text-left rounded-xl border border-amber-200 bg-white px-3 py-2 hover:bg-amber-100/60 transition-colors"><span className="flex items-center justify-between gap-2"><span className="text-xs font-extrabold text-[#7C1D2E]">{pr.prNo}</span><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${pr.complete ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{pr.complete ? "Form Complete" : "Form Required"}</span></span><span className="block text-xs text-stone-600 truncate mt-0.5">{pr.purpose || "Purchase Request"}</span></button>)}</div>
             </div>
           </div>
         </div>
