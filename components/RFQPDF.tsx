@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
   signerRole: { fontSize: 8.8, textAlign: "center", marginTop: 1 },
   tableHeader: { flexDirection: "row", borderTopWidth: 1.4, borderBottomWidth: 0.75, borderColor: "#000000", minHeight: 19 },
   supplierNoteRow: { flexDirection: "row", minHeight: 18, borderBottomWidth: 0.75, borderColor: "#000000" },
+  supplierNote: { width: SUPPLIER_COLUMNS, justifyContent: "center", alignItems: "center" },
   th: { minHeight: 19, alignItems: "center", justifyContent: "center", paddingHorizontal: 1, paddingVertical: 1 },
   thText: { fontFamily: "Helvetica-Bold", fontSize: 7.2, textAlign: "center" },
   subHeaderRow: { flexDirection: "row", minHeight: 18, borderBottomWidth: 1.25, borderColor: "#000000" },
@@ -104,6 +105,7 @@ const styles = StyleSheet.create({
   nothingCenter: { width: C.specs, borderRightWidth: 1.2, borderColor: "#000000", justifyContent: "center", alignItems: "center" },
   nothingText: { fontFamily: "Helvetica-Bold", fontSize: 7.7, textAlign: "center" },
   purposeRow: { minHeight: 18, flexDirection: "row", borderBottomWidth: 0.75, borderColor: "#000000", alignItems: "center" },
+  purposeValue: { width: SUPPLIER_COLUMNS, fontSize: 7.7, paddingLeft: 5, paddingRight: 5 },
   totalRow: { minHeight: 20, flexDirection: "row", borderBottomWidth: 0.75, borderColor: "#000000", alignItems: "center" },
   totalLabel: { width: "17.5%", borderRightWidth: 1.2, borderColor: "#000000", fontFamily: "Helvetica-Bold", fontSize: 8, textAlign: "center" },
   totalBlank: { width: C.abc, borderRightWidth: 1.2, borderColor: "#000000" },
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
   instructionsText: { width: "72.2%", fontFamily: "Helvetica-Oblique", fontSize: 7.7, paddingLeft: 5 },
   note: { textAlign: "right", fontSize: 7.7, paddingRight: 5, paddingTop: 4, paddingBottom: 2 },
   supplierFields: { minHeight: 52, flexDirection: "row", justifyContent: "flex-end", paddingRight: 4, paddingTop: 4 },
-  supplierInner: { width: "34.7%" },
+  supplierInner: { width: SUPPLIER_COLUMNS },
   detailLine: { flexDirection: "row", alignItems: "flex-end", minHeight: 14 },
   detailLabel: { fontSize: 7.8 },
   detailUnderline: { flex: 1, height: 11, borderBottomWidth: 0.75, borderColor: "#000000", marginLeft: 2 },
@@ -136,10 +138,6 @@ function formatDate(value: string | null | undefined) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-}
-
-function FixedCell({ width, children, style }: { width: string; children?: React.ReactNode; style?: any }) {
-  return <View style={[{ width, borderRightWidth: 1.2, borderColor: "#000000" }, style]}>{children}</View>;
 }
 
 export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfItem[] }) {
@@ -196,7 +194,7 @@ export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfI
             <View style={[styles.th, { width: C.qty }, styles.rightBorder]}><Text style={styles.thText}>QTY</Text></View>
             <View style={[styles.th, { width: C.abc }, styles.rightBorder]}><Text style={styles.thText}>ABC</Text></View>
             <View style={[styles.th, { width: C.specs }, styles.rightBorder]}><Text style={styles.thText}>Technical Specifications</Text></View>
-            <View style={[styles.th, { width: SUPPLIER_UNIT_PRICE }, styles.rightBorder]}><Text style={styles.thText}>Unit Price</Text></View>
+            <View style={[styles.th, { width: SUPPLIER_COLUMNS }, styles.rightBorder]}><Text style={styles.thText}>Unit Price</Text></View>
             <View style={[styles.th, { width: C.total }]}><Text style={styles.thText}>Total Amount</Text></View>
           </View>
 
@@ -241,12 +239,10 @@ export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfI
           <View style={styles.purposeRow}>
             <View style={{ width: BASE_LEFT, borderRightWidth: 1.2, borderColor: "#000000", minHeight: 18 }} />
             <Text style={styles.purposeValue}>(Purpose) {rfq.purpose}</Text>
-            <View style={{ width: "34.7%" }} />
           </View>
           <View style={styles.purposeRow}>
             <View style={{ width: BASE_LEFT, borderRightWidth: 1.2, borderColor: "#000000", minHeight: 18 }} />
             <Text style={styles.purposeValue}>(Office) {rfq.office}</Text>
-            <View style={{ width: "34.7%" }} />
           </View>
 
           <View style={styles.totalRow}>
