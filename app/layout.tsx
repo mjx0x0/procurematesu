@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from "next-themes";
 import PageTransition from "@/components/PageTransition";
 import RFQStagePopup from "@/components/RFQStagePopup";
+import AppThemeShell from "@/components/AppThemeShell";
 import "./globals.css";
 import "./page-transitions.css";
 
@@ -57,7 +58,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <PageTransition />
           <RFQStagePopup />
-          {children}
+          <AppThemeShell>{children}</AppThemeShell>
         </ThemeProvider>
       </body>
     </html>
