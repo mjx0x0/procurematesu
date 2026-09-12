@@ -40,7 +40,9 @@ export default function RFQStagePopup() {
     const { data: prs } = await supabase.from("purchase_requests").select("pr_no,purpose").eq("current_stage", "rfq_generation").order("created_at", { ascending: false });
     const pending: Step7PR[] = [];
 
-    for (const pr of (prs || []) as Step7PR[]) {
+    for (const row of prs || []) {
+      const pr: Step7PR = { prNo: String((row as any).pr_no || ""), purpose: String((row as any).purpose || "") };
+      if (!pr.prNo) continue;
       let response = await fetch(`/api/admin/rfq?prNo=${encodeURIComponent(pr.prNo)}`, { credentials: "include", cache: "no-store" });
       if (response.status === 404) {
         await fetch("/api/admin/rfq", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prNo: pr.prNo }) });
