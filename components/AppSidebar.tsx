@@ -3,22 +3,22 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { BarChart3, Bot, FilePlus2, FileText, LogOut, MessageSquare, ShieldCheck, Users, ClipboardCheck, type LucideIcon } from "lucide-react";
+import { BarChart3, Bot, FilePlus2, FileText, LogOut, MessageSquare, ShieldCheck, Users, ClipboardCheck } from "lucide-react";
 
 interface AppSidebarProps {
   mode: "user" | "admin";
 }
 
-type SidebarItem = {
+interface SidebarItem {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: typeof BarChart3;
   badge?: string;
-};
+}
 
 const userItems: SidebarItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
-  { href: "/dashboard/chatbot", label: "Ask Gab AI", icon: Bot, badge: "AI" },
+  { href: "/dashboard/chatbot", label: "Gab AI", icon: Bot, badge: "AI" },
   { href: "/dashboard/transparency", label: "Transparency", icon: ShieldCheck },
   { href: "/dashboard/new-pr", label: "Create Purchase Request", icon: FilePlus2 },
 ];
@@ -48,7 +48,7 @@ export default function AppSidebar({ mode }: AppSidebarProps) {
         </div>
         <div className="min-w-0 leading-tight">
           <p className="truncate text-[11px] font-extrabold">MSU GenSan</p>
-          <p className="text-[9px] font-bold text-[#E5C34E]">PROCUREMENT PORTAL</p>
+          <p className="text-[9px] font-bold text-[#E5C34E]">PROCUREMENT SYSTEM</p>
         </div>
       </div>
 
