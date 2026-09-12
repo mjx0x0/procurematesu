@@ -9,6 +9,20 @@ import {
 
 type Action = 'complete' | 'remark' | 'reject';
 const JSON_HEADERS = { 'Cache-Control': 'no-store' };
+const RFQ_GENERATION_STAGE = 'rfq_generation';
+
+type RFQRecord = {
+  id: string;
+  pr_no: string;
+  template_type: 'less_than_50k' | 'more_than_50k';
+  reference_no: string;
+  project_name: string;
+  location: string;
+  rfq_date: string;
+  generated_by: string;
+  created_at: string;
+  updated_at: string;
+};
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,7 +69,7 @@ export async function POST(req: NextRequest) {
     if (!serviceRoleKey || !supabaseUrl) return NextResponse.json({ error: 'Server configuration error.' }, { status: 500, headers: JSON_HEADERS });
 
     const db = createSupabaseAdminClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
-    const { data: pr, error: prError } = await db.from('purchase_requests').select('pr_no, current_stage, current_status').eq('pr_no', prNo).single();
+    const { data: pr, error: prError } = await db.from('purchase_requests').select('pr_no, current_stage, current_status, purpose, total').eq('pr_no', prNo).single();
     if (prError || !pr) return NextResponse.json({ error: 'Purchase request not found.' }, { status: 404, headers: JSON_HEADERS });
 
     if (TERMINAL_STAGES.includes(pr.current_stage as any)) return NextResponse.json({ error: 'This purchase request is already in a terminal status.' }, { status: 409, headers: JSON_HEADERS });
@@ -95,12 +109,62 @@ export async function POST(req: NextRequest) {
     const nextIndex = PROCUREMENT_STAGE_KEYS.indexOf(newStatus as any);
     if (currentIndex < 0 || nextIndex !== currentIndex + 1) return NextResponse.json({ error: 'Invalid stage transition. The PR must follow the official 20-step procurement sequence.' }, { status: 409, headers: JSON_HEADERS });
 
+    let generatedRFQ: RFQRecord | null = null;
+    let createdRFQ = false;
+
+    // Step 7 is the RFQ-generation milestone. Create the RFQ record as part of
+    // the same controlled server-side stage transition so advancing the PR cannot
+    // leave Step 7 without its corresponding RFQ record.
+    if (newStatus === RFQ_GENERATION_STAGE) {
+      const { data: existingRFQ, error: existingRFQError } = await db
+        .from('rfqs')
+        .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,created_at,updated_at')
+        .eq('pr_no', prNo)
+        .maybeSingle();
+
+      if (existingRFQError) {
+        console.error('[complete-stage] RFQ lookup failed:', existingRFQError.message);
+        return NextResponse.json({ error: 'Unable to verify the RFQ record for this Purchase Request.' }, { status: 500, headers: JSON_HEADERS });
+      }
+
+      if (existingRFQ) {
+        generatedRFQ = existingRFQ as RFQRecord;
+      } else {
+        const total = Number(pr.total || 0);
+        const templateType = total < 50000 ? 'less_than_50k' : 'more_than_50k';
+        const { data: newRFQ, error: rfqError } = await db
+          .from('rfqs')
+          .insert({
+            pr_no: pr.pr_no,
+            template_type: templateType,
+            reference_no: pr.pr_no,
+            project_name: pr.purpose,
+            location: '',
+            generated_by: user.id,
+          })
+          .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,created_at,updated_at')
+          .single();
+
+        if (rfqError || !newRFQ) {
+          console.error('[complete-stage] Automatic RFQ creation failed:', rfqError?.message);
+          return NextResponse.json({ error: 'RFQ could not be generated for this Purchase Request. The PR was not advanced.' }, { status: 500, headers: JSON_HEADERS });
+        }
+
+        generatedRFQ = newRFQ as RFQRecord;
+        createdRFQ = true;
+      }
+    }
+
     const { error: updateError } = await db.from('purchase_requests').update({ current_stage: newStatus, current_status: newStatus, updated_at: now }).eq('pr_no', prNo).eq('current_stage', pr.current_stage);
-    if (updateError) return NextResponse.json({ error: 'Failed to update purchase request.' }, { status: 500, headers: JSON_HEADERS });
+    if (updateError) {
+      if (createdRFQ) await db.from('rfqs').delete().eq('id', generatedRFQ?.id || '00000000-0000-0000-0000-000000000000');
+      return NextResponse.json({ error: 'Failed to update purchase request.' }, { status: 500, headers: JSON_HEADERS });
+    }
 
     const { error: historyError } = await db.from('pr_stages_completed').insert({ pr_no: prNo, stage_name: PROCUREMENT_STAGE_LABELS[newStatus], stage_key: newStatus, status: 'completed', completed_at: now, remarks: remarks || 'No remarks provided.' });
     if (historyError) {
       await db.from('purchase_requests').update({ current_stage: pr.current_stage, current_status: pr.current_status, updated_at: new Date().toISOString() }).eq('pr_no', prNo).eq('current_stage', newStatus);
+      if (createdRFQ) await db.from('rfqs').delete().eq('id', generatedRFQ?.id || '00000000-0000-0000-0000-000000000000');
       return NextResponse.json({ error: 'Stage history could not be recorded. No stage change was kept.' }, { status: 500, headers: JSON_HEADERS });
     }
 
@@ -109,7 +173,16 @@ export async function POST(req: NextRequest) {
       db.from('pr_stages_completed').select('stage_name, stage_key, completed_at, remarks, status').eq('pr_no', prNo).order('completed_at', { ascending: true }),
     ]);
 
-    return NextResponse.json({ success: true, action: 'complete', newStatus, updatedPR, stageHistory }, { headers: JSON_HEADERS });
+    return NextResponse.json({
+      success: true,
+      action: 'complete',
+      newStatus,
+      updatedPR,
+      stageHistory,
+      rfqGenerated: newStatus === RFQ_GENERATION_STAGE,
+      rfqCreated: createdRFQ,
+      rfq: generatedRFQ,
+    }, { headers: JSON_HEADERS });
   } catch (error) {
     console.error('[complete-stage] Unexpected API error:', error);
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500, headers: JSON_HEADERS });
