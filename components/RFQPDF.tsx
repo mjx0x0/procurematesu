@@ -153,6 +153,7 @@ export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfI
         <View style={styles.form}>
           <View style={styles.headerGrid}>
             <View style={styles.brandBlock}>
+              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image src={logoSrc} style={styles.logo} />
               <Text style={styles.university}>MINDANAO STATE UNIVERSITY</Text>
               <Text style={styles.city}>Fatima, General Santos City</Text>
