@@ -38,6 +38,10 @@ body:has(nav) .min-h-screen.bg-\[\#F9F7F4\] { background: var(--paper) !importan
 .min-h-screen.bg-\[\#F9F7F4\] > main > div:nth-child(2) > div { border-color: rgba(122,19,21,.08) !important; box-shadow: 0 12px 30px rgba(53,7,8,.045); }
 .min-h-screen.bg-\[\#F9F7F4\] > main > div:nth-child(3) { border-radius: 15px; box-shadow: 0 16px 40px rgba(53,7,8,.055); }
 
+/* Gab AI identity in the floating advisor UI. */
+.fixed.z-50 > div:first-child span.truncate { font-size: 0 !important; }
+.fixed.z-50 > div:first-child span.truncate::after { content: 'Gab AI'; font-size: .75rem; font-weight: 800; }
+
 @media (max-width: 1023px) {
   .portal-topbar { border-top: 2px solid rgba(184,142,19,.78); }
 }
