@@ -3,7 +3,6 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = [
   "/",
-  "/auth/login",
   "/auth/signup",
   "/auth/forgot-password",
   "/auth/reset-password",
@@ -20,7 +19,7 @@ export async function updateSession(request: NextRequest) {
   if (!supabaseUrl || !supabaseKey) {
     if (isPublicPath(request.nextUrl.pathname)) return NextResponse.next();
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
+    url.pathname = "/";
     url.searchParams.set("error", "configuration");
     return NextResponse.redirect(url);
   }
@@ -44,7 +43,7 @@ export async function updateSession(request: NextRequest) {
   if (!claims && !isPublicPath(pathname)) {
     if (pathname.startsWith("/api/")) return response;
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
+    url.pathname = "/";
     url.searchParams.set("error", "unauthorized");
     return NextResponse.redirect(url);
   }
@@ -59,7 +58,7 @@ export async function updateSession(request: NextRequest) {
     if (error || !profile || profile.is_active === false || profile.status !== "approved") {
       await supabase.auth.signOut();
       const url = request.nextUrl.clone();
-      url.pathname = "/auth/login";
+      url.pathname = "/";
       url.searchParams.set("error", "account");
       return NextResponse.redirect(url);
     }
