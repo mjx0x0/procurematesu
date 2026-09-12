@@ -27,7 +27,10 @@ export default function AppThemeShell({ children }: { children: React.ReactNode 
   return (
     <div className={`app-theme ${isAdmin ? "admin-shell" : "portal-shell"}`}>
       <SystemBranding />
-      {(isAdmin || isPortalPage) && <AppSidebar mode={isAdmin ? "admin" : "user"} />}
+      {/* Admin keeps its dedicated navigation. End-user pages own their navigation
+          inside the dashboard content so the workspace can remain uncluttered. */}
+      {isAdmin && <AppSidebar mode="admin" />}
+      {isPortalPage && <SystemBranding />}
       {children}
     </div>
   );
