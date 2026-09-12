@@ -20,7 +20,7 @@ export default function RFQActionButton({ prNo, mode, className = "" }: RFQActio
 
   const print = async () => {
     if (busy) return;
-    const copies = window.prompt("Step 9 — RFQ Printing\nEnter number of RFQ copies to prepare (3 or 4):", "3");
+    const copies = window.prompt("Step 9 — RFQ Printing\nHow many physical copies are you preparing? Enter 3 or 4.\nThe generated official PDF is one master copy; select the same number of copies in your printer's print dialog.", "3");
     if (copies === null) return;
     if (copies !== "3" && copies !== "4") {
       setError("Please enter exactly 3 or 4 copies for Step 9 printing.");
@@ -47,7 +47,6 @@ export default function RFQActionButton({ prNo, mode, className = "" }: RFQActio
       window.document.body.appendChild(anchor);
       anchor.click();
       window.setTimeout(() => { anchor.remove(); URL.revokeObjectURL(url); }, 2000);
-      setError(null);
     } catch (err: any) {
       console.error("RFQ print preparation failed:", err);
       setError(err?.message || "Unable to generate the RFQ PDF.");
