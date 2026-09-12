@@ -1,33 +1,50 @@
-/* Seamless navigation: use the native View Transitions API where supported,
-   with a graceful fade fallback elsewhere. */
+/* Premium navigation transitions. Uses the native View Transitions API where supported,
+   with graceful motion fallback elsewhere. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 220ms;
-  animation-timing-function: cubic-bezier(.22, .61, .36, 1);
+  animation-duration: 360ms;
+  animation-timing-function: cubic-bezier(.22, .72, .2, 1);
+  transform-origin: center top;
 }
 
-::view-transition-old(root) { animation-name: procuremate-page-out; }
-::view-transition-new(root) { animation-name: procuremate-page-in; }
+::view-transition-old(root) { animation-name: msu-page-out; }
+::view-transition-new(root) { animation-name: msu-page-in; }
 
-@keyframes procuremate-page-out {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: .94; transform: translateY(-4px); }
+@keyframes msu-page-out {
+  from { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  to { opacity: .72; transform: translateY(-8px) scale(.992); filter: blur(1px); }
 }
 
-@keyframes procuremate-page-in {
-  from { opacity: .96; transform: translateY(7px); }
+@keyframes msu-page-in {
+  from { opacity: 0; transform: translateY(14px) scale(.992); filter: blur(1.5px); }
+  60% { opacity: .92; }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* Subtle default page entrance for browsers without View Transitions. */
+@keyframes msu-content-arrive {
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .portal-shell > main,
+  .admin-shell > main,
+  .app-theme > main {
+    animation: msu-content-arrive 320ms cubic-bezier(.22, .72, .2, 1) both;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root) { animation-duration: 1ms; }
+  .portal-shell > main,
+  .admin-shell > main,
+  .app-theme > main { animation: none; }
 }
 
 /* --------------------------------------------------------------------------
    Procurement timeline
-   The existing timeline data/logic remains unchanged. These rules turn the
-   existing stage history into an institutional process-map visual.
    -------------------------------------------------------------------------- */
 main > section:has(> h3) {
   position: relative;
@@ -75,11 +92,7 @@ main > section:has(> h3) > h3::after {
   letter-spacing: .12em;
 }
 
-main > section:has(> h3) > div:last-child {
-  position: relative;
-}
-
-/* Continuous process rail behind the existing stage entries. */
+main > section:has(> h3) > div:last-child { position: relative; }
 main > section:has(> h3) > div:last-child::before {
   content: '';
   position: absolute;
@@ -90,7 +103,6 @@ main > section:has(> h3) > div:last-child::before {
   background: linear-gradient(to bottom, #7A1315 0%, #B88E13 52%, rgba(184,142,19,.16) 100%);
   border-radius: 99px;
 }
-
 main > section:has(> h3) > div:last-child > div {
   position: relative;
   z-index: 1;
@@ -102,30 +114,17 @@ main > section:has(> h3) > div:last-child > div {
   box-shadow: 0 5px 16px rgba(53,7,8,.035);
   transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
-
 main > section:has(> h3) > div:last-child > div:hover {
   transform: translateX(3px);
   border-color: rgba(122,19,21,.20);
   box-shadow: 0 9px 22px rgba(53,7,8,.07);
 }
-
-/* The first compact marker/circle in each existing stage row becomes the
-   process-map node. */
-main > section:has(> h3) > div:last-child > div > div:first-child {
-  position: relative;
-  z-index: 2;
-}
-
+main > section:has(> h3) > div:last-child > div > div:first-child { position: relative; z-index: 2; }
 main > section:has(> h3) > div:last-child > div > div:first-child > div,
-main > section:has(> h3) > div:last-child > div > div:first-child > span {
-  box-shadow: 0 0 0 5px #f8f3eb;
-}
-
+main > section:has(> h3) > div:last-child > div > div:first-child > span { box-shadow: 0 0 0 5px #f8f3eb; }
 main > section:has(> h3) > div:last-child > div:nth-child(1) > div:first-child > div,
 main > section:has(> h3) > div:last-child > div:nth-child(2) > div:first-child > div,
-main > section:has(> h3) > div:last-child > div:nth-child(3) > div:first-child > div {
-  box-shadow: 0 0 0 5px #f8f3eb, 0 0 18px rgba(184,142,19,.18);
-}
+main > section:has(> h3) > div:last-child > div:nth-child(3) > div:first-child > div { box-shadow: 0 0 0 5px #f8f3eb, 0 0 18px rgba(184,142,19,.18); }
 
 @media (max-width: 640px) {
   main > section:has(> h3)::before { display: none; }
