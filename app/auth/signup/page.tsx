@@ -100,8 +100,8 @@ export default function SignupPage() {
             <div className="mt-4 bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-xl text-xs leading-relaxed">
               You can sign in only after an authorized ProcuremateSU administrator approves your account. No email verification is required.
             </div>
-            <Link href="/auth/login" className="mt-5 w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] text-white py-3 rounded-xl font-semibold text-sm shadow-md border border-amber-400/30 flex items-center justify-center gap-2">
-              Continue to Sign In <ArrowRight className="h-4 w-4 text-amber-300" />
+            <Link href="/" className="mt-5 w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] text-white py-3 rounded-xl font-semibold text-sm shadow-md border border-amber-400/30 flex items-center justify-center gap-2">
+              Return to Sign In <ArrowRight className="h-4 w-4 text-amber-300" />
             </Link>
           </div>
         </div>
@@ -141,11 +141,11 @@ export default function SignupPage() {
               <label className="block text-xs font-semibold text-stone-700 mb-1">Confirm Password</label>
               <div className="relative"><Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" /><input type={showConfirm ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Re-enter your password" autoComplete="new-password" className="w-full pl-9 pr-11 py-2.5 text-sm border border-stone-300 rounded-xl bg-white text-gray-900 placeholder:text-stone-400 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] outline-none transition-all" required /><button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600" aria-label={showConfirm ? "Hide password" : "Show password"}>{showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div>
             </div>
-            {error && <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-start gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-600" /><span>{error}</span></div>}
+            {error && <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-start gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600" /><span>{error}</span></div>}
             <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#630E10] hover:to-[#7A1315] text-white py-3 rounded-xl font-semibold text-sm shadow-md shadow-red-950/20 hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100 border border-amber-400/30">
               {loading ? <><span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />Creating account...</> : <><span>Create End-User Account</span><ArrowRight className="h-4 w-4 text-amber-300" /></>}
             </button>
-            <p className="text-center text-xs text-stone-600 pt-1">Already have an account? <Link href="/auth/login" className="font-semibold text-[#7A1315] hover:text-[#4D0C0D]">Sign in</Link></p>
+            <p className="text-center text-xs text-stone-600 pt-1">Already have an account? <Link href="/" className="font-semibold text-[#7A1315] hover:text-[#4D0C0D]">Sign in on the home page</Link></p>
           </form>
         </div>
       </div>
