@@ -23,7 +23,6 @@ export interface RFQPdfItem {
   total_cost: number;
 }
 
-// Verbatim text taken from the uploaded official MSU-Gensan RFQ workbook.
 const TERMS = [
   "1. Mayor's/Business Permit",
   "2. Philgeps Registration Certificate",
@@ -38,7 +37,7 @@ const TERMS = [
   "11. Partial bid is allowed, evaluation, comparison and contract award shall be made PER ITEM; partial bid is not allowed; the goods are grouped in a single lot, evaluation, comparison, and contract award shall be made PER LOT",
 ] as const;
 
-// Proportions are derived from the official XLSX column widths B:H.
+// Column proportions derived from the uploaded official MSU-Gensan workbook B:H widths.
 const C = {
   item: "7.5%",
   qty: "10.0%",
@@ -49,10 +48,11 @@ const C = {
   total: "16.0%",
 };
 
-const blackBorder = { borderColor: "#000000" } as const;
+const border = { borderColor: "#000000" } as const;
 
 const styles = StyleSheet.create({
   page: {
+    size: "LETTER",
     paddingTop: 18,
     paddingBottom: 18,
     paddingLeft: 24,
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   header: {
     minHeight: 63,
     borderBottomWidth: 1.2,
-    ...blackBorder,
+    ...border,
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
@@ -76,55 +76,54 @@ const styles = StyleSheet.create({
   university: { fontSize: 12, fontFamily: "Helvetica-Bold" },
   city: { fontSize: 9.5, fontFamily: "Helvetica-Bold", marginTop: 2 },
   title: { fontSize: 12.5, fontFamily: "Helvetica-Bold", marginTop: 9 },
-  metadata: { flexDirection: "row", minHeight: 77, borderBottomWidth: 1.2, ...blackBorder },
-  supplierBlock: { width: "73.6%", borderRightWidth: 1.2, ...blackBorder, paddingLeft: 8, paddingTop: 3 },
+  metadata: { flexDirection: "row", minHeight: 77, borderBottomWidth: 1.2, ...border },
+  supplierBlock: { width: "73.6%", borderRightWidth: 1.2, ...border, paddingLeft: 8, paddingTop: 3 },
   supplierLine: { width: "94%", flexDirection: "row", alignItems: "flex-end", minHeight: 21 },
   supplierLabel: { fontSize: 8.6 },
-  underline: { flex: 1, height: 14, borderBottomWidth: 0.75, ...blackBorder, marginLeft: 3 },
+  underline: { flex: 1, height: 14, borderBottomWidth: 0.75, ...border, marginLeft: 3 },
   metaRight: { width: "26.4%", paddingLeft: 5, paddingRight: 4, paddingTop: 4, paddingBottom: 3 },
   metaLine: { flexDirection: "row", alignItems: "flex-end", minHeight: 15.5 },
   metaLabel: { width: 70, fontSize: 7.7 },
-  metaValue: { flex: 1, minHeight: 12, borderBottomWidth: 0.75, ...blackBorder, fontSize: 7.4, paddingLeft: 2, paddingBottom: 1 },
-  instruction: { minHeight: 26, borderBottomWidth: 0.75, ...blackBorder, paddingHorizontal: 6, justifyContent: "center", fontSize: 7.3 },
+  metaValue: { flex: 1, minHeight: 12, borderBottomWidth: 0.75, ...border, fontSize: 7.4, paddingLeft: 2, paddingBottom: 1 },
+  instruction: { minHeight: 26, borderBottomWidth: 0.75, ...border, paddingHorizontal: 6, justifyContent: "center", fontSize: 7.3 },
   terms: { paddingLeft: 8, paddingRight: 8, paddingTop: 5, paddingBottom: 5 },
   termsTitle: { fontFamily: "Helvetica-Bold", fontSize: 8.2, marginBottom: 3.5 },
   term: { fontSize: 6.65, lineHeight: 1.09, marginBottom: 1.15 },
   truly: { fontFamily: "Helvetica-Bold", fontSize: 8.2, marginTop: 2 },
   signatoryName: { fontFamily: "Helvetica-Bold", fontSize: 10.7, textAlign: "center", marginTop: 4.5 },
   signatoryRole: { fontSize: 8.8, textAlign: "center", marginTop: 1 },
-  tableRow: { flexDirection: "row", alignItems: "stretch", borderBottomWidth: 0.75, ...blackBorder },
+  tableRow: { flexDirection: "row", alignItems: "stretch", borderBottomWidth: 0.75, ...border },
   topCell: { minHeight: 18, alignItems: "center", justifyContent: "center", paddingHorizontal: 1, paddingVertical: 1 },
   hText: { fontFamily: "Helvetica-Bold", fontSize: 7.2, textAlign: "center" },
-  itemRow: { minHeight: 24, flexDirection: "row", alignItems: "stretch", borderBottomWidth: 0.75, ...blackBorder },
+  itemRow: { minHeight: 24, flexDirection: "row", alignItems: "stretch", borderBottomWidth: 0.75, ...border },
   itemCell: { paddingHorizontal: 2.5, paddingVertical: 3, fontSize: 7.0, justifyContent: "center" },
   center: { textAlign: "center" },
   right: { textAlign: "right" },
-  nothingRow: { minHeight: 18, flexDirection: "row", alignItems: "stretch", borderBottomWidth: 0.75, ...blackBorder },
-  nothingTextCell: { width: C.tech, borderRightWidth: 1.2, ...blackBorder, justifyContent: "center", alignItems: "center" },
+  nothingRow: { minHeight: 18, flexDirection: "row", alignItems: "stretch", borderBottomWidth: 0.75, ...border },
+  nothingTextCell: { width: C.tech, borderRightWidth: 1.2, ...border, justifyContent: "center", alignItems: "center" },
   nothingText: { fontFamily: "Helvetica-Bold", fontSize: 7.6, textAlign: "center" },
-  purposeRow: { minHeight: 18, flexDirection: "row", alignItems: "center", borderBottomWidth: 0.75, ...blackBorder },
-  purposeLabel: { width: "10%", fontSize: 7.6, paddingLeft: 4 },
-  purposeValue: { width: "65.8%", fontSize: 7.6, paddingLeft: 2, paddingRight: 2, borderRightWidth: 1.2, ...blackBorder },
-  purposeRightBlank: { width: "24.2%" },
-  totalRow: { minHeight: 20, flexDirection: "row", alignItems: "center", borderBottomWidth: 0.75, ...blackBorder },
-  totalLabel: { width: "17.8%", fontFamily: "Helvetica-Bold", fontSize: 8.0, textAlign: "center" },
-  totalBlank: { width: "20%", borderRightWidth: 1.2, ...blackBorder },
-  totalValue: { width: "37.5%", fontFamily: "Helvetica-Bold", fontSize: 7.7, textAlign: "right", paddingRight: 4, borderRightWidth: 1.2, ...blackBorder },
-  totalRest: { width: "24.7%" },
-  instructionsRow: { minHeight: 20, flexDirection: "row", alignItems: "center", borderBottomWidth: 0.9, ...blackBorder },
+  purposeRow: { minHeight: 18, flexDirection: "row", alignItems: "center", borderBottomWidth: 0.75, ...border },
+  purposeLabel: { width: "17.8%", paddingLeft: 7, fontSize: 7.6, textAlign: "center" },
+  purposeValue: { width: "82.2%", fontSize: 7.6, paddingLeft: 2, paddingRight: 4 },
+  totalRow: { minHeight: 20, flexDirection: "row", alignItems: "center", borderBottomWidth: 0.75, ...border },
+  totalLabel: { width: "21%", fontFamily: "Helvetica-Bold", fontSize: 8.0, textAlign: "center" },
+  totalBlank: { width: "10.3%", borderRightWidth: 1.2, ...border },
+  totalValue: { width: "30.4%", fontFamily: "Helvetica-Bold", fontSize: 7.7, textAlign: "right", paddingRight: 4, borderRightWidth: 1.2, ...border },
+  totalRest: { width: "38.3%" },
+  instructionsRow: { minHeight: 20, flexDirection: "row", alignItems: "center", borderBottomWidth: 0.9, ...border },
   instructionsLabel: { width: "29.2%", fontFamily: "Helvetica-Bold", fontSize: 8.0, textAlign: "center" },
-  instructionsText: { width: "70.8%", borderLeftWidth: 1.2, ...blackBorder, fontFamily: "Helvetica-Oblique", fontSize: 7.7, paddingLeft: 5 },
+  instructionsText: { width: "70.8%", borderLeftWidth: 1.2, ...border, fontFamily: "Helvetica-Oblique", fontSize: 7.7, paddingLeft: 5 },
   note: { textAlign: "right", fontSize: 7.7, paddingRight: 5, paddingTop: 4, paddingBottom: 2 },
   supplierFields: { minHeight: 52, flexDirection: "row", justifyContent: "flex-end", paddingTop: 4, paddingRight: 5, paddingBottom: 4 },
   supplierFieldsInner: { width: "39%" },
   detailLine: { flexDirection: "row", alignItems: "flex-end", minHeight: 14 },
   detailLabel: { fontSize: 7.7 },
-  detailUnderline: { flex: 1, height: 11, borderBottomWidth: 0.75, ...blackBorder, marginLeft: 2 },
+  detailUnderline: { flex: 1, height: 11, borderBottomWidth: 0.75, ...border, marginLeft: 2 },
   statement: { paddingHorizontal: 7, fontSize: 7.7, lineHeight: 1.22 },
   signatureArea: { minHeight: 47, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", paddingLeft: 7, paddingRight: 5, paddingTop: 7, paddingBottom: 3 },
-  canvasser: { width: "45%", textAlign: "center", fontSize: 7.7, borderBottomWidth: 0.75, ...blackBorder, paddingBottom: 2 },
+  canvasser: { width: "45%", textAlign: "center", fontSize: 7.7, borderBottomWidth: 0.75, ...border, paddingBottom: 2 },
   bidder: { width: "41%" },
-  bidderLine: { height: 14, borderBottomWidth: 0.75, ...blackBorder },
+  bidderLine: { height: 14, borderBottomWidth: 0.75, ...border },
   small: { fontSize: 7.5, paddingTop: 1 },
 });
 
@@ -206,10 +205,10 @@ export default function RFQPDF({ rfq, items }: { rfq: RFQPdfData; items: RFQPdfI
 
           {safeItems.map((item, index) => (
             <View style={styles.itemRow} key={`${item.item_description}-${index}`}>
-              <View style={[styles.itemCell, { width: C.item, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text>{item.item_description}</Text></View>
+              <View style={[styles.itemCell, { width: C.item, borderRightWidth: 1.2, borderColor: "#000000" }, styles.center]}><Text>{index + 1}</Text></View>
               <View style={[styles.itemCell, { width: C.qty, borderRightWidth: 1.2, borderColor: "#000000" }, styles.center]}><Text>{item.quantity || ""}</Text></View>
               <View style={[styles.itemCell, { width: C.abc, borderRightWidth: 1.2, borderColor: "#000000" }, styles.right]}><Text>{item.total_cost ? money(item.total_cost) : ""}</Text></View>
-              <View style={[styles.itemCell, { width: C.tech, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text></Text></View>
+              <View style={[styles.itemCell, { width: C.tech, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text>{item.item_description}</Text></View>
               <View style={[styles.itemCell, { width: C.unit, borderRightWidth: 1.2, borderColor: "#000000" }, styles.center]}><Text>{item.unit || ""}</Text></View>
               <View style={[styles.itemCell, { width: C.unitPrice, borderRightWidth: 1.2, borderColor: "#000000" }]}><Text></Text></View>
               <View style={[styles.itemCell, { width: C.total }, styles.right]}><Text></Text></View>
