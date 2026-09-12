@@ -15,12 +15,37 @@
 .portal-card { background:rgba(255,255,255,.96); border:1px solid rgba(122,19,21,.09); border-radius:15px; box-shadow:0 14px 38px rgba(53,7,8,.055),0 2px 8px rgba(53,7,8,.025); }
 .portal-stat { display:flex; align-items:center; justify-content:space-between; min-height:105px; padding:1rem 1.1rem; border-radius:14px; background:rgba(255,255,255,.96); border:1px solid rgba(122,19,21,.08); box-shadow:0 12px 30px rgba(53,7,8,.045); }
 
+/* Luxury institutional title treatment. Garamond is preferred, with classic serif fallbacks. */
+#home h1,
+.system-title-luxury {
+  font-family: Garamond, "EB Garamond", "Cormorant Garamond", "Times New Roman", serif !important;
+  font-style: italic !important;
+  font-weight: 600 !important;
+  letter-spacing: -.015em !important;
+  text-shadow: 0 3px 24px rgba(0,0,0,.22), 0 1px 0 rgba(240,200,63,.10);
+}
+#home h1 span { font-style: italic !important; }
+#home header a > div > div:first-child {
+  font-family: Garamond, "EB Garamond", "Cormorant Garamond", "Times New Roman", serif !important;
+  font-style: italic;
+  font-size: 15px !important;
+  letter-spacing: .005em !important;
+  color: rgba(255,255,255,.94);
+}
+#home header a > div > div:first-child span { color: #F0C83F !important; }
+.portal-shell header .truncate {
+  font-family: Garamond, "EB Garamond", "Cormorant Garamond", "Times New Roman", serif !important;
+  font-style: italic;
+  font-weight: 700 !important;
+  letter-spacing: .005em !important;
+}
+
 /* Existing admin workspace: same premium visual language without changing its workflow logic. */
 body:has(nav) .min-h-screen.bg-\[\#F9F7F4\] { background:var(--paper)!important; }
 .min-h-screen.bg-\[\#F9F7F4\] > nav + main { background:transparent; }
 .min-h-screen.bg-\[\#F9F7F4\] > nav { border-top:2px solid rgba(184,142,19,.78)!important; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:0 8px 26px rgba(53,7,8,.05); }
-.min-h-screen.bg-\[\#F9F7F4\] > nav b { font-size:0!important; }
-.min-h-screen.bg-\[\#F9F7F4\] > nav b::after { content:'MSU GenSan Procurement System'; font-size:1rem; font-weight:800; color:#5a1420; letter-spacing:-.025em; }
+.min-h-screen.bg-\[\#F9F7F4\] > nav b { font-size:0!important; font-family:Garamond,"EB Garamond","Cormorant Garamond","Times New Roman",serif!important; font-style:italic!important; }
+.min-h-screen.bg-\[\#F9F7F4\] > nav b::after { content:'MSU GenSan Procurement Management System'; font-size:1.05rem; font-weight:700; font-style:italic; color:#5a1420; letter-spacing:.005em; text-shadow:0 1px 10px rgba(184,142,19,.10); }
 .min-h-screen.bg-\[\#F9F7F4\] > main > div:first-child { padding:1.25rem 1.35rem; border-radius:16px; background:linear-gradient(110deg,#650709 0%,#7d0d11 60%,#53100c 100%); color:white; box-shadow:0 18px 45px rgba(77,12,13,.12); }
 .min-h-screen.bg-\[\#F9F7F4\] > main > div:first-child h1 { color:#fff!important; }
 .min-h-screen.bg-\[\#F9F7F4\] > main > div:first-child p { color:rgba(255,255,255,.62)!important; }
