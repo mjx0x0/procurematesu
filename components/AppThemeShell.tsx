@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import AppSidebar from "@/components/AppSidebar";
+import SystemBranding from "@/components/SystemBranding";
 
 const PRESERVE_PAGE_ROUTES = [
   "/",
@@ -25,6 +26,7 @@ export default function AppThemeShell({ children }: { children: React.ReactNode 
 
   return (
     <div className={`app-theme ${isAdmin ? "admin-shell" : "portal-shell"}`}>
+      <SystemBranding />
       {(isAdmin || isPortalPage) && <AppSidebar mode={isAdmin ? "admin" : "user"} />}
       {children}
     </div>
