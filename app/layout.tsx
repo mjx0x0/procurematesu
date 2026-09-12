@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from "next-themes";
 import PageTransition from "@/components/PageTransition";
+import RFQStagePopup from "@/components/RFQStagePopup";
 import "./globals.css";
 import "./page-transitions.css";
 
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased bg-white text-gray-900">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <PageTransition />
+          <RFQStagePopup />
           {children}
         </ThemeProvider>
       </body>
