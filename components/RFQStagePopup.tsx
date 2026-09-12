@@ -54,10 +54,10 @@ export default function RFQStagePopup() {
     }
 
     setStep7PRs(rows);
-    const incomplete = rows.find((item) => !item.complete);
-    if (!openPrNo && !dismissed && incomplete) setOpenPrNo(incomplete.prNo);
+    // Intentionally do not auto-open the editor. Administrators should land on
+    // the dashboard first and explicitly choose which Step 7 RFQ to open.
     if (openPrNo && !rows.some((item) => item.prNo === openPrNo)) setOpenPrNo(null);
-  }, [pathname, openPrNo, dismissed]);
+  }, [pathname, openPrNo]);
 
   useEffect(() => {
     void refresh();
@@ -83,7 +83,7 @@ export default function RFQStagePopup() {
   return (
     <>
       {!openPrNo && (
-        <div className="fixed bottom-5 right-5 z-[90] w-[min(420px,calc(100vw-2rem))] rounded-2xl border border-amber-300 bg-amber-50 shadow-xl p-4">
+        <div className="fixed bottom-5 right-5 z-[90] w-[min(420px,calc(100vw-2rem))] rounded-2xl border border-amber-300 bg-amber-50 shadow-xl p-4 animate-in fade-in slide-in-from-bottom-3 duration-300">
           <div className="flex items-start gap-3">
             <div className="rounded-xl bg-amber-100 p-2 text-amber-700"><AlertCircle className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1">
