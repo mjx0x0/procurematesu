@@ -5,6 +5,7 @@ import PageTransition from "@/components/PageTransition";
 import RFQStagePopup from "@/components/RFQStagePopup";
 import AppThemeShell from "@/components/AppThemeShell";
 import "./globals.css";
+import "./portal-theme.css";
 import "./page-transitions.css";
 
 const inter = Inter({
