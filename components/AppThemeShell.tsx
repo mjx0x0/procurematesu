@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import AppSidebar from "@/components/AppSidebar";
 
 const PRESERVE_PAGE_ROUTES = [
   "/",
@@ -17,5 +18,15 @@ export default function AppThemeShell({ children }: { children: React.ReactNode 
     route.endsWith("/") ? pathname.startsWith(route) : pathname === route || pathname.startsWith(`${route}/`)
   );
 
-  return <div className={preservePageDesign ? "" : "app-theme"}>{children}</div>;
+  if (preservePageDesign) return <>{children}</>;
+
+  const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
+  const isPortalPage = pathname === "/dashboard" || pathname.startsWith("/dashboard/");
+
+  return (
+    <div className={`app-theme ${isAdmin ? "admin-shell" : "portal-shell"}`}>
+      {(isAdmin || isPortalPage) && <AppSidebar mode={isAdmin ? "admin" : "user"} />}
+      {children}
+    </div>
+  );
 }
