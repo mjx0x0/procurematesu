@@ -1,15 +1,119 @@
 "use client";
-import { useCallback,useEffect,useState } from "react";
-import { usePathname } from "next/navigation";
-import { AlertCircle,ArrowRight,FileText } from "lucide-react";
+
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import RFQEditorModal from "@/components/RFQEditorModal";
-interface Step7PR{prNo:string;purpose:string;complete:boolean}
-function isRFQFormComplete(formData:any){if(!formData||typeof formData!=="object")return false;const requiredText=["reference_no","project_name","location","rfq_date","purpose","office","instructions"];if(requiredText.some(k=>typeof formData[k]!=="string"||!formData[k].trim()))return false;if(!Array.isArray(formData.items)||formData.items.length===0)return false;return formData.items.every((item:any)=>Number(item?.quantity)>0&&Number(item?.abc)>0&&typeof item?.technical_specifications==="string"&&item.technical_specifications.trim()&&typeof item?.supplier_unit==="string"&&item.supplier_unit.trim())}
-export default function RFQStagePopup(){const pathname=usePathname();const[step7PRs,setStep7PRs]=useState<Step7PR[]>([]);const[openPrNo,setOpenPrNo]=useState<string|null>(null);
- const refresh=useCallback(async()=>{if(!pathname?.startsWith("/admin"))return;const{data:{user}}=await supabase.auth.getUser();if(!user)return;const{data:profile}=await supabase.from("users").select("role,status,is_active").eq("id",user.id).maybeSingle();if(profile?.role!=="admin"||profile.status!=="approved"||profile.is_active!==true)return;const{data:prs}=await supabase.from("purchase_requests").select("pr_no,purpose").eq("current_stage","rfq_generation").order("created_at",{ascending:false}).limit(8);const rows:Step7PR[]=[];for(const row of prs||[]){const prNo=String((row as any).pr_no||"");if(!prNo)continue;let response=await fetch(`/api/admin/rfq?prNo=${encodeURIComponent(prNo)}`,{credentials:"include",cache:"no-store"});if(response.status===404){await fetch("/api/admin/rfq",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({prNo})});response=await fetch(`/api/admin/rfq?prNo=${encodeURIComponent(prNo)}`,{credentials:"include",cache:"no-store"})}const data=response.ok?await response.json():null;rows.push({prNo,purpose:String((row as any).purpose||""),complete:Boolean(data&&isRFQFormComplete(data.formData))})}setStep7PRs(rows);if(openPrNo&&!rows.some(i=>i.prNo===openPrNo))setOpenPrNo(null)},[pathname,openPrNo]);
- useEffect(()=>{void refresh();const channel=supabase.channel("rfq-generation-popup").on("postgres_changes",{event:"*",schema:"public",table:"purchase_requests"},()=>void refresh()).on("postgres_changes",{event:"*",schema:"public",table:"rfqs"},()=>void refresh()).subscribe();return()=>{void supabase.removeChannel(channel)}},[pathname,refresh]);
- const closeEditor=()=>{if(!openPrNo)return;setOpenPrNo(null);window.setTimeout(()=>void refresh(),250)};const openEditor=(prNo:string)=>setOpenPrNo(prNo);
- if(!pathname?.startsWith("/admin")||!step7PRs.length)return null;
- return <>{!openPrNo&&<div className="rfq-reminder fixed bottom-5 right-5 z-[90] w-[min(390px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#D4AF37]/35 bg-white shadow-[0_22px_60px_rgba(45,25,20,.18)]"><div className="flex items-center gap-3 border-b border-stone-100 bg-gradient-to-r from-[#5D090B] to-[#7A1315] px-4 py-3 text-white"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F0C83F]/10 text-[#F0C83F]"><AlertCircle className="h-4 w-4"/></div><div className="min-w-0"><p className="text-[10px] font-black uppercase tracking-[.14em] text-[#F0D56A]">Action required</p><p className="mt-0.5 text-[12px] font-extrabold">RFQ Generation · Step 7</p></div></div><div className="p-3"><p className="px-1 text-[9px] leading-4 text-stone-500">Complete the official RFQ form before advancing these purchase requests to Step 8.</p><div className="mt-2 space-y-1.5">{step7PRs.map(pr=><button key={pr.prNo} type="button" onClick={()=>openEditor(pr.prNo)} className="group flex w-full items-center gap-2.5 rounded-xl border border-stone-200 bg-[#FCFBF9] px-3 py-2.5 text-left transition hover:border-[#D4AF37]/45 hover:bg-[#FFFDF5]"><div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#FFF2F2] text-[#7A1315]"><FileText className="h-3.5 w-3.5"/></div><div className="min-w-0 flex-1"><div className="flex items-center justify-between gap-2"><span className="text-[9px] font-extrabold text-[#4D0C0D]">{pr.prNo}</span><span className={`rounded-full px-1.5 py-0.5 text-[6px] font-black uppercase tracking-wide ${pr.complete?"bg-emerald-50 text-emerald-700":"bg-amber-50 text-amber-700"}`}>{pr.complete?"Ready":"Form Required"}</span></div><span className="mt-0.5 block truncate text-[8px] text-stone-500">{pr.purpose||"Purchase Request"}</span></div><ArrowRight className="h-3.5 w-3.5 shrink-0 text-stone-300 transition group-hover:translate-x-0.5 group-hover:text-[#7A1315]"/></button>)}</div></div></div>}{openPrNo&&<RFQEditorModal prNo={openPrNo} onClose={closeEditor} onSaved={()=>window.setTimeout(()=>void refresh(),250)}/>}</>;
+
+interface Step7PR {
+  prNo: string;
+}
+
+/**
+ * The RFQ action belongs to the Step 7 PR row itself. This component keeps
+ * the dashboard clean while adding a real action beside the row's controls.
+ */
+export default function RFQStagePopup() {
+  const [step7PRs, setStep7PRs] = useState<Step7PR[]>([]);
+  const [openPrNo, setOpenPrNo] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: profile } = await supabase
+      .from("users")
+      .select("role,status,is_active")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profile?.role !== "admin" || profile.status !== "approved" || profile.is_active !== true) {
+      return;
+    }
+
+    const { data: prs } = await supabase
+      .from("purchase_requests")
+      .select("pr_no")
+      .eq("current_stage", "rfq_generation")
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    setStep7PRs(
+      (prs || [])
+        .map((row: any) => ({ prNo: String(row.pr_no || "") }))
+        .filter((row) => row.prNo)
+    );
+  }, []);
+
+  useEffect(() => {
+    void refresh();
+
+    const channel = supabase
+      .channel("rfq-generation-inline-actions")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "purchase_requests" },
+        () => void refresh()
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [refresh]);
+
+  // The PR table is rendered by the admin dashboard. We enhance only the
+  // matching Step 7 rows, preserving the dashboard's existing action layout.
+  useEffect(() => {
+    if (!step7PRs.length) return;
+
+    const addInlineActions = () => {
+      const rows = Array.from(document.querySelectorAll("main table tbody tr"));
+
+      rows.forEach((row) => {
+        const prNo = row.querySelector("td:first-child")?.textContent?.trim();
+        if (!prNo || !step7PRs.some((item) => item.prNo === prNo)) return;
+
+        const actions = row.querySelector("td:last-child > div");
+        if (!actions || actions.querySelector(`[data-rfq-action="${CSS.escape(prNo)}"]`)) return;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.rfqAction = prNo;
+        button.title = `Open RFQ Form for ${prNo}`;
+        button.className = "rfq-inline-action";
+        button.textContent = "RFQ Form";
+        button.addEventListener("click", () => setOpenPrNo(prNo));
+
+        // Put the RFQ action immediately before the normal workflow action.
+        actions.insertBefore(button, actions.firstChild);
+      });
+    };
+
+    addInlineActions();
+    const observer = new MutationObserver(addInlineActions);
+    const table = document.querySelector("main table");
+    if (table) observer.observe(table, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      document.querySelectorAll("[data-rfq-action]").forEach((node) => node.remove());
+    };
+  }, [step7PRs]);
+
+  const closeEditor = () => {
+    setOpenPrNo(null);
+    window.setTimeout(() => void refresh(), 250);
+  };
+
+  if (!openPrNo) return null;
+
+  return (
+    <RFQEditorModal
+      prNo={openPrNo}
+      onClose={closeEditor}
+      onSaved={() => window.setTimeout(() => void refresh(), 250)}
+    />
+  );
 }
