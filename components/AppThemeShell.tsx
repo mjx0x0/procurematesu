@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import AppSidebar from "@/components/AppSidebar";
 import SystemBranding from "@/components/SystemBranding";
+import AdminVisualOverrides from "@/components/AdminVisualOverrides";
 
 const PRESERVE_PAGE_ROUTES = ["/", "/auth/signup", "/dashboard/new-pr", "/dashboard/pr-print", "/dashboard/pr/", "/admin/rfq"];
 
@@ -17,6 +18,7 @@ export default function AppThemeShell({ children }: { children: React.ReactNode 
   return (
     <div className={`app-theme ${isAdmin ? "admin-shell" : "portal-shell"}`}>
       <SystemBranding />
+      {isAdmin && <AdminVisualOverrides />}
       {isAdmin && <AppSidebar mode="admin" />}
       {children}
     </div>
