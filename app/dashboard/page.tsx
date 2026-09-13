@@ -9,63 +9,188 @@ import { NotificationPopover } from "@/components/NotificationPopover";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
 
-interface PurchaseRequest { pr_no:string; purpose:string; total:number; current_stage:string; created_at:string; department:string; }
-const TERMINAL_STAGES=["completed","cancelled","rejected"];
-const quickActions=[
- {href:"/dashboard/new-pr",label:"Create Purchase Request",description:"Start and submit a new procurement request.",icon:PlusCircle,tone:"gold"},
- {href:"/dashboard/transparency",label:"Transparency Board",description:"Browse public procurement information and records.",icon:BarChart3,tone:"light"},
- {href:"/dashboard/chatbot",label:"Ask Gab AI",description:"Get guidance on RA 12009, PR preparation, SVP, and procurement stages.",icon:Bot,tone:"light"},
+interface PurchaseRequest {
+  pr_no: string;
+  purpose: string;
+  total: number;
+  current_stage: string;
+  created_at: string;
+  department: string;
+}
+
+const TERMINAL_STAGES = ["completed", "cancelled", "rejected"];
+const QUICK_ACTIONS = [
+  { href: "/dashboard/new-pr", label: "Create Purchase Request", description: "Start and submit a new procurement request.", icon: PlusCircle, tone: "gold" },
+  { href: "/dashboard/transparency", label: "Transparency Board", description: "Browse public procurement information and records.", icon: BarChart3, tone: "light" },
+  { href: "/dashboard/chatbot", label: "Ask Gab AI", description: "Get guidance on RA 12009, PR preparation, SVP, and procurement stages.", icon: Bot, tone: "light" },
 ];
 
-export default function DashboardPage(){
- const router=useRouter();
- const [user,setUser]=useState<any>(null); const [prs,setPrs]=useState<PurchaseRequest[]>([]); const [loading,setLoading]=useState(true); const [isAdmin,setIsAdmin]=useState(false);
- const [stats,setStats]=useState({total:0,pending:0,completed:0});
- useEffect(()=>{
-  let cancelled=false;
-  const load=async()=>{
-   try{
-    const {data:{user:authUser}}=await supabase.auth.getUser();
-    if(!authUser){router.replace("/auth/login");return;}
-    if(cancelled)return;
-    setUser(authUser);
-    const [{data:profile},{data:prData}]=await Promise.all([
-      supabase.from("users").select("role").eq("id",authUser.id).maybeSingle(),
-      supabase.from("purchase_requests").select("pr_no,purpose,total,current_stage,created_at,department").eq("user_id",authUser.id).order("created_at",{ascending:false}).limit(20),
-    ]);
-    if(cancelled)return;
-    const role=profile?.role||"end_user";
-    setIsAdmin(role==="admin");
-    const list=(prData||[]) as PurchaseRequest[];
-    setPrs(list);
-    setStats({total:list.length,pending:list.filter(p=>!TERMINAL_STAGES.includes(p.current_stage)).length,completed:list.filter(p=>p.current_stage==="completed").length});
-   }catch(error){console.error("Dashboard load error:",error)}finally{if(!cancelled)setLoading(false)}
+export default function DashboardPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [prs, setPrs] = useState<PurchaseRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0 });
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadDashboard = async () => {
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) {
+          router.replace("/auth/login");
+          return;
+        }
+        if (cancelled) return;
+        setUser(authUser);
+
+        const [{ data: profile }, { data: prData }] = await Promise.all([
+          supabase.from("users").select("role").eq("id", authUser.id).maybeSingle(),
+          supabase.from("purchase_requests").select("pr_no,purpose,total,current_stage,created_at,department").eq("user_id", authUser.id).order("created_at", { ascending: false }).limit(20),
+        ]);
+
+        if (cancelled) return;
+        const role = profile?.role || "end_user";
+        setIsAdmin(role === "admin");
+        const list = (prData || []) as PurchaseRequest[];
+        setPrs(list);
+        setStats({
+          total: list.length,
+          pending: list.filter((pr) => !TERMINAL_STAGES.includes(pr.current_stage)).length,
+          completed: list.filter((pr) => pr.current_stage === "completed").length,
+        });
+      } catch (error) {
+        console.error("Dashboard load error:", error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    loadDashboard();
+    return () => { cancelled = true; };
+  }, [router]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.replace("/");
   };
-  load();
-  return()=>{cancelled=true};
- },[router]);
- const logout=async()=>{await supabase.auth.signOut();router.replace("/")};
- const statusColor=(s:string)=>s==="completed"?"border-emerald-200 bg-emerald-50 text-emerald-700":TERMINAL_STAGES.includes(s)?"border-red-200 bg-red-50 text-red-700":"border-amber-200 bg-amber-50 text-amber-700";
- const statusLabel=(s:string)=>s==="completed"?"Completed":s==="rejected"?"Rejected":s==="cancelled"?"Cancelled":PROCUREMENT_STAGE_LABELS[s]||s.replace(/_/g," ");
- const stage=(s:string)=>PROCUREMENT_STAGES.find(x=>x.key===s)?.number;
- const recent=prs.slice(0,5); const active=prs.find(p=>!TERMINAL_STAGES.includes(p.current_stage));
- const name=user?.user_metadata?.full_name||"Requisitioner"; const initials=name.slice(0,2).toUpperCase();
- if(loading)return <div className="app-theme flex min-h-[100svh] items-center justify-center bg-[#F7F5F2] px-6"><div className="flex flex-col items-center gap-3"><Loader2 className="h-7 w-7 animate-spin text-[#7A1315]"/><span className="text-center text-[9px] font-semibold uppercase tracking-[.16em] text-stone-400">Preparing your workspace</span></div></div>;
- return <div className="app-theme min-h-[100svh] overflow-x-hidden bg-[#F7F5F2] text-[#302725]">
-  <header className="sticky top-0 z-40 border-b border-[#7A1315]/10 bg-[#FCFBF9]/95 backdrop-blur-xl">
-   <div className="mx-auto flex min-h-[58px] max-w-[1220px] items-center justify-between gap-2 px-3 py-2 sm:min-h-[66px] sm:gap-4 sm:px-7 lg:px-8">
-    <Link href="/dashboard" className="flex min-w-0 items-center gap-2 sm:gap-3"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#7A1315] to-[#4D0C0D] shadow-[0_7px_20px_rgba(77,12,13,.16)] sm:h-9 sm:w-9 sm:rounded-xl"><FileText className="h-3.5 w-3.5 text-[#F0C83F] sm:h-4 sm:w-4"/></div><div className="min-w-0 leading-none"><div className="max-w-[185px] truncate text-[9px] font-extrabold tracking-[-.015em] text-[#4D0C0D] sm:max-w-none sm:text-[12px]">MSU GenSan Procurement Management System</div><div className="mt-1 text-[6px] font-bold uppercase tracking-[.16em] text-[#B88E13] sm:text-[7px] sm:tracking-[.18em]">End User Workspace</div></div></Link>
-    <div className="flex shrink-0 items-center gap-1 sm:gap-2"><NotificationPopover/><div className="hidden h-7 w-px bg-stone-200 sm:block"/><div className="hidden items-center gap-2 sm:flex"><div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#D4AF37]/45 bg-[#FFF6D9] text-[9px] font-black text-[#6B4F05]">{initials}</div><div className="max-w-[150px] leading-tight"><p className="truncate text-[9px] font-bold text-stone-800">{name}</p><p className="truncate text-[8px] text-stone-400">{user?.email}</p></div></div>{isAdmin&&<Link href="/admin" className="hidden items-center gap-1.5 rounded-xl border border-[#D4AF37]/45 bg-[#FFFDF6] px-3 py-2 text-[9px] font-bold text-[#7A1315] sm:flex"><ShieldCheck className="h-3.5 w-3.5 text-[#B88E13]"/>Admin</Link>}<button onClick={logout} className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-[8px] font-bold text-stone-600 transition hover:bg-red-50 hover:text-[#7A1315] sm:px-3" aria-label="Logout"><LogOut className="h-3.5 w-3.5"/><span>Logout</span></button></div>
-   </div>
-  </header>
-  <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
-   <section className="relative overflow-hidden rounded-[20px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#5A080A] via-[#760D10] to-[#4A0507] px-4 py-6 shadow-[0_18px_45px_rgba(77,12,13,.12)] sm:rounded-[24px] sm:px-8 sm:py-9"><div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl"/><div className="relative grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end"><div><span className="inline-flex items-center gap-1.5 rounded-full border border-[#F0C83F]/35 bg-[#F0C83F]/10 px-2.5 py-1.5 text-[7px] font-black uppercase tracking-[.14em] text-[#F5D766] sm:px-3 sm:text-[8px]"><Sparkles className="h-3 w-3"/>Institutional Procurement</span><h1 className="mt-3 text-[26px] font-semibold leading-[1.06] tracking-[-.035em] text-white sm:mt-4 sm:text-[40px]">Good day, {name}.</h1><p className="mt-2.5 max-w-[670px] text-[10px] leading-[1.7] text-white/70 sm:mt-3 sm:text-[12px]">Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.</p></div><Link href="/dashboard/new-pr" className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#F0C83F]/50 bg-gradient-to-r from-[#F0C83F] to-[#D4A82C] px-4 py-3 text-[9px] font-extrabold text-[#4D0C0D] shadow-[0_10px_25px_rgba(0,0,0,.16)] transition hover:-translate-y-0.5 sm:w-auto sm:px-4 sm:text-[10px]"><PlusCircle className="h-4 w-4"/>Create Purchase Request</Link></div></section>
-   <section className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5 sm:grid-cols-3 sm:gap-3">{[[stats.total,"Total Requests","All submitted PRs",FileText,"bg-[#FFF2F2] text-[#7A1315]"],[stats.pending,"In Progress","Awaiting next stage",Clock,"bg-[#FFF8E5] text-[#9A7205]"],[stats.completed,"Completed","Successfully delivered",CheckCircle,"bg-[#ECFFF5] text-[#087449]"] .map(([n,t,sub,Icon,tone]:any)=><div key={t} className={`rounded-2xl border border-stone-200/80 bg-white p-3.5 shadow-[0_8px_24px_rgba(45,35,30,.04)] ${t==="Completed"?"col-span-2 sm:col-span-1":""}`}><div className="flex items-center justify-between gap-2"><div><p className="text-[7px] font-black uppercase tracking-[.13em] text-stone-400 sm:text-[8px]">{t}</p><p className="mt-1 text-[23px] font-black tracking-[-.03em] text-[#4D0C0D] sm:text-[25px]">{n}</p><p className="mt-0.5 text-[8px] text-stone-500 sm:text-[9px]">{sub}</p></div><div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10 ${tone}`}><Icon className="h-4 w-4"/></div></div></div>)}</section>
-   <section className="mt-4 sm:mt-5"><div className="mb-2 flex items-end justify-between px-1"><div><p className="text-[7px] font-black uppercase tracking-[.16em] text-[#B88E13] sm:text-[8px]">Workspace</p><h2 className="mt-1 text-[14px] font-extrabold text-[#4D0C0D] sm:text-[15px]">Quick access</h2></div><span className="hidden text-[8px] text-stone-400 sm:block">Your essential tools</span></div><div className="grid gap-2.5 md:grid-cols-3">{quickActions.map(({href,label,description,icon:Icon,tone})=><Link key={href} href={href} className={`group relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 sm:p-5 ${tone==="gold"?"border-[#D4AF37]/35 bg-gradient-to-br from-[#FFFDF5] to-[#FFF7DD] shadow-[0_12px_30px_rgba(184,142,19,.07)]":"border-stone-200/80 bg-white shadow-[0_10px_28px_rgba(45,35,30,.04)]"}`}><div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#D4AF37]/10 blur-2xl"/><div className="relative flex items-start gap-3"><div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone==="gold"?"bg-[#7A1315] text-[#F0C83F]":"bg-[#FFF6E4] text-[#9A7205]"}`}><Icon className="h-4 w-4"/></div><div className="min-w-0 flex-1"><p className="text-[10px] font-extrabold text-[#4D0C0D] sm:text-[11px]">{label}</p><p className="mt-1 text-[8px] leading-4 text-stone-500 sm:text-[9px]">{description}</p></div><ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-stone-300 transition group-hover:text-[#7A1315]"/></div></Link>)}</div></section>
-   <div className="mt-4 grid gap-4 sm:mt-5 xl:grid-cols-[1fr_320px]">
-    <section className="overflow-hidden rounded-2xl border border-stone-200/80 bg-white shadow-[0_12px_34px_rgba(45,35,30,.045)]"><div className="flex items-center justify-between gap-3 border-b border-stone-100 px-4 py-3.5 sm:px-5 sm:py-4"><div><h2 className="text-[12px] font-extrabold text-[#4D0C0D] sm:text-[13px]">Recent Purchase Requests</h2><p className="mt-0.5 text-[8px] text-stone-500 sm:text-[9px]">Select a request to view its procurement timeline.</p></div><span className="shrink-0 rounded-full bg-[#F8F2E8] px-2 py-1 text-[6px] font-bold uppercase tracking-[.1em] text-[#9A7205] sm:px-2.5 sm:text-[7px]">My requests</span></div>{recent.length===0?<div className="p-9 text-center"><ClipboardList className="mx-auto h-8 w-8 text-stone-300"/><h3 className="mt-3 text-[11px] font-bold text-stone-800">No purchase requests yet</h3><p className="mx-auto mt-1 max-w-sm text-[9px] leading-5 text-stone-500">Create your first request to begin tracking it through the university procurement process.</p></div>:<div className="divide-y divide-stone-100">{recent.map(p=><Link key={p.pr_no} href={`/dashboard/pr/${p.pr_no}`} className="group flex min-w-0 items-center gap-2.5 px-4 py-3.5 transition hover:bg-[#FFFBF7] sm:gap-3 sm:px-5 sm:py-4"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FFF3E8] text-[#7A1315] sm:h-9 sm:w-9 sm:rounded-xl"><FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4"/></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-1.5"><span className="text-[9px] font-extrabold text-[#7A1315] sm:text-[10px]">{p.pr_no}</span><span className="text-[7px] text-stone-400 sm:text-[8px]">{new Date(p.created_at).toLocaleDateString()}</span></div><p className="mt-0.5 truncate text-[9px] font-semibold text-stone-700 sm:text-[10px]">{p.purpose||"Official procurement request"}</p><p className="mt-0.5 truncate text-[7px] text-stone-400 sm:text-[8px]">{p.department||"University Office"}</p></div><div className="hidden shrink-0 text-right sm:block"><p className="text-[10px] font-extrabold text-stone-800">₱{Number(p.total||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</p><span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[7px] font-bold ${statusColor(p.current_stage)}`}>{stage(p.current_stage)?`Step ${stage(p.current_stage)} · `:""}{statusLabel(p.current_stage)}</span></div><Eye className="h-3.5 w-3.5 shrink-0 text-stone-300 sm:h-4 sm:w-4"/></Link>)}</div>}</section>
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1"><section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#5D090B] to-[#7A1315] p-4 text-white shadow-[0_16px_38px_rgba(77,12,13,.09)] sm:p-5"><div className="relative flex items-center gap-2.5"><div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#F0C83F]/30 bg-[#F0C83F]/10 text-[#F0C83F]"><Bot className="h-4 w-4"/></div><div><p className="text-[7px] font-black uppercase tracking-[.15em] text-[#F0D56A]">Procurement Advisor</p><h3 className="mt-0.5 text-[13px] font-extrabold">Gab AI</h3></div></div><p className="relative mt-3 text-[8px] leading-5 text-white/70 sm:text-[9px]">Need help with RA 12009, PR preparation, procurement stages, or SVP? Gab can guide you through the process.</p><Link href="/dashboard/chatbot" className="relative mt-3 flex items-center justify-between rounded-xl border border-white/15 bg-white/[0.08] px-3 py-2.5 text-[8px] font-bold text-[#F5D766] sm:mt-4 sm:text-[9px]">Open Gab AI<ArrowUpRight className="h-3.5 w-3.5"/></Link></section><section className="rounded-2xl border border-stone-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(45,35,30,.04)] sm:p-5"><div className="flex items-center gap-2"><LayoutDashboard className="h-4 w-4 text-[#B88E13]"/><h3 className="text-[11px] font-extrabold text-[#4D0C0D] sm:text-[12px]">Current activity</h3></div>{active?<div className="mt-3 rounded-xl border border-[#E9D9AE] bg-[#FFFDF6] p-3"><p className="text-[7px] font-black uppercase tracking-[.14em] text-[#A07A13]">Active request</p><p className="mt-1 text-[9px] font-extrabold text-[#7A1315]">{active.pr_no}</p><p className="mt-1 truncate text-[8px] text-stone-500">{statusLabel(active.current_stage)}</p><Link href={`/dashboard/pr/${active.pr_no}`} className="mt-2 inline-flex items-center gap-1 text-[8px] font-bold text-[#7A1315]">Continue tracking<ArrowRight className="h-3 w-3"/></Link></div>:<p className="mt-3 text-[8px] leading-5 text-stone-500">You have no active procurement requests. Start a new request whenever you are ready.</p>}</section></div>
-   </div>
-   <footer className="mt-6 flex flex-col items-center justify-between gap-1.5 border-t border-stone-200/80 py-4 text-center sm:mt-8 sm:flex-row"><p className="text-[7px] text-stone-400 sm:text-[8px]">MSU GenSan Procurement Management System · Institutional access</p><p className="text-[7px] text-stone-400 sm:text-[8px]">RA 12009 Compliant</p></footer>
-  </main><Chatbot/></div>;
+
+  const statusColor = (status: string) => {
+    if (status === "completed") return "border-emerald-200 bg-emerald-50 text-emerald-700";
+    if (status === "rejected" || status === "cancelled") return "border-red-200 bg-red-50 text-red-700";
+    return "border-amber-200 bg-amber-50 text-amber-700";
+  };
+
+  const statusLabel = (status: string) => {
+    if (status === "completed") return "Completed";
+    if (status === "rejected") return "Rejected";
+    if (status === "cancelled") return "Cancelled";
+    return PROCUREMENT_STAGE_LABELS[status] || status.replace(/_/g, " ");
+  };
+
+  const stageNumber = (status: string) => PROCUREMENT_STAGES.find((stage) => stage.key === status)?.number;
+  const displayName = user?.user_metadata?.full_name || "Requisitioner";
+  const initials = displayName.slice(0, 2).toUpperCase();
+  const recent = prs.slice(0, 5);
+  const activeRequest = prs.find((pr) => !TERMINAL_STAGES.includes(pr.current_stage));
+
+  if (loading) {
+    return (
+      <div className="app-theme flex min-h-[100svh] items-center justify-center bg-[#F7F5F2] px-6">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-7 w-7 animate-spin text-[#7A1315]" />
+          <span className="text-center text-[9px] font-semibold uppercase tracking-[.16em] text-stone-400">Preparing your workspace</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app-theme min-h-[100svh] overflow-x-hidden bg-[#F7F5F2] text-[#302725]">
+      <header className="sticky top-0 z-40 border-b border-[#7A1315]/10 bg-[#FCFBF9]/95 backdrop-blur-xl">
+        <div className="mx-auto flex min-h-[58px] max-w-[1220px] items-center justify-between gap-2 px-3 py-2 sm:min-h-[66px] sm:gap-4 sm:px-7 lg:px-8">
+          <Link href="/dashboard" className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#7A1315] to-[#4D0C0D] shadow-[0_7px_20px_rgba(77,12,13,.16)] sm:h-9 sm:w-9 sm:rounded-xl"><FileText className="h-3.5 w-3.5 text-[#F0C83F] sm:h-4 sm:w-4" /></div>
+            <div className="min-w-0 leading-none">
+              <div className="max-w-[190px] truncate text-[9px] font-extrabold tracking-[-.015em] text-[#4D0C0D] sm:max-w-none sm:text-[12px]">MSU GenSan Procurement Management System</div>
+              <div className="mt-1 text-[6px] font-bold uppercase tracking-[.16em] text-[#B88E13] sm:text-[7px] sm:tracking-[.18em]">End User Workspace</div>
+            </div>
+          </Link>
+
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <NotificationPopover />
+            <div className="hidden h-7 w-px bg-stone-200 sm:block" />
+            <div className="hidden items-center gap-2 sm:flex">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#D4AF37]/45 bg-[#FFF6D9] text-[9px] font-black text-[#6B4F05]">{initials}</div>
+              <div className="max-w-[150px] leading-tight"><p className="truncate text-[9px] font-bold text-stone-800">{displayName}</p><p className="truncate text-[8px] text-stone-400">{user?.email}</p></div>
+            </div>
+            {isAdmin && <Link href="/admin" className="hidden items-center gap-1.5 rounded-xl border border-[#D4AF37]/45 bg-[#FFFDF6] px-3 py-2 text-[9px] font-bold text-[#7A1315] sm:flex"><ShieldCheck className="h-3.5 w-3.5 text-[#B88E13]" />Admin</Link>}
+            <button onClick={handleLogout} className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-[8px] font-bold text-stone-600 transition hover:bg-red-50 hover:text-[#7A1315] sm:px-3" aria-label="Logout"><LogOut className="h-3.5 w-3.5" /><span>Logout</span></button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
+        <section className="relative overflow-hidden rounded-[20px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#5A080A] via-[#760D10] to-[#4A0507] px-4 py-6 shadow-[0_18px_45px_rgba(77,12,13,.12)] sm:rounded-[24px] sm:px-8 sm:py-9">
+          <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
+          <div className="relative grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F0C83F]/35 bg-[#F0C83F]/10 px-2.5 py-1.5 text-[7px] font-black uppercase tracking-[.14em] text-[#F5D766] sm:px-3 sm:text-[8px]"><Sparkles className="h-3 w-3" />Institutional Procurement</span>
+              <h1 className="mt-3 text-[26px] font-semibold leading-[1.06] tracking-[-.035em] text-white sm:mt-4 sm:text-[40px]">Good day, {displayName}.</h1>
+              <p className="mt-2.5 max-w-[670px] text-[10px] leading-[1.7] text-white/70 sm:mt-3 sm:text-[12px]">Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.</p>
+            </div>
+            <Link href="/dashboard/new-pr" className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#F0C83F]/50 bg-gradient-to-r from-[#F0C83F] to-[#D4A82C] px-4 py-3 text-[9px] font-extrabold text-[#4D0C0D] shadow-[0_10px_25px_rgba(0,0,0,.16)] transition hover:-translate-y-0.5 sm:w-auto sm:text-[10px]"><PlusCircle className="h-4 w-4" />Create Purchase Request</Link>
+          </div>
+        </section>
+
+        <section className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5 sm:grid-cols-3 sm:gap-3">
+          {[{n:stats.total,t:"Total Requests",s:"All submitted PRs",Icon:FileText,tone:"bg-[#FFF2F2] text-[#7A1315]"},{n:stats.pending,t:"In Progress",s:"Awaiting next stage",Icon:Clock,tone:"bg-[#FFF8E5] text-[#9A7205]"},{n:stats.completed,t:"Completed",s:"Successfully delivered",Icon:CheckCircle,tone:"bg-[#ECFFF5] text-[#087449]"}].map((item) => (
+            <div key={item.t} className={`rounded-2xl border border-stone-200/80 bg-white p-3.5 shadow-[0_8px_24px_rgba(45,35,30,.04)] ${item.t === "Completed" ? "col-span-2 sm:col-span-1" : ""}`}>
+              <div className="flex items-center justify-between gap-2"><div><p className="text-[7px] font-black uppercase tracking-[.13em] text-stone-400 sm:text-[8px]">{item.t}</p><p className="mt-1 text-[23px] font-black tracking-[-.03em] text-[#4D0C0D] sm:text-[25px]">{item.n}</p><p className="mt-0.5 text-[8px] text-stone-500 sm:text-[9px]">{item.s}</p></div><div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10 ${item.tone}`}><item.Icon className="h-4 w-4" /></div></div>
+            </div>
+          ))}
+        </section>
+
+        <section className="mt-4 sm:mt-5">
+          <div className="mb-2 flex items-end justify-between px-1"><div><p className="text-[7px] font-black uppercase tracking-[.16em] text-[#B88E13] sm:text-[8px]">Workspace</p><h2 className="mt-1 text-[14px] font-extrabold text-[#4D0C0D] sm:text-[15px]">Quick access</h2></div><span className="hidden text-[8px] text-stone-400 sm:block">Your essential tools</span></div>
+          <div className="grid gap-2.5 md:grid-cols-3">
+            {QUICK_ACTIONS.map(({href,label,description,icon:Icon,tone}) => (
+              <Link key={href} href={href} className={`group relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 sm:p-5 ${tone === "gold" ? "border-[#D4AF37]/35 bg-gradient-to-br from-[#FFFDF5] to-[#FFF7DD] shadow-[0_12px_30px_rgba(184,142,19,.07)]" : "border-stone-200/80 bg-white shadow-[0_10px_28px_rgba(45,35,30,.04)]"}`}>
+                <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#D4AF37]/10 blur-2xl" />
+                <div className="relative flex items-start gap-3"><div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone === "gold" ? "bg-[#7A1315] text-[#F0C83F]" : "bg-[#FFF6E4] text-[#9A7205]"}`}><Icon className="h-4 w-4" /></div><div className="min-w-0 flex-1"><p className="text-[10px] font-extrabold text-[#4D0C0D] sm:text-[11px]">{label}</p><p className="mt-1 text-[8px] leading-4 text-stone-500 sm:text-[9px]">{description}</p></div><ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-stone-300 transition group-hover:text-[#7A1315]" /></div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <div className="mt-4 grid gap-4 sm:mt-5 xl:grid-cols-[1fr_320px]">
+          <section className="overflow-hidden rounded-2xl border border-stone-200/80 bg-white shadow-[0_12px_34px_rgba(45,35,30,.045)]">
+            <div className="flex items-center justify-between gap-3 border-b border-stone-100 px-4 py-3.5 sm:px-5 sm:py-4"><div><h2 className="text-[12px] font-extrabold text-[#4D0C0D] sm:text-[13px]">Recent Purchase Requests</h2><p className="mt-0.5 text-[8px] text-stone-500 sm:text-[9px]">Select a request to view its procurement timeline.</p></div><span className="shrink-0 rounded-full bg-[#F8F2E8] px-2 py-1 text-[6px] font-bold uppercase tracking-[.1em] text-[#9A7205] sm:px-2.5 sm:text-[7px]">My requests</span></div>
+            {recent.length === 0 ? (
+              <div className="p-9 text-center"><ClipboardList className="mx-auto h-8 w-8 text-stone-300" /><h3 className="mt-3 text-[11px] font-bold text-stone-800">No purchase requests yet</h3><p className="mx-auto mt-1 max-w-sm text-[9px] leading-5 text-stone-500">Create your first request to begin tracking it through the university procurement process.</p></div>
+            ) : (
+              <div className="divide-y divide-stone-100">
+                {recent.map((pr) => (
+                  <Link key={pr.pr_no} href={`/dashboard/pr/${pr.pr_no}`} className="group flex min-w-0 items-center gap-2.5 px-4 py-3.5 transition hover:bg-[#FFFBF7] sm:gap-3 sm:px-5 sm:py-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FFF3E8] text-[#7A1315] sm:h-9 sm:w-9 sm:rounded-xl"><FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></div>
+                    <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-1.5"><span className="text-[9px] font-extrabold text-[#7A1315] sm:text-[10px]">{pr.pr_no}</span><span className="text-[7px] text-stone-400 sm:text-[8px]">{new Date(pr.created_at).toLocaleDateString()}</span></div><p className="mt-0.5 truncate text-[9px] font-semibold text-stone-700 sm:text-[10px]">{pr.purpose || "Official procurement request"}</p><p className="mt-0.5 truncate text-[7px] text-stone-400 sm:text-[8px]">{pr.department || "University Office"}</p></div>
+                    <div className="hidden shrink-0 text-right sm:block"><p className="text-[10px] font-extrabold text-stone-800">₱{Number(pr.total || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</p><span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[7px] font-bold ${statusColor(pr.current_stage)}`}>{stageNumber(pr.current_stage) ? `Step ${stageNumber(pr.current_stage)} · ` : ""}{statusLabel(pr.current_stage)}</span></div>
+                    <Eye className="h-3.5 w-3.5 shrink-0 text-stone-300 transition group-hover:text-[#7A1315] sm:h-4 sm:w-4" />
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+            <section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#5D090B] to-[#7A1315] p-4 text-white shadow-[0_16px_38px_rgba(77,12,13,.09)] sm:p-5"><div className="relative flex items-center gap-2.5"><div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#F0C83F]/30 bg-[#F0C83F]/10 text-[#F0C83F]"><Bot className="h-4 w-4" /></div><div><p className="text-[7px] font-black uppercase tracking-[.15em] text-[#F0D56A]">Procurement Advisor</p><h3 className="mt-0.5 text-[13px] font-extrabold">Gab AI</h3></div></div><p className="mt-3 text-[8px] leading-5 text-white/70 sm:text-[9px]">Need help with RA 12009, PR preparation, procurement stages, or SVP? Gab can guide you through the process.</p><Link href="/dashboard/chatbot" className="mt-3 flex items-center justify-between rounded-xl border border-white/15 bg-white/[0.08] px-3 py-2.5 text-[8px] font-bold text-[#F5D766] sm:mt-4 sm:text-[9px]">Open Gab AI<ArrowUpRight className="h-3.5 w-3.5" /></Link></section>
+            <section className="rounded-2xl border border-stone-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(45,35,30,.04)] sm:p-5"><div className="flex items-center gap-2"><LayoutDashboard className="h-4 w-4 text-[#B88E13]" /><h3 className="text-[11px] font-extrabold text-[#4D0C0D] sm:text-[12px]">Current activity</h3></div>{activeRequest ? <div className="mt-3 rounded-xl border border-[#E9D9AE] bg-[#FFFDF6] p-3"><p className="text-[7px] font-black uppercase tracking-[.14em] text-[#A07A13]">Active request</p><p className="mt-1 text-[9px] font-extrabold text-[#7A1315]">{activeRequest.pr_no}</p><p className="mt-1 truncate text-[8px] text-stone-500">{statusLabel(activeRequest.current_stage)}</p><Link href={`/dashboard/pr/${activeRequest.pr_no}`} className="mt-2 inline-flex items-center gap-1 text-[8px] font-bold text-[#7A1315]">Continue tracking<ArrowRight className="h-3 w-3" /></Link></div> : <p className="mt-3 text-[8px] leading-5 text-stone-500">You have no active procurement requests. Start a new request whenever you are ready.</p>}</section>
+          </div>
+        </div>
+
+        <footer className="mt-6 flex flex-col items-center justify-between gap-1.5 border-t border-stone-200/80 py-4 text-center sm:mt-8 sm:flex-row sm:text-left"><p className="text-[7px] text-stone-400 sm:text-[8px]">MSU GenSan Procurement Management System · Institutional access</p><p className="text-[7px] text-stone-400 sm:text-[8px]">RA 12009 Compliant</p></footer>
+      </main>
+      <Chatbot />
+    </div>
+  );
 }
