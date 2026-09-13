@@ -13,7 +13,8 @@ const CONFIG:Record<string,{label:string;mode:RfqMode}>={
 };
 const STAGES=PROCUREMENT_STAGES;
 const keyOf=(s:string)=>Array.from(s).map(ch=>ch.charCodeAt(0).toString(16)).join("");
-const escapeHtml=(value:string)=>value.replace(/[&<>\"']/g,(ch)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]||ch));
+const HTML_ENTITIES:Record<string,string>={"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"};
+const escapeHtml=(value:string)=>value.replace(/[&<>\"']/g,(ch)=>HTML_ENTITIES[ch]??ch);
 const stageIndex=(stage:string)=>STAGES.findIndex(s=>s.key===stage);
 
 export default function AdminWorkflowBridge(){
@@ -60,7 +61,7 @@ export default function AdminWorkflowBridge(){
         actionRow.insertBefore(button,completeButton);
       }
 
-      const timelineLabel=Array.from(modal.querySelectorAll("*" )).find(el=>el.children.length===0&&/RECORDED STAGE TIMELINE/i.test((el.textContent||"").trim())) as HTMLElement|null;
+      const timelineLabel=Array.from(modal.querySelectorAll("*")).find(el=>el.children.length===0&&/RECORDED STAGE TIMELINE/i.test((el.textContent||"").trim())) as HTMLElement|null;
       if(!timelineLabel)return;
       const section=timelineLabel.parentElement;
       if(!section)return;
@@ -79,7 +80,8 @@ export default function AdminWorkflowBridge(){
         const historyByStage=new Map<string,any>();
         history.forEach((h:any)=>{if(h?.stage_key)historyByStage.set(String(h.stage_key),h);});
         const isCompletedRequest=currentStage==="completed";
-        const progressCount=isCompletedRequest?20:Math.max(0,currentIndex);
+        const historyCount=new Set(history.map((h:any)=>String(h?.stage_key||"")).filter(Boolean)).size;
+        const progressCount=isCompletedRequest?20:Math.min(20,Math.max(historyCount,currentIndex));
         const percent=Math.round((progressCount/20)*100);
         const currentInfo=STAGES.find(s=>s.key===currentStage);
         const headerText=isCompletedRequest?"Completed — all 20 stages finished":currentInfo?`Step ${currentInfo.number} of 20 — ${currentInfo.label}`:currentStage?currentStage.replace(/_/g," "):"Current stage unavailable";
@@ -103,8 +105,7 @@ export default function AdminWorkflowBridge(){
           list.appendChild(row);
         });
 
-        const terminal=currentStage==="rejected"||currentStage==="cancelled";
-        if(terminal){
+        if(currentStage==="rejected"||currentStage==="cancelled"){
           const terminalRow=document.createElement("div");
           terminalRow.className="admin-timeline-terminal";
           terminalRow.textContent=currentStage==="rejected"?"PROCESS TERMINATED — Purchase Request rejected":"PROCESS TERMINATED — Purchase Request cancelled";
