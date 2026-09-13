@@ -106,7 +106,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="app-theme min-h-[100svh] overflow-x-hidden bg-[#F7F5F2] text-[#302725]">
+    <div className="app-theme min-h-[100svh] overflow-x-hidden bg-[#F7F5F2] text-[#302725] dashboard-page">
       <header className="sticky top-0 z-40 border-b border-[#7A1315]/10 bg-[#FCFBF9]/95 backdrop-blur-xl">
         <div className="mx-auto flex min-h-[58px] max-w-[1220px] items-center justify-between gap-2 px-3 py-2 sm:min-h-[66px] sm:gap-4 sm:px-7 lg:px-8">
           <Link href="/dashboard" className="flex min-w-0 items-center gap-2 sm:gap-3">
@@ -125,7 +125,7 @@ export default function DashboardPage() {
               <div className="max-w-[150px] leading-tight"><p className="truncate text-[9px] font-bold text-stone-800">{displayName}</p><p className="truncate text-[8px] text-stone-400">{user?.email}</p></div>
             </div>
             {isAdmin && <Link href="/admin" className="hidden items-center gap-1.5 rounded-xl border border-[#D4AF37]/45 bg-[#FFFDF6] px-3 py-2 text-[9px] font-bold text-[#7A1315] sm:flex"><ShieldCheck className="h-3.5 w-3.5 text-[#B88E13]" />Admin</Link>}
-            <button onClick={handleLogout} className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-[8px] font-bold text-stone-600 transition hover:bg-red-50 hover:text-[#7A1315] sm:px-3" aria-label="Logout"><LogOut className="h-3.5 w-3.5" /><span>Logout</span></button>
+            <button onClick={handleLogout} className="dashboard-logout inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-[8px] font-bold text-stone-600 transition hover:bg-red-50 hover:text-[#7A1315] sm:px-3" title="Logout"><LogOut className="h-3.5 w-3.5" /><span>Logout</span></button>
           </div>
         </div>
       </header>
@@ -191,6 +191,18 @@ export default function DashboardPage() {
         <footer className="mt-6 flex flex-col items-center justify-between gap-1.5 border-t border-stone-200/80 py-4 text-center sm:mt-8 sm:flex-row sm:text-left"><p className="text-[7px] text-stone-400 sm:text-[8px]">MSU GenSan Procurement Management System · Institutional access</p><p className="text-[7px] text-stone-400 sm:text-[8px]">RA 12009 Compliant</p></footer>
       </main>
       <Chatbot />
+      <style jsx global>{`
+        .dashboard-page .dashboard-logout::before,
+        .dashboard-page .dashboard-logout::after,
+        .dashboard-page button[title="Logout"]::before,
+        .dashboard-page button[title="Logout"]::after,
+        .dashboard-page button[aria-label="Logout"]::before,
+        .dashboard-page button[aria-label="Logout"]::after {
+          content: none !important;
+          display: none !important;
+        }
+        .dashboard-page .dashboard-logout span { display: inline !important; }
+      `}</style>
     </div>
   );
 }
