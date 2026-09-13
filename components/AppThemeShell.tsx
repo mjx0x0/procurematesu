@@ -10,5 +10,19 @@ export default function AppThemeShell({children}:{children:React.ReactNode}){
  const preserve=PRESERVE_PAGE_ROUTES.some(route=>route.endsWith("/")?pathname.startsWith(route):pathname===route);
  if(preserve)return <>{children}</>;
  const isAdmin=pathname==="/admin"||pathname.startsWith("/admin/");
- return <div className={`app-theme ${isAdmin?"admin-shell":"portal-shell"}`}>{isAdmin&&<AppSidebar mode="admin"/>}<div className="app-theme-content">{children}</div><SystemBranding/>{isAdmin&&<AdminWorkflowBridge/>}</div>;
+ return <div className={`app-theme ${isAdmin?"admin-shell":"portal-shell"}`}>
+   <style>{`
+     .portal-shell button[aria-label="Logout"]::after,
+     .portal-shell button[title="Logout"]::after,
+     .admin-shell button[aria-label="Logout"]::after,
+     .admin-shell button[title="Logout"]::after{
+       content:none!important;
+       display:none!important;
+     }
+   `}</style>
+   {isAdmin&&<AppSidebar mode="admin"/>}
+   <div className="app-theme-content">{children}</div>
+   <SystemBranding/>
+   {isAdmin&&<AdminWorkflowBridge/>}
+ </div>;
 }
