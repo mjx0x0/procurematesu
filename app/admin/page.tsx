@@ -195,7 +195,7 @@ export default function AdminDashboard() {
 
         <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-5 flex flex-col lg:flex-row gap-3 shadow-[0_5px_20px_rgba(45,20,10,0.03)]"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" /><input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search PR number, purpose, or department" className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-[#7C1D2E]/20 focus:border-[#7C1D2E]" /></div><div className="flex flex-col sm:flex-row gap-3"><select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900"><option value="all">All Statuses</option>{STAGES.map((s) => <option key={s.key} value={s.key}>{s.number}. {s.shortLabel}</option>)}<option value="completed">Completed</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select><select value={departmentFilter} onChange={(e) => setDepartmentFilter(e.target.value)} className="px-3 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900"><option value="all">All Departments</option>{departments.map((d) => <option key={d} value={d}>{d}</option>)}</select></div></div>
 
-        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-[0_8px_30px_rgba(45,20,10,0.04)]"><div className="px-5 py-4 border-b border-stone-200 flex justify-between items-center"><div><h2 className="font-bold text-[#5A1420]">Purchase Requests</h2><p className="text-xs text-stone-500 mt-1">Workflow stages are enforced in order; administrators cannot skip steps.</p></div><span className="text-xs bg-stone-100 px-2.5 py-1 rounded-full font-bold text-stone-700">{filtered.length}</span></div>{filtered.length === 0 ? <div className="p-12 text-center text-stone-500">No purchase requests found.</div> : <div className="overflow-x-auto"><table className="w-full min-w-[1120px]"><thead className="bg-stone-50"><tr>{["PR #", "Purpose", "Department", "Amount", "Current Status", "Date", "Actions"].map((h) => <th key={h} className="px-5 py-3 text-left text-xs uppercase tracking-wide text-stone-500 font-semibold">{h}</th>)}</tr></thead><tbody className="divide-y divide-stone-100">{filtered.map((pr) => {
+        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-[0_8px_30px_rgba(45,20,10,0.04)]"><div className="px-5 py-4 border-b border-stone-200 flex justify-between items-center"><div><h2 className="font-bold text-[#5A1420]">Purchase Requests</h2><p className="text-xs text-stone-500 mt-1">Workflow stages are enforced in order; administrators cannot skip steps.</p></div><span className="text-xs bg-stone-100 px-2.5 py-1 rounded-full font-bold text-stone-700">{filtered.length}</span></div>{filtered.length === 0 ? <div className="p-12 text-center text-stone-500">No purchase requests found.</div> : <div className="overflow-x-auto"><table className="w-full min-w-[1120px] admin-pr-table"><thead className="bg-stone-50"><tr>{["PR #", "Purpose", "Department", "Amount", "Current Status", "Date", "Actions"].map((h) => <th key={h} className="px-5 py-3 text-left text-xs uppercase tracking-wide text-stone-500 font-semibold">{h}</th>)}</tr></thead><tbody className="divide-y divide-stone-100">{filtered.map((pr) => {
           const stepInfo = currentStage(pr); const nxt = nextStage(pr); const stageNumber = stepInfo?.number || 0;
           const rfqMode: RfqMode | null = pr.current_stage === "rfq_generation" ? "generation" : pr.current_stage === "rfq_evaluation" ? "evaluation" : pr.current_stage === "rfq_printing" ? "printing" : null;
           return <tr key={pr.pr_no} className={`hover:bg-stone-50/70 transition-colors ${rfqMode ? "bg-orange-50/25" : ""}`}>
@@ -203,12 +203,12 @@ export default function AdminDashboard() {
             <td className="px-5 py-4 text-sm max-w-xs truncate">{pr.purpose}</td><td className="px-5 py-4 text-sm text-stone-600">{pr.department}</td><td className="px-5 py-4 text-sm font-medium whitespace-nowrap">₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
             <td className="px-5 py-4"><span className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${COLORS[pr.current_stage] || "bg-gray-100 text-gray-600"}`}>{stageNumber ? `Step ${stageNumber}: ` : ""}{LABELS[pr.current_stage] || pr.current_stage}</span></td>
             <td className="px-5 py-4 text-sm text-stone-500 whitespace-nowrap">{pr.created_at ? new Date(pr.created_at).toLocaleDateString("en-PH") : "—"}</td>
-            <td className="px-5 py-4"><div className="flex justify-end gap-1.5 items-center">
+            <td className="px-4 py-3"><div className="admin-pr-actions">
               {rfqMode && <button onClick={() => void openRfq(pr, rfqMode)} title={`${rfqMode === "generation" ? "Generate" : rfqMode === "evaluation" ? "Review" : "Print"} RFQ for ${pr.pr_no}`} className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[#7C1D2E] hover:bg-[#5A1420] text-white border border-[#7C1D2E] text-xs font-extrabold shadow-sm hover:shadow-md transition-all"><FileText className="h-3.5 w-3.5 text-[#D4A843]" /><span>{rfqMode === "generation" ? "Generate RFQ" : rfqMode === "evaluation" ? "Review RFQ" : "Print RFQ"}</span></button>}
-              <button onClick={() => setFullPrNo(pr.pr_no)} title="View complete submitted PR form" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-stone-50 text-[#7C1D2E] border border-stone-300 text-xs font-extrabold transition-all"><FileText className="h-3.5 w-3.5" /> Full PR</button>
-              {nxt && <button onClick={() => openAction("complete", pr)} title={`Complete Step ${nxt.number}: ${nxt.label}`} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-[#7C1D2E] border border-amber-200 text-xs font-bold transition-all"><Check className="h-3.5 w-3.5 text-[#D4A843]" /> Complete Next</button>}
-              <button onClick={() => void openDetails(pr)} title="View workflow details" className="p-2 rounded-lg text-[#7C1D2E] hover:bg-red-50 transition-colors"><Eye className="h-4 w-4" /></button>
-              <button onClick={() => setDeletePR(pr.pr_no)} title="Delete PR" className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors"><Trash2 className="h-4 w-4" /></button>
+              <button onClick={() => setFullPrNo(pr.pr_no)} title="View complete submitted PR form" className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-stone-50 text-[#7C1D2E] border border-stone-300 text-xs font-extrabold transition-all"><FileText className="h-3.5 w-3.5" /> <span>Full PR</span></button>
+              {nxt && <button onClick={() => openAction("complete", pr)} title={`Complete Step ${nxt.number}: ${nxt.label}`} className="inline-flex items-center justify-center gap-1 px-2.5 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 text-[#7C1D2E] border border-amber-200 text-xs font-bold transition-all"><Check className="h-3.5 w-3.5 text-[#D4A843]" /> <span>Complete Next</span></button>}
+              <button onClick={() => void openDetails(pr)} title="View workflow details" aria-label={`View workflow details for ${pr.pr_no}`} className="admin-pr-icon-button"><Eye className="h-4 w-4" /></button>
+              <button onClick={() => setDeletePR(pr.pr_no)} title="Delete PR" aria-label={`Delete ${pr.pr_no}`} className="admin-pr-icon-button admin-pr-delete"><Trash2 className="h-4 w-4" /></button>
             </div></td>
           </tr>;
         })}</tbody></table></div>}</div>
@@ -248,8 +248,65 @@ export default function AdminDashboard() {
       {fullPrNo && <AdminPRFullFormModal prNo={fullPrNo} onClose={() => setFullPrNo(null)} />}
       <ActionFeedbackModal open={feedback.open} tone={feedback.tone} title={feedback.title} message={feedback.message} onClose={() => setFeedback((f) => ({ ...f, open: false }))} actionLabel="Done" />
       <style jsx global>{`
-        .admin-logout::after,.admin-logout::before{content:none!important;display:none!important}
-        .admin-dashboard-page button[title="Logout"]::after,.admin-dashboard-page button[aria-label="Logout"]::after{content:none!important;display:none!important}
+        .admin-dashboard-page .admin-pr-table { table-layout: fixed; width: 100%; min-width: 1120px; }
+        .admin-dashboard-page .admin-pr-table th,
+        .admin-dashboard-page .admin-pr-table td { vertical-align: middle; }
+        .admin-dashboard-page .admin-pr-table th:nth-child(1) { width: 14%; }
+        .admin-dashboard-page .admin-pr-table th:nth-child(2) { width: 22%; }
+        .admin-dashboard-page .admin-pr-table th:nth-child(3) { width: 11%; }
+        .admin-dashboard-page .admin-pr-table th:nth-child(4) { width: 10%; }
+        .admin-dashboard-page .admin-pr-table th:nth-child(5) { width: 17%; }
+        .admin-dashboard-page .admin-pr-table th:nth-child(6) { width: 9%; }
+        .admin-dashboard-page .admin-pr-table th:nth-child(7) { width: 17%; text-align: center; }
+        .admin-dashboard-page .admin-pr-table td:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .admin-dashboard-page .admin-pr-table td:last-child { padding: 12px 14px; }
+        .admin-dashboard-page .admin-pr-actions {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 38px 38px;
+          gap: 8px;
+          align-items: stretch;
+          width: 100%;
+          max-width: 330px;
+          margin: 0 auto;
+        }
+        .admin-dashboard-page .admin-pr-actions > button {
+          min-width: 0;
+          min-height: 40px;
+          width: 100%;
+          margin: 0;
+          white-space: normal;
+          line-height: 1.15;
+        }
+        .admin-dashboard-page .admin-pr-actions > button[title*="RFQ"] {
+          grid-column: 1 / span 2;
+        }
+        .admin-dashboard-page .admin-pr-icon-button {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 38px !important;
+          min-width: 38px !important;
+          padding: 0 !important;
+          border-radius: 10px;
+          border: 1px solid #E7DED5;
+          background: #fff;
+          color: #7C1D2E;
+          transition: background-color .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+        }
+        .admin-dashboard-page .admin-pr-icon-button:hover { background: #FFF7F5; border-color: #D7BDB7; transform: translateY(-1px); }
+        .admin-dashboard-page .admin-pr-delete { color: #DC5A5A; border-color: #F1D8D8; }
+        .admin-dashboard-page .admin-pr-delete:hover { color: #B91C1C; background: #FFF1F1; border-color: #EAB4B4; }
+        .admin-dashboard-page .admin-logout::before,
+        .admin-dashboard-page .admin-logout::after,
+        .admin-dashboard-page button[title="Logout"]::before,
+        .admin-dashboard-page button[title="Logout"]::after,
+        .admin-dashboard-page button[aria-label="Logout"]::before,
+        .admin-dashboard-page button[aria-label="Logout"]::after { content: none !important; display: none !important; }
+        @media (max-width: 900px) {
+          .admin-dashboard-page .admin-pr-table { min-width: 1080px; }
+          .admin-dashboard-page .admin-pr-actions { max-width: 300px; gap: 6px; }
+          .admin-dashboard-page .admin-pr-actions > button { min-height: 38px; font-size: 11px; }
+        }
       `}</style>
     </div>
   );
