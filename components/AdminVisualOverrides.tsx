@@ -33,7 +33,7 @@ export default function AdminVisualOverrides() {
         visibility: visible !important;
       }
 
-      .admin-shell .admin-dashboard-page table .rfq-generate-btn {
+      .admin-shell .admin-dashboard-page table button[title^="Generate RFQ"] {
         min-width: 122px !important;
         min-height: 36px !important;
         padding: 0.55rem 0.8rem !important;
@@ -45,7 +45,7 @@ export default function AdminVisualOverrides() {
         letter-spacing: 0.01em !important;
       }
 
-      .admin-shell .admin-dashboard-page table .rfq-generate-btn:hover {
+      .admin-shell .admin-dashboard-page table button[title^="Generate RFQ"]:hover {
         background: linear-gradient(135deg, #5a1420, #4d0c0d) !important;
       }
     `}</style>
