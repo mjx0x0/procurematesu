@@ -18,19 +18,16 @@ export default function AppThemeShell({children}:{children:React.ReactNode}){
      .admin-shell button[title="Logout"]::after,
      .app-sidebar button::after{content:none!important;display:none!important}
 
-     /* Admin PR table: use a deliberate, fixed visual hierarchy instead of allowing
-        the action controls to squeeze into an uneven flex/grid layout. */
+     /* Purchase Requests table: stable column proportions and readable type. */
      .admin-shell .admin-pr-table{
        width:100%!important;
-       min-width:1180px!important;
+       min-width:1200px!important;
        table-layout:fixed!important;
        border-collapse:separate!important;
        border-spacing:0!important;
      }
      .admin-shell .admin-pr-table th,
-     .admin-shell .admin-pr-table td{
-       vertical-align:middle!important;
-     }
+     .admin-shell .admin-pr-table td{vertical-align:middle!important}
      .admin-shell .admin-pr-table thead th{
        padding-top:12px!important;
        padding-bottom:12px!important;
@@ -46,19 +43,19 @@ export default function AppThemeShell({children}:{children:React.ReactNode}){
        line-height:1.45!important;
      }
      .admin-shell .admin-pr-table th:nth-child(1),
-     .admin-shell .admin-pr-table td:nth-child(1){width:155px!important}
+     .admin-shell .admin-pr-table td:nth-child(1){width:135px!important}
      .admin-shell .admin-pr-table th:nth-child(2),
-     .admin-shell .admin-pr-table td:nth-child(2){width:290px!important}
+     .admin-shell .admin-pr-table td:nth-child(2){width:260px!important}
      .admin-shell .admin-pr-table th:nth-child(3),
-     .admin-shell .admin-pr-table td:nth-child(3){width:145px!important}
+     .admin-shell .admin-pr-table td:nth-child(3){width:125px!important}
      .admin-shell .admin-pr-table th:nth-child(4),
-     .admin-shell .admin-pr-table td:nth-child(4){width:125px!important}
+     .admin-shell .admin-pr-table td:nth-child(4){width:110px!important}
      .admin-shell .admin-pr-table th:nth-child(5),
-     .admin-shell .admin-pr-table td:nth-child(5){width:230px!important}
+     .admin-shell .admin-pr-table td:nth-child(5){width:220px!important}
      .admin-shell .admin-pr-table th:nth-child(6),
-     .admin-shell .admin-pr-table td:nth-child(6){width:120px!important}
+     .admin-shell .admin-pr-table td:nth-child(6){width:110px!important}
      .admin-shell .admin-pr-table th:nth-child(7),
-     .admin-shell .admin-pr-table td:nth-child(7){width:315px!important}
+     .admin-shell .admin-pr-table td:nth-child(7){width:240px!important}
 
      .admin-shell .admin-pr-table td:nth-child(1){font-size:13px!important;font-weight:800!important}
      .admin-shell .admin-pr-table td:nth-child(2){
@@ -71,21 +68,22 @@ export default function AppThemeShell({children}:{children:React.ReactNode}){
      .admin-shell .admin-pr-table td:nth-child(5) span{
        display:inline-flex!important;
        align-items:center!important;
+       justify-content:center!important;
        max-width:100%!important;
        min-height:30px!important;
-       padding:6px 10px!important;
+       padding:6px 9px!important;
        font-size:11px!important;
        line-height:1.25!important;
        white-space:normal!important;
        text-align:center!important;
      }
 
-     /* Four intentional action slots. RFQ gets the full top row; the remaining
-        controls form one clean row with equal visual weight. */
+     /* Four intentional action slots. RFQ uses the full first row; the remaining
+        controls stay in one aligned row with equal visual weight. */
      .admin-shell .admin-pr-actions{
        display:grid!important;
-       grid-template-columns:minmax(0,1.15fr) minmax(0,1.15fr) 42px 42px!important;
-       grid-auto-rows:minmax(40px,auto)!important;
+       grid-template-columns:minmax(0,1fr) minmax(0,1fr) 42px 42px!important;
+       grid-auto-rows:40px!important;
        gap:8px!important;
        width:100%!important;
        align-items:stretch!important;
@@ -96,7 +94,7 @@ export default function AppThemeShell({children}:{children:React.ReactNode}){
        min-height:40px!important;
        height:40px!important;
        margin:0!important;
-       padding:7px 9px!important;
+       padding:7px 8px!important;
        border-radius:10px!important;
        white-space:normal!important;
        line-height:1.15!important;
@@ -107,13 +105,11 @@ export default function AppThemeShell({children}:{children:React.ReactNode}){
      }
      .admin-shell .admin-pr-actions > button[title*="RFQ"]{
        grid-column:1 / -1!important;
-       height:42px!important;
-       min-height:42px!important;
+       height:40px!important;
+       min-height:40px!important;
        font-size:11.5px!important;
      }
-     .admin-shell .admin-pr-actions > button[title*="RFQ"] span{
-       white-space:nowrap!important;
-     }
+     .admin-shell .admin-pr-actions > button[title*="RFQ"] span{white-space:nowrap!important}
      .admin-shell .admin-pr-actions .admin-pr-icon-button{
        display:inline-flex!important;
        align-items:center!important;
@@ -140,19 +136,14 @@ export default function AppThemeShell({children}:{children:React.ReactNode}){
        border-color:#E8A9A9!important;
      }
 
-     /* Keep the table readable on narrower desktop windows while retaining the
-        horizontal scroll rather than crushing columns. */
+     /* Preserve readability rather than collapsing columns on smaller windows. */
      @media (max-width:1280px){
-       .admin-shell .admin-pr-table{min-width:1120px!important}
-       .admin-shell .admin-pr-table th:nth-child(2),
-       .admin-shell .admin-pr-table td:nth-child(2){width:250px!important}
-       .admin-shell .admin-pr-table th:nth-child(7),
-       .admin-shell .admin-pr-table td:nth-child(7){width:285px!important}
+       .admin-shell .admin-pr-table{min-width:1200px!important}
      }
      @media (max-width:760px){
-       .admin-shell .admin-pr-table{min-width:1080px!important}
+       .admin-shell .admin-pr-table{min-width:1200px!important}
        .admin-shell .admin-pr-table tbody td{font-size:12px!important}
-       .admin-shell .admin-pr-actions{grid-template-columns:minmax(0,1.1fr) minmax(0,1.1fr) 40px 40px!important;gap:7px!important}
+       .admin-shell .admin-pr-actions{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px 40px!important;gap:7px!important}
        .admin-shell .admin-pr-actions > button{font-size:10.5px!important}
      }
    `}</style>
