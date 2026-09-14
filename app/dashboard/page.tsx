@@ -37,7 +37,11 @@ export default function DashboardPage() {
     let cancelled = false;
     const loadDashboard = async () => {
       try {
-        const { data: { user: authUser } } = await supabase.auth.getUser();
+        let { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) {
+          const { data: { session } } = await supabase.auth.getSession();
+          authUser = session?.user || null;
+        }
         if (!authUser) {
           router.replace("/auth/login");
           return;
@@ -163,19 +167,57 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <div className="mt-4 grid gap-4 sm:mt-5 xl:grid-cols-[1fr_320px]">
+        <div className="mt-4 grid gap-4 sm:mt-5 xl:grid-cols-[1fr_340px]">
           <section className="overflow-hidden rounded-2xl border border-stone-200/80 bg-white shadow-[0_12px_34px_rgba(45,35,30,.045)]">
-            <div className="flex items-center justify-between gap-3 border-b border-stone-100 px-4 py-3.5 sm:px-5 sm:py-4"><div><h2 className="text-[12px] font-extrabold text-[#4D0C0D] sm:text-[13px]">Recent Purchase Requests</h2><p className="mt-0.5 text-[8px] text-stone-500 sm:text-[9px]">Select a request to view its procurement timeline.</p></div><span className="shrink-0 rounded-full bg-[#F8F2E8] px-2 py-1 text-[6px] font-bold uppercase tracking-[.1em] text-[#9A7205] sm:px-2.5 sm:text-[7px]">My requests</span></div>
+            <div className="flex items-center justify-between gap-3 border-b border-stone-100 px-5 py-4 sm:px-6 sm:py-4.5 bg-stone-50/50">
+              <div>
+                <h2 className="text-base sm:text-lg font-extrabold text-[#4D0C0D]">Recent Purchase Requests</h2>
+                <p className="mt-0.5 text-xs sm:text-sm text-stone-500">Select a request to view its procurement timeline and status.</p>
+              </div>
+              <span className="shrink-0 rounded-full bg-[#F8F2E8] border border-[#E9D9AE] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#9A7205]">
+                My requests ({recent.length})
+              </span>
+            </div>
             {recent.length === 0 ? (
-              <div className="p-9 text-center"><ClipboardList className="mx-auto h-8 w-8 text-stone-300" /><h3 className="mt-3 text-[11px] font-bold text-stone-800">No purchase requests yet</h3><p className="mx-auto mt-1 max-w-sm text-[9px] leading-5 text-stone-500">Create your first request to begin tracking it through the university procurement process.</p></div>
+              <div className="p-10 text-center">
+                <ClipboardList className="mx-auto h-10 w-10 text-stone-300" />
+                <h3 className="mt-3 text-sm font-bold text-stone-800">No purchase requests yet</h3>
+                <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-stone-500">Create your first request to begin tracking it through the university procurement process.</p>
+              </div>
             ) : (
               <div className="divide-y divide-stone-100">
                 {recent.map((pr) => (
-                  <Link key={pr.pr_no} href={`/dashboard/pr/${pr.pr_no}`} className="group flex min-w-0 items-center gap-2.5 px-4 py-3.5 transition hover:bg-[#FFFBF7] sm:gap-3 sm:px-5 sm:py-4">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FFF3E8] text-[#7A1315] sm:h-9 sm:w-9 sm:rounded-xl"><FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></div>
-                    <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-1.5"><span className="text-[9px] font-extrabold text-[#7A1315] sm:text-[10px]">{pr.pr_no}</span><span className="text-[7px] text-stone-400 sm:text-[8px]">{new Date(pr.created_at).toLocaleDateString()}</span></div><p className="mt-0.5 truncate text-[9px] font-semibold text-stone-700 sm:text-[10px]">{pr.purpose || "Official procurement request"}</p><p className="mt-0.5 truncate text-[7px] text-stone-400 sm:text-[8px]">{pr.department || "University Office"}</p></div>
-                    <div className="hidden shrink-0 text-right sm:block"><p className="text-[10px] font-extrabold text-stone-800">₱{Number(pr.total || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</p><span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[7px] font-bold ${statusColor(pr.current_stage)}`}>{stageNumber(pr.current_stage) ? `Step ${stageNumber(pr.current_stage)} · ` : ""}{statusLabel(pr.current_stage)}</span></div>
-                    <Eye className="h-3.5 w-3.5 shrink-0 text-stone-300 transition group-hover:text-[#7A1315] sm:h-4 sm:w-4" />
+                  <Link
+                    key={pr.pr_no}
+                    href={`/dashboard/pr/${pr.pr_no}`}
+                    className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 transition hover:bg-[#FFFBF7]"
+                  >
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FFF3E8] text-[#7A1315] border border-[#F5D8C4] shadow-xs">
+                        <FileText className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-mono text-sm font-extrabold text-[#7A1315]">{pr.pr_no}</span>
+                          <span className="text-xs text-stone-400 font-medium">· {new Date(pr.created_at).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}</span>
+                        </div>
+                        <p className="mt-1 truncate text-sm font-semibold text-stone-800">{pr.purpose || "Official procurement request"}</p>
+                        <p className="mt-0.5 text-xs text-stone-500 font-medium">{pr.department || "University Office"}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 pt-2 sm:pt-0 border-t border-stone-100 sm:border-0">
+                      <div className="text-left sm:text-right">
+                        <p className="text-sm font-extrabold text-stone-900">₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <span className={`mt-1 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${statusColor(pr.current_stage)}`}>
+                          {stageNumber(pr.current_stage) ? `Step ${stageNumber(pr.current_stage)} · ` : ""}{statusLabel(pr.current_stage)}
+                        </span>
+                      </div>
+                      <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs font-bold text-[#7A1315] shadow-xs group-hover:bg-[#7A1315] group-hover:text-white group-hover:border-[#7A1315] transition-all shrink-0">
+                        <Eye className="h-4 w-4" />
+                        <span>Track PR</span>
+                      </div>
+                    </div>
                   </Link>
                 ))}
               </div>
@@ -183,8 +225,41 @@ export default function DashboardPage() {
           </section>
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-            <section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#5D090B] to-[#7A1315] p-4 text-white shadow-[0_16px_38px_rgba(77,12,13,.09)] sm:p-5"><div className="relative flex items-center gap-2.5"><div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#F0C83F]/30 bg-[#F0C83F]/10 text-[#F0C83F]"><Bot className="h-4 w-4" /></div><div><p className="text-[7px] font-black uppercase tracking-[.15em] text-[#F0D56A]">Procurement Advisor</p><h3 className="mt-0.5 text-[13px] font-extrabold">Gab AI</h3></div></div><p className="mt-3 text-[8px] leading-5 text-white/70 sm:text-[9px]">Need help with RA 12009, PR preparation, procurement stages, or SVP? Gab can guide you through the process.</p><Link href="/dashboard/chatbot" className="mt-3 flex items-center justify-between rounded-xl border border-white/15 bg-white/[0.08] px-3 py-2.5 text-[8px] font-bold text-[#F5D766] sm:mt-4 sm:text-[9px]">Open Gab AI<ArrowUpRight className="h-3.5 w-3.5" /></Link></section>
-            <section className="rounded-2xl border border-stone-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(45,35,30,.04)] sm:p-5"><div className="flex items-center gap-2"><LayoutDashboard className="h-4 w-4 text-[#B88E13]" /><h3 className="text-[11px] font-extrabold text-[#4D0C0D] sm:text-[12px]">Current activity</h3></div>{activeRequest ? <div className="mt-3 rounded-xl border border-[#E9D9AE] bg-[#FFFDF6] p-3"><p className="text-[7px] font-black uppercase tracking-[.14em] text-[#A07A13]">Active request</p><p className="mt-1 text-[9px] font-extrabold text-[#7A1315]">{activeRequest.pr_no}</p><p className="mt-1 truncate text-[8px] text-stone-500">{statusLabel(activeRequest.current_stage)}</p><Link href={`/dashboard/pr/${activeRequest.pr_no}`} className="mt-2 inline-flex items-center gap-1 text-[8px] font-bold text-[#7A1315]">Continue tracking<ArrowRight className="h-3 w-3" /></Link></div> : <p className="mt-3 text-[8px] leading-5 text-stone-500">You have no active procurement requests. Start a new request whenever you are ready.</p>}</section>
+            <section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#5D090B] to-[#7A1315] p-5 text-white shadow-[0_16px_38px_rgba(77,12,13,.09)]">
+              <div className="relative flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#F0C83F]/30 bg-[#F0C83F]/10 text-[#F0C83F]">
+                  <Bot className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[.15em] text-[#F0D56A]">Procurement Advisor</p>
+                  <h3 className="mt-0.5 text-base font-extrabold">Gab AI</h3>
+                </div>
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-white/80">Need help with RA 12009, PR preparation, procurement stages, or SVP? Gab can guide you through the process.</p>
+              <Link href="/dashboard/chatbot" className="mt-4 flex items-center justify-between rounded-xl border border-white/20 bg-white/[0.1] px-4 py-2.5 text-xs font-bold text-[#F5D766] hover:bg-white/[0.16] transition-colors">
+                <span>Open Gab AI</span>
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </section>
+            <section className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-[0_10px_28px_rgba(45,35,30,.04)]">
+              <div className="flex items-center gap-2.5">
+                <LayoutDashboard className="h-4 w-4 text-[#B88E13]" />
+                <h3 className="text-sm font-extrabold text-[#4D0C0D]">Current activity</h3>
+              </div>
+              {activeRequest ? (
+                <div className="mt-3 rounded-xl border border-[#E9D9AE] bg-[#FFFDF6] p-3.5">
+                  <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#A07A13]">Active request</p>
+                  <p className="mt-1 font-mono text-sm font-extrabold text-[#7A1315]">{activeRequest.pr_no}</p>
+                  <p className="mt-1 truncate text-xs text-stone-600 font-medium">{statusLabel(activeRequest.current_stage)}</p>
+                  <Link href={`/dashboard/pr/${activeRequest.pr_no}`} className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold text-[#7A1315] hover:text-[#5A1420]">
+                    <span>Continue tracking</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              ) : (
+                <p className="mt-3 text-xs leading-relaxed text-stone-500">You have no active procurement requests. Start a new request whenever you are ready.</p>
+              )}
+            </section>
           </div>
         </div>
 

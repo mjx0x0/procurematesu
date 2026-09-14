@@ -86,17 +86,22 @@ export default function PRDownloadButton({ pr, items = [] }: { pr: PRData; items
 
   return (
     <div className="relative">
-      <button type="button" onClick={handleDownload} disabled={downloading} className="bg-gradient-to-r from-[#7A1315] to-[#8B1518] hover:from-[#630E10] hover:to-[#7A1315] text-white px-4 py-2 rounded-xl hover:shadow-lg transition-all hover:scale-105 flex items-center gap-2 text-sm font-semibold border border-amber-400/30 disabled:opacity-60 disabled:hover:scale-100 cursor-pointer">
+      <button
+        type="button"
+        onClick={handleDownload}
+        disabled={downloading}
+        className="ui-button ui-button-primary text-xs sm:text-sm shadow-xs"
+      >
         {downloading ? <Loader2 className="h-4 w-4 animate-spin text-amber-300" /> : <FileDown className="h-4 w-4 text-amber-300" />}
-        {downloading ? "Generating PR..." : "Download PR Form"}
+        <span>{downloading ? "Generating PR..." : "Download PR Form"}</span>
       </button>
       {downloadError && (
-        <div className="absolute right-0 top-full mt-1 w-64 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg p-2.5 z-20 shadow-md">
+        <div className="absolute right-0 top-full mt-2 w-72 text-xs text-red-800 bg-red-50 border border-red-200 rounded-xl p-3 z-30 shadow-md">
           <p className="font-semibold mb-1">{downloadError}</p>
           <button 
             type="button" 
             onClick={() => window.print()} 
-            className="text-[#7A1315] underline font-medium hover:text-[#4D0C0D]"
+            className="text-[#7A1315] underline font-bold hover:text-[#4D0C0D]"
           >
             Or use Print to save as PDF
           </button>

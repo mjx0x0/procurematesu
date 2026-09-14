@@ -56,43 +56,135 @@ export default function AdminRFQPage() {
   }), [prs, search, filter]);
 
   return (
-    <div className="min-h-screen bg-[#F9F7F4] text-gray-800">
-      <nav className="bg-white/95 border-b border-stone-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-[#FDFBF7] text-gray-800">
+      <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-40 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="p-2 rounded-lg text-stone-500 hover:text-[#7C1D2E] hover:bg-stone-50" title="Back to Admin Dashboard"><ArrowLeft className="h-5 w-5" /></Link>
-            <div className="bg-[#7C1D2E] p-2 rounded-xl text-[#D4A843]"><FileCheck2 className="h-5 w-5" /></div>
-            <div><b className="text-xl text-[#5A1420]">RFQ Workspace</b><p className="text-[11px] text-stone-500">Official MSU-Gensan RFQ generation, evaluation, and printing</p></div>
+            <Link
+              href="/admin"
+              className="p-2 rounded-xl text-stone-500 hover:text-[#7A1315] hover:bg-stone-100 transition-colors"
+              title="Back to Admin Dashboard"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+            <div className="bg-[#4D0C0D] p-2 rounded-xl text-amber-300 shadow-sm">
+              <FileCheck2 className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <b className="text-xl font-black text-[#4D0C0D]">
+                  RFQ <span className="text-[#B88E13]">Workspace</span>
+                </b>
+                <span className="text-[11px] bg-red-50 text-[#7A1315] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                  Admin Tool
+                </span>
+              </div>
+              <p className="text-[10px] text-stone-500">Official MSU-GenSan RFQ generation, evaluation, and printing</p>
+            </div>
           </div>
+          <Link
+            href="/admin"
+            className="text-xs font-bold text-stone-600 hover:text-[#7A1315] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
+          </Link>
         </div>
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-7">
-        <div className="mb-6"><h1 className="text-3xl font-extrabold text-[#5A1420]">Requests for Quotation</h1><p className="text-stone-600 mt-1">Step 7: complete the RFQ → Step 8: review/evaluate the RFQ → Step 9: print the RFQ.</p></div>
+        <div className="mb-6">
+          <h1 className="text-3xl font-black tracking-tight text-[#4D0C0D]">Requests for Quotation (RFQ)</h1>
+          <p className="text-sm text-stone-600 mt-1">
+            Official PMO Sequence: <b>Step 7</b> (Generate RFQ) → <b>Step 8</b> (Evaluate Quotations) → <b>Step 9</b> (Print RFQ).
+          </p>
+        </div>
 
-        <div className="bg-white rounded-xl border border-stone-200 p-4 mb-5 flex flex-col lg:flex-row gap-3">
-          <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search PR number, purpose, or department" className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-stone-200 bg-white text-gray-900 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-[#7C1D2E]/20 focus:border-[#7C1D2E]" /></div>
-          <select value={filter} onChange={(e) => setFilter(e.target.value)} className="px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-gray-900">
-            <option value="all">All RFQ stages</option><option value="rfq_generation">Step 7 — RFQ Generation</option><option value="rfq_evaluation">Step 8 — RFQ Evaluation</option><option value="rfq_printing">Step 9 — RFQ/SVP Printing</option>
+        <div className="ui-card p-4 mb-5 flex flex-col lg:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by PR number, purpose, or department..."
+              className="ui-input w-full pl-10 pr-4 py-2.5 text-sm"
+            />
+          </div>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="ui-select px-3 py-2.5 text-sm min-w-[220px]"
+          >
+            <option value="all">All RFQ Stages</option>
+            <option value="rfq_generation">Step 7 — RFQ Generation</option>
+            <option value="rfq_evaluation">Step 8 — RFQ Evaluation</option>
+            <option value="rfq_printing">Step 9 — RFQ/SVP Printing</option>
           </select>
         </div>
 
-        <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
-          {loading ? <div className="p-12 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-[#7C1D2E]" /></div> : filtered.length === 0 ? <div className="p-12 text-center text-stone-500">No Purchase Requests are currently in the RFQ stages.</div> : (
-            <div className="overflow-x-auto"><table className="w-full"><thead className="bg-stone-50"><tr>{["PR #", "Purpose", "Department", "ABC", "Current Stage", "Action"].map((header) => <th key={header} className="px-5 py-3 text-left text-xs uppercase tracking-wide text-stone-500 font-semibold">{header}</th>)}</tr></thead>
-              <tbody className="divide-y divide-stone-100">{filtered.map((pr) => (
-                <tr key={pr.pr_no} className="hover:bg-stone-50/70">
-                  <td className="px-5 py-4 text-sm font-bold text-[#7C1D2E] whitespace-nowrap">{pr.pr_no}</td>
-                  <td className="px-5 py-4 text-sm max-w-md">{pr.purpose}</td>
-                  <td className="px-5 py-4 text-sm text-stone-600">{pr.department}</td>
-                  <td className="px-5 py-4 text-sm font-medium whitespace-nowrap">₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                  <td className="px-5 py-4 text-sm"><span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${pr.current_stage === "rfq_generation" ? "bg-amber-50 text-amber-800 border-amber-200" : pr.current_stage === "rfq_evaluation" ? "bg-blue-50 text-blue-800 border-blue-200" : "bg-green-50 text-green-800 border-green-200"}`}>{stageLabel(pr.current_stage)}</span></td>
-                  <td className="px-5 py-4 whitespace-nowrap">
-                    {pr.current_stage === "rfq_generation" ? <RFQActionButton prNo={pr.pr_no} mode="generate" /> : pr.current_stage === "rfq_evaluation" ? <RFQActionButton prNo={pr.pr_no} mode="review" /> : <RFQActionButton prNo={pr.pr_no} mode="print" />}
-                  </td>
-                </tr>
-              ))}</tbody>
-            </table></div>
+        <div className="ui-card overflow-hidden">
+          {loading ? (
+            <div className="p-12 flex justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-[#7A1315]" />
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="p-12 text-center text-stone-500">
+              <FileCheck2 className="h-10 w-10 mx-auto text-stone-300 mb-2" />
+              <p className="font-semibold">No Purchase Requests are currently in the RFQ stages.</p>
+              <p className="text-xs text-stone-400 mt-1">Purchase Requests at Steps 7, 8, and 9 will automatically appear here.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-stone-50 border-b border-stone-200">
+                  <tr>
+                    {["PR Number", "Purpose / Project", "Department", "Approved Budget (ABC)", "Current Stage", "Action"].map(
+                      (header) => (
+                        <th
+                          key={header}
+                          className="px-5 py-3.5 text-left text-[11px] uppercase tracking-wider text-stone-500 font-bold"
+                        >
+                          {header}
+                        </th>
+                      )
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {filtered.map((pr) => (
+                    <tr key={pr.pr_no} className="hover:bg-amber-50/20 transition-colors">
+                      <td className="px-5 py-4 text-sm font-bold text-[#7A1315] whitespace-nowrap">{pr.pr_no}</td>
+                      <td className="px-5 py-4 text-sm max-w-md font-medium text-stone-900">{pr.purpose}</td>
+                      <td className="px-5 py-4 text-sm text-stone-600 whitespace-nowrap">{pr.department}</td>
+                      <td className="px-5 py-4 text-sm font-bold text-stone-800 whitespace-nowrap">
+                        ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="px-5 py-4 text-sm">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-bold border inline-block whitespace-nowrap ${
+                            pr.current_stage === "rfq_generation"
+                              ? "bg-amber-50 text-amber-800 border-amber-200"
+                              : pr.current_stage === "rfq_evaluation"
+                              ? "bg-blue-50 text-blue-800 border-blue-200"
+                              : "bg-emerald-50 text-emerald-800 border-emerald-200"
+                          }`}
+                        >
+                          {stageLabel(pr.current_stage)}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        {pr.current_stage === "rfq_generation" ? (
+                          <RFQActionButton prNo={pr.pr_no} mode="generate" />
+                        ) : pr.current_stage === "rfq_evaluation" ? (
+                          <RFQActionButton prNo={pr.pr_no} mode="review" />
+                        ) : (
+                          <RFQActionButton prNo={pr.pr_no} mode="print" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </main>

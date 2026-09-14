@@ -70,7 +70,11 @@ export default function PRDetailPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        let { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          const { data: { session } } = await supabase.auth.getSession();
+          user = session?.user || null;
+        }
         if (!user) { router.push("/auth/login"); return; }
         const { data: prData, error: prError } = await supabase.from("purchase_requests").select("*").eq("pr_no", prNo).single();
         if (prError || !prData) { setError("Purchase request not found"); return; }
@@ -162,19 +166,62 @@ export default function PRDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <nav className="bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center"><div className="flex items-center gap-2"><div className="bg-[#7A1315] p-2 rounded-xl text-amber-200 border border-amber-400/30"><FileText className="h-5 w-5" /></div><span className="font-bold text-xl text-[#4D0C0D]">ProcuremateSU</span></div><Link href="/dashboard" className="text-stone-600 hover:text-[#7A1315] flex items-center gap-2 text-sm font-medium"><ArrowLeft className="h-4 w-4" />Back to Dashboard</Link></div>
+      <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 px-4 py-3 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="bg-[#7A1315] p-2 rounded-xl text-amber-200 border border-amber-400/30 shadow-xs">
+              <FileText className="h-5 w-5" />
+            </div>
+            <div>
+              <span className="font-extrabold text-xl text-[#4D0C0D] tracking-tight">
+                Procuremate<span className="text-[#B88E13]">SU</span>
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-50 text-[#7A1315] border border-amber-200/80 ml-2">
+                MSU-GenSan
+              </span>
+            </div>
+          </div>
+          <Link
+            href="/dashboard"
+            className="ui-button ui-button-secondary ui-button-sm text-xs font-semibold"
+          >
+            <ArrowLeft className="h-4 w-4 text-[#7A1315]" />
+            <span>Back to Dashboard</span>
+          </Link>
+        </div>
       </nav>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div><h1 className="text-2xl font-extrabold text-[#4D0C0D]">{pr.pr_no}</h1><div className="flex items-center gap-3 mt-1"><span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClass(pr.current_stage)}`}>{statusLabel(pr.current_stage)}</span><span className="text-sm text-stone-500">{new Date(pr.created_at).toLocaleString()}</span></div></div>
-          <div className="flex gap-2 flex-wrap"><PRDownloadButton pr={pr} items={items} /><button onClick={() => window.print()} className="bg-stone-100 border border-stone-200 text-stone-700 px-4 py-2 rounded-xl hover:bg-stone-200 text-sm font-medium print:hidden">Print</button></div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-stone-200">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-black text-[#4D0C0D] font-mono tracking-tight">
+                {pr.pr_no}
+              </h1>
+              <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClass(pr.current_stage)}`}>
+                {statusLabel(pr.current_stage)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 mt-1 text-xs text-stone-500 font-medium">
+              <span>Department: <strong className="text-stone-800">{pr.department}</strong></span>
+              <span>•</span>
+              <span>Created on {new Date(pr.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+            </div>
+          </div>
+          <div className="flex gap-2.5 flex-wrap items-center">
+            <PRDownloadButton pr={pr} items={items} />
+            <button
+              onClick={() => window.print()}
+              className="ui-button ui-button-secondary text-xs sm:text-sm font-semibold print:hidden"
+            >
+              Print
+            </button>
+          </div>
         </div>
 
-        {error && <div className="mb-5 bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-sm">{error}</div>}
+        {error && <div className="mb-5 bg-red-50 border border-red-200 text-red-700 p-3.5 rounded-xl text-xs font-medium">{error}</div>}
 
-        <section className="bg-white rounded-xl shadow-sm border border-stone-300 p-4 sm:p-8 overflow-x-auto print:p-0 print:border-0 print:shadow-none">
+        <section className="bg-white rounded-2xl shadow-xs border border-stone-300 p-4 sm:p-8 overflow-x-auto print:p-0 print:border-0 print:shadow-none">
           <div className="min-w-[700px] border-2 border-black text-black bg-white">
             <div className="border-b-2 border-black text-center py-3 px-4 relative"><div className="absolute left-4 top-1/2 -translate-y-1/2 hidden sm:block"><MsuLogo size={42} /></div><h2 className="text-xl font-black uppercase tracking-wider font-serif">PURCHASE REQUEST</h2><p className="text-sm font-bold mt-0.5 tracking-wide font-serif">MINDANAO STATE UNIVERSITY - General Santos City</p></div>
             <div className="grid grid-cols-12 border-b-2 border-black text-xs">

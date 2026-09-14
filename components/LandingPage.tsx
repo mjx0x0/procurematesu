@@ -29,25 +29,310 @@ export default function LandingPage() {
   }, [category, query]);
 
   return (
-    <div className="min-h-screen bg-[#F4F5F7] font-sans antialiased text-[#25201D]">
+    <div className="min-h-screen bg-[#F8F6F2] font-sans antialiased text-[#25201D]">
+      {/* Hero Section */}
       <section id="home" className="relative min-h-screen overflow-hidden bg-[#560608] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_42%,rgba(184,142,19,.24),transparent_29%),radial-gradient(circle_at_88%_8%,rgba(122,19,21,.68),transparent_36%),linear-gradient(120deg,#6D1207_0%,#650709_42%,#4A0507_100%)]" />
-        <div className="absolute -left-32 top-1/3 h-80 w-80 rounded-full bg-[#C99516]/15 blur-3xl" />
-        <div className="absolute -right-32 -bottom-32 h-[30rem] w-[30rem] rounded-full bg-[#8F1518]/25 blur-3xl" />
-        <header className="relative z-20 mx-auto flex w-full max-w-[980px] items-center justify-between gap-6 px-5 py-5 sm:px-7 lg:py-6">
-          <Link href="#home" className="flex min-w-0 items-center gap-3"><MsuLogo size={34} /><div className="min-w-0 leading-none"><div className="text-[12px] font-semibold tracking-[-.01em] sm:text-[13px]">MSU GenSan <span className="text-[#F0C83F]">Procurement System</span></div><div className="mt-1 text-[7px] font-medium uppercase tracking-[.12em] text-white/55 sm:text-[8px]">Digital Procurement Management System</div></div></Link>
-          <nav className="hidden items-center gap-7 text-[11px] font-medium text-white/80 md:flex"><Link href="#home" className="hover:text-[#F0C83F]">Home</Link><Link href="#about" className="hover:text-[#F0C83F]">About</Link><Link href="#transparency" className="hover:text-[#F0C83F]">Transparency Board</Link><Link href="#about" className="inline-flex items-center gap-1.5 rounded-full border border-white/25 px-4 py-2 text-[10px] font-semibold hover:border-[#F0C83F]/60 hover:text-[#F0C83F]"><Sparkles className="h-3 w-3 text-[#F0C83F]" /> Learn More</Link></nav>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_40%,rgba(212,175,55,0.22),transparent_32%),radial-gradient(circle_at_85%_15%,rgba(122,19,21,0.65),transparent_40%),linear-gradient(135deg,#5A080A_0%,#4A0507_50%,#350405_100%)]" />
+        <div className="absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-[#D4AF37]/15 blur-3xl pointer-events-none" />
+        <div className="absolute -right-32 -bottom-32 h-[32rem] w-[32rem] rounded-full bg-[#8F1518]/25 blur-3xl pointer-events-none" />
+
+        <header className="relative z-20 mx-auto flex w-full max-w-[1200px] items-center justify-between gap-6 px-6 py-6 sm:px-8">
+          <Link href="#home" className="flex min-w-0 items-center gap-3.5 group">
+            <MsuLogo size={42} />
+            <div className="min-w-0 leading-tight">
+              <div className="text-sm font-extrabold tracking-tight sm:text-base text-white group-hover:text-[#F0C83F] transition-colors">
+                MSU GenSan <span className="text-[#F0C83F]">Procurement</span>
+              </div>
+              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-200/70">
+                Digital Procurement Management System
+              </div>
+            </div>
+          </Link>
+
+          <nav className="hidden items-center gap-8 text-xs font-bold text-white/85 md:flex">
+            <Link href="#home" className="hover:text-[#F0C83F] transition-colors">Home</Link>
+            <Link href="#about" className="hover:text-[#F0C83F] transition-colors">About</Link>
+            <Link href="#transparency" className="hover:text-[#F0C83F] transition-colors">Transparency Board</Link>
+            <Link
+              href="#about"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/5 px-4 py-2 text-xs font-bold text-white hover:border-[#F0C83F] hover:bg-[#F0C83F]/10 hover:text-[#F0C83F] transition-all shadow-xs"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-[#F0C83F]" /> Learn More
+            </Link>
+          </nav>
         </header>
-        <div className="relative z-10 mx-auto grid min-h-[calc(100vh-76px)] w-full max-w-[980px] items-center gap-8 px-5 pb-16 pt-5 sm:px-7 lg:grid-cols-[1.12fr_.78fr] lg:gap-14 lg:pt-0">
-          <div className="text-center lg:text-left"><div className="inline-flex items-center gap-2 rounded-full border border-[#F0C83F]/35 bg-[#F0C83F]/10 px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] text-[#F5D766]"><ShieldCheck className="h-3.5 w-3.5" /> Institutional Procurement Portal</div><div className="mt-7 flex justify-center lg:justify-start"><div className="relative rounded-2xl border border-[#F0C83F]/20 bg-white/[.045] p-3 shadow-[0_22px_60px_rgba(0,0,0,.25)]"><div className="absolute -inset-2 rounded-3xl bg-[#D4AF37]/10 blur-xl" /><div className="relative"><MsuLogo size={68} /></div></div></div><h1 className="mt-7 text-[40px] font-semibold leading-[.98] tracking-[-.045em] sm:text-[52px] lg:text-[58px]">MSU GenSan<span className="block mt-1 text-[#F0C83F]">Procurement</span><span className="block text-white">Management System</span></h1><p className="mx-auto mt-5 max-w-[580px] text-[13px] leading-6 text-white/65 sm:text-[14px] lg:mx-0">MSU Gensan Procurement System brings Purchase Request preparation, procurement tracking, digital records, transparency information, and Gab AI assistance into one institutional workspace.</p><div className="mt-7 flex flex-wrap justify-center gap-2.5 lg:justify-start"><Link href="#about" className="inline-flex items-center gap-2 rounded-xl border border-white/25 px-5 py-2.5 text-[11px] font-semibold hover:border-[#F0C83F]/60 hover:bg-white/[.06]"><Sparkles className="h-3.5 w-3.5 text-[#F0C83F]" /> Learn More</Link><Link href="#transparency" className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-[11px] font-semibold text-[#F0C83F] hover:text-white">View Transparency <ArrowRight className="h-3.5 w-3.5" /></Link></div><div className="mt-7 grid max-w-[600px] grid-cols-3 border-t border-white/15 pt-5 text-left"><div><div className="text-[20px] font-semibold text-[#F0C83F]">20</div><div className="text-[9px] text-white/55">Procurement Stages</div></div><div className="border-l border-white/10 pl-4"><div className="text-[20px] font-semibold text-[#F0C83F]">67</div><div className="text-[9px] text-white/55">Public Listings</div></div><div className="border-l border-white/10 pl-4"><div className="text-[20px] font-semibold text-[#F0C83F]">AI</div><div className="text-[9px] text-white/55">Gab AI Assistance</div></div></div></div>
-          <div className="w-full max-w-[350px] justify-self-center lg:justify-self-end"><div className="relative"><div className="absolute -inset-3 rounded-[26px] bg-[#D4AF37]/10 blur-2xl" /><div className="relative scale-[.94] origin-center"><LandingLoginCard /></div></div><div className="mx-auto mt-1 flex max-w-[330px] items-start gap-2 rounded-xl border border-[#F0C83F]/15 bg-black/15 px-3.5 py-2.5"><ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#F0C83F]" /><p className="text-[9px] leading-4 text-white/50"><span className="font-semibold text-white/75">Institutional access.</span> Use your official <span className="font-semibold text-white/70">@msugensan.edu.ph</span> account. New registrations require administrator approval.</p></div></div>
-        </div><Link href="#about" aria-label="Scroll to About" className="absolute bottom-5 left-1/2 z-20 -translate-x-1/2 text-[#F0C83F]/75 hover:text-[#F0C83F]"><ChevronDown className="h-5 w-5 animate-bounce" /></Link>
+
+        <div className="relative z-10 mx-auto grid min-h-[calc(100vh-88px)] w-full max-w-[1200px] items-center gap-10 px-6 pb-20 pt-4 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:pt-0">
+          <div className="text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#F0C83F]/40 bg-[#F0C83F]/15 px-4 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-[#F5D766]">
+              <ShieldCheck className="h-4 w-4 text-[#F0C83F]" /> Official University Procurement Portal
+            </div>
+
+            <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl text-white">
+              MSU GenSan
+              <span className="block mt-1 text-[#F0C83F]">Procurement</span>
+              <span className="block text-white/95">Management System</span>
+            </h1>
+
+            <p className="mx-auto mt-5 max-w-[580px] text-sm leading-relaxed text-white/80 sm:text-base lg:mx-0">
+              A refined digital workspace bringing Purchase Request preparation, standardized workflow tracking, public transparency records, and Gab AI procurement guidance into one institutional system.
+            </p>
+
+            <div className="mt-8 flex flex-wrap justify-center gap-3.5 lg:justify-start">
+              <Link
+                href="#about"
+                className="inline-flex items-center gap-2 rounded-xl border border-[#F0C83F]/60 bg-gradient-to-r from-[#F0C83F] to-[#D4A82C] px-6 py-3 text-sm font-extrabold text-[#4D0C0D] shadow-[0_8px_20px_rgba(0,0,0,0.2)] hover:brightness-105 transition-all"
+              >
+                <Sparkles className="h-4 w-4" /> Explore System
+              </Link>
+              <Link
+                href="#transparency"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-6 py-3 text-sm font-bold text-white hover:bg-white/15 hover:border-white/40 transition-all"
+              >
+                Public Transparency <ArrowRight className="h-4 w-4 text-[#F0C83F]" />
+              </Link>
+            </div>
+
+            <div className="mt-10 grid max-w-[520px] grid-cols-3 border-t border-white/15 pt-6 text-left">
+              <div>
+                <div className="text-3xl font-extrabold text-[#F0C83F]">20</div>
+                <div className="mt-1 text-xs font-semibold text-white/70">Procurement Stages</div>
+              </div>
+              <div className="border-l border-white/15 pl-5">
+                <div className="text-3xl font-extrabold text-[#F0C83F]">67</div>
+                <div className="mt-1 text-xs font-semibold text-white/70">Public Listings</div>
+              </div>
+              <div className="border-l border-white/15 pl-5">
+                <div className="text-3xl font-extrabold text-[#F0C83F]">Gab AI</div>
+                <div className="mt-1 text-xs font-semibold text-white/70">Assistant & Support</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full max-w-[420px] justify-self-center lg:justify-self-end">
+            <div className="relative">
+              <div className="absolute -inset-4 rounded-3xl bg-[#D4AF37]/15 blur-2xl" />
+              <div className="relative">
+                <LandingLoginCard />
+              </div>
+            </div>
+            <div className="mx-auto mt-4 flex items-start gap-3 rounded-xl border border-[#F0C83F]/20 bg-black/20 px-4 py-3 text-white/75 backdrop-blur-xs">
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#F0C83F]" />
+              <p className="text-xs leading-relaxed">
+                <strong className="text-white">Institutional Access Only.</strong> Sign in with your verified{" "}
+                <span className="text-[#F0C83F]">@msugensan.edu.ph</span> account. All new registrations undergo official administrator verification.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <Link
+          href="#about"
+          aria-label="Scroll to About"
+          className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 text-[#F0C83F]/80 hover:text-[#F0C83F] transition-colors p-2"
+        >
+          <ChevronDown className="h-6 w-6 animate-bounce" />
+        </Link>
       </section>
 
-      <section id="about" className="scroll-mt-4 border-b border-[#D9DDE2] bg-white"><div className="mx-auto w-full max-w-[900px] px-5 py-16 sm:px-7 sm:py-20"><div className="text-center"><span className="inline-flex rounded-full border border-[#E8B923]/60 bg-[#FFF9E8] px-3 py-1 text-[8px] font-bold uppercase tracking-[.12em] text-[#A87500]">Institutional Procurement Support</span><h2 className="mt-3 text-[24px] font-semibold tracking-[-.035em] text-[#5A090B] sm:text-[28px]">The Procurement Management System</h2><div className="mx-auto mt-2 h-px w-10 bg-[#C99618]" /></div><div className="mt-10 grid items-center gap-10 md:grid-cols-2 md:gap-14"><div className="text-[12px] leading-6 text-[#5F6670]"><p>The <span className="font-semibold text-[#5A090B]">MSU Gensan Procurement System</span> supports the procurement activities of Mindanao State University - General Santos through a centralized digital workspace for Purchase Requests, workflow monitoring, records, and procurement inquiries.</p><p className="mt-4">The system follows the university's standardized <span className="font-semibold text-[#5A090B]">20-stage procurement workflow</span>, helping authorized users see where a request currently stands and review recorded stage history.</p><p className="mt-4">It also provides <span className="font-semibold text-[#5A090B]">Gab AI</span> while keeping procurement decisions and official actions with the appropriate university offices and authorized personnel.</p><div className="mt-5 flex flex-wrap gap-2">{["Digital Records","Workflow Tracking","Transparency","Gab AI"].map((x)=><span key={x} className="inline-flex items-center gap-1.5 rounded-full border border-[#E8B923]/55 bg-[#FFFDF5] px-2.5 py-1 text-[9px] font-semibold text-[#7B5A08]"><CheckCircle2 className="h-3 w-3" />{x}</span>)}</div></div><div className="grid grid-cols-2 gap-3">{[["20","Procurement stages","Standardized workflow tracking"],["67","Public listings","Transparency information"],["2","Access roles","Admin and end-user workspaces"],["1","AI assistant","Gab procurement support"]].map(([v,l,d])=><div key={l} className="relative min-h-[112px] overflow-hidden rounded-xl bg-gradient-to-br from-[#690B0D] to-[#8C1115] p-4 text-white shadow-[0_8px_22px_rgba(86,6,8,.12)]"><div className="absolute -right-5 -bottom-7 h-16 w-16 rounded-full bg-[#D4AF37]/15" /><div className="relative text-[20px] font-semibold text-[#F3CB46]">{v}</div><div className="relative mt-1 text-[10px] font-semibold">{l}</div><div className="relative mt-1 text-[8px] leading-4 text-white/55">{d}</div></div>)}</div></div></div></section>
-      <section className="border-b border-[#D9DDE2] bg-[#F4F5F7]"><div className="mx-auto w-full max-w-[900px] px-5 py-14 sm:px-7 sm:py-16"><div className="text-center"><span className="text-[8px] font-bold uppercase tracking-[.14em] text-[#A87500]">What the system provides</span><h2 className="mt-2 text-[23px] font-semibold tracking-[-.03em] text-[#5A090B]">One workspace for procurement support</h2></div><div className="mt-8 grid gap-3 md:grid-cols-3">{FEATURES.map(([Icon,n,title,text])=><article key={n} className="rounded-xl border border-[#DDE1E5] bg-white p-5 shadow-[0_5px_18px_rgba(36,42,48,.045)] transition-all hover:-translate-y-0.5 hover:border-[#D5B24A]"><div className="flex items-center justify-between"><div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FFF8E2] text-[#9B7205]"><Icon className="h-4 w-4" /></div><span className="text-[9px] font-bold tracking-[.14em] text-[#B18718]">{n}</span></div><h3 className="mt-4 text-[12px] font-semibold text-[#4C1517]">{title}</h3><p className="mt-1.5 text-[10px] leading-5 text-[#737A83]">{text}</p></article>)}</div></div></section>
-      <section id="transparency" className="scroll-mt-4 bg-[#F4F5F7]"><div className="mx-auto w-full max-w-[900px] px-5 py-14 sm:px-7 sm:py-16"><div className="text-center"><span className="inline-flex rounded-full border border-[#E8B923]/60 bg-[#FFF9E8] px-3 py-1 text-[8px] font-bold uppercase tracking-[.12em] text-[#A87500]">Public Disclosure & Transparency</span><h2 className="mt-3 text-[24px] font-semibold tracking-[-.035em] text-[#5A090B]">Transparency Board</h2><p className="mx-auto mt-1.5 max-w-[540px] text-[10px] leading-5 text-[#747B84]">Browse publicly listed MSU-Gensan procurement information sourced from the university's bidding-document archive.</p></div><div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div className="inline-flex w-fit rounded-lg border border-[#DDE1E5] bg-white p-1 shadow-sm">{CATEGORIES.map((x)=><button key={x} onClick={()=>setCategory(x)} className={`rounded-md px-3 py-1.5 text-[9px] font-semibold ${category===x?"bg-[#780D10] text-white":"text-[#68707A] hover:bg-[#F7F1E7]"}`}>{x}</button>)}</div><div className="relative w-full sm:w-[230px]"><Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#9AA1A9]" /><input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Search projects or references..." className="h-9 w-full rounded-lg border border-[#DDE1E5] bg-white pl-9 pr-3 text-[10px] text-[#3E454D] shadow-sm outline-none focus:border-[#B58A18] focus:ring-2 focus:ring-[#D4AF37]/15" /></div></div><div className="mt-5 grid gap-3 md:grid-cols-2">{projects.map((p,i)=><article key={`${p.year}-${p.reference||p.title}-${i}`} className="rounded-xl border border-[#DDE1E5] bg-white p-4 shadow-[0_5px_18px_rgba(36,42,48,.04)] transition-all hover:border-[#D1B14D]"><div className="flex items-start justify-between gap-3"><span className="rounded border border-[#F0D9D9] bg-[#FFF5F5] px-2 py-1 text-[8px] font-bold text-[#9B262B]">{p.reference || `PUBLIC-${p.year}`}</span><span className="rounded-full border border-[#B9EBD4] bg-[#ECFFF5] px-2.5 py-1 text-[8px] font-semibold text-[#087449]">Public Listing</span></div><h3 className="mt-3 text-[11px] font-semibold leading-5 text-[#24282D]">{p.title}</h3><p className="mt-1 text-[9px] leading-4 text-[#747B84]">{p.category}</p><div className="mt-3 flex items-center justify-between border-t border-[#ECEEF0] pt-3 text-[8px] text-[#7B828A]"><span>{p.year} · {p.category}</span><span className="font-semibold text-[#76090D]">Public record</span></div></article>)}</div><div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E2E5E8] bg-white px-4 py-3"><p className="text-[9px] leading-4 text-[#737A83]">Listings are public procurement information and do not by themselves establish award or completion status.</p><Link href={TRANSPARENCY_SOURCE_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[9px] font-semibold text-[#76090D] hover:text-[#B18718]">Official source <ExternalLink className="h-3 w-3" /></Link></div></div></section>
-      <section className="bg-[#560608] text-white"><div className="mx-auto flex w-full max-w-[900px] flex-col gap-5 px-5 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-7"><div><p className="text-[9px] font-bold uppercase tracking-[.14em] text-[#F0C83F]">MSU General Santos</p><h2 className="mt-1 text-[20px] font-semibold tracking-[-.025em]">MSU Gensan Procurement System</h2><p className="mt-1 max-w-[520px] text-[9px] leading-4 text-white/50">A digital workspace for Purchase Request preparation, procurement workflow monitoring, transparency information, and Gab AI inquiry assistance.</p></div><Link href="#home" className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-4 py-2 text-[9px] font-semibold hover:border-[#F0C83F]/60 hover:text-[#F0C83F]">Back to top <ArrowRight className="h-3 w-3 -rotate-90" /></Link></div><div className="border-t border-white/10 py-4 text-center text-[8px] text-white/35">Mindanao State University - General Santos · Procurement Management System</div></section>
+      {/* About Section */}
+      <section id="about" className="scroll-mt-6 border-b border-stone-200/80 bg-white">
+        <div className="mx-auto w-full max-w-[1100px] px-6 py-20 sm:px-8 sm:py-24">
+          <div className="text-center">
+            <span className="inline-flex rounded-full border border-[#B88E13]/30 bg-[#FFF9E8] px-4 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-[#9A7205]">
+              Institutional Procurement Support
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#4D0C0D] sm:text-4xl">
+              About the Procurement System
+            </h2>
+            <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#B88E13]" />
+          </div>
+
+          <div className="mt-12 grid items-center gap-12 md:grid-cols-2 md:gap-16">
+            <div className="text-sm leading-relaxed text-stone-600 sm:text-base">
+              <p>
+                The <strong className="font-extrabold text-[#4D0C0D]">MSU Gensan Procurement System</strong> provides Mindanao State University - General Santos personnel with an integrated institutional platform for purchase requests, automated status monitoring, and compliant procurement documentation.
+              </p>
+              <p className="mt-4">
+                Operating strictly in alignment with Philippine public procurement guidelines and university standards, every request progresses through the standardized <strong className="font-extrabold text-[#4D0C0D]">20-stage procurement workflow</strong> with complete auditability.
+              </p>
+              <p className="mt-4">
+                Users can also consult <strong className="font-extrabold text-[#4D0C0D]">Gab AI</strong> for instant guidance on procurement policies, required attachments, and standard operating procedures.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-2.5">
+                {["Digital Records", "Workflow Tracking", "Transparency Board", "Gab AI Assistant"].map((x) => (
+                  <span
+                    key={x}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[#B88E13]/30 bg-[#FFFDF5] px-3.5 py-1.5 text-xs font-bold text-[#805F07] shadow-xs"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 text-[#B88E13]" />
+                    {x}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                ["20", "Procurement Stages", "Complete standardized workflow"],
+                ["67", "Public Listings", "Open records on transparency board"],
+                ["2", "Access Roles", "Separated end-user & admin portals"],
+                ["1", "AI Assistant", "Gab AI policy & PR guidance"],
+              ].map(([v, l, d]) => (
+                <div
+                  key={l}
+                  className="relative min-h-[130px] overflow-hidden rounded-2xl bg-gradient-to-br from-[#620A0C] via-[#760D10] to-[#4D080A] p-5 text-white shadow-[0_10px_28px_rgba(77,12,13,0.14)] border border-[#D4AF37]/20"
+                >
+                  <div className="absolute -right-6 -bottom-8 h-20 w-20 rounded-full bg-[#D4AF37]/15" />
+                  <div className="relative text-3xl font-extrabold text-[#F0C83F]">{v}</div>
+                  <div className="relative mt-1 text-xs font-bold text-white">{l}</div>
+                  <div className="relative mt-1 text-xs leading-relaxed text-white/60">{d}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="border-b border-stone-200/80 bg-[#F8F6F2]">
+        <div className="mx-auto w-full max-w-[1100px] px-6 py-18 sm:px-8 sm:py-20">
+          <div className="text-center">
+            <span className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#9A7205]">
+              System Capabilities
+            </span>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#4D0C0D]">
+              One Workspace for University Procurement
+            </h2>
+          </div>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {FEATURES.map(([Icon, n, title, text]) => (
+              <article
+                key={n}
+                className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_6px_22px_rgba(40,20,10,0.035)] transition-all hover:-translate-y-1 hover:border-[#D4AF37]/60 hover:shadow-md"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFF6E4] text-[#9A7205] border border-[#E9D9AE]">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <span className="text-xs font-mono font-extrabold tracking-wider text-[#B88E13]">{n}</span>
+                </div>
+                <h3 className="mt-5 text-base font-extrabold text-[#4D0C0D]">{title}</h3>
+                <p className="mt-2 text-xs sm:text-sm leading-relaxed text-stone-600">{text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Transparency Section */}
+      <section id="transparency" className="scroll-mt-6 bg-[#F8F6F2]">
+        <div className="mx-auto w-full max-w-[1100px] px-6 py-18 sm:px-8 sm:py-20">
+          <div className="text-center">
+            <span className="inline-flex rounded-full border border-[#B88E13]/30 bg-[#FFF9E8] px-4 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-[#9A7205]">
+              Public Disclosure & Accountability
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#4D0C0D]">
+              Transparency Board
+            </h2>
+            <p className="mx-auto mt-2 max-w-xl text-xs sm:text-sm leading-relaxed text-stone-600">
+              Browse publicly listed MSU GenSan procurement notices and bidding documents sourced from official university records.
+            </p>
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="inline-flex flex-wrap gap-1.5 rounded-xl border border-stone-200 bg-white p-1.5 shadow-xs">
+              {CATEGORIES.map((x) => (
+                <button
+                  key={x}
+                  onClick={() => setCategory(x)}
+                  className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${
+                    category === x
+                      ? "bg-gradient-to-r from-[#7A1315] to-[#4D0C0D] text-white shadow-xs"
+                      : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+                  }`}
+                >
+                  {x}
+                </button>
+              ))}
+            </div>
+
+            <div className="relative w-full sm:w-[260px]">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search projects or references..."
+                className="h-10 w-full rounded-xl border border-stone-200 bg-white pl-10 pr-3.5 text-xs sm:text-sm text-stone-800 shadow-xs outline-none focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {projects.map((p, i) => (
+              <article
+                key={`${p.year}-${p.reference || p.title}-${i}`}
+                className="rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_6px_22px_rgba(40,20,10,0.03)] transition-all hover:border-[#D4AF37]/50"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <span className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-extrabold text-[#7A1315]">
+                    {p.reference || `PUBLIC-${p.year}`}
+                  </span>
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-0.5 text-xs font-bold text-emerald-700">
+                    Public Notice
+                  </span>
+                </div>
+                <h3 className="mt-3 text-sm sm:text-base font-bold leading-snug text-stone-900">{p.title}</h3>
+                <p className="mt-1 text-xs font-semibold text-[#B88E13]">{p.category}</p>
+                <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-3 text-xs text-stone-500">
+                  <span>Year: {p.year} · Category: {p.category}</span>
+                  <span className="font-bold text-[#7A1315]">Public Record</span>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-white px-5 py-4 shadow-xs">
+            <p className="text-xs text-stone-600">
+              Listings are public procurement disclosures maintained for university transparency and statutory compliance.
+            </p>
+            <Link
+              href={TRANSPARENCY_SOURCE_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#7A1315] hover:text-[#B88E13] transition-colors underline decoration-[#B88E13] underline-offset-4"
+            >
+              Official University Source <ExternalLink className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gradient-to-b from-[#4A0507] to-[#300304] text-white border-t border-[#D4AF37]/20">
+        <div className="mx-auto flex w-full max-w-[1100px] flex-col gap-6 px-6 py-12 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#F0C83F]">
+              Mindanao State University - General Santos
+            </p>
+            <h2 className="mt-1 text-xl font-extrabold tracking-tight">MSU GenSan Procurement System</h2>
+            <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-white/60">
+              Centralized platform for Purchase Requests, standardized 20-stage procurement workflows, transparency disclosures, and Gab AI assistance.
+            </p>
+          </div>
+          <Link
+            href="#home"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-xs font-bold hover:border-[#F0C83F] hover:text-[#F0C83F] hover:bg-white/10 transition-all self-start sm:self-auto"
+          >
+            Back to Top <ArrowRight className="h-3.5 w-3.5 -rotate-90" />
+          </Link>
+        </div>
+        <div className="border-t border-white/10 py-5 text-center text-xs text-white/45">
+          © {new Date().getFullYear()} Mindanao State University - General Santos · Procurement Management System
+        </div>
+      </footer>
     </div>
   );
 }

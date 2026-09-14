@@ -66,7 +66,11 @@ export default function NewPRForm() {
   // Get current user
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      let { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        const { data: { session } } = await supabase.auth.getSession();
+        user = session?.user || null;
+      }
       if (!user) {
         router.push("/auth/login");
         return;

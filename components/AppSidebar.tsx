@@ -41,22 +41,24 @@ export default function AppSidebar({ mode }: AppSidebarProps) {
   };
 
   return (
-    <aside className="app-sidebar fixed inset-y-0 left-0 z-[55] hidden w-[171px] flex-col bg-gradient-to-b from-[#620A0C] via-[#760D10] to-[#4D080A] text-white shadow-[8px_0_28px_rgba(53,7,8,.12)] lg:flex">
-      <div className="flex h-[66px] items-center gap-2.5 border-b border-amber-300/15 px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-300/10 text-[#E5C34E] border border-amber-300/20">
-          <FileText className="h-4 w-4" />
+    <aside className="app-sidebar fixed inset-y-0 left-0 z-[55] hidden w-[230px] flex-col bg-gradient-to-b from-[#560608] via-[#6D0D10] to-[#420406] text-white shadow-[10px_0_30px_rgba(40,4,6,0.18)] border-r border-[#D4AF37]/20 lg:flex">
+      <div className="flex h-[72px] items-center gap-3 border-b border-[#D4AF37]/15 px-5 bg-black/10">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#F0C83F]/20 to-[#B88E13]/10 text-[#F0C83F] border border-[#F0C83F]/30 shadow-inner">
+          <FileText className="h-5 w-5" />
         </div>
         <div className="min-w-0 leading-tight">
-          <p className="truncate text-[11px] font-extrabold">MSU GenSan</p>
-          <p className="text-[9px] font-bold text-[#E5C34E]">PROCUREMENT SYSTEM</p>
+          <p className="truncate text-sm font-extrabold tracking-tight text-white">MSU GenSan</p>
+          <p className="text-[10px] font-black tracking-wider text-[#F0C83F] uppercase">Procurement System</p>
         </div>
       </div>
 
-      <div className="px-3 pt-5">
-        <p className="px-2 text-[8px] font-extrabold uppercase tracking-[.13em] text-amber-200/55">Portal Menu</p>
+      <div className="px-5 pt-6 pb-2">
+        <p className="text-[11px] font-black uppercase tracking-[0.16em] text-amber-200/60">
+          {mode === "admin" ? "Admin Controls" : "Main Navigation"}
+        </p>
       </div>
 
-      <nav className="mt-2 flex-1 space-y-1 px-2.5">
+      <nav className="mt-1 flex-1 space-y-1.5 px-3">
         {items.map(({ href, label, icon: Icon, badge }) => {
           const active = href === (mode === "admin" ? "/admin" : "/dashboard")
             ? pathname === href
@@ -65,24 +67,31 @@ export default function AppSidebar({ mode }: AppSidebarProps) {
             <Link
               key={href}
               href={href}
-              className={`group flex min-h-9 items-center gap-2 rounded-lg px-2.5 text-[10px] font-semibold transition-all ${
+              className={`group flex min-h-[44px] items-center gap-3 rounded-xl px-3.5 text-xs font-bold transition-all ${
                 active
-                  ? "bg-[#B10814] text-white shadow-[0_5px_16px_rgba(0,0,0,.15)] ring-1 ring-amber-300/15"
-                  : "text-white/75 hover:bg-white/[.07] hover:text-white"
+                  ? "bg-gradient-to-r from-[#99151B] to-[#7A1315] text-white shadow-[0_4px_16px_rgba(0,0,0,0.25)] border border-[#F0C83F]/30"
+                  : "text-white/80 hover:bg-white/[0.08] hover:text-white hover:border-white/10"
               }`}
             >
-              <Icon className={`h-3.5 w-3.5 shrink-0 ${active ? "text-amber-300" : "text-white/55 group-hover:text-amber-200"}`} />
+              <Icon className={`h-4 w-4 shrink-0 transition-colors ${active ? "text-[#F0C83F]" : "text-white/60 group-hover:text-amber-300"}`} />
               <span className="truncate">{label}</span>
-              {badge && <span className="ml-auto rounded bg-amber-300 px-1 text-[7px] font-black text-[#5A090B]">{badge}</span>}
+              {badge && (
+                <span className="ml-auto rounded-md bg-[#F0C83F] px-1.5 py-0.5 text-[9px] font-black text-[#4D0C0D] shadow-xs">
+                  {badge}
+                </span>
+              )}
             </Link>
           );
         })}
       </nav>
 
-      <div className="border-t border-white/10 p-2.5">
-        <button onClick={logout} className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[10px] font-semibold text-white/65 hover:bg-white/[.07] hover:text-white">
-          <LogOut className="h-3.5 w-3.5" />
-          Sign out
+      <div className="border-t border-white/10 p-3 bg-black/10">
+        <button
+          onClick={logout}
+          className="flex w-full min-h-[40px] items-center gap-3 rounded-xl px-3.5 py-2 text-left text-xs font-bold text-white/70 hover:bg-white/[0.1] hover:text-white transition-colors"
+        >
+          <LogOut className="h-4 w-4 text-amber-200/60" />
+          <span>Sign out</span>
         </button>
       </div>
     </aside>

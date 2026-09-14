@@ -145,8 +145,12 @@ export default function ChatbotDashboard() {
     let cancelled = false;
     (async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error || !user) {
+        let { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          const { data: { session } } = await supabase.auth.getSession();
+          user = session?.user || null;
+        }
+        if (!user) {
           router.replace("/auth/login");
           return;
         }
