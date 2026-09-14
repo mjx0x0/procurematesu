@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, Eye, Loader2, Plus, Printer, Save, Trash2, X } from "lucide-react";
+import { Check, Eye, Loader2, Plus, Printer, Save, Trash2, X, FileSpreadsheet } from "lucide-react";
+import { motion } from "motion/react";
 
 export type RFQItemDraft = { item: number; quantity: number; abc: number; technical_specifications: string; supplier_unit: string; supplier_unit_price: string; supplier_total_amount: string };
 export type RFQFormDraft = { reference_no: string; project_name: string; location: string; rfq_date: string; quotation_no: string; company_name: string; address: string; items: RFQItemDraft[]; purpose: string; office: string; total_abc: number; instructions: string; delivery_period: string; warranty: string; price_validity: string; bidder_name: string; bidder_contact: string; bidder_email: string; canvasser_name: string };
@@ -21,8 +22,26 @@ export default function RFQEditorModal({prNo,onClose,onSaved,mode="generation"}:
  const removeItem=(idx:number)=>setForm(c=>{if(!c||c.items.length<=1)return c;const items=c.items.filter((_,i)=>i!==idx).map((x,i)=>({...x,item:i+1}));return {...c,items,total_abc:items.reduce((s,i)=>s+Number(i.abc||0),0)}});
  const save=async()=>{if(!form||saving||readOnly)return;setSaving(true);setError("");try{const r=await fetch("/api/admin/rfq",{method:"PATCH",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({prNo,formData:form})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Unable to save RFQ.");setForm(d.formData);setSaved(true);onSaved?.()}catch(e:any){setError(e?.message||"Unable to save RFQ")}finally{setSaving(false)}};
  const print=()=>{document.body.classList.add("printing-rfq");window.setTimeout(()=>window.print(),100);window.setTimeout(()=>document.body.classList.remove("printing-rfq"),1500)};
- if(loading)return <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center"><div className="bg-white rounded-xl p-8 flex items-center gap-3"><Loader2 className="h-5 w-5 animate-spin text-[#7C1D2E]"/>Loading official RFQ...</div></div>;
- if(!form)return <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4"><div className="bg-white rounded-xl p-6 max-w-md"><h3 className="font-bold text-[#7C1D2E]">RFQ unavailable</h3><p className="text-sm text-stone-600 mt-2">{error}</p><button onClick={onClose} className="mt-4 px-4 py-2 rounded-lg bg-[#7C1D2E] text-white">Close</button></div></div>;
+ if(loading)return (
+    <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.2 }}
+        className="bg-white rounded-2xl p-6 shadow-2xl border border-stone-200 flex flex-col items-center text-center max-w-xs w-full"
+      >
+        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#7C1D2E]/10">
+          <FileSpreadsheet className="h-6 w-6 text-[#7C1D2E] animate-pulse"/>
+        </div>
+        <p className="text-sm font-bold text-[#5A1420]">Loading Official RFQ</p>
+        <p className="text-xs text-stone-500 mt-0.5">Fetching quotation data for {prNo}...</p>
+        <div className="mt-4 w-40 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-[#7A1315] via-[#D4AF37] to-[#7A1315] rounded-full animate-progress-indeterminate"/>
+        </div>
+      </motion.div>
+    </div>
+  );
+ if(!form)return <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div className="bg-white rounded-2xl p-6 max-w-md shadow-2xl border border-stone-200 text-center"><h3 className="font-bold text-[#7C1D2E]">RFQ unavailable</h3><p className="text-sm text-stone-600 mt-2">{error}</p><button onClick={onClose} className="mt-4 px-5 py-2.5 rounded-xl bg-[#7C1D2E] text-white text-xs font-bold hover:bg-[#5A1420] transition-colors">Close</button></div></div>;
  const page=(copy:number)=><section key={copy} className="rfq-print-page mx-auto max-w-6xl bg-white text-black border border-stone-300 shadow-sm p-6 print:border-0 print:shadow-none print:break-after-page">
   <div className="text-center font-bold text-lg">MINDANAO STATE UNIVERSITY</div><div className="text-center font-bold text-sm">Fatima, General Santos City</div>
   <div className="grid grid-cols-1 lg:grid-cols-[1fr_310px] border border-black mt-2"><div className="flex items-center justify-center min-h-[70px]"><b className="text-xl">REQUEST FOR QUOTATION</b></div><div className="border-t lg:border-t-0 lg:border-l border-black"><label className="grid grid-cols-[105px_1fr] border-b border-black text-xs"><span className="p-2">Reference Nos.</span><Input disabled={readOnly} value={form.reference_no} onChange={v=>setField("reference_no",v)}/></label><label className="grid grid-cols-[105px_1fr] border-b border-black text-xs"><span className="p-2">Project Name:</span><Input disabled={readOnly} value={form.project_name} onChange={v=>setField("project_name",v)}/></label><label className="grid grid-cols-[105px_1fr] text-xs"><span className="p-2">Location:</span><Input disabled={readOnly} value={form.location} onChange={v=>setField("location",v)}/></label></div></div>
@@ -34,12 +53,12 @@ export default function RFQEditorModal({prNo,onClose,onSaved,mode="generation"}:
   <p className="text-xs mt-8">Unit Purchase/Job Order or a Contract is prepared and executed, this Quotation/Proposal shall be binding upon us. We understand that you are not bound to accept the lowest or any Proposal you may receive.</p><p className="text-xs mt-2">After having carefully read and accepted your General Conditions, I/We quote you on the item at prices noted above.</p><div className="grid grid-cols-2 gap-12 mt-10 text-xs"><div className="text-center"><Input disabled={readOnly} value={form.canvasser_name} onChange={v=>setField("canvasser_name",v)}/><div>Signature over printed name of canvasser</div></div><div><Input disabled={readOnly} value={form.bidder_name} onChange={v=>setField("bidder_name",v)}/><div>Signature over printed name of bidder</div><div className="mt-2">Tel. No. / Cellphone No.: {form.bidder_contact}</div><div>E-mail address: {form.bidder_email}</div></div></div>
   {mode==="printing"&&<div className="print:hidden mt-4 text-center text-[10px] text-stone-500">COPY {copy} OF {copies}</div>}
  </section>;
- return <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"><div className="w-full max-w-[1500px] max-h-[97vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+ return <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 transition-colors"><motion.div initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }} className="w-full max-w-[1500px] max-h-[97vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-stone-200">
   <header className="px-5 py-4 border-b border-stone-200 flex items-center justify-between shrink-0"><div><div className="flex items-center gap-2"><span className="px-2.5 py-1 rounded-full bg-[#7C1D2E] text-white text-[10px] font-extrabold">{meta.step}</span><h2 className="text-xl font-extrabold text-[#5A1420]">{meta.title} — {prNo}</h2></div><p className="text-xs text-stone-500 mt-1 max-w-3xl">{meta.description}</p></div><div className="flex items-center gap-2"><span className="px-3 py-1.5 rounded-full text-xs font-bold bg-stone-100 text-stone-700">{less?"RFQ LESS THAN 50 K":"RFQ MORE THAN 50K"}</span><button onClick={onClose} className="p-2 rounded-lg hover:bg-stone-100"><X className="h-5 w-5"/></button></div></header>
   {mode==="evaluation"&&<div className="px-5 py-3 bg-amber-50 border-b border-amber-200 text-xs text-amber-900 flex items-center gap-2"><Eye className="h-4 w-4 shrink-0"/><b>Evaluation checkpoint:</b> compare the RFQ item-by-item with the submitted PR before using Complete Next to move to Step 9.</div>}
   {mode==="printing"&&<div className="px-5 py-3 bg-green-50 border-b border-green-200 flex flex-wrap items-center justify-between gap-3 text-xs"><span className="font-semibold text-green-900">Step 9 is the final RFQ printing checkpoint.</span><label className="flex items-center gap-2 font-bold">Copies:<select value={copies} onChange={e=>setCopies(Number(e.target.value) as 3|4)} className="rounded-lg border border-green-300 bg-white px-3 py-1.5"><option value={3}>3 copies</option><option value={4}>4 copies</option></select></label></div>}
   <main className="overflow-y-auto bg-stone-100 p-4 sm:p-6 space-y-5">{Array.from({length:mode==="printing"?copies:1},(_,i)=>page(i+1))}</main>
   <footer className="px-5 py-3 border-t border-stone-200 flex items-center justify-between shrink-0"><div className="text-xs">{error&&<span className="text-red-600 font-semibold">{error}</span>}{saved&&!error&&<span className="text-green-700 font-semibold inline-flex items-center gap-1"><Check className="h-4 w-4"/>Saved</span>}</div><div className="flex gap-2">{!readOnly&&<><button onClick={addItem} className="px-3 py-2 rounded-lg border border-stone-200 text-xs font-bold inline-flex items-center gap-1"><Plus className="h-4 w-4"/>Add Item</button><button onClick={()=>void save()} disabled={saving} className="px-4 py-2 rounded-lg bg-[#7C1D2E] text-white text-xs font-bold inline-flex items-center gap-2 disabled:opacity-60"><Save className="h-4 w-4"/>{saving?"Saving…":"Save RFQ"}</button></>}{readOnly&&<button onClick={print} className="px-5 py-2.5 rounded-lg bg-[#7C1D2E] text-white text-xs font-bold inline-flex items-center gap-2"><Printer className="h-4 w-4"/>Print {copies} Copies</button>}<button onClick={onClose} className="px-4 py-2 rounded-lg border border-stone-200 text-xs font-bold">Close</button></div></footer>
- </div></div>;
+ </motion.div></div>;
 }
 

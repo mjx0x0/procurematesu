@@ -36,7 +36,7 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
           </CardContent>
           <CardFooter className="flex flex-col gap-2 pt-4">
             <Button asChild className="w-full bg-blue-700 hover:bg-blue-800 text-white">
-              <Link href="/auth/login">
+              <Link href="/">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Return to Login
               </Link>

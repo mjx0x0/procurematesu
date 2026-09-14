@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { AlertCircle, ArrowRight, Building2, CheckCircle, Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
+import { AlertCircle, ArrowRight, Building2, CheckCircle, Eye, EyeOff, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
+import { MsuLogo } from "@/components/msu-logo";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function LandingLoginCard() {
   const router = useRouter();
@@ -234,15 +236,56 @@ export default function LandingLoginCard() {
         </form>
       </div>
 
-      {redirecting && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#FAF8F5]/95 backdrop-blur-sm">
-          <div className="text-center">
-            <div className="mx-auto h-10 w-10 rounded-full border-2 border-[#7A1315]/15 border-t-[#7A1315] animate-spin" />
-            <p className="mt-3 text-sm font-bold text-[#4D0C0D]">Signing you in</p>
-            <p className="mt-1 text-xs text-stone-500">Preparing your procurement workspace...</p>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {redirecting && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#FAF8F5]/98 backdrop-blur-md px-4 selection:bg-[#7A1315] selection:text-amber-200"
+          >
+            {/* Decorative top accent */}
+            <div className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#4D0C0D] via-[#D4AF37] to-[#7A1315]" />
+
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0, y: 12 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col items-center text-center max-w-sm"
+            >
+              {/* Pulsing University Seal with Gold Aura */}
+              <div className="relative mb-6">
+                <div className="absolute -inset-2 rounded-full bg-[#D4AF37]/25 blur-xl animate-pulse" />
+                <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-white p-3 shadow-[0_20px_40px_rgba(77,12,13,0.18)] border border-[#D4AF37]/40">
+                  <MsuLogo size={56} />
+                </div>
+              </div>
+
+              {/* Text */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4D0C0D]/10 text-[#4D0C0D] text-[10px] font-black tracking-wider uppercase mb-2">
+                <Sparkles className="h-3 w-3 text-[#B88E13]" />
+                Institutional Authentication
+              </div>
+              <h3 className="text-xl font-black text-[#4D0C0D] tracking-tight">
+                Authenticating Session
+              </h3>
+              <p className="mt-1 text-xs text-stone-500 font-medium leading-relaxed">
+                Loading your authorized procurement workspace and permissions...
+              </p>
+
+              {/* Shimmering Gold Progress Track */}
+              <div className="mt-6 w-56 h-1.5 bg-stone-200/90 rounded-full overflow-hidden relative">
+                <div className="h-full bg-gradient-to-r from-[#7A1315] via-[#D4AF37] to-[#7A1315] rounded-full animate-progress-indeterminate" />
+              </div>
+
+              <p className="mt-5 text-[9px] font-extrabold text-stone-400 uppercase tracking-widest">
+                Mindanao State University - General Santos
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

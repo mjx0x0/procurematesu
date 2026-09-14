@@ -1,10 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function PageTransition() {
   const router = useRouter();
+  const pathname = usePathname();
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  // When pathname changes, finish the navigation indicator
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [pathname]);
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -19,24 +26,35 @@ export default function PageTransition() {
       const href = link.getAttribute("href");
       if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return;
 
-      const url = new URL(href, window.location.href);
-      if (url.origin !== window.location.origin) return;
+      try {
+        const url = new URL(href, window.location.href);
+        if (url.origin !== window.location.origin) return;
 
-      const startViewTransition = (document as Document & {
-        startViewTransition?: (callback: () => void) => { ready: Promise<void>; finished: Promise<void> };
-      }).startViewTransition;
+        // Don't trigger transition if clicking on the current exact page
+        if (url.pathname === window.location.pathname && url.search === window.location.search) return;
 
-      if (!startViewTransition) return;
-      event.preventDefault();
+        // Visual navigation indicator feedback without interrupting Next.js router
+        setIsNavigating(true);
 
-      startViewTransition(() => {
-        router.push(`${url.pathname}${url.search}${url.hash}`);
-      });
+        // Safety timeout in case navigation is aborted or instantaneous
+        window.setTimeout(() => {
+          setIsNavigating(false);
+        }, 4000);
+      } catch {
+        // Invalid URL, ignore
+      }
     };
 
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
-  }, [router]);
+    document.addEventListener("click", onClick, { capture: true });
+    return () => document.removeEventListener("click", onClick, { capture: true });
+  }, []);
 
-  return null;
+  if (!isNavigating) return null;
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-[9999] h-[3px] overflow-hidden pointer-events-none">
+      <div className="h-full bg-gradient-to-r from-[#7A1315] via-[#F0C83F] to-[#7A1315] animate-progress-indeterminate shadow-[0_0_8px_rgba(212,175,55,0.7)]" />
+    </div>
+  );
 }
+

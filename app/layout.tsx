@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from "next-themes";
 import PageTransition from "@/components/PageTransition";
+import ConsoleSanitizer from "@/components/ConsoleSanitizer";
 import AppThemeShell from "@/components/AppThemeShell";
 import "./globals.css";
 import "./portal-theme.css";
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" suppressHydrationWarning className={`${inter.variable} scroll-smooth`}>
       <body className="font-sans antialiased bg-white text-gray-900">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ConsoleSanitizer />
           <PageTransition />
           <AppThemeShell>{children}</AppThemeShell>
         </ThemeProvider>
