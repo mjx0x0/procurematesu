@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, ChevronDown, ClipboardList, ExternalLink, MessageCircle, Search, ShieldCheck, Sparkles, Workflow } from "lucide-react";
+import { ArrowRight, CheckCircle2, ClipboardList, ExternalLink, MessageCircle, Search, Workflow } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MsuLogo } from "@/components/msu-logo";
 import LandingLoginCard from "@/components/auth/LandingLoginCard";
@@ -31,82 +31,44 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#F8F6F2] font-sans antialiased text-[#25201D]">
       {/* Hero Section */}
-      <section id="home" className="relative min-h-screen overflow-hidden bg-[#560608] text-white">
+      <section id="home" className="relative min-h-screen overflow-x-clip bg-[#560608] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_40%,rgba(212,175,55,0.22),transparent_32%),radial-gradient(circle_at_85%_15%,rgba(122,19,21,0.65),transparent_40%),linear-gradient(135deg,#5A080A_0%,#4A0507_50%,#350405_100%)]" />
         <div className="absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-[#D4AF37]/15 blur-3xl pointer-events-none" />
         <div className="absolute -right-32 -bottom-32 h-[32rem] w-[32rem] rounded-full bg-[#8F1518]/25 blur-3xl pointer-events-none" />
 
-        <header className="relative z-20 mx-auto flex w-full max-w-[1200px] items-center justify-between gap-6 px-6 py-6 sm:px-8">
-          <Link href="#home" className="flex min-w-0 items-center gap-3.5 group">
-            <MsuLogo size={42} />
-            <div className="min-w-0 leading-tight">
-              <div className="text-sm font-extrabold tracking-tight sm:text-base text-white group-hover:text-[#F0C83F] transition-colors">
-                MSU GenSan <span className="text-[#F0C83F]">Procurement</span>
+        <header className="fixed inset-x-0 top-0 z-50 border-b border-[#D4AF37]/25 bg-[#4B0608]/90 backdrop-blur-md transition-all shadow-[0_4px_24px_rgba(30,3,4,0.35)]">
+          <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-6 px-6 py-3.5 sm:px-8">
+            <Link href="#home" className="flex min-w-0 items-center gap-3.5 group">
+              <MsuLogo size={40} />
+              <div className="min-w-0 leading-tight">
+                <div className="text-sm font-extrabold tracking-tight sm:text-base text-white group-hover:text-[#F0C83F] transition-colors">
+                  MSU GenSan <span className="text-[#F0C83F]">Procurement</span>
+                </div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-200/70">
+                  Digital Procurement Management System
+                </div>
               </div>
-              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-200/70">
-                Digital Procurement Management System
-              </div>
-            </div>
-          </Link>
-
-          <nav className="hidden items-center gap-8 text-xs font-bold text-white/85 md:flex">
-            <Link href="#home" className="hover:text-[#F0C83F] transition-colors">Home</Link>
-            <Link href="#about" className="hover:text-[#F0C83F] transition-colors">About</Link>
-            <Link href="#transparency" className="hover:text-[#F0C83F] transition-colors">Transparency Board</Link>
-            <Link
-              href="#about"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/5 px-4 py-2 text-xs font-bold text-white hover:border-[#F0C83F] hover:bg-[#F0C83F]/10 hover:text-[#F0C83F] transition-all shadow-xs"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-[#F0C83F]" /> Learn More
             </Link>
-          </nav>
+
+            <nav className="hidden items-center gap-8 text-xs font-bold text-white/90 md:flex">
+              <Link href="#home" className="hover:text-[#F0C83F] transition-colors">Home</Link>
+              <Link href="#about" className="hover:text-[#F0C83F] transition-colors">About</Link>
+              <Link href="#transparency" className="hover:text-[#F0C83F] transition-colors">Transparency Board</Link>
+            </nav>
+          </div>
         </header>
 
-        <div className="relative z-10 mx-auto grid min-h-[calc(100vh-88px)] w-full max-w-[1200px] items-center gap-10 px-6 pb-20 pt-4 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:pt-0">
+        <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1200px] items-center gap-10 px-6 pt-24 pb-16 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:pt-20">
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#F0C83F]/40 bg-[#F0C83F]/15 px-4 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-[#F5D766]">
-              <ShieldCheck className="h-4 w-4 text-[#F0C83F]" /> Official University Procurement Portal
-            </div>
-
-            <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl text-white">
+            <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl text-white">
               MSU GenSan
               <span className="block mt-1 text-[#F0C83F]">Procurement</span>
               <span className="block text-white/95">Management System</span>
             </h1>
 
-            <p className="mx-auto mt-5 max-w-[580px] text-sm leading-relaxed text-white/80 sm:text-base lg:mx-0">
+            <p className="mx-auto mt-6 max-w-[560px] text-sm sm:text-base leading-relaxed text-white/80 lg:mx-0">
               A refined digital workspace bringing Purchase Request preparation, standardized workflow tracking, public transparency records, and Gab AI procurement guidance into one institutional system.
             </p>
-
-            <div className="mt-8 flex flex-wrap justify-center gap-3.5 lg:justify-start">
-              <Link
-                href="#about"
-                className="inline-flex items-center gap-2 rounded-xl border border-[#F0C83F]/60 bg-gradient-to-r from-[#F0C83F] to-[#D4A82C] px-6 py-3 text-sm font-extrabold text-[#4D0C0D] shadow-[0_8px_20px_rgba(0,0,0,0.2)] hover:brightness-105 transition-all"
-              >
-                <Sparkles className="h-4 w-4" /> Explore System
-              </Link>
-              <Link
-                href="#transparency"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-6 py-3 text-sm font-bold text-white hover:bg-white/15 hover:border-white/40 transition-all"
-              >
-                Public Transparency <ArrowRight className="h-4 w-4 text-[#F0C83F]" />
-              </Link>
-            </div>
-
-            <div className="mt-10 grid max-w-[520px] grid-cols-3 border-t border-white/15 pt-6 text-left">
-              <div>
-                <div className="text-3xl font-extrabold text-[#F0C83F]">Full-Cycle</div>
-                <div className="mt-1 text-xs font-semibold text-white/70">Workflow Tracking</div>
-              </div>
-              <div className="border-l border-white/15 pl-5">
-                <div className="text-3xl font-extrabold text-[#F0C83F]">67</div>
-                <div className="mt-1 text-xs font-semibold text-white/70">Public Listings</div>
-              </div>
-              <div className="border-l border-white/15 pl-5">
-                <div className="text-3xl font-extrabold text-[#F0C83F]">Gab AI</div>
-                <div className="mt-1 text-xs font-semibold text-white/70">Assistant & Support</div>
-              </div>
-            </div>
           </div>
 
           <div className="w-full max-w-[420px] justify-self-center lg:justify-self-end">
@@ -116,27 +78,12 @@ export default function LandingPage() {
                 <LandingLoginCard />
               </div>
             </div>
-            <div className="mx-auto mt-4 flex items-start gap-3 rounded-xl border border-[#F0C83F]/20 bg-black/20 px-4 py-3 text-white/75 backdrop-blur-xs">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#F0C83F]" />
-              <p className="text-xs leading-relaxed">
-                <strong className="text-white">Institutional Access Only.</strong> Sign in with your verified{" "}
-                <span className="text-[#F0C83F]">@msugensan.edu.ph</span> account. All new registrations undergo official administrator verification.
-              </p>
-            </div>
           </div>
         </div>
-
-        <Link
-          href="#about"
-          aria-label="Scroll to About"
-          className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 text-[#F0C83F]/80 hover:text-[#F0C83F] transition-colors p-2"
-        >
-          <ChevronDown className="h-6 w-6 animate-bounce" />
-        </Link>
       </section>
 
       {/* About Section */}
-      <section id="about" className="scroll-mt-6 border-b border-stone-200/80 bg-white">
+      <section id="about" className="scroll-mt-20 border-b border-stone-200/80 bg-white">
         <div className="mx-auto w-full max-w-[1100px] px-6 py-20 sm:px-8 sm:py-24">
           <div className="text-center">
             <span className="inline-flex rounded-full border border-[#B88E13]/30 bg-[#FFF9E8] px-4 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-[#9A7205]">
@@ -228,7 +175,7 @@ export default function LandingPage() {
       </section>
 
       {/* Transparency Section */}
-      <section id="transparency" className="scroll-mt-6 bg-[#F8F6F2]">
+      <section id="transparency" className="scroll-mt-20 bg-[#F8F6F2]">
         <div className="mx-auto w-full max-w-[1100px] px-6 py-18 sm:px-8 sm:py-20">
           <div className="text-center">
             <span className="inline-flex rounded-full border border-[#B88E13]/30 bg-[#FFF9E8] px-4 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-[#9A7205]">

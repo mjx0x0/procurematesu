@@ -266,74 +266,129 @@ export default function AdminDashboard() {
           {filtered.length === 0 ? (
             <div className="p-12 text-center text-sm font-medium text-stone-500">No purchase requests found matching the filter criteria.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[980px] border-collapse">
-                <thead className="bg-[#FAF7F2] border-b border-stone-200 text-stone-600">
-                  <tr>
-                    <th className="w-[140px] px-5 py-3.5 text-left text-xs uppercase tracking-wider font-bold">PR #</th>
-                    <th className="px-5 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Purpose</th>
-                    <th className="w-[170px] px-5 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Department</th>
-                    <th className="w-[130px] px-5 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Amount</th>
-                    <th className="w-[230px] px-5 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Current Status</th>
-                    <th className="w-[120px] px-5 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Date</th>
-                    <th className="w-[140px] px-5 py-3.5 text-right text-xs uppercase tracking-wider font-bold pr-6">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {filtered.map((pr) => {
-                    const stepInfo = currentStage(pr);
-                    const stageNumber = stepInfo?.number || 0;
-                    const rfqMode: RfqMode | null = pr.current_stage === "rfq_generation" ? "generation" : pr.current_stage === "rfq_evaluation" ? "evaluation" : pr.current_stage === "rfq_printing" ? "printing" : null;
-                    return (
-                      <tr
-                        key={pr.pr_no}
-                        onClick={() => void openDetails(pr)}
-                        className={`hover:bg-[#FFFDF7] transition-colors cursor-pointer ${rfqMode ? "bg-amber-50/25" : ""}`}
-                      >
-                        <td className="px-5 py-4 align-middle whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-sm font-extrabold text-[#7C1D2E] tracking-tight">{pr.pr_no}</span>
-                            {rfqMode && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-100 border border-amber-300 text-[#8B6009] text-[10px] font-black tracking-wider uppercase">
-                                RFQ
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-5 py-4 align-middle text-sm text-stone-800 font-medium">
-                          <div className="max-w-[260px] truncate" title={pr.purpose}>
-                            {pr.purpose || "—"}
-                          </div>
-                        </td>
-                        <td className="px-5 py-4 align-middle text-sm text-stone-600 font-medium whitespace-nowrap">
-                          {pr.department || "—"}
-                        </td>
-                        <td className="px-5 py-4 align-middle text-sm font-bold text-stone-900 whitespace-nowrap font-mono">
+            <div className="w-full overflow-hidden">
+              {/* Desktop / Tablet View: Table fits 100% width with no horizontal scroll */}
+              <div className="hidden md:block w-full">
+                <table className="w-full table-fixed border-collapse">
+                  <thead className="bg-[#FAF7F2] border-b border-stone-200 text-stone-600">
+                    <tr>
+                      <th className="w-[14%] lg:w-[13%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">PR #</th>
+                      <th className="w-[24%] lg:w-[23%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Purpose</th>
+                      <th className="w-[16%] lg:w-[15%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Department</th>
+                      <th className="w-[15%] lg:w-[13%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Amount</th>
+                      <th className="w-[19%] lg:w-[17%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Current Status</th>
+                      <th className="hidden lg:table-cell lg:w-[10%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Date</th>
+                      <th className="w-[12%] lg:w-[9%] px-3 lg:px-4 py-3.5 text-right text-xs uppercase tracking-wider font-bold pr-4 lg:pr-6">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100">
+                    {filtered.map((pr) => {
+                      const stepInfo = currentStage(pr);
+                      const stageNumber = stepInfo?.number || 0;
+                      const rfqMode: RfqMode | null = pr.current_stage === "rfq_generation" ? "generation" : pr.current_stage === "rfq_evaluation" ? "evaluation" : pr.current_stage === "rfq_printing" ? "printing" : null;
+                      return (
+                        <tr
+                          key={pr.pr_no}
+                          onClick={() => void openDetails(pr)}
+                          className={`hover:bg-[#FFFDF7] transition-colors cursor-pointer ${rfqMode ? "bg-amber-50/25" : ""}`}
+                        >
+                          <td className="px-3 lg:px-4 py-3.5 align-middle whitespace-nowrap">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="font-mono text-xs lg:text-sm font-extrabold text-[#7C1D2E] tracking-tight">{pr.pr_no}</span>
+                              {rfqMode && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300 text-[#8B6009] text-[9px] font-black tracking-wider uppercase shrink-0">
+                                  RFQ
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-3 lg:px-4 py-3.5 align-middle text-xs lg:text-sm text-stone-800 font-medium">
+                            <div className="truncate" title={pr.purpose}>
+                              {pr.purpose || "—"}
+                            </div>
+                          </td>
+                          <td className="px-3 lg:px-4 py-3.5 align-middle text-xs lg:text-sm text-stone-600 font-medium">
+                            <div className="truncate" title={pr.department}>
+                              {pr.department || "—"}
+                            </div>
+                          </td>
+                          <td className="px-3 lg:px-4 py-3.5 align-middle text-xs lg:text-sm font-bold text-stone-900 whitespace-nowrap font-mono">
+                            ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                          <td className="px-3 lg:px-4 py-3.5 align-middle">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] lg:text-xs font-bold border max-w-full truncate ${COLORS[pr.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`} title={LABELS[pr.current_stage] || pr.current_stage}>
+                              <span className="truncate">{stageNumber ? `Stage ${stageNumber}: ` : ""}{LABELS[pr.current_stage] || pr.current_stage}</span>
+                            </span>
+                          </td>
+                          <td className="hidden lg:table-cell px-3 lg:px-4 py-3.5 align-middle text-xs font-semibold text-stone-500 whitespace-nowrap">
+                            {pr.created_at ? new Date(pr.created_at).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" }) : "—"}
+                          </td>
+                          <td className="px-3 lg:px-4 py-3.5 align-middle text-right pr-4 lg:pr-6 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              onClick={() => void openDetails(pr)}
+                              title={`View details and actions for ${pr.pr_no}`}
+                              className="inline-flex items-center gap-1 h-7.5 px-2.5 lg:px-3 rounded-lg lg:rounded-xl bg-white hover:bg-stone-50 text-[#7C1D2E] text-xs font-bold border border-stone-200 hover:border-[#7C1D2E]/40 transition-all shadow-2xs hover:shadow-xs active:scale-95"
+                            >
+                              <Eye className="h-3.5 w-3.5 text-[#7C1D2E]" />
+                              <span>View</span>
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile View: Clean card rows fitting 100% width without horizontal scroll */}
+              <div className="md:hidden divide-y divide-stone-100">
+                {filtered.map((pr) => {
+                  const stepInfo = currentStage(pr);
+                  const stageNumber = stepInfo?.number || 0;
+                  const rfqMode: RfqMode | null = pr.current_stage === "rfq_generation" ? "generation" : pr.current_stage === "rfq_evaluation" ? "evaluation" : pr.current_stage === "rfq_printing" ? "printing" : null;
+                  return (
+                    <div
+                      key={pr.pr_no}
+                      onClick={() => void openDetails(pr)}
+                      className={`p-4 hover:bg-[#FFFDF7] transition-colors cursor-pointer flex flex-col gap-2.5 ${rfqMode ? "bg-amber-50/25" : ""}`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="font-mono text-sm font-extrabold text-[#7C1D2E] tracking-tight">{pr.pr_no}</span>
+                          {rfqMode && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300 text-[#8B6009] text-[9px] font-black uppercase">
+                              RFQ
+                            </span>
+                          )}
+                        </div>
+                        <span className="font-mono text-sm font-bold text-stone-900 shrink-0">
                           ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </td>
-                        <td className="px-5 py-4 align-middle">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border max-w-[220px] truncate ${COLORS[pr.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
-                            {stageNumber ? `Stage ${stageNumber}: ` : ""}{LABELS[pr.current_stage] || pr.current_stage}
-                          </span>
-                        </td>
-                        <td className="px-5 py-4 align-middle text-xs font-semibold text-stone-500 whitespace-nowrap">
-                          {pr.created_at ? new Date(pr.created_at).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" }) : "—"}
-                        </td>
-                        <td className="px-5 py-4 align-middle text-right pr-6 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            onClick={() => void openDetails(pr)}
-                            title={`View details and actions for ${pr.pr_no}`}
-                            className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-xl bg-white hover:bg-stone-50 text-[#7C1D2E] text-xs font-bold border border-stone-200 hover:border-[#7C1D2E]/40 transition-all shadow-2xs hover:shadow-xs active:scale-95"
-                          >
-                            <Eye className="h-3.5 w-3.5 text-[#7C1D2E]" />
-                            <span>View Details</span>
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        </span>
+                      </div>
+
+                      <p className="text-sm font-medium text-stone-800 line-clamp-1">{pr.purpose || "Official procurement request"}</p>
+
+                      <div className="flex items-center justify-between gap-2 text-xs text-stone-500 font-medium">
+                        <span className="truncate">{pr.department || "University Office"}</span>
+                        <span className="shrink-0">{pr.created_at ? new Date(pr.created_at).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "—"}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 pt-1 border-t border-stone-100">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border truncate max-w-[220px] ${COLORS[pr.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
+                          <span className="truncate">{stageNumber ? `Stage ${stageNumber}: ` : ""}{LABELS[pr.current_stage] || pr.current_stage}</span>
+                        </span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); void openDetails(pr); }}
+                          className="inline-flex items-center gap-1 h-7 px-2.5 rounded-lg bg-white text-[#7C1D2E] text-xs font-bold border border-stone-200 shadow-2xs hover:bg-stone-50"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          <span>View</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

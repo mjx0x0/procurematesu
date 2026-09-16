@@ -9,12 +9,10 @@ import {
   Lock,
   User,
   ArrowRight,
-  ArrowLeft,
   AlertCircle,
   Eye,
   EyeOff,
   CheckCircle2,
-  ShieldCheck,
   Check,
   Building2,
   Clock,
@@ -211,17 +209,9 @@ export default function SignupPage() {
                   </Link>
 
                   <div className="mt-8">
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-[#F0C83F]/35 bg-[#F0C83F]/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[#F5D766]">
-                      <ShieldCheck className="h-3.5 w-3.5 text-[#F0C83F]" /> Official End-User Portal
-                    </div>
-
-                    <h1 className="mt-4 text-2xl sm:text-3xl font-black text-white leading-tight tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight tracking-tight">
                       End-User <span className="text-[#F0C83F]">Registration</span>
                     </h1>
-
-                    <p className="mt-2.5 text-xs text-white/80 leading-relaxed">
-                      Register your official university account to submit Purchase Requests, track institutional procurement workflows, and access Gab AI assistance.
-                    </p>
                   </div>
 
                   {/* 3-Step Verification Guide */}
@@ -272,22 +262,13 @@ export default function SignupPage() {
               {/* Right Form Column */}
               <div className="p-6 sm:p-8 lg:p-9 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between gap-2 border-b border-stone-100 pb-4 mb-5">
-                    <div>
-                      <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#B88E13]">
-                        Institutional Credentials
-                      </p>
-                      <h2 className="text-xl font-black text-[#4D0C0D] tracking-tight">
-                        Create your account
-                      </h2>
-                    </div>
-                    <Link
-                      href="/"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#7A1315] hover:text-[#4D0C0D] transition-colors bg-[#7A1315]/5 hover:bg-[#7A1315]/10 px-3 py-1.5 rounded-lg"
-                    >
-                      <ArrowLeft className="h-3.5 w-3.5" />
-                      Back to Landing & Sign In
-                    </Link>
+                  <div className="border-b border-stone-100 pb-4 mb-5">
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#B88E13]">
+                      Institutional Credentials
+                    </p>
+                    <h2 className="text-xl font-black text-[#4D0C0D] tracking-tight">
+                      Create your account
+                    </h2>
                   </div>
 
                   <form onSubmit={handleSignup} className="space-y-4">
@@ -487,7 +468,7 @@ export default function SignupPage() {
                       href="/"
                       className="font-extrabold text-[#7A1315] hover:text-[#4D0C0D] underline decoration-amber-400 underline-offset-2"
                     >
-                      Sign in directly on landing page
+                      Sign In
                     </Link>
                   </p>
                 </div>

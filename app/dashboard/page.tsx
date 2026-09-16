@@ -20,11 +20,6 @@ interface PurchaseRequest {
 }
 
 const TERMINAL_STAGES = ["completed", "cancelled", "rejected"];
-const QUICK_ACTIONS = [
-  { href: "/dashboard/new-pr", label: "Create Purchase Request", description: "Start and submit a new procurement request.", icon: PlusCircle, tone: "gold" },
-  { href: "/dashboard/transparency", label: "Transparency Board", description: "Browse public procurement information and records.", icon: BarChart3, tone: "light" },
-  { href: "/dashboard/chatbot", label: "Ask Gab AI", description: "Get guidance on RA 12009, PR preparation, SVP, and procurement stages.", icon: Bot, tone: "light" },
-];
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -156,19 +151,7 @@ export default function DashboardPage() {
           ))}
         </section>
 
-        <section className="mt-4 sm:mt-5">
-          <div className="mb-2.5 flex items-end justify-between px-1"><div><p className="text-xs font-bold uppercase tracking-wider text-[#B88E13]">Workspace</p><h2 className="mt-0.5 text-base sm:text-lg font-extrabold text-[#4D0C0D]">Quick access</h2></div><span className="hidden text-xs text-stone-400 sm:block">Your essential tools</span></div>
-          <div className="grid gap-3 md:grid-cols-3">
-            {QUICK_ACTIONS.map(({href,label,description,icon:Icon,tone}) => (
-              <Link key={href} href={href} className={`group relative overflow-hidden rounded-2xl border p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 ${tone === "gold" ? "border-[#D4AF37]/35 bg-gradient-to-br from-[#FFFDF5] to-[#FFF7DD] shadow-[0_12px_30px_rgba(184,142,19,.07)]" : "border-stone-200/80 bg-white shadow-[0_10px_28px_rgba(45,35,30,.04)]"}`}>
-                <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#D4AF37]/10 blur-2xl" />
-                <div className="relative flex items-start gap-3"><div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone === "gold" ? "bg-[#7A1315] text-[#F0C83F]" : "bg-[#FFF6E4] text-[#9A7205]"}`}><Icon className="h-5 w-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-extrabold text-[#4D0C0D]">{label}</p><p className="mt-1 text-xs leading-relaxed text-stone-500">{description}</p></div><ArrowUpRight className="h-4 w-4 shrink-0 text-stone-300 transition group-hover:text-[#7A1315]" /></div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <div className="mt-4 grid gap-4 sm:mt-5 xl:grid-cols-[1fr_340px]">
+        <div className="mt-4 grid gap-4 sm:mt-6 xl:grid-cols-[1fr_340px]">
           <section className="overflow-hidden rounded-2xl border border-stone-200/80 bg-white shadow-[0_12px_34px_rgba(45,35,30,.045)]">
             <div className="flex items-center justify-between gap-3 border-b border-stone-100 px-5 py-4 sm:px-6 sm:py-4.5 bg-stone-50/50">
               <div>
@@ -242,6 +225,7 @@ export default function DashboardPage() {
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
             </section>
+
             <section className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-[0_10px_28px_rgba(45,35,30,.04)]">
               <div className="flex items-center gap-2.5">
                 <LayoutDashboard className="h-4 w-4 text-[#B88E13]" />
@@ -260,6 +244,18 @@ export default function DashboardPage() {
               ) : (
                 <p className="mt-3 text-xs leading-relaxed text-stone-500">You have no active procurement requests. Start a new request whenever you are ready.</p>
               )}
+            </section>
+
+            <section className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-[0_10px_28px_rgba(45,35,30,.04)]">
+              <div className="flex items-center gap-2.5">
+                <BarChart3 className="h-4 w-4 text-[#B88E13]" />
+                <h3 className="text-sm font-extrabold text-[#4D0C0D]">Transparency Board</h3>
+              </div>
+              <p className="mt-2 text-xs leading-relaxed text-stone-500">Browse official MSU-GenSan public procurement postings and bidding records.</p>
+              <Link href="/dashboard/transparency" className="mt-3.5 flex items-center justify-between rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs font-bold text-[#7A1315] hover:bg-[#7A1315] hover:text-white hover:border-[#7A1315] transition-all">
+                <span>View Transparency Board</span>
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
             </section>
           </div>
         </div>
