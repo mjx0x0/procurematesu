@@ -60,14 +60,14 @@ export default function LandingPage() {
 
         <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1200px] items-center gap-10 px-6 pt-24 pb-16 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:pt-20">
           <div className="text-center lg:text-left">
-            <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl text-white">
-              MSU GenSan
-              <span className="block mt-1 text-[#F0C83F]">Procurement</span>
-              <span className="block text-white/95">Management System</span>
+            <h1 style={{ fontFamily: "Georgia, serif" }} className="text-left text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.15] text-[#FAF3E0]">
+              <span className="text-[#FFF7E2]">MSU GenSan</span> <br className="hidden sm:inline" />
+              <span className="text-[#F3CF60]">Procurement</span>{" "}
+              <span className="text-[#F3EAD3]">Management System</span>
             </h1>
 
-            <p className="mx-auto mt-6 max-w-[560px] text-sm sm:text-base leading-relaxed text-white/80 lg:mx-0">
-              A refined digital workspace bringing Purchase Request preparation, standardized workflow tracking, public transparency records, and Gab AI procurement guidance into one institutional system.
+            <p className="mx-auto mt-6 max-w-[560px] text-justify text-sm sm:text-base leading-relaxed text-[#F3EAD3]/90 lg:mx-0 border-l-2 border-[#F3CF60]/60 pl-4 sm:pl-5">
+              A centralized institutional workspace for Purchase Request preparation, standardized procurement workflow monitoring, public transparency records, and automated policy guidance powered by Gab AI.
             </p>
           </div>
 

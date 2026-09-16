@@ -116,7 +116,7 @@ export default function LandingLoginCard() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#B88E13]">Institutional Access</p>
-              <h2 className="mt-1 text-2xl font-black tracking-tight text-[#4D0C0D]">Welcome back</h2>
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-[#4D0C0D]">Welcome!</h2>
               <p className="mt-1 text-xs text-stone-500">Sign in to the MSU GenSan Procurement System.</p>
             </div>
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7A1315] to-[#4D0C0D] shadow-sm border border-[#D4AF37]/25">
