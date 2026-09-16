@@ -8,6 +8,7 @@ import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-
 import { ActionFeedbackModal, type FeedbackTone } from "@/components/ui/ActionFeedbackModal";
 import RFQEditorModal from "@/components/RFQEditorModal";
 import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
+import { MsuLogo } from "@/components/msu-logo";
 import {
   Check, CheckCircle, Clock, Eye, FileCheck, FileText, Loader2, LogOut,
   MessageSquare, RefreshCw, Search, Trash2, User, Users, X, XCircle,
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
           const { data: { session } } = await supabase.auth.getSession();
           authUser = session?.user || null;
         }
-        if (!authUser) { router.replace("/auth/login"); return; }
+        if (!authUser) { router.replace("/"); return; }
         const { data: profile } = await supabase.from("users").select("role,is_active,status").eq("id", authUser.id).single();
         if (profile?.role !== "admin" || profile?.is_active === false || (profile?.status && profile.status !== "approved")) { router.replace("/dashboard"); return; }
         setUser(authUser);
@@ -159,7 +160,7 @@ export default function AdminDashboard() {
       if (result.stageHistory) setHistory(result.stageHistory);
       void loadData();
       const nextInfo = action === "complete" && result.newStatus ? STAGES.find((s) => s.key === result.newStatus) : null;
-      if (action === "complete") showFeedback("success", "Stage Completed Successfully", `${selectedPR.pr_no} has been advanced to ${nextInfo ? `Step ${nextInfo.number}: ${nextInfo.label}` : "the next stage"}.`);
+      if (action === "complete") showFeedback("success", "Stage Completed Successfully", `${selectedPR.pr_no} has been advanced to ${nextInfo ? `Stage ${nextInfo.number}: ${nextInfo.label}` : "the next stage"}.`);
       else if (action === "remark") showFeedback("success", "Remark Recorded", `Your procurement remark for ${selectedPR.pr_no} has been recorded.`);
       else showFeedback("success", "Purchase Request Rejected", `${selectedPR.pr_no} has been marked as rejected.`);
     } catch (e: any) { console.error(e); showFeedback("error", "Action Failed", e.message || "Unable to complete the requested action."); }
@@ -194,13 +195,13 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
       <nav className="bg-white/95 border-b border-stone-200 sticky top-0 z-40 shadow-[0_1px_12px_rgba(45,20,10,0.04)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0"><div className="bg-[#7C1D2E] p-2 rounded-xl text-[#D4A843] shrink-0"><FileText className="h-5 w-5" /></div><div className="min-w-0"><b className="block text-base sm:text-lg text-[#5A1420] truncate">MSU GenSan Procurement Management System</b><span className="text-[10px] sm:text-xs text-stone-500 font-semibold tracking-wide">ADMIN PORTAL</span></div></div>
+          <div className="flex items-center gap-3 min-w-0"><MsuLogo size={40} className="shrink-0" /><div className="min-w-0"><b className="block text-base sm:text-lg text-[#5A1420] truncate">MSU GenSan Procurement Management System</b><span className="text-[10px] sm:text-xs text-stone-500 font-semibold tracking-wide">ADMIN PORTAL</span></div></div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0"><span className="hidden lg:block text-xs text-stone-600"><User className="inline h-3.5 w-3.5 mr-1" />{user?.email}</span><button onClick={logout} title="Logout" aria-label="Logout" className="admin-logout inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-stone-200 bg-white text-stone-600 hover:text-[#7C1D2E] hover:bg-red-50 text-xs font-bold transition-colors"><LogOut className="h-4 w-4" /><span>Logout</span></button></div>
         </div>
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-7">
-        <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-[#9A7B2F] font-extrabold mb-2"><Sparkles className="h-3.5 w-3.5" /> Procurement Operations</div><h1 className="text-3xl font-extrabold tracking-tight text-[#5A1420]">Admin Dashboard</h1><p className="text-stone-600 mt-1 text-sm">Manage Purchase Requests through the official 20-step PMO procurement process.</p></div><div className="flex flex-wrap gap-2 items-start"><Link href="/admin/users" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7C1D2E] hover:bg-red-50 flex items-center gap-2"><Users className="h-4 w-4" /> User Approvals</Link><Link href="/admin/inquiries" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7C1D2E] hover:bg-red-50 flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#7C1D2E] border border-[#7C1D2E] rounded-xl text-sm font-bold text-white hover:bg-[#5A1420] disabled:opacity-60 disabled:cursor-wait shadow-sm transition-all"><RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
+        <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-[#9A7B2F] font-extrabold mb-2"><Sparkles className="h-3.5 w-3.5" /> Procurement Operations</div><h1 className="text-3xl font-extrabold tracking-tight text-[#5A1420]">Admin Dashboard</h1><p className="text-stone-600 mt-1 text-sm">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="flex flex-wrap gap-2 items-start"><Link href="/admin/users" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7C1D2E] hover:bg-red-50 flex items-center gap-2"><Users className="h-4 w-4" /> User Approvals</Link><Link href="/admin/inquiries" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7C1D2E] hover:bg-red-50 flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#7C1D2E] border border-[#7C1D2E] rounded-xl text-sm font-bold text-white hover:bg-[#5A1420] disabled:opacity-60 disabled:cursor-wait shadow-sm transition-all"><RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-7">{[[stats.total, "Total PRs", FileCheck, "text-[#7C1D2E]"], [stats.pending, "In Progress", Clock, "text-amber-600"], [stats.inProgress, "Beyond Receipt", AlertCircle, "text-orange-600"], [stats.completed, "Completed", CheckCircle, "text-emerald-700"], [stats.rejected, "Rejected", XCircle, "text-red-600"]].map(([n, l, I, c]: any) => <div key={l} className="bg-white rounded-2xl p-4 border border-stone-200 shadow-[0_5px_20px_rgba(45,20,10,0.035)]"><div className="flex justify-between items-center"><div><div className={`text-2xl font-bold ${c}`}>{n}</div><div className="text-xs font-semibold text-stone-600 mt-0.5">{l}</div></div><I className={`h-5 w-5 ${c}`} /></div></div>)}</div>
 
@@ -312,7 +313,7 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-5 py-4 align-middle">
                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border max-w-[220px] truncate ${COLORS[pr.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
-                            {stageNumber ? `Step ${stageNumber}: ` : ""}{LABELS[pr.current_stage] || pr.current_stage}
+                            {stageNumber ? `Stage ${stageNumber}: ` : ""}{LABELS[pr.current_stage] || pr.current_stage}
                           </span>
                         </td>
                         <td className="px-5 py-4 align-middle text-xs font-semibold text-stone-500 whitespace-nowrap">
@@ -347,7 +348,7 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-3">
                   <h3 className="text-xl font-extrabold text-[#5A1420] tracking-tight">PR {selectedPR.pr_no}</h3>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${COLORS[selectedPR.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
-                    {detailStage ? `Step ${detailStage.number}: ${detailStage.shortLabel}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
+                    {detailStage ? `Stage ${detailStage.number}: ${detailStage.shortLabel}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-stone-500 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -387,7 +388,7 @@ export default function AdminDashboard() {
                     <p className="text-xs text-stone-500 mt-0.5">Execute stage advancement, evaluate RFQs, inspect submitted forms, or record remarks.</p>
                   </div>
                   <div className="text-xs font-bold text-stone-600 bg-white px-3 py-1 rounded-lg border border-stone-200 shrink-0">
-                    {detailStage ? `Step ${detailStage.number} of 20` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
+                    {detailStage ? `Stage ${detailStage.number}: ${detailStage.label}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
                   </div>
                 </div>
 
@@ -425,16 +426,16 @@ export default function AdminDashboard() {
                   {nextStage(selectedPR) ? (
                     <button
                       onClick={() => openAction("complete")}
-                      title={`Advance to Step ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}`}
+                      title={`Advance to Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}`}
                       className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#FFFDF7] hover:bg-[#FFF8E6] text-[#7C1D2E] text-xs sm:text-sm font-bold border-2 border-[#D4AF37] shadow-sm transition-all active:scale-98"
                     >
                       <Check className="h-4 w-4 text-[#B88E13]" />
-                      <span>Step {nextStage(selectedPR)?.number} · Complete Stage</span>
+                      <span>Stage {nextStage(selectedPR)?.number} · Complete Stage</span>
                     </button>
                   ) : selectedPR.current_stage === "completed" ? (
                     <div className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-emerald-50 text-emerald-800 text-xs sm:text-sm font-bold border border-emerald-200">
                       <CheckCircle className="h-4 w-4 text-emerald-600" />
-                      <span>Procurement Completed (20 of 20)</span>
+                      <span>Procurement Completed — All Stages Finished</span>
                     </div>
                   ) : null}
 
@@ -479,24 +480,24 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Current PMO Step banner */}
+              {/* Current PMO Stage banner */}
               {detailStage && (
                 <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-4">
-                  <p className="text-[10px] uppercase tracking-wide text-amber-800 font-extrabold mb-1">Current PMO Step</p>
-                  <p className="text-sm font-extrabold text-stone-900">Step {detailStage.number}: {detailStage.label}</p>
+                  <p className="text-[10px] uppercase tracking-wide text-amber-800 font-extrabold mb-1">Current PMO Stage</p>
+                  <p className="text-sm font-extrabold text-stone-900">Stage {detailStage.number}: {detailStage.label}</p>
                   <p className="text-xs text-stone-600 mt-1">{detailStage.description}</p>
                 </div>
               )}
 
-              {/* 20-Step Procurement Progress */}
+              {/* Procurement Progress */}
               <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
-                    <h4 className="text-sm font-extrabold text-[#5A1420]">20-Step Procurement Progress</h4>
-                    <p className="text-xs text-stone-500">The current step is always shown, even when no historical completion row has been recorded yet.</p>
+                    <h4 className="text-sm font-extrabold text-[#5A1420]">Procurement Workflow Progress</h4>
+                    <p className="text-xs text-stone-500">The current stage is always shown, even when no historical completion row has been recorded yet.</p>
                   </div>
                   <span className="text-xs font-extrabold text-[#7C1D2E] bg-red-50 border border-red-100 px-2.5 py-1 rounded-full">
-                    {selectedPR.current_stage === "completed" ? "20 / 20" : detailIndex >= 0 ? `${detailIndex + 1} / 20` : "— / 20"}
+                    {selectedPR.current_stage === "completed" ? "Completed" : detailIndex >= 0 ? `Stage ${detailIndex + 1}` : "—"}
                   </span>
                 </div>
                 <div className="h-2 rounded-full bg-stone-100 overflow-hidden mb-4">
@@ -533,7 +534,7 @@ export default function AdminDashboard() {
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-[9px] uppercase tracking-[.12em] font-black text-stone-400">Step {stage.number}</span>
+                              <span className="text-[9px] uppercase tracking-[.12em] font-black text-stone-400">Stage {stage.number}</span>
                               <span
                                 className={`text-[9px] font-black ${
                                   state === "current" ? "text-[#7C1D2E]" : state === "completed" ? "text-emerald-700" : "text-stone-400"
@@ -596,7 +597,7 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   <p className="text-xs text-stone-400 text-center py-4">
-                    No historical activity has been recorded yet. The 20-step progress above is still calculated from the PR&apos;s current stage.
+                    No historical activity has been recorded yet. The procurement progress above is still calculated from the PR&apos;s current stage.
                   </p>
                 )}
               </div>
@@ -605,7 +606,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {action && selectedPR && <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className={`p-3 rounded-xl ${action === "reject" ? "bg-red-100 text-red-700" : action === "remark" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{action === "reject" ? <XCircle className="h-6 w-6" /> : action === "remark" ? <MessageSquare className="h-6 w-6" /> : <CheckCircle className="h-6 w-6" />}</div><div className="flex-1"><h3 className="text-lg font-bold text-gray-900">{action === "complete" ? "Complete Next Stage" : action === "remark" ? "Send Remark" : "Reject Purchase Request"}</h3><p className="text-xs text-stone-500 mt-1 font-medium">{selectedPR.pr_no}{action === "complete" && nextStage(selectedPR) ? ` · Step ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}` : ""}</p></div><button onClick={() => setAction(null)} className="p-1 text-stone-400 hover:text-stone-600"><X className="h-5 w-5" /></button></div>{action === "complete" && nextStage(selectedPR) && <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5"><div className="flex items-center gap-2 text-xs font-bold text-emerald-800 mb-1"><span>Advancing Step</span><ArrowRight className="h-3.5 w-3.5" /><span>Step {nextStage(selectedPR)?.number}: {nextStage(selectedPR)?.label}</span></div><p className="text-xs text-emerald-700">{nextStage(selectedPR)?.description}</p></div>}<label className="block text-xs font-bold text-stone-600 uppercase tracking-wide mb-2">{action === "complete" ? "Remarks / completion note" : "Reason / remark"} {action !== "complete" && <span className="text-red-500">*</span>}</label><textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder={action === "reject" ? "Explain why this PR is being rejected..." : action === "remark" ? "Enter a procurement remark..." : "Add a note for this stage (optional)..."} className="w-full min-h-[110px] rounded-xl border border-stone-200 bg-white text-gray-900 placeholder:text-stone-400 p-3 text-sm outline-none focus:ring-2 focus:ring-[#7C1D2E]/20 focus:border-[#7C1D2E] resize-y" /><div className="flex justify-end gap-2.5 mt-5"><button onClick={() => setAction(null)} disabled={busy} className="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200">Cancel</button><button onClick={() => void submitAction()} disabled={busy || (action !== "complete" && !remarks.trim())} className={`px-4 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 ${action === "reject" ? "bg-red-600 hover:bg-red-700" : action === "remark" ? "bg-[#7C1D2E] hover:bg-[#5A1420]" : "bg-gradient-to-r from-[#7C1D2E] to-[#91191C]"}`}>{busy && <Loader2 className="h-4 w-4 animate-spin" />}{action === "complete" ? "Complete Stage" : action === "remark" ? "Send Remark" : "Reject PR"}</button></div></div></div>}
+      {action && selectedPR && <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className={`p-3 rounded-xl ${action === "reject" ? "bg-red-100 text-red-700" : action === "remark" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{action === "reject" ? <XCircle className="h-6 w-6" /> : action === "remark" ? <MessageSquare className="h-6 w-6" /> : <CheckCircle className="h-6 w-6" />}</div><div className="flex-1"><h3 className="text-lg font-bold text-gray-900">{action === "complete" ? "Complete Next Stage" : action === "remark" ? "Send Remark" : "Reject Purchase Request"}</h3><p className="text-xs text-stone-500 mt-1 font-medium">{selectedPR.pr_no}{action === "complete" && nextStage(selectedPR) ? ` · Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}` : ""}</p></div><button onClick={() => setAction(null)} className="p-1 text-stone-400 hover:text-stone-600"><X className="h-5 w-5" /></button></div>{action === "complete" && nextStage(selectedPR) && <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5"><div className="flex items-center gap-2 text-xs font-bold text-emerald-800 mb-1"><span>Advancing Stage</span><ArrowRight className="h-3.5 w-3.5" /><span>Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}</span></div><p className="text-xs text-emerald-700">{nextStage(selectedPR)?.description}</p></div>}<label className="block text-xs font-bold text-stone-600 uppercase tracking-wide mb-2">{action === "complete" ? "Remarks / completion note" : "Reason / remark"} {action !== "complete" && <span className="text-red-500">*</span>}</label><textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder={action === "reject" ? "Explain why this PR is being rejected..." : action === "remark" ? "Enter a procurement remark..." : "Add a note for this stage (optional)..."} className="w-full min-h-[110px] rounded-xl border border-stone-200 bg-white text-gray-900 placeholder:text-stone-400 p-3 text-sm outline-none focus:ring-2 focus:ring-[#7C1D2E]/20 focus:border-[#7C1D2E] resize-y" /><div className="flex justify-end gap-2.5 mt-5"><button onClick={() => setAction(null)} disabled={busy} className="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200">Cancel</button><button onClick={() => void submitAction()} disabled={busy || (action !== "complete" && !remarks.trim())} className={`px-4 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 ${action === "reject" ? "bg-red-600 hover:bg-red-700" : action === "remark" ? "bg-[#7C1D2E] hover:bg-[#5A1420]" : "bg-gradient-to-r from-[#7C1D2E] to-[#91191C]"}`}>{busy && <Loader2 className="h-4 w-4 animate-spin" />}{action === "complete" ? "Complete Stage" : action === "remark" ? "Send Remark" : "Reject PR"}</button></div></div></div>}
 
       {deletePR && <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className="p-3 rounded-xl bg-red-50 text-red-600"><Trash2 className="h-6 w-6" /></div><div><h3 className="text-lg font-bold text-gray-900">Delete Purchase Request?</h3><p className="text-sm text-stone-600 mt-1"><b>{deletePR}</b> and its recorded stage history will be permanently removed.</p></div></div><div className="flex justify-end gap-2"><button onClick={() => setDeletePR(null)} className="px-4 py-2 rounded-lg bg-stone-100 text-stone-700 text-sm font-semibold">Cancel</button><button onClick={() => void deleteRequest()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold flex items-center gap-2"><Trash2 className="h-4 w-4" /> Delete Permanently</button></div></div></div>}
 

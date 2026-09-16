@@ -46,7 +46,7 @@ export default function AdminMonitoringPage() {
         const { data: { session } } = await supabase.auth.getSession();
         user = session?.user || null;
       }
-      if (!user) { router.replace("/auth/login"); return; }
+      if (!user) { router.replace("/"); return; }
       const { data: profile } = await supabase.from("users").select("role,is_active").eq("id", user.id).maybeSingle();
       if (!profile || profile.role !== "admin" || profile.is_active === false) { router.replace("/dashboard"); return; }
       const [{ data: prData }, { data: stageData }] = await Promise.all([

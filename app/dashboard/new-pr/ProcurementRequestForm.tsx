@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import { ArrowLeft, FileText, Loader2, Plus, Save, Send, Sparkles, Trash2, X, CheckCircle2, AlertCircle, Printer } from "lucide-react";
+import { MsuLogo } from "@/components/msu-logo";
 import { firstValidationError, validatePurchaseRequest } from "@/lib/pr-validation";
 
 interface Item { id: string; description: string; qty: number; unit: string; unit_cost: number; total_cost: number; }
@@ -36,7 +37,7 @@ export default function ProcurementRequestForm() {
         const { data: { session } } = await supabase.auth.getSession();
         user = session?.user || null;
       }
-      if (!user) { router.push("/auth/login"); return; }
+      if (!user) { router.push("/"); return; }
       setUserId(user.id);
       const name = user.user_metadata?.full_name || "";
       setUserName(name && !name.includes("@") ? name : "");
@@ -116,10 +117,8 @@ export default function ProcurementRequestForm() {
             <div className="p-1.5 rounded-lg border border-stone-200 text-stone-600 group-hover:text-[#7A1315] group-hover:border-[#7A1315]/30 group-hover:bg-[#FAF7F2] transition-colors">
               <ArrowLeft className="h-4 w-4" />
             </div>
-            <div className="flex items-center gap-2.5">
-              <span className="bg-[#7A1315] p-2 rounded-xl text-amber-200 border border-amber-400/30 shadow-sm">
-                <FileText className="h-4 w-4" />
-              </span>
+            <div className="flex items-center gap-3">
+              <MsuLogo size={38} className="shrink-0" />
               <div>
                 <span className="font-extrabold text-lg text-[#4D0C0D] leading-tight block">New Purchase Request</span>
                 <span className="text-[11px] text-stone-500 font-medium leading-none">Mindanao State University - General Santos</span>
@@ -143,6 +142,29 @@ export default function ProcurementRequestForm() {
           <div className="h-1.5 bg-gradient-to-r from-[#4D0C0D] via-[#B88E13] to-[#7A1315]" />
           
           <div className="p-6 md:p-8">
+            {/* Official University Header & Dedicated Logo Space */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pb-6 mb-8 border-b border-stone-200 text-center sm:text-left">
+              <div className="shrink-0">
+                <MsuLogo size={68} className="rounded-full shadow-xs" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold uppercase tracking-wider text-stone-500">
+                  Republic of the Philippines
+                </p>
+                <h1 className="text-lg sm:text-xl md:text-2xl font-black text-[#4D0C0D] tracking-tight">
+                  MINDANAO STATE UNIVERSITY - GENERAL SANTOS
+                </h1>
+                <p className="text-xs sm:text-sm font-semibold text-[#8C6B13]">
+                  Procurement Management Office &middot; Fatima, General Santos City
+                </p>
+                <div className="mt-2.5 inline-flex items-center gap-2 rounded-lg bg-red-50 border border-red-200/80 px-3 py-1">
+                  <span className="text-xs font-extrabold uppercase tracking-wide text-[#7A1315]">
+                    PURCHASE REQUEST FORM (PR)
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm flex items-start gap-3 animate-fade-in">
@@ -196,7 +218,7 @@ export default function ProcurementRequestForm() {
                     <input
                       value="Auto-generated"
                       disabled
-                      className="w-full font-mono text-xs font-semibold text-stone-500 bg-stone-100"
+                      className="w-full h-11 px-3.5 font-mono text-sm font-semibold text-stone-500 bg-stone-100 rounded-xl border border-stone-200"
                     />
                     <p className="text-[11px] text-stone-500">Assigned upon submission</p>
                   </div>
@@ -206,7 +228,7 @@ export default function ProcurementRequestForm() {
                       type="date"
                       value={new Date().toISOString().split("T")[0]}
                       disabled
-                      className="w-full text-xs font-semibold text-stone-600 bg-stone-100"
+                      className="w-full h-11 px-3.5 text-sm font-semibold text-stone-600 bg-stone-100 rounded-xl border border-stone-200"
                     />
                     <p className="text-[11px] text-stone-500">Current date</p>
                   </div>
@@ -215,7 +237,7 @@ export default function ProcurementRequestForm() {
                     <input
                       value="Auto-generated"
                       disabled
-                      className="w-full font-mono text-xs font-semibold text-stone-500 bg-stone-100"
+                      className="w-full h-11 px-3.5 font-mono text-sm font-semibold text-stone-500 bg-stone-100 rounded-xl border border-stone-200"
                     />
                     <p className="text-[11px] text-stone-500">Accounting reference</p>
                   </div>
@@ -224,15 +246,15 @@ export default function ProcurementRequestForm() {
                     <input
                       value="Auto-generated"
                       disabled
-                      className="w-full font-mono text-xs font-semibold text-stone-500 bg-stone-100"
+                      className="w-full h-11 px-3.5 font-mono text-sm font-semibold text-stone-500 bg-stone-100 rounded-xl border border-stone-200"
                     />
                     <p className="text-[11px] text-stone-500">Budget reference</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                  <div className="space-y-1">
-                    <label htmlFor="pr-dept" className="block text-xs font-bold text-stone-700">
+                  <div className="space-y-1.5">
+                    <label htmlFor="pr-dept" className="block text-sm font-bold text-stone-800">
                       Department / College / Office <span className="text-[#9E1A1D]">*</span>
                     </label>
                     <input
@@ -242,12 +264,12 @@ export default function ProcurementRequestForm() {
                       onChange={(e) => setForm({ ...form, department: e.target.value })}
                       placeholder="e.g., College of Engineering, Cashier's Office"
                       required
-                      className="w-full text-sm"
+                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-xs"
                     />
                     <p className="text-[11px] text-stone-500">Enter the official name of your operating unit or department.</p>
                   </div>
-                  <div className="space-y-1">
-                    <label htmlFor="pr-section" className="block text-xs font-bold text-stone-700">
+                  <div className="space-y-1.5">
+                    <label htmlFor="pr-section" className="block text-sm font-bold text-stone-800">
                       Section <span className="text-stone-400 font-normal">(Optional)</span>
                     </label>
                     <input
@@ -256,14 +278,14 @@ export default function ProcurementRequestForm() {
                       value={form.section}
                       onChange={(e) => setForm({ ...form, section: e.target.value })}
                       placeholder="e.g., IT Support Section, Science Laboratory"
-                      className="w-full text-sm"
+                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-xs"
                     />
                     <p className="text-[11px] text-stone-500">Leave blank if not applicable.</p>
                   </div>
                 </div>
 
-                <div className="space-y-1 pt-2">
-                  <label htmlFor="pr-purpose" className="block text-xs font-bold text-stone-700">
+                <div className="space-y-1.5 pt-2">
+                  <label htmlFor="pr-purpose" className="block text-sm font-bold text-stone-800">
                     Purpose / Description <span className="text-[#9E1A1D]">*</span>
                   </label>
                   <textarea
@@ -271,9 +293,9 @@ export default function ProcurementRequestForm() {
                     value={form.purpose}
                     onChange={(e) => setForm({ ...form, purpose: e.target.value })}
                     placeholder="State clearly the official purpose of this purchase request..."
-                    rows={3}
+                    rows={4}
                     required
-                    className="w-full text-sm resize-y"
+                    className="w-full min-h-[115px] p-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-xs resize-y leading-relaxed"
                   />
                   <p className="text-[11px] text-stone-500">Provide an accurate justification and intended use for the requested items.</p>
                 </div>
@@ -298,69 +320,69 @@ export default function ProcurementRequestForm() {
 
                 <div className="border border-stone-200 rounded-xl overflow-hidden shadow-xs">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse text-xs">
+                    <table className="w-full min-w-[760px] text-left border-collapse text-xs sm:text-sm">
                       <thead>
                         <tr className="bg-[#FAF7F2] border-b border-stone-200">
-                          <th className="py-3 px-3 w-10 text-center font-bold text-stone-500">#</th>
-                          <th className="py-3 px-3 font-bold text-stone-700">Item Description</th>
-                          <th className="py-3 px-3 w-20 text-center font-bold text-stone-700">Qty</th>
-                          <th className="py-3 px-3 w-24 text-center font-bold text-stone-700">Unit</th>
-                          <th className="py-3 px-3 w-32 text-right font-bold text-stone-700">Unit Cost (₱)</th>
-                          <th className="py-3 px-3 w-32 text-right font-bold text-stone-700">Total (₱)</th>
+                          <th className="py-3 px-3 w-12 text-center font-bold text-stone-500">#</th>
+                          <th className="py-3 px-3 min-w-[240px] font-bold text-stone-700">Item Description</th>
+                          <th className="py-3 px-3 w-24 text-center font-bold text-stone-700">Qty</th>
+                          <th className="py-3 px-3 w-28 text-center font-bold text-stone-700">Unit</th>
+                          <th className="py-3 px-3 w-36 text-right font-bold text-stone-700">Unit Cost (₱)</th>
+                          <th className="py-3 px-3 w-36 text-right font-bold text-stone-700">Total (₱)</th>
                           <th className="py-3 px-2 w-12 text-center font-bold text-stone-500" />
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-stone-100 bg-white">
                         {items.map((item, index) => (
                           <tr key={item.id} className="hover:bg-stone-50/60 transition-colors">
-                            <td className="py-2.5 px-3 text-center font-semibold text-stone-400">
+                            <td className="py-3 px-3 text-center font-semibold text-stone-400">
                               {index + 1}
                             </td>
-                            <td className="py-2.5 px-3">
+                            <td className="py-3 px-3">
                               <input
                                 value={item.description}
                                 onChange={(e) => updateItem(index, { description: e.target.value })}
                                 placeholder="e.g., Heavy duty stapler, A4 copy paper (70gsm)"
-                                className="w-full text-xs py-2 px-3"
+                                className="w-full h-11 px-3.5 text-sm rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
                               />
                             </td>
-                            <td className="py-2.5 px-3">
+                            <td className="py-3 px-3">
                               <input
                                 type="number"
                                 min="1"
                                 value={item.qty}
                                 onChange={(e) => updateItem(index, { qty: Math.max(1, Number(e.target.value) || 1) })}
-                                className="w-full text-center text-xs py-2 px-2 font-semibold"
+                                className="w-full h-11 px-2 text-center text-sm font-semibold rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
                               />
                             </td>
-                            <td className="py-2.5 px-3">
+                            <td className="py-3 px-3">
                               <input
                                 value={item.unit}
                                 onChange={(e) => updateItem(index, { unit: e.target.value })}
                                 placeholder="pcs"
-                                className="w-full text-center text-xs py-2 px-2"
+                                className="w-full h-11 px-2 text-center text-sm rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
                               />
                             </td>
-                            <td className="py-2.5 px-3">
+                            <td className="py-3 px-3">
                               <input
                                 type="number"
                                 min="0"
                                 step="0.01"
                                 value={item.unit_cost}
                                 onChange={(e) => updateItem(index, { unit_cost: Math.max(0, Number(e.target.value) || 0) })}
-                                className="w-full text-right text-xs py-2 px-2 font-mono"
+                                className="w-full h-11 px-3 text-right text-sm font-mono rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
                               />
                             </td>
-                            <td className="py-2.5 px-3 text-right font-mono font-bold text-stone-900">
+                            <td className="py-3 px-3 text-right font-mono font-bold text-stone-900 text-sm sm:text-base">
                               ₱{(item.qty * item.unit_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
-                            <td className="py-2.5 px-2 text-center">
+                            <td className="py-3 px-2 text-center">
                               <button
                                 type="button"
                                 onClick={() => removeItem(index)}
                                 disabled={items.length === 1}
                                 title="Remove item"
-                                className="p-1.5 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-25 transition-colors"
+                                className="p-2 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-25 transition-colors"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -392,8 +414,8 @@ export default function ProcurementRequestForm() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="space-y-2 rounded-xl border border-stone-200 bg-[#FFFEFC] p-4">
-                    <label htmlFor="pr-requested-by" className="block text-xs font-bold text-stone-800">
+                  <div className="space-y-3 rounded-xl border border-stone-200 bg-[#FFFEFC] p-5">
+                    <label htmlFor="pr-requested-by" className="block text-sm font-bold text-stone-800">
                       Requested By (Requisitioner Name) <span className="text-[#9E1A1D]">*</span>
                     </label>
                     <input
@@ -402,12 +424,12 @@ export default function ProcurementRequestForm() {
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
                       placeholder="Enter your actual full name"
-                      className="w-full text-sm"
+                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-xs"
                     />
                     <p className="text-[11px] text-stone-500">Provide your actual legal full name, not an email address.</p>
                     
-                    <div className="pt-2 space-y-1">
-                      <label htmlFor="pr-designation" className="block text-xs font-semibold text-stone-700">
+                    <div className="pt-2 space-y-1.5">
+                      <label htmlFor="pr-designation" className="block text-sm font-semibold text-stone-700">
                         Designation / Position <span className="text-stone-400 font-normal">(Optional)</span>
                       </label>
                       <input
@@ -415,7 +437,7 @@ export default function ProcurementRequestForm() {
                         value={form.requested_by_designation}
                         onChange={(e) => setForm({ ...form, requested_by_designation: e.target.value })}
                         placeholder="e.g., Faculty, Administrative Aide IV, Department Chair"
-                        className="w-full text-sm"
+                        className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-xs"
                       />
                     </div>
                   </div>

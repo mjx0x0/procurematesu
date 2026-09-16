@@ -72,7 +72,7 @@ export default function NewPRForm() {
         user = session?.user || null;
       }
       if (!user) {
-        router.push("/auth/login");
+        router.push("/");
         return;
       }
       setUserId(user.id);

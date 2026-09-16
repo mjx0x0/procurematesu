@@ -75,7 +75,7 @@ export default function PRDetailPage() {
           const { data: { session } } = await supabase.auth.getSession();
           user = session?.user || null;
         }
-        if (!user) { router.push("/auth/login"); return; }
+        if (!user) { router.push("/"); return; }
         const { data: prData, error: prError } = await supabase.from("purchase_requests").select("*").eq("pr_no", prNo).single();
         if (prError || !prData) { setError("Purchase request not found"); return; }
         setPr(prData);
@@ -169,11 +169,9 @@ export default function PRDetailPage() {
       <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 px-4 py-3 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="bg-[#7A1315] p-2 rounded-xl text-amber-200 border border-amber-400/30 shadow-xs">
-              <FileText className="h-5 w-5" />
-            </div>
+            <MsuLogo size={38} className="shrink-0" />
             <div>
-              <span className="font-extrabold text-xl text-[#4D0C0D] tracking-tight">
+              <span className="font-extrabold text-lg sm:text-xl text-[#4D0C0D] tracking-tight">
                 Procuremate<span className="text-[#B88E13]">SU</span>
               </span>
               <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-50 text-[#7A1315] border border-amber-200/80 ml-2">

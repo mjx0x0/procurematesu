@@ -84,7 +84,7 @@ export default function AdminWorkflowBridge(){
         const progressCount=isCompletedRequest?20:Math.min(20,Math.max(historyCount,currentIndex));
         const percent=Math.round((progressCount/20)*100);
         const currentInfo=STAGES.find(s=>s.key===currentStage);
-        const headerText=isCompletedRequest?"Completed — all 20 stages finished":currentInfo?`Step ${currentInfo.number} of 20 — ${currentInfo.label}`:currentStage?currentStage.replace(/_/g," "):"Current stage unavailable";
+        const headerText=isCompletedRequest?"Completed — procurement finished":currentInfo?`Stage ${currentInfo.number}: ${currentInfo.label}`:currentStage?currentStage.replace(/_/g," "):"Current stage unavailable";
 
         const wrap=document.createElement("div");
         wrap.dataset.adminStageTimeline="true";

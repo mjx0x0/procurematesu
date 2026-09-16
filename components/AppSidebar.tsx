@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { MsuLogo } from "@/components/msu-logo";
 import { BarChart3, Bot, FilePlus2, FileText, LogOut, MessageSquare, ShieldCheck, Users, ClipboardCheck } from "lucide-react";
 
 interface AppSidebarProps {
@@ -43,9 +44,7 @@ export default function AppSidebar({ mode }: AppSidebarProps) {
   return (
     <aside className="app-sidebar fixed inset-y-0 left-0 z-[55] hidden w-[230px] flex-col bg-gradient-to-b from-[#560608] via-[#6D0D10] to-[#420406] text-white shadow-[10px_0_30px_rgba(40,4,6,0.18)] border-r border-[#D4AF37]/20 lg:flex">
       <div className="flex h-[72px] items-center gap-3 border-b border-[#D4AF37]/15 px-5 bg-black/10">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#F0C83F]/20 to-[#B88E13]/10 text-[#F0C83F] border border-[#F0C83F]/30 shadow-inner">
-          <FileText className="h-5 w-5" />
-        </div>
+        <MsuLogo size={38} className="shrink-0" />
         <div className="min-w-0 leading-tight">
           <p className="truncate text-sm font-extrabold tracking-tight text-white">MSU GenSan</p>
           <p className="text-[10px] font-black tracking-wider text-[#F0C83F] uppercase">Procurement System</p>

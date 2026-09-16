@@ -80,7 +80,7 @@ main > section:has(> h3) > h3 {
 }
 
 main > section:has(> h3) > h3::after {
-  content: '20 STAGES';
+  content: 'WORKFLOW TIMELINE';
   margin-left: auto;
   padding: 5px 9px;
   border: 1px solid rgba(184,142,19,.38);

@@ -6,7 +6,7 @@ import { GoogleGenAI } from '@google/genai';
 
 const TESTS = [
   { name: 'RA 12009', question: 'What is RA 12009?', keywords: ['12009', 'procurement', 'government'] },
-  { name: '20-stage workflow', question: 'What are the stages in the MSU-General Santos procurement process?', keywords: ['receipt', 'verification', 'purchase order', 'monitoring'] },
+  { name: 'Procurement workflow', question: 'What are the stages in the MSU-General Santos procurement process?', keywords: ['receipt', 'verification', 'purchase order', 'monitoring'] },
   { name: 'SVP', question: 'What is Small Value Procurement and what should I consider?', keywords: ['small value', 'procurement', 'threshold'] },
   { name: 'PR tracking', question: 'How does ProcuremateSU help users track a Purchase Request?', keywords: ['purchase request', 'status', 'stage'] },
   { name: 'Next step', question: 'What information should a user need to know about what happens next in a procurement process?', keywords: ['next', 'stage', 'process'] },

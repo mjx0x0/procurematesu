@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ArrowLeft, ExternalLink, FileText, Search, ShieldCheck, TrendingUp } from "lucide-react";
+import { MsuLogo } from "@/components/msu-logo";
 import { TRANSPARENCY_PROJECTS, TRANSPARENCY_SOURCE_URL } from "@/lib/transparency-projects";
 
 const YEARS = [2026, 2025, 2024];
@@ -39,11 +40,9 @@ export default function TransparencyPage() {
             <ArrowLeft className="h-4 w-4" />
             Back to Dashboard
           </Link>
-          <div className="flex items-center gap-2">
-            <div className="bg-[#7A1315] p-2 rounded-xl text-amber-300 border border-amber-400/30">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <span className="font-bold text-lg text-[#4D0C0D]">Procurement Transparency</span>
+          <div className="flex items-center gap-2.5">
+            <MsuLogo size={36} className="shrink-0" />
+            <span className="font-bold text-base sm:text-lg text-[#4D0C0D]">Procurement Transparency</span>
           </div>
         </div>
       </nav>

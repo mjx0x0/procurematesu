@@ -21,6 +21,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
+import { MsuLogo } from "@/components/msu-logo";
 
 interface PRChoice {
   pr_no: string;
@@ -62,7 +63,7 @@ const WELCOME: Message = {
   id: "welcome",
   role: "assistant",
   content:
-    "👋 Kumusta! I am your official **AI Procurement Assistant for Mindanao State University - General Santos**.\n\nI can help you with:\n• **RA 12009 & RA 9184** procurement guidelines\n• **Purchase Request drafting** step-by-step\n• **PR tracking** and 20-stage timeline status\n• **Procurement Office (PMO) & BAC** requirements\n• **Small Value Procurement (SVP)** and PhilGEPS thresholds\n\nYour conversations are automatically saved. Ask me anything or choose a quick prompt below!",
+    "👋 Kumusta! I am your official **AI Procurement Assistant for Mindanao State University - General Santos**.\n\nI can help you with:\n• **RA 12009 & RA 9184** procurement guidelines\n• **Purchase Request drafting** step-by-step\n• **PR tracking** and live milestone timeline status\n• **Procurement Office (PMO) & BAC** requirements\n• **Small Value Procurement (SVP)** and PhilGEPS thresholds\n\nYour conversations are automatically saved. Ask me anything or choose a quick prompt below!",
   timestamp: new Date(),
 };
 
@@ -151,7 +152,7 @@ export default function ChatbotDashboard() {
           user = session?.user || null;
         }
         if (!user) {
-          router.replace("/auth/login");
+          router.replace("/");
           return;
         }
         if (cancelled) return;
@@ -277,7 +278,7 @@ export default function ChatbotDashboard() {
         await persistMessage(sid, "user", text);
         const prs = await loadMyPRs();
         const response = prs.length
-          ? `📋 **Which Purchase Request would you like to track?**\n\nI found **${prs.length} submitted PR${prs.length === 1 ? "" : "s"}** under your account. Select one below to view its complete 20-stage timeline status.`
+          ? `📋 **Which Purchase Request would you like to track?**\n\nI found **${prs.length} submitted PR${prs.length === 1 ? "" : "s"}** under your account. Select one below to view its complete milestone timeline status.`
           : `📋 **You don't have any submitted Purchase Requests yet.**\n\nOnce you submit a Purchase Request in the system, you can say **"Track my PR"** and I will display your real-time tracking status here.`;
 
         await persistMessage(sid, "assistant", response, prs.length ? { prOptions: prs } : {});
@@ -516,7 +517,8 @@ export default function ChatbotDashboard() {
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <div className="bg-[#7A1315] p-2 rounded-xl text-amber-300 border border-amber-400/30 shadow-xs shrink-0">
+            <MsuLogo size={36} className="shrink-0" />
+            <div className="bg-[#7A1315] p-2 rounded-xl text-amber-300 border border-amber-400/30 shadow-xs shrink-0 hidden sm:flex">
               <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div className="min-w-0">

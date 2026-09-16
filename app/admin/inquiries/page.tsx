@@ -55,7 +55,7 @@ export default function InquiriesPage() {
           user = session?.user || null;
         }
         if (!user) {
-          router.push("/auth/login");
+          router.push("/");
           return;
         }
 

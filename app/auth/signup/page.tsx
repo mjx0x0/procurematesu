@@ -220,7 +220,7 @@ export default function SignupPage() {
                     </h1>
 
                     <p className="mt-2.5 text-xs text-white/80 leading-relaxed">
-                      Register your official university account to submit Purchase Requests, track the 20-stage procurement roadmap, and access Gab AI assistance.
+                      Register your official university account to submit Purchase Requests, track institutional procurement workflows, and access Gab AI assistance.
                     </p>
                   </div>
 

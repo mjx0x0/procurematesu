@@ -39,11 +39,38 @@ select) {
   color: #1F1B18 !important;
   -webkit-text-fill-color: #1F1B18 !important;
   border: 1px solid #D6CDC2 !important;
-  border-radius: 10px;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  min-height: 2.75rem;
   line-height: 1.45;
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+#pr-dept,
+#pr-section,
+#pr-requested-by,
+#pr-designation {
+  min-height: 3.125rem !important;
+  font-size: 0.95rem !important;
+  padding: 0.75rem 1.125rem !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+}
+
+#pr-purpose {
+  min-height: 7rem !important;
+  font-size: 0.95rem !important;
+  padding: 0.875rem 1.125rem !important;
+  border-radius: 12px !important;
+  line-height: 1.55 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+}
+
+@media (max-width: 640px) {
+  :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+    font-size: 16px !important; /* Prevents iOS mobile zoom while providing comfortable touch targets */
+  }
 }
 
 #landing-email {

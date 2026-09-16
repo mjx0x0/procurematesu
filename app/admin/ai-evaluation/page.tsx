@@ -25,7 +25,7 @@ export default function AIEvaluationPage() {
         const { data: { session } } = await supabase.auth.getSession();
         user = session?.user || null;
       }
-      if (!user) { router.replace("/auth/login"); return; }
+      if (!user) { router.replace("/"); return; }
       const { data: profile } = await supabase.from("users").select("role,is_active").eq("id", user.id).maybeSingle();
       if (!profile || profile.role !== "admin" || profile.is_active === false) { router.replace("/dashboard"); return; }
       const { data } = await supabase.from("ai_response_evaluations").select("id,test_name,score,created_at,notes").order("created_at", { ascending: false }).limit(30);

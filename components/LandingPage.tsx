@@ -9,7 +9,7 @@ import { TRANSPARENCY_PROJECTS, TRANSPARENCY_SOURCE_URL } from "@/lib/transparen
 
 const FEATURES = [
   [ClipboardList, "01", "Prepare Purchase Requests", "Create and review PR information digitally before completing the required physical submission."],
-  [Workflow, "02", "Track the Procurement Flow", "Follow the standardized 20-stage PMO workflow and view recorded progress for submitted requests."],
+  [Workflow, "02", "Track the Procurement Flow", "Follow the standardized PMO workflow and view recorded progress for submitted requests."],
   [MessageCircle, "03", "Ask Gab AI", "Get procurement guidance and assistance grounded in the system's available procurement references."],
 ] as const;
 
@@ -95,8 +95,8 @@ export default function LandingPage() {
 
             <div className="mt-10 grid max-w-[520px] grid-cols-3 border-t border-white/15 pt-6 text-left">
               <div>
-                <div className="text-3xl font-extrabold text-[#F0C83F]">20</div>
-                <div className="mt-1 text-xs font-semibold text-white/70">Procurement Stages</div>
+                <div className="text-3xl font-extrabold text-[#F0C83F]">Full-Cycle</div>
+                <div className="mt-1 text-xs font-semibold text-white/70">Workflow Tracking</div>
               </div>
               <div className="border-l border-white/15 pl-5">
                 <div className="text-3xl font-extrabold text-[#F0C83F]">67</div>
@@ -154,7 +154,7 @@ export default function LandingPage() {
                 The <strong className="font-extrabold text-[#4D0C0D]">MSU Gensan Procurement System</strong> provides Mindanao State University - General Santos personnel with an integrated institutional platform for purchase requests, automated status monitoring, and compliant procurement documentation.
               </p>
               <p className="mt-4">
-                Operating strictly in alignment with Philippine public procurement guidelines and university standards, every request progresses through the standardized <strong className="font-extrabold text-[#4D0C0D]">20-stage procurement workflow</strong> with complete auditability.
+                Operating strictly in alignment with Philippine public procurement guidelines and university standards, every request progresses through the standardized <strong className="font-extrabold text-[#4D0C0D]">end-to-end procurement workflow</strong> with complete auditability.
               </p>
               <p className="mt-4">
                 Users can also consult <strong className="font-extrabold text-[#4D0C0D]">Gab AI</strong> for instant guidance on procurement policies, required attachments, and standard operating procedures.
@@ -175,7 +175,7 @@ export default function LandingPage() {
 
             <div className="grid grid-cols-2 gap-4">
               {[
-                ["20", "Procurement Stages", "Complete standardized workflow"],
+                ["Full", "Milestone Tracking", "Complete end-to-end PMO workflow"],
                 ["67", "Public Listings", "Open records on transparency board"],
                 ["2", "Access Roles", "Separated end-user & admin portals"],
                 ["1", "AI Assistant", "Gab AI policy & PR guidance"],
@@ -319,7 +319,7 @@ export default function LandingPage() {
             </p>
             <h2 className="mt-1 text-xl font-extrabold tracking-tight">MSU GenSan Procurement System</h2>
             <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-white/60">
-              Centralized platform for Purchase Requests, standardized 20-stage procurement workflows, transparency disclosures, and Gab AI assistance.
+              Centralized platform for Purchase Requests, standardized procurement workflows, transparency disclosures, and Gab AI assistance.
             </p>
           </div>
           <Link

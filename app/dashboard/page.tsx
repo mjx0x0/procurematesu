@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ArrowUpRight, BarChart3, Bot, CheckCircle, ClipboardList, Clock, Eye, FileText, LayoutDashboard, Loader2, LogOut, PlusCircle, ShieldCheck, Sparkles } from "lucide-react";
+import { MsuLogo } from "@/components/msu-logo";
 import { Chatbot } from "@/components/chatbot/Chatbot";
 import { NotificationPopover } from "@/components/NotificationPopover";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
@@ -43,7 +44,7 @@ export default function DashboardPage() {
           authUser = session?.user || null;
         }
         if (!authUser) {
-          router.replace("/auth/login");
+          router.replace("/");
           return;
         }
         if (cancelled) return;
@@ -112,12 +113,12 @@ export default function DashboardPage() {
   return (
     <div className="app-theme min-h-[100svh] overflow-x-hidden bg-[#F7F5F2] text-[#302725] dashboard-page">
       <header className="sticky top-0 z-40 border-b border-[#7A1315]/10 bg-[#FCFBF9]/95 backdrop-blur-xl">
-        <div className="mx-auto flex min-h-[58px] max-w-[1220px] items-center justify-between gap-2 px-3 py-2 sm:min-h-[66px] sm:gap-4 sm:px-7 lg:px-8">
-          <Link href="/dashboard" className="flex min-w-0 items-center gap-2 sm:gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#7A1315] to-[#4D0C0D] shadow-[0_7px_20px_rgba(77,12,13,.16)] sm:h-9 sm:w-9 sm:rounded-xl"><FileText className="h-3.5 w-3.5 text-[#F0C83F] sm:h-4 sm:w-4" /></div>
-            <div className="min-w-0 leading-none">
-              <div className="max-w-[190px] truncate text-[9px] font-extrabold tracking-[-.015em] text-[#4D0C0D] sm:max-w-none sm:text-[12px]">MSU GenSan Procurement Management System</div>
-              <div className="mt-1 text-[6px] font-bold uppercase tracking-[.16em] text-[#B88E13] sm:text-[7px] sm:tracking-[.18em]">End User Workspace</div>
+        <div className="mx-auto flex min-h-[60px] max-w-[1220px] items-center justify-between gap-3 px-4 py-2.5 sm:min-h-[68px] sm:px-7 lg:px-8">
+          <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
+            <MsuLogo size={36} className="shrink-0" />
+            <div className="min-w-0 leading-tight">
+              <div className="max-w-[210px] truncate text-xs sm:text-sm font-extrabold tracking-tight text-[#4D0C0D] sm:max-w-none">MSU GenSan Procurement Management</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#B88E13]">End User Workspace</div>
             </div>
           </Link>
 
@@ -129,39 +130,39 @@ export default function DashboardPage() {
               <div className="max-w-[150px] leading-tight"><p className="truncate text-[9px] font-bold text-stone-800">{displayName}</p><p className="truncate text-[8px] text-stone-400">{user?.email}</p></div>
             </div>
             {isAdmin && <Link href="/admin" className="hidden items-center gap-1.5 rounded-xl border border-[#D4AF37]/45 bg-[#FFFDF6] px-3 py-2 text-[9px] font-bold text-[#7A1315] sm:flex"><ShieldCheck className="h-3.5 w-3.5 text-[#B88E13]" />Admin</Link>}
-            <button onClick={handleLogout} className="dashboard-logout inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-[8px] font-bold text-stone-600 transition hover:bg-red-50 hover:text-[#7A1315] sm:px-3" title="Logout"><LogOut className="h-3.5 w-3.5" /><span>Logout</span></button>
+            <button onClick={handleLogout} className="dashboard-logout inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-bold text-stone-600 transition hover:bg-red-50 hover:text-[#7A1315]" title="Logout"><LogOut className="h-4 w-4" /><span>Logout</span></button>
           </div>
         </div>
       </header>
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
-        <section className="relative overflow-hidden rounded-[20px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#5A080A] via-[#760D10] to-[#4A0507] px-4 py-6 shadow-[0_18px_45px_rgba(77,12,13,.12)] sm:rounded-[24px] sm:px-8 sm:py-9">
+        <section className="relative overflow-hidden rounded-[20px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#5A080A] via-[#760D10] to-[#4A0507] p-5 sm:p-8 md:p-9 shadow-[0_18px_45px_rgba(77,12,13,.12)]">
           <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
           <div className="relative grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F0C83F]/35 bg-[#F0C83F]/10 px-2.5 py-1.5 text-[7px] font-black uppercase tracking-[.14em] text-[#F5D766] sm:px-3 sm:text-[8px]"><Sparkles className="h-3 w-3" />Institutional Procurement</span>
-              <h1 className="mt-3 text-[26px] font-semibold leading-[1.06] tracking-[-.035em] text-white sm:mt-4 sm:text-[40px]">Good day, {displayName}.</h1>
-              <p className="mt-2.5 max-w-[670px] text-[10px] leading-[1.7] text-white/70 sm:mt-3 sm:text-[12px]">Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.</p>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F0C83F]/35 bg-[#F0C83F]/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-[#F5D766]"><Sparkles className="h-3.5 w-3.5" />Institutional Procurement</span>
+              <h1 className="mt-3 text-xl sm:text-3xl md:text-4xl font-extrabold leading-tight tracking-tight text-white">Good day, {displayName}.</h1>
+              <p className="mt-2.5 max-w-[670px] text-xs sm:text-sm leading-relaxed text-white/80">Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.</p>
             </div>
-            <Link href="/dashboard/new-pr" className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#F0C83F]/50 bg-gradient-to-r from-[#F0C83F] to-[#D4A82C] px-4 py-3 text-[9px] font-extrabold text-[#4D0C0D] shadow-[0_10px_25px_rgba(0,0,0,.16)] transition hover:-translate-y-0.5 sm:w-auto sm:text-[10px]"><PlusCircle className="h-4 w-4" />Create Purchase Request</Link>
+            <Link href="/dashboard/new-pr" className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#F0C83F]/50 bg-gradient-to-r from-[#F0C83F] to-[#D4A82C] px-5 py-3 text-xs sm:text-sm font-extrabold text-[#4D0C0D] shadow-[0_10px_25px_rgba(0,0,0,.16)] transition hover:-translate-y-0.5 sm:w-auto"><PlusCircle className="h-4 w-4" />Create Purchase Request</Link>
           </div>
         </section>
 
-        <section className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5 sm:grid-cols-3 sm:gap-3">
+        <section className="mt-4 grid grid-cols-2 gap-3 sm:mt-5 sm:grid-cols-3">
           {[{n:stats.total,t:"Total Requests",s:"All submitted PRs",Icon:FileText,tone:"bg-[#FFF2F2] text-[#7A1315]"},{n:stats.pending,t:"In Progress",s:"Awaiting next stage",Icon:Clock,tone:"bg-[#FFF8E5] text-[#9A7205]"},{n:stats.completed,t:"Completed",s:"Successfully delivered",Icon:CheckCircle,tone:"bg-[#ECFFF5] text-[#087449]"}].map((item) => (
-            <div key={item.t} className={`rounded-2xl border border-stone-200/80 bg-white p-3.5 shadow-[0_8px_24px_rgba(45,35,30,.04)] ${item.t === "Completed" ? "col-span-2 sm:col-span-1" : ""}`}>
-              <div className="flex items-center justify-between gap-2"><div><p className="text-[7px] font-black uppercase tracking-[.13em] text-stone-400 sm:text-[8px]">{item.t}</p><p className="mt-1 text-[23px] font-black tracking-[-.03em] text-[#4D0C0D] sm:text-[25px]">{item.n}</p><p className="mt-0.5 text-[8px] text-stone-500 sm:text-[9px]">{item.s}</p></div><div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10 ${item.tone}`}><item.Icon className="h-4 w-4" /></div></div>
+            <div key={item.t} className={`rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-5 shadow-[0_8px_24px_rgba(45,35,30,.04)] ${item.t === "Completed" ? "col-span-2 sm:col-span-1" : ""}`}>
+              <div className="flex items-center justify-between gap-2"><div><p className="text-xs font-bold uppercase tracking-wider text-stone-500">{item.t}</p><p className="mt-1 text-2xl sm:text-3xl font-black tracking-tight text-[#4D0C0D]">{item.n}</p><p className="mt-0.5 text-xs text-stone-500">{item.s}</p></div><div className={`flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl ${item.tone}`}><item.Icon className="h-5 w-5" /></div></div>
             </div>
           ))}
         </section>
 
         <section className="mt-4 sm:mt-5">
-          <div className="mb-2 flex items-end justify-between px-1"><div><p className="text-[7px] font-black uppercase tracking-[.16em] text-[#B88E13] sm:text-[8px]">Workspace</p><h2 className="mt-1 text-[14px] font-extrabold text-[#4D0C0D] sm:text-[15px]">Quick access</h2></div><span className="hidden text-[8px] text-stone-400 sm:block">Your essential tools</span></div>
-          <div className="grid gap-2.5 md:grid-cols-3">
+          <div className="mb-2.5 flex items-end justify-between px-1"><div><p className="text-xs font-bold uppercase tracking-wider text-[#B88E13]">Workspace</p><h2 className="mt-0.5 text-base sm:text-lg font-extrabold text-[#4D0C0D]">Quick access</h2></div><span className="hidden text-xs text-stone-400 sm:block">Your essential tools</span></div>
+          <div className="grid gap-3 md:grid-cols-3">
             {QUICK_ACTIONS.map(({href,label,description,icon:Icon,tone}) => (
-              <Link key={href} href={href} className={`group relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 sm:p-5 ${tone === "gold" ? "border-[#D4AF37]/35 bg-gradient-to-br from-[#FFFDF5] to-[#FFF7DD] shadow-[0_12px_30px_rgba(184,142,19,.07)]" : "border-stone-200/80 bg-white shadow-[0_10px_28px_rgba(45,35,30,.04)]"}`}>
+              <Link key={href} href={href} className={`group relative overflow-hidden rounded-2xl border p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 ${tone === "gold" ? "border-[#D4AF37]/35 bg-gradient-to-br from-[#FFFDF5] to-[#FFF7DD] shadow-[0_12px_30px_rgba(184,142,19,.07)]" : "border-stone-200/80 bg-white shadow-[0_10px_28px_rgba(45,35,30,.04)]"}`}>
                 <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#D4AF37]/10 blur-2xl" />
-                <div className="relative flex items-start gap-3"><div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone === "gold" ? "bg-[#7A1315] text-[#F0C83F]" : "bg-[#FFF6E4] text-[#9A7205]"}`}><Icon className="h-4 w-4" /></div><div className="min-w-0 flex-1"><p className="text-[10px] font-extrabold text-[#4D0C0D] sm:text-[11px]">{label}</p><p className="mt-1 text-[8px] leading-4 text-stone-500 sm:text-[9px]">{description}</p></div><ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-stone-300 transition group-hover:text-[#7A1315]" /></div>
+                <div className="relative flex items-start gap-3"><div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone === "gold" ? "bg-[#7A1315] text-[#F0C83F]" : "bg-[#FFF6E4] text-[#9A7205]"}`}><Icon className="h-5 w-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-extrabold text-[#4D0C0D]">{label}</p><p className="mt-1 text-xs leading-relaxed text-stone-500">{description}</p></div><ArrowUpRight className="h-4 w-4 shrink-0 text-stone-300 transition group-hover:text-[#7A1315]" /></div>
               </Link>
             ))}
           </div>
@@ -210,7 +211,7 @@ export default function DashboardPage() {
                       <div className="text-left sm:text-right">
                         <p className="text-sm font-extrabold text-stone-900">₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                         <span className={`mt-1 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${statusColor(pr.current_stage)}`}>
-                          {stageNumber(pr.current_stage) ? `Step ${stageNumber(pr.current_stage)} · ` : ""}{statusLabel(pr.current_stage)}
+                          {stageNumber(pr.current_stage) ? `Stage ${stageNumber(pr.current_stage)} · ` : ""}{statusLabel(pr.current_stage)}
                         </span>
                       </div>
                       <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs font-bold text-[#7A1315] shadow-xs group-hover:bg-[#7A1315] group-hover:text-white group-hover:border-[#7A1315] transition-all shrink-0">
@@ -263,7 +264,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <footer className="mt-6 flex flex-col items-center justify-between gap-1.5 border-t border-stone-200/80 py-4 text-center sm:mt-8 sm:flex-row sm:text-left"><p className="text-[7px] text-stone-400 sm:text-[8px]">MSU GenSan Procurement Management System · Institutional access</p><p className="text-[7px] text-stone-400 sm:text-[8px]">RA 12009 Compliant</p></footer>
+        <footer className="mt-6 flex flex-col items-center justify-between gap-1.5 border-t border-stone-200/80 py-4 text-center sm:mt-8 sm:flex-row sm:text-left"><p className="text-xs text-stone-500">MSU GenSan Procurement Management System · Institutional access</p><p className="text-xs text-stone-500">RA 12009 Compliant</p></footer>
       </main>
       <Chatbot />
       <style jsx global>{`

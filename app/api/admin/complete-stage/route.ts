@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
 
     const currentIndex = PROCUREMENT_STAGE_KEYS.indexOf(pr.current_stage as any);
     const nextIndex = PROCUREMENT_STAGE_KEYS.indexOf(newStatus as any);
-    if (currentIndex < 0 || nextIndex !== currentIndex + 1) return NextResponse.json({ error: 'Invalid stage transition. The PR must follow the official 20-step procurement sequence.' }, { status: 409, headers: JSON_HEADERS });
+    if (currentIndex < 0 || nextIndex !== currentIndex + 1) return NextResponse.json({ error: 'Invalid stage transition. The PR must follow the official procurement workflow sequence.' }, { status: 409, headers: JSON_HEADERS });
 
     // Step 7: an RFQ record is mandatory before the PR can leave the generation stage.
     if (pr.current_stage === RFQ_GENERATION_STAGE && newStatus === RFQ_EVALUATION_STAGE) {
