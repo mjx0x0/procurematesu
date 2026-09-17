@@ -21,6 +21,30 @@ function looksGibberish(value: string): boolean {
   return false;
 }
 
+const GENERIC_ITEMS = new Set([
+  'computer', 'computers', 'pc', 'pcs', 'laptop', 'laptops', 'desktop', 'desktops',
+  'printer', 'printers', 'scanner', 'scanners', 'projector', 'projectors',
+  'table', 'tables', 'chair', 'chairs', 'paper', 'papers', 'pen', 'pens',
+  'ink', 'inks', 'toner', 'toners', 'desk', 'desks', 'cabinet', 'cabinets',
+  'monitor', 'monitors', 'mouse', 'keyboard', 'keyboards', 'phone', 'phones',
+  'camera', 'cameras', 'aircon', 'fan', 'fans', 'software', 'equipment',
+  'supplies', 'materials', 'tools', 'device', 'devices', 'book', 'books',
+  'hard drive', 'flash drive', 'usb', 'headset', 'whiteboard', 'stapler'
+]);
+
+function isGenericWithoutSpecs(desc: string): boolean {
+  const clean = desc.trim().toLowerCase();
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (words.length <= 2) {
+    if (GENERIC_ITEMS.has(clean)) return true;
+    for (const w of words) {
+      if (GENERIC_ITEMS.has(w) && words.length <= 2) return true;
+    }
+  }
+  if (words.length < 2 && clean.length < 12) return true;
+  return false;
+}
+
 function cleanWords(value: string) { return value.trim().split(/\s+/).filter(Boolean); }
 
 export function validateDraftInput(value: string): string | null {
@@ -51,7 +75,11 @@ export function validatePurchaseRequest(input: {
   if (!input.items.length) errors.items = 'Add at least one procurement item.';
   else input.items.forEach((item, index) => {
     const description = item.description.trim(); const unit = item.unit.trim().toLowerCase();
-    if (description.length < 3 || looksGibberish(description)) errors[`item_${index}_description`] = `Item ${index + 1}: enter a meaningful item description.`;
+    if (description.length < 4 || looksGibberish(description)) {
+      errors[`item_${index}_description`] = `Item ${index + 1}: enter a meaningful item description with technical specifications.`;
+    } else if (isGenericWithoutSpecs(description)) {
+      errors[`item_${index}_description`] = `Item ${index + 1} ("${description}"): Please add complete technical specifications (e.g. brand, model, dimensions, processor/RAM, or capacity) rather than just a simple item name.`;
+    }
     if (!Number.isFinite(item.qty) || item.qty < 1) errors[`item_${index}_qty`] = `Item ${index + 1}: quantity must be at least 1.`;
     if (!COMMON_UNITS.has(unit)) errors[`item_${index}_unit`] = `Item ${index + 1}: enter a recognized unit such as pcs, sets, boxes, reams, kg, liters, or service.`;
     if (!Number.isFinite(item.unit_cost) || item.unit_cost < 0) errors[`item_${index}_cost`] = `Item ${index + 1}: unit cost must be a valid amount.`;

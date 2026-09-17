@@ -4,12 +4,50 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
-import { ArrowLeft, FileText, Loader2, Plus, Save, Send, Sparkles, Trash2, X, CheckCircle2, AlertCircle, Printer } from "lucide-react";
+import { ArrowLeft, FileText, Loader2, Plus, Save, Trash2, X, CheckCircle2, AlertCircle, Printer } from "lucide-react";
 import { MsuLogo } from "@/components/msu-logo";
 import { firstValidationError, validatePurchaseRequest } from "@/lib/pr-validation";
 
-interface Item { id: string; description: string; qty: number; unit: string; unit_cost: number; total_cost: number; }
-const emptyItem = (): Item => ({ id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, description: "", qty: 1, unit: "pcs", unit_cost: 0, total_cost: 0 });
+interface Item {
+  id: string;
+  description: string;
+  qty: number | "";
+  unit: string;
+  unit_cost: number | "";
+  total_cost: number;
+}
+
+const emptyItem = (): Item => ({
+  id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  description: "",
+  qty: 1,
+  unit: "pcs",
+  unit_cost: "",
+  total_cost: 0,
+});
+
+const STANDARD_UNITS = [
+  { value: "pcs", label: "pcs (Pieces)" },
+  { value: "unit", label: "unit (Units)" },
+  { value: "set", label: "set (Sets)" },
+  { value: "box", label: "box (Boxes)" },
+  { value: "ream", label: "ream (Reams)" },
+  { value: "pack", label: "pack (Packs)" },
+  { value: "roll", label: "roll (Rolls)" },
+  { value: "lot", label: "lot (Lot / Package)" },
+  { value: "pair", label: "pair (Pairs)" },
+  { value: "bottle", label: "bottle (Bottles)" },
+  { value: "bundle", label: "bundle (Bundles)" },
+  { value: "kit", label: "kit (Kits)" },
+  { value: "kg", label: "kg (Kilograms)" },
+  { value: "g", label: "g (Grams)" },
+  { value: "liter", label: "liter (Liters)" },
+  { value: "meter", label: "meter (Meters)" },
+  { value: "job", label: "job (Job Order)" },
+  { value: "service", label: "service (Services)" },
+  { value: "license", label: "license (Licenses)" },
+  { value: "month", label: "month (Months)" },
+];
 
 export default function ProcurementRequestForm() {
   const router = useRouter();
@@ -21,9 +59,6 @@ export default function ProcurementRequestForm() {
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [showAi, setShowAi] = useState(false);
-  const [aiInput, setAiInput] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [createdPRNo, setCreatedPRNo] = useState<string | null>(null);
   const [physicalSubmissionAcknowledged, setPhysicalSubmissionAcknowledged] = useState(false);
@@ -47,29 +82,48 @@ export default function ProcurementRequestForm() {
 
   useEffect(() => {
     if (!searchParams) return;
-    const department = searchParams.get("department"); const purpose = searchParams.get("purpose"); const total = searchParams.get("total"); const itemsParam = searchParams.get("items");
+    const department = searchParams.get("department"); const purpose = searchParams.get("purpose"); const totalParam = searchParams.get("total"); const itemsParam = searchParams.get("items");
     setForm(prev => ({ ...prev, ...(department ? { department } : {}), ...(purpose ? { purpose } : {}) }));
-    if (itemsParam) { try { const parsed = JSON.parse(itemsParam); if (Array.isArray(parsed) && parsed.length) setItems(parsed.map((item: any, index: number) => ({ id: `${Date.now()}-${index}`, description: item.item_description || "", qty: Number(item.quantity) || 1, unit: item.unit || "pcs", unit_cost: Number(item.unit_cost) || 0, total_cost: Number(item.total_cost) || (Number(item.quantity) || 1) * (Number(item.unit_cost) || 0) }))); } catch {} } else if (total) setItems(prev => prev.length ? prev : [emptyItem()]);
+    if (itemsParam) {
+      try {
+        const parsed = JSON.parse(itemsParam);
+        if (Array.isArray(parsed) && parsed.length) {
+          setItems(parsed.map((item: any, index: number) => {
+            const qty = Number(item.quantity) || 1;
+            const unitCost = Number(item.unit_cost) || 0;
+            return {
+              id: `${Date.now()}-${index}`,
+              description: item.item_description || "",
+              qty,
+              unit: item.unit || "pcs",
+              unit_cost: unitCost > 0 ? unitCost : "",
+              total_cost: qty * unitCost
+            };
+          }));
+        }
+      } catch {}
+    } else if (totalParam) {
+      setItems(prev => prev.length ? prev : [emptyItem()]);
+    }
   }, [searchParams]);
 
-  const total = items.reduce((sum, item) => sum + item.qty * item.unit_cost, 0);
-  const updateItem = (index: number, patch: Partial<Item>) => setItems(prev => prev.map((item, i) => { if (i !== index) return item; const next = { ...item, ...patch }; next.total_cost = next.qty * next.unit_cost; return next; }));
+  const total = items.reduce(
+    (sum, item) => sum + (Number(item.qty) || 0) * (Number(item.unit_cost) || 0),
+    0
+  );
+
+  const updateItem = (index: number, patch: Partial<Item>) =>
+    setItems(prev => prev.map((item, i) => {
+      if (i !== index) return item;
+      const next = { ...item, ...patch };
+      const q = typeof next.qty === "number" ? next.qty : (next.qty === "" ? 0 : Number(next.qty) || 0);
+      const c = typeof next.unit_cost === "number" ? next.unit_cost : (next.unit_cost === "" ? 0 : Number(next.unit_cost) || 0);
+      next.total_cost = q * c;
+      return next;
+    }));
+
   const addItem = () => setItems(prev => [...prev, emptyItem()]);
   const removeItem = (index: number) => setItems(prev => prev.length === 1 ? prev : prev.filter((_, i) => i !== index));
-
-  const handleAiDraft = async () => {
-    if (!aiInput.trim()) return;
-    setAiLoading(true); setError(null);
-    try {
-      const response = await fetch("/api/slot-fill", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: aiInput }) });
-      const data = await response.json();
-      if (!response.ok || data.error) throw new Error(data.error || "Unable to generate the draft.");
-      const ext = data.extracted || {};
-      setForm(prev => ({ ...prev, purpose: ext.purpose || prev.purpose, department: ext.department || prev.department }));
-      if (Array.isArray(ext.items) && ext.items.length) setItems(ext.items.map((item: any, index: number) => { const qty = Number(item.quantity) || 1; const unitCost = Number(item.unit_cost) || 0; return { id: `${Date.now()}-${index}`, description: item.item_description || "", qty, unit: item.unit || "pcs", unit_cost: unitCost, total_cost: Number(item.total_cost) || qty * unitCost }; }));
-      setShowAi(false); setAiInput("");
-    } catch (err: any) { setError(err?.message || "Failed to process the AI draft."); } finally { setAiLoading(false); }
-  };
 
   const validateBeforeReview = () => {
     if (!physicalSubmissionAcknowledged) {
@@ -77,7 +131,19 @@ export default function ProcurementRequestForm() {
       setShowReview(false);
       return false;
     }
-    const validationErrors = validatePurchaseRequest({ purpose: form.purpose, department: form.department, section: form.section, requestedBy: userName, designation: form.requested_by_designation, items: items.filter(item => item.description.trim()).map(item => ({ description: item.description, qty: item.qty, unit: item.unit, unit_cost: item.unit_cost })) });
+    const validationErrors = validatePurchaseRequest({
+      purpose: form.purpose,
+      department: form.department,
+      section: form.section,
+      requestedBy: userName,
+      designation: form.requested_by_designation,
+      items: items.filter(item => item.description.trim()).map(item => ({
+        description: item.description,
+        qty: Number(item.qty) || 0,
+        unit: item.unit,
+        unit_cost: Number(item.unit_cost) || 0
+      }))
+    });
     const message = firstValidationError(validationErrors);
     if (message) { setError(message); setShowReview(false); return false; }
     setError(null); return true;
@@ -91,7 +157,17 @@ export default function ProcurementRequestForm() {
     setSubmitting(true); setError(null);
     try {
       await supabase.auth.updateUser({ data: { full_name: userName.trim() } }).catch(() => {});
-      const validItems = items.filter(item => item.description.trim()).map(item => ({ description: item.description.trim(), qty: item.qty, unit: item.unit.trim() || "pcs", unit_cost: item.unit_cost, total_cost: item.qty * item.unit_cost }));
+      const validItems = items.filter(item => item.description.trim()).map(item => {
+        const q = Number(item.qty) || 1;
+        const c = Number(item.unit_cost) || 0;
+        return {
+          description: item.description.trim(),
+          qty: q,
+          unit: item.unit.trim() || "pcs",
+          unit_cost: c,
+          total_cost: q * c
+        };
+      });
       const { data: sessionData } = await supabase.auth.getSession(); const accessToken = sessionData?.session?.access_token;
       const res = await fetch("/api/pr/create", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json", ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) }, body: JSON.stringify({ department: form.department.trim(), section: form.section.trim() || null, purpose: form.purpose.trim(), total, printed_name: userName.trim(), designation: form.requested_by_designation.trim() || null, items: validItems }) });
       const resData = await res.json();
@@ -125,14 +201,6 @@ export default function ProcurementRequestForm() {
               </div>
             </div>
           </Link>
-          <button
-            type="button"
-            onClick={() => setShowAi(true)}
-            className="ui-button ui-button-gold text-xs px-3.5 py-2"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-[#4D0C0D]" />
-            <span>Draft with AI</span>
-          </button>
         </div>
       </nav>
 
@@ -166,13 +234,6 @@ export default function ProcurementRequestForm() {
             </div>
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm flex items-start gap-3 animate-fade-in">
-                  <AlertCircle className="h-5 w-5 mt-0.5 shrink-0 text-red-600" />
-                  <div className="leading-relaxed">{error}</div>
-                </div>
-              )}
-
               {/* Physical Submission Notice */}
               <div className="rounded-xl border-2 border-amber-300/80 bg-[#FFFDF7] p-5 shadow-sm">
                 <div className="flex items-start gap-3.5">
@@ -324,11 +385,31 @@ export default function ProcurementRequestForm() {
                       <thead>
                         <tr className="bg-[#FAF7F2] border-b border-stone-200">
                           <th className="py-3 px-3 w-12 text-center font-bold text-stone-500">#</th>
-                          <th className="py-3 px-3 min-w-[240px] font-bold text-stone-700">Item Description</th>
-                          <th className="py-3 px-3 w-24 text-center font-bold text-stone-700">Qty</th>
-                          <th className="py-3 px-3 w-28 text-center font-bold text-stone-700">Unit</th>
-                          <th className="py-3 px-3 w-36 text-right font-bold text-stone-700">Unit Cost (₱)</th>
-                          <th className="py-3 px-3 w-36 text-right font-bold text-stone-700">Total (₱)</th>
+                          <th className="py-3 px-3 min-w-[280px] font-bold text-stone-700">
+                            <div className="flex items-center gap-1.5">
+                              <span>Item Description &amp; Complete Specifications</span>
+                              <span className="text-[#9E1A1D]">*</span>
+                            </div>
+                            <span className="block text-[10px] font-normal text-stone-500 font-sans mt-0.5">
+                              Include brand, model, specs (e.g. processor/RAM or dimensions/size)
+                            </span>
+                          </th>
+                          <th className="py-3 px-3 w-28 text-center font-bold text-stone-700">
+                            <div>Qty <span className="text-[#9E1A1D]">*</span></div>
+                            <span className="block text-[10px] font-normal text-stone-500 font-sans mt-0.5">Quantity</span>
+                          </th>
+                          <th className="py-3 px-3 w-36 text-center font-bold text-stone-700">
+                            <div>Unit <span className="text-[#9E1A1D]">*</span></div>
+                            <span className="block text-[10px] font-normal text-stone-500 font-sans mt-0.5">Dropdown</span>
+                          </th>
+                          <th className="py-3 px-3 w-36 text-right font-bold text-stone-700">
+                            <div>Unit Cost (₱) <span className="text-[#9E1A1D]">*</span></div>
+                            <span className="block text-[10px] font-normal text-stone-500 font-sans mt-0.5">Estimated</span>
+                          </th>
+                          <th className="py-3 px-3 w-36 text-right font-bold text-stone-700">
+                            <div>Total (₱)</div>
+                            <span className="block text-[10px] font-normal text-stone-500 font-sans mt-0.5">Subtotal</span>
+                          </th>
                           <th className="py-3 px-2 w-12 text-center font-bold text-stone-500" />
                         </tr>
                       </thead>
@@ -340,41 +421,83 @@ export default function ProcurementRequestForm() {
                             </td>
                             <td className="py-3 px-3">
                               <input
+                                type="text"
                                 value={item.description}
                                 onChange={(e) => updateItem(index, { description: e.target.value })}
-                                placeholder="e.g., Heavy duty stapler, A4 copy paper (70gsm)"
-                                className="w-full h-11 px-3.5 text-sm rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
+                                placeholder="e.g., Desktop Computer: Core i7 13th Gen, 16GB RAM, 512GB SSD, 24&quot; IPS Monitor, Win 11 Pro"
+                                className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
                               />
+                              {item.description.trim().length > 0 && item.description.trim().length < 15 && (
+                                <p className="text-[10px] text-amber-700 font-medium mt-1">
+                                  Please provide complete technical specs (brand, model, size/specs, capacity, etc.)
+                                </p>
+                              )}
                             </td>
                             <td className="py-3 px-3">
                               <input
                                 type="number"
                                 min="1"
                                 value={item.qty}
-                                onChange={(e) => updateItem(index, { qty: Math.max(1, Number(e.target.value) || 1) })}
+                                placeholder="1"
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  if (val === "") {
+                                    updateItem(index, { qty: "" });
+                                  } else {
+                                    const parsed = parseInt(val, 10);
+                                    updateItem(index, { qty: isNaN(parsed) ? "" : parsed });
+                                  }
+                                }}
+                                onBlur={() => {
+                                  if (item.qty === "" || Number(item.qty) < 1) {
+                                    updateItem(index, { qty: 1 });
+                                  }
+                                }}
                                 className="w-full h-11 px-2 text-center text-sm font-semibold rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
                               />
                             </td>
                             <td className="py-3 px-3">
-                              <input
+                              <select
                                 value={item.unit}
                                 onChange={(e) => updateItem(index, { unit: e.target.value })}
-                                placeholder="pcs"
-                                className="w-full h-11 px-2 text-center text-sm rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
-                              />
+                                className="w-full h-11 px-2 text-center text-xs sm:text-sm font-medium rounded-lg border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all cursor-pointer shadow-2xs"
+                              >
+                                {STANDARD_UNITS.map((u) => (
+                                  <option key={u.value} value={u.value}>
+                                    {u.label}
+                                  </option>
+                                ))}
+                                {item.unit && !STANDARD_UNITS.some((u) => u.value.toLowerCase() === item.unit.toLowerCase()) && (
+                                  <option value={item.unit}>{item.unit}</option>
+                                )}
+                              </select>
                             </td>
                             <td className="py-3 px-3">
                               <input
                                 type="number"
                                 min="0"
-                                step="0.01"
+                                step="any"
                                 value={item.unit_cost}
-                                onChange={(e) => updateItem(index, { unit_cost: Math.max(0, Number(e.target.value) || 0) })}
+                                placeholder="0.00"
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  if (val === "") {
+                                    updateItem(index, { unit_cost: "" });
+                                  } else {
+                                    const parsed = parseFloat(val);
+                                    updateItem(index, { unit_cost: isNaN(parsed) ? "" : parsed });
+                                  }
+                                }}
+                                onBlur={() => {
+                                  if (item.unit_cost === "") {
+                                    updateItem(index, { unit_cost: 0 });
+                                  }
+                                }}
                                 className="w-full h-11 px-3 text-right text-sm font-mono rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
                               />
                             </td>
                             <td className="py-3 px-3 text-right font-mono font-bold text-stone-900 text-sm sm:text-base">
-                              ₱{(item.qty * item.unit_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              ₱{((Number(item.qty) || 0) * (Number(item.unit_cost) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
                             <td className="py-3 px-2 text-center">
                               <button
@@ -490,80 +613,6 @@ export default function ProcurementRequestForm() {
         </div>
       </main>
 
-      {/* AI Draft Modal */}
-      {showAi && (
-        <div className="fixed inset-0 bg-black/55 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-stone-200">
-            <div className="h-1 bg-gradient-to-r from-[#4D0C0D] via-[#B88E13] to-[#7A1315]" />
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2.5">
-                  <div className="bg-[#7A1315] p-2 rounded-xl text-amber-200 shadow-sm">
-                    <Sparkles className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-extrabold text-[#4D0C0D]">Draft with AI Procurement Assistant</h3>
-                    <p className="text-[11px] text-stone-500">Auto-structure your requirements into form fields</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowAi(false)}
-                  className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              
-              <div className="space-y-3">
-                <label htmlFor="ai-desc" className="block text-xs font-bold text-stone-700">
-                  What supplies or equipment do you need?
-                </label>
-                <textarea
-                  id="ai-desc"
-                  value={aiInput}
-                  onChange={(e) => setAiInput(e.target.value)}
-                  rows={4}
-                  placeholder="Example: I need 10 laptops for the College of Engineering computer laboratory, each costing around 35,000 pesos..."
-                  className="w-full text-sm"
-                />
-                <p className="text-[11px] text-stone-500 leading-relaxed">
-                  Mention quantities, estimated prices, and the department or purpose if available.
-                </p>
-              </div>
-
-              <div className="flex gap-3 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowAi(false)}
-                  className="ui-button ui-button-secondary flex-1"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAiDraft}
-                  disabled={aiLoading || !aiInput.trim()}
-                  className="ui-button ui-button-primary flex-1"
-                >
-                  {aiLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin text-amber-300" />
-                      <span>Structuring Draft...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4 text-amber-300" />
-                      <span>Generate Draft</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Review Modal */}
       {showReview && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-[60] p-4 animate-fade-in">
@@ -603,19 +652,23 @@ export default function ProcurementRequestForm() {
                     <span>Subtotal</span>
                   </div>
                   <div className="divide-y divide-stone-100 max-h-52 overflow-y-auto">
-                    {items.filter((i) => i.description.trim()).map((item) => (
-                      <div key={item.id} className="px-4 py-3 flex justify-between gap-4 items-center bg-white">
-                        <div className="min-w-0 flex-1">
-                          <div className="font-semibold text-stone-800 text-xs truncate">{item.description}</div>
-                          <div className="text-[11px] text-stone-500 mt-0.5">
-                            {item.qty} {item.unit} × ₱{item.unit_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {items.filter((i) => i.description.trim()).map((item) => {
+                      const q = Number(item.qty) || 0;
+                      const c = Number(item.unit_cost) || 0;
+                      return (
+                        <div key={item.id} className="px-4 py-3 flex justify-between gap-4 items-center bg-white">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-semibold text-stone-800 text-xs truncate">{item.description}</div>
+                            <div className="text-[11px] text-stone-500 mt-0.5">
+                              {q} {item.unit} × ₱{c.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
+                          </div>
+                          <div className="font-mono font-bold text-xs text-[#7A1315] shrink-0">
+                            ₱{(q * c).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </div>
                         </div>
-                        <div className="font-mono font-bold text-xs text-[#7A1315] shrink-0">
-                          ₱{(item.qty * item.unit_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                   <div className="px-4 py-3 bg-[#FAF7F2] border-t border-stone-200 flex justify-between items-center font-extrabold">
                     <span className="text-xs uppercase tracking-wider text-stone-700">Total Amount:</span>
@@ -696,6 +749,48 @@ export default function ProcurementRequestForm() {
                   <span>Close</span>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Error Pop-up / Toast Notification */}
+      {error && (
+        <div
+          role="alert"
+          className="fixed bottom-6 right-6 z-[90] max-w-md w-[calc(100vw-2rem)] sm:w-[440px] bg-white rounded-2xl border-2 border-red-500 shadow-[0_16px_48px_rgba(180,20,20,0.32)] overflow-hidden transition-all animate-in slide-in-from-bottom-5 duration-200"
+        >
+          <div className="h-1.5 bg-gradient-to-r from-red-600 via-amber-500 to-[#7A1315]" />
+          <div className="p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-xl bg-red-100 text-red-700 shrink-0 mt-0.5 shadow-2xs">
+                  <AlertCircle className="h-5 w-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-sm font-black text-red-900 tracking-tight">Attention: Form Incomplete</h4>
+                  <p className="mt-1.5 text-xs sm:text-sm text-stone-700 leading-relaxed font-medium">
+                    {error}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setError(null)}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors shrink-0"
+                title="Dismiss notice"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-3.5 pt-3 border-t border-stone-100 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={() => setError(null)}
+                className="text-xs font-bold text-white bg-[#7A1315] hover:bg-[#5E0E10] px-4 py-1.5 rounded-lg transition-colors shadow-xs"
+              >
+                Dismiss
+              </button>
             </div>
           </div>
         </div>
