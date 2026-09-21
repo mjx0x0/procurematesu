@@ -257,6 +257,24 @@ function generateOfflineProcurementResponse(query: string, retrievedContext: str
   );
 }
 
+function cleanAIResponse(text: string): string {
+  if (!text) return text;
+
+  return text
+    .replace(/\\?\\s*<br\\s*\\/?\\s*>/gi, '\\n')
+    .replace(/<\\/?(?:div|p|span|table|thead|tbody|tr|th|td)[^>]*>/gi, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\\\\\\|/g, '|')
+    .replace(/\\\\\\\\/g, '\\')
+    .replace(/[ \\t]+\\n/g, '\\n')
+    .trim();
+}
+
 // ============================================================
 // SMART PR PARSER & EXTRACTOR
 // ============================================================
@@ -770,7 +788,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
       }
     }
 
-    // 3. Update session in memory
+    // Normalize model formatting before saving or returning it to the UI.\n    responseText = cleanAIResponse(responseText);\n\n    // 3. Update session in memory
     sessionData.state = updatedState;
     sessionData.messages.push(
       { sender: 'user', content: trimmedMsg, time: new Date().toISOString() },
