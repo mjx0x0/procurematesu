@@ -4,6 +4,7 @@ import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js
 import { GoogleGenAI } from '@google/genai';
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
+import { callGroq } from '@/lib/groq';
 
 const NEW_TOPIC_PATTERN = /\b(what is|what are|how does|how do|explain|tell me about|where is|where can|when is|who is|contact|ra\s*12009|ra\s*9184|small value|svp|bidding|procurement flow|procurement office|new purchase request|draft (?:a )?pr|create (?:a )?pr|track my pr|show me my pr)\b/i;
 const DRAFT_CONTINUATION_PATTERN = /\b(purpose|department|office|section|item|items|quantity|unit|price|cost|budget|supplier|description|yes|no|correct|continue|next)\b/i;
@@ -33,14 +34,38 @@ function basicSlotCheck(step: string, message: string) {
 
 async function validateSlotAnswer(step: string, message: string, collected: any) {
   if (!basicSlotCheck(step, message)) return { valid: false, reason: 'That answer does not look like a valid response for this field.' };
+
+  const prompt = `Validate a user's answer during a Purchase Request slot-filling conversation. The current field is "${step}". Previous collected data: ${JSON.stringify(collected || {})}. User answer: "${message}". Decide whether the answer is semantically relevant to the requested field. Do not require exact MSU department names; plausible university departments/units are valid. For purpose, accept a clear reason or intended use for the procurement. For department, accept a department, office, college, school, unit, laboratory, or similar organizational name. For items, accept goods/materials/equipment/services and quantities or descriptions. Reject greetings, jokes, unrelated conversation, random text, gibberish, or answers that belong to a different slot. Return ONLY JSON: {"valid":true|false,"reason":"short reason"}.`;
+
+  const groqResult = await callGroq(prompt, 'You are a strict Purchase Request slot validator. Return only the requested JSON.', 0, {
+    maxOutputTokens: 180,
+    timeoutMs: 7000,
+    responseFormat: { type: 'json_object' },
+  });
+
+  if (groqResult) {
+    try {
+      const parsed = JSON.parse(groqResult.replace(/```json/gi, '').replace(/```/g, '').trim());
+      return { valid: parsed?.valid === true, reason: typeof parsed?.reason === 'string' ? parsed.reason : '' };
+    } catch {
+      // Fall through to Gemini compatibility fallback.
+    }
+  }
+
   const client = getSlotValidator();
   if (!client) return { valid: true, reason: '' };
-  const prompt = `Validate a user's answer during a Purchase Request slot-filling conversation. The current field is "${step}". Previous collected data: ${JSON.stringify(collected || {})}. User answer: "${message}". Decide whether the answer is semantically relevant to the requested field. Do not require exact MSU department names; plausible university departments/units are valid. For purpose, accept a clear reason or intended use for the procurement. For department, accept a department, office, college, school, unit, laboratory, or similar organizational name. For items, accept goods/materials/equipment/services and quantities or descriptions. Reject greetings, jokes, unrelated conversation, random text, gibberish, or answers that belong to a different slot. Return ONLY JSON: {"valid":true|false,"reason":"short reason"}.`;
+
   try {
-    const response = await client.models.generateContent({ model: 'gemini-3.1-flash-lite', contents: prompt, config: { temperature: 0, responseMimeType: 'application/json', maxOutputTokens: 180 } });
+    const response = await client.models.generateContent({
+      model: 'gemini-3.1-flash-lite',
+      contents: prompt,
+      config: { temperature: 0, responseMimeType: 'application/json', maxOutputTokens: 180 },
+    });
     const parsed = JSON.parse((response.text || '').replace(/```json/gi, '').replace(/```/g, '').trim());
     return { valid: parsed?.valid === true, reason: typeof parsed?.reason === 'string' ? parsed.reason : '' };
-  } catch { return { valid: true, reason: '' }; }
+  } catch {
+    return { valid: true, reason: '' };
+  }
 }
 
 function buildProcurementFlowResponse() { const lines = PROCUREMENT_STAGES.map(stage => `${stage.number}. **${stage.label}** — ${stage.description}`).join('\n'); return `🏛️ **MSU-General Santos Procurement Workflow**\n\nHere is the official **procurement workflow used in ProcuremateSU**, from receipt of the Purchase Request through monitoring and documentation.\n\n${lines}\n\n### Key posting thresholds\n• **₱50,000 and above:** applicable RFQ posting to PhilGEPS\n• **₱200,000 and above:** applicable SVP posting threshold noted in the MSU workflow\n\nThe exact stage descriptions above are taken from ProcuremateSU's centralized procurement-process definition, providing clear milestone tracking for all purchase requests.`; }
