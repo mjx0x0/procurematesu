@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
+import { callGroq } from '@/lib/groq';
 
 // ============================================================
 // CONFIGURATION & DATABASE FALLBACKS
@@ -86,7 +87,7 @@ const MOCK_PRS: Record<string, any> = {
 };
 
 // ============================================================
-// GEMINI API CALL WITH MULTI-MODEL RESILIENCE
+ // AI API CALL WITH GROQ PRIMARY + GEMINI FALLBACK
 // ============================================================
 
 let aiClient: GoogleGenAI | null = null;
@@ -104,14 +105,19 @@ async function callGeminiWithFallback(
   systemInstruction?: string,
   temperature: number = 0.2
 ): Promise<string> {
+  // Groq is the primary provider for low-latency responses. Gemini remains
+  // available as a server-side fallback so the chatbot keeps working if
+  // GROQ_API_KEY is missing or a Groq request is temporarily unavailable.
+  const groqResponse = await callGroq(prompt, systemInstruction, temperature, {
+    maxOutputTokens: 1200,
+    timeoutMs: 10000,
+  });
+  if (groqResponse) return groqResponse;
+
   const client = getGenAI();
-  if (!client) {
-    return '';
-  }
+  if (!client) return '';
 
-  // Prioritize gemini-3.1-flash-lite for fastest speed and high availability, fallback to gemini-3.8-flash
   const modelsToTry = ['gemini-3.1-flash-lite', 'gemini-3.8-flash'];
-
   for (const model of modelsToTry) {
     try {
       const generatePromise = client.models.generateContent({
@@ -124,7 +130,6 @@ async function callGeminiWithFallback(
         },
       });
 
-      // Allow up to 14 seconds before moving to fallback model or offline knowledge
       const timeoutPromise = new Promise<never>((_, reject) => {
         const id = setTimeout(() => {
           clearTimeout(id);
@@ -134,12 +139,10 @@ async function callGeminiWithFallback(
 
       const response = await Promise.race([generatePromise, timeoutPromise]);
       const text = response?.text?.trim();
-      if (text) {
-        return text;
-      }
+      if (text) return text;
     } catch (err: any) {
       if (err?.message !== 'TIMEOUT') {
-        console.warn(`[Gemini API] Call to ${model} failed gracefully:`, err?.message?.slice(0, 120) || 'Unknown error');
+        console.warn(`[Gemini fallback] Call to ${model} failed gracefully:`, err?.message?.slice(0, 120) || 'Unknown error');
       }
     }
   }
