@@ -262,8 +262,9 @@ function cleanAIResponse(text: string): string {
 
   let cleaned = text
     // Remove HTML/escaped HTML artifacts produced by the model.
-    .replace(/\\?<br\\s*\\/?\\s*>/gi, '\n')
-    .replace(/<\\/?(?:div|p|span|table|thead|tbody|tr|th|td)[^>]*>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/\\<br\s*\/?>/gi, '\n')
+    .replace(/<\/?(?:div|p|span|table|thead|tbody|tr|th|td)[^>]*>/gi, '')
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
     .replace(/&lt;/gi, '<')
