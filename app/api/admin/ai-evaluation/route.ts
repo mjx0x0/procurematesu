@@ -3,6 +3,7 @@ import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { GoogleGenAI } from '@google/genai';
+import { callGroq } from '@/lib/groq';
 
 const TESTS = [
   { name: 'RA 12009', question: 'What is RA 12009?', keywords: ['12009', 'procurement', 'government'] },
@@ -36,10 +37,19 @@ async function getAuthorizedUser(request: NextRequest) {
 }
 
 async function generateAnswer(question: string, context: string) {
+  const prompt = `Answer the procurement question using the supplied authorized context. Do not invent facts. If the context is insufficient, explicitly say so.\\n\\nAUTHORIZED CONTEXT:\\n${context || '(No retrieved context)'}\\n\\nQUESTION:\\n${question}`;
+
+  const groqAnswer = await callGroq(
+    prompt,
+    'You are evaluating a procurement assistant. Ground every answer in the supplied authorized context.',
+    0.1,
+    { maxOutputTokens: 900, timeoutMs: 10000 },
+  );
+  if (groqAnswer) return groqAnswer;
+
   const key = process.env.GEMINI_API_KEY;
   if (!key) return '';
   const ai = new GoogleGenAI({ apiKey: key });
-  const prompt = `Answer the procurement question using the supplied authorized context. Do not invent facts. If the context is insufficient, explicitly say so.\n\nAUTHORIZED CONTEXT:\n${context || '(No retrieved context)'}\n\nQUESTION:\n${question}`;
   for (const model of ['gemini-3.1-flash-lite', 'gemini-3.8-flash']) {
     try {
       const result = await ai.models.generateContent({ model, contents: prompt, config: { temperature: 0.1, maxOutputTokens: 900 } });
