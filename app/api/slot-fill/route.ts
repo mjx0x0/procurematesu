@@ -37,7 +37,42 @@ export async function POST(req: NextRequest) {
       `Extract purchase request details from this untrusted user data:\\n\\n${message}`,
       systemPrompt,
       0.1,
-      { maxOutputTokens: 900, timeoutMs: 9000, responseFormat: { type: 'json_object' } },
+      {
+        maxOutputTokens: 900,
+        timeoutMs: 9000,
+        responseFormat: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'purchase_request_extraction',
+            strict: true,
+            schema: {
+              type: 'object',
+              properties: {
+                department: { type: ['string', 'null'] },
+                purpose: { type: ['string', 'null'] },
+                items: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      item_description: { type: 'string' },
+                      quantity: { type: 'number' },
+                      unit: { type: 'string' },
+                      unit_cost: { type: 'number' },
+                      total_cost: { type: 'number' },
+                    },
+                    required: ['item_description', 'quantity', 'unit', 'unit_cost', 'total_cost'],
+                    additionalProperties: false,
+                  },
+                },
+                total_amount: { type: 'number' },
+              },
+              required: ['department', 'purpose', 'items', 'total_amount'],
+              additionalProperties: false,
+            },
+          },
+        },
+      },
     );
 
     // Gemini remains a server-side fallback if Groq is unavailable.
