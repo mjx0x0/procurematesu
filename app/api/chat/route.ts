@@ -260,18 +260,77 @@ function generateOfflineProcurementResponse(query: string, retrievedContext: str
 function cleanAIResponse(text: string): string {
   if (!text) return text;
 
-  return text
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/?(?:div|p|span|table|thead|tbody|tr|th|td)[^>]*>/gi, '')
+  let cleaned = text
+    // Remove HTML/escaped HTML artifacts produced by the model.
+    .replace(/\\?<br\\s*\\/?\\s*>/gi, '\n')
+    .replace(/<\\/?(?:div|p|span|table|thead|tbody|tr|th|td)[^>]*>/gi, '')
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
     .replace(/&lt;/gi, '<')
     .replace(/&gt;/gi, '>')
     .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
-    .replace(/\\\|/g, '|')
+    .replace(/&#39;/gi, "'");
+
+  // Convert Markdown tables into clean, readable bullets so raw pipes and
+  // separator rows never leak into the chat UI.
+  const lines = cleaned.split('\n');
+  const output: string[] = [];
+  let inTable = false;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+
+    if (line.includes('|')) {
+      const cells = line
+        .replace(/^\|/, '')
+        .replace(/\|$/, '')
+        .split('|')
+        .map((cell) => cell.trim())
+        .filter(Boolean);
+
+      const isSeparator =
+        cells.length > 0 && cells.every((cell) => /^:?-{2,}:?$/.test(cell));
+
+      if (isSeparator) {
+        inTable = true;
+        continue;
+      }
+
+      if (cells.length >= 2) {
+        inTable = true;
+        const isHeader =
+          output.length === 0 ||
+          (cells[0].toLowerCase() === 'aspect' &&
+            cells[1].toLowerCase().includes('what the act provides'));
+
+        output.push(
+          isHeader
+            ? '**' + cells.join(' — ') + '**'
+            : '• ' + cells.join(' — ')
+        );
+        continue;
+      }
+    }
+
+    if (line) {
+      output.push(rawLine);
+    } else if (!inTable || output[output.length - 1] !== '') {
+      output.push('');
+    }
+
+    if (!line.includes('|')) {
+      inTable = false;
+    }
+  }
+
+  cleaned = output.join('\n')
+    .replace(/\\\|/g, '')
+    .replace(/\|/g, '')
     .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
+
+  return cleaned;
 }
 
 // ============================================================
@@ -764,6 +823,7 @@ CRITICAL DIRECTIVES:
    - **Head of Procurement Office**: Prof. Engr. Nelson P. Benares, Jr.
 5. If the retrieved database context does not provide sufficient detail to answer a specific institutional inquiry, state what the law provides and advise the user to coordinate directly with the MSU-GenSan Procurement Management Office (PMO) or BAC Secretariat using the contact details above.
 6. Provide a helpful, clear, and structured answer using markdown headings, bullet points, and bold emphasis for key procurement terms.
+7. Do NOT use Markdown tables, pipe characters (|), HTML tags such as <br>, or escaped HTML. Use headings and bullet points instead.
 `;
 
         const userPrompt = `
