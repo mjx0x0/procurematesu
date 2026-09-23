@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
@@ -44,6 +44,18 @@ export default function InquiriesPage() {
   const [dateFilter, setDateFilter] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const adminMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target as Node)) {
+        setAdminMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Check admin and load data
   useEffect(() => {
@@ -227,18 +239,42 @@ export default function InquiriesPage() {
               <p className="text-[10px] text-stone-500">Isko BidDo assistant interaction logs & procurement knowledge inquiries</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-stone-600 hidden sm:inline font-medium">
-              <User className="h-3.5 w-3.5 inline mr-1 text-[#7A1315]" />
-              {user?.email}
-            </span>
+          <div ref={adminMenuRef} className="relative shrink-0">
             <button
-              onClick={handleLogout}
-              className="text-stone-400 hover:text-red-700 transition-colors p-2 rounded-lg hover:bg-stone-100"
-              title="Sign Out"
+              type="button"
+              onClick={() => setAdminMenuOpen((prev) => !prev)}
+              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7C1D2E]/20 cursor-pointer"
+              aria-expanded={adminMenuOpen}
+              aria-label="Admin account menu"
             >
-              <LogOut className="h-4 w-4" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7C1D2E]/10 text-[10px] font-bold text-[#7C1D2E]">
+                <User className="h-3.5 w-3.5" />
+              </div>
+              <span className="hidden sm:inline font-medium text-xs max-w-[170px] truncate text-stone-800">
+                {user?.email}
+              </span>
+              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7C1D2E]" : ""}`} />
             </button>
+
+            {adminMenuOpen && (
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">
+                <div className="border-b border-stone-100 px-3 py-2.5">
+                  <p className="truncate text-xs font-bold text-stone-900">{user?.email}</p>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-[#7C1D2E] border border-red-200/60">
+                      Administrator
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </nav>

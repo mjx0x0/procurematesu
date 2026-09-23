@@ -12,7 +12,7 @@ import { MsuLogo } from "@/components/msu-logo";
 import {
   Check, CheckCircle, Clock, Eye, FileCheck, FileText, Loader2, LogOut,
   MessageSquare, RefreshCw, Search, Trash2, User, Users, X, XCircle,
-  AlertCircle, ArrowRight, Sparkles, ChevronRight,
+  AlertCircle, ArrowRight, Sparkles, ChevronRight, ChevronDown,
 } from "lucide-react";
 
 interface PR {
@@ -71,6 +71,18 @@ export default function AdminDashboard() {
   const [busy, setBusy] = useState(false);
   const [deletePR, setDeletePR] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ open: boolean; tone: FeedbackTone; title: string; message: string }>({ open: false, tone: "success", title: "", message: "" });
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const adminMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target as Node)) {
+        setAdminMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const selectedPRRef = useRef<PR | null>(null);
   selectedPRRef.current = selectedPR;
 
@@ -196,7 +208,43 @@ export default function AdminDashboard() {
       <nav className="bg-white/95 border-b border-stone-200 sticky top-0 z-40 shadow-[0_1px_12px_rgba(45,20,10,0.04)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0"><MsuLogo size={40} className="shrink-0" /><div className="min-w-0"><b className="block text-base sm:text-lg text-[#5A1420] truncate">MSU GenSan Procurement Management System</b><span className="text-[10px] sm:text-xs text-stone-500 font-semibold tracking-wide">ADMIN PORTAL</span></div></div>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0"><span className="hidden lg:block text-xs text-stone-600"><User className="inline h-3.5 w-3.5 mr-1" />{user?.email}</span><button onClick={logout} title="Logout" aria-label="Logout" className="admin-logout inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-stone-200 bg-white text-stone-600 hover:text-[#7C1D2E] hover:bg-red-50 text-xs font-bold transition-colors"><LogOut className="h-4 w-4" /><span>Logout</span></button></div>
+          <div ref={adminMenuRef} className="relative shrink-0">
+            <button
+              type="button"
+              onClick={() => setAdminMenuOpen((prev) => !prev)}
+              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7C1D2E]/20 cursor-pointer"
+              aria-expanded={adminMenuOpen}
+              aria-label="Admin account menu"
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7C1D2E]/10 text-[10px] font-bold text-[#7C1D2E]">
+                <User className="h-3.5 w-3.5" />
+              </div>
+              <span className="hidden sm:inline font-medium text-xs max-w-[170px] truncate text-stone-800">
+                {user?.email}
+              </span>
+              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7C1D2E]" : ""}`} />
+            </button>
+
+            {adminMenuOpen && (
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">
+                <div className="border-b border-stone-100 px-3 py-2.5">
+                  <p className="truncate text-xs font-bold text-stone-900">{user?.email}</p>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-[#7C1D2E] border border-red-200/60">
+                      Administrator
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={logout}
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 

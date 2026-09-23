@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, ArrowUpRight, BarChart3, Bot, CheckCircle, ClipboardList, Clock, Eye, FileText, LayoutDashboard, Loader2, LogOut, PlusCircle, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BarChart3, Bot, CheckCircle, ChevronDown, ClipboardList, Clock, Eye, FileText, LayoutDashboard, Loader2, LogOut, PlusCircle, ShieldCheck, Sparkles } from "lucide-react";
 import { MsuLogo } from "@/components/msu-logo";
 import { Chatbot } from "@/components/chatbot/Chatbot";
 import { NotificationPopover } from "@/components/NotificationPopover";
@@ -28,6 +28,18 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0 });
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -52,7 +64,11 @@ export default function DashboardPage() {
 
         if (cancelled) return;
         const role = profile?.role || "end_user";
-        setIsAdmin(role === "admin");
+        if (role === "admin") {
+          router.replace("/admin");
+          return;
+        }
+        setIsAdmin(false);
         const list = (prData || []) as PurchaseRequest[];
         setPrs(list);
         setStats({
@@ -120,12 +136,55 @@ export default function DashboardPage() {
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <NotificationPopover />
             <div className="hidden h-7 w-px bg-stone-200 sm:block" />
-            <div className="hidden items-center gap-2 sm:flex">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#D4AF37]/45 bg-[#FFF6D9] text-[9px] font-black text-[#6B4F05]">{initials}</div>
-              <div className="max-w-[150px] leading-tight"><p className="truncate text-[9px] font-bold text-stone-800">{displayName}</p><p className="truncate text-[8px] text-stone-400">{user?.email}</p></div>
+            <div ref={userMenuRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                className="flex items-center gap-2 rounded-xl border border-stone-200/80 bg-white px-2.5 py-1.5 transition hover:border-[#D4AF37]/60 hover:bg-[#FFFDF7] focus:outline-none focus:ring-2 focus:ring-[#7A1315]/20 cursor-pointer"
+                aria-expanded={userMenuOpen}
+                aria-label="User account menu"
+              >
+                <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/45 bg-[#FFF6D9] text-[9px] sm:text-[10px] font-black text-[#6B4F05]">
+                  {initials}
+                </div>
+                <div className="hidden max-w-[150px] text-left leading-tight sm:block">
+                  <p className="truncate text-[10px] font-bold text-stone-800">{displayName}</p>
+                  <p className="truncate text-[8px] text-stone-400">{user?.email}</p>
+                </div>
+                <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${userMenuOpen ? "rotate-180 text-[#7A1315]" : ""}`} />
+              </button>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">
+                  <div className="border-b border-stone-100 px-3 py-2.5">
+                    <p className="truncate text-xs font-bold text-stone-900">{displayName}</p>
+                    <p className="truncate text-[10px] text-stone-500">{user?.email}</p>
+                    <div className="mt-1.5 flex items-center gap-1.5">
+                      <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[9px] font-semibold text-amber-800 border border-amber-200/60">
+                        {isAdmin ? "Administrator" : "Requisitioner"}
+                      </span>
+                    </div>
+                  </div>
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 hover:text-[#7A1315] transition"
+                    >
+                      <ShieldCheck className="h-4 w-4 text-[#B88E13]" />
+                      <span>Admin Portal</span>
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
-            {isAdmin && <Link href="/admin" className="hidden items-center gap-1.5 rounded-xl border border-[#D4AF37]/45 bg-[#FFFDF6] px-3 py-2 text-[9px] font-bold text-[#7A1315] sm:flex"><ShieldCheck className="h-3.5 w-3.5 text-[#B88E13]" />Admin</Link>}
-            <button onClick={handleLogout} className="dashboard-logout inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-bold text-stone-600 transition hover:bg-red-50 hover:text-[#7A1315]" title="Logout"><LogOut className="h-4 w-4" /><span>Logout</span></button>
           </div>
         </div>
       </header>
