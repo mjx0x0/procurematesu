@@ -159,7 +159,7 @@ export default function InquiriesPage() {
 
   const getTypeBadge = (type: string) => {
     const colors: Record<string, string> = {
-      general: "bg-red-50 text-[#7A1315] border border-red-200/60",
+      general: "bg-red-50 text-[#7B0046] border border-red-200/60",
       pr_status: "bg-amber-50 text-amber-800 border border-amber-200/60",
       ra_12009: "bg-emerald-50 text-emerald-800 border border-emerald-200/60",
       slot_fill: "bg-orange-50 text-orange-800 border border-orange-200/60",
@@ -204,7 +204,7 @@ export default function InquiriesPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[#7A1315] mx-auto" />
+          <Loader2 className="h-12 w-12 animate-spin text-[#7B0046] mx-auto" />
           <p className="mt-4 text-stone-600 font-medium">Loading inquiries...</p>
         </div>
       </div>
@@ -219,20 +219,20 @@ export default function InquiriesPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/admin"
-              className="p-2 rounded-xl text-stone-500 hover:text-[#7A1315] hover:bg-stone-100 transition-colors"
+              className="p-2 rounded-xl text-stone-500 hover:text-[#7B0046] hover:bg-stone-100 transition-colors"
               title="Back to Admin Dashboard"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
-            <div className="bg-[#4D0C0D] p-2 rounded-xl text-amber-300 shadow-sm">
+            <div className="bg-[#4D002C] p-2 rounded-xl text-amber-300 shadow-sm">
               <MessageSquare className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <b className="text-xl font-black text-[#4D0C0D]">
-                  Inquiry <span className="text-[#B88E13]">Monitoring</span>
+                <b className="text-xl font-black text-[#4D002C]">
+                  Inquiry <span className="text-[#F5AB26]">Monitoring</span>
                 </b>
-                <span className="text-[11px] bg-red-50 text-[#7A1315] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                <span className="text-[11px] bg-red-50 text-[#7B0046] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
                   Admin Tool
                 </span>
               </div>
@@ -243,17 +243,17 @@ export default function InquiriesPage() {
             <button
               type="button"
               onClick={() => setAdminMenuOpen((prev) => !prev)}
-              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7C1D2E]/20 cursor-pointer"
+              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 cursor-pointer"
               aria-expanded={adminMenuOpen}
               aria-label="Admin account menu"
             >
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7C1D2E]/10 text-[10px] font-bold text-[#7C1D2E]">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7B0046]/10 text-[10px] font-bold text-[#7B0046]">
                 <User className="h-3.5 w-3.5" />
               </div>
               <span className="hidden sm:inline font-medium text-xs max-w-[170px] truncate text-stone-800">
                 {user?.email}
               </span>
-              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7C1D2E]" : ""}`} />
+              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7B0046]" : ""}`} />
             </button>
 
             {adminMenuOpen && (
@@ -261,7 +261,7 @@ export default function InquiriesPage() {
                 <div className="border-b border-stone-100 px-3 py-2.5">
                   <p className="truncate text-xs font-bold text-stone-900">{user?.email}</p>
                   <div className="mt-1 flex items-center gap-1.5">
-                    <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-[#7C1D2E] border border-red-200/60">
+                    <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-[#7B0046] border border-red-200/60">
                       Administrator
                     </span>
                   </div>
@@ -283,7 +283,7 @@ export default function InquiriesPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-[#4D0C0D]">Chatbot & Helpdesk Logs</h1>
+            <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Chatbot & Helpdesk Logs</h1>
             <p className="text-sm text-stone-600 mt-1">
               <b>{filteredInquiries.length}</b> logged inquiries across user sessions.
             </p>
@@ -293,7 +293,7 @@ export default function InquiriesPage() {
             className="ui-button bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 text-xs py-2 px-3.5 shadow-xs"
             disabled={filteredInquiries.length === 0}
           >
-            <Download className="h-4 w-4 text-[#7A1315]" />
+            <Download className="h-4 w-4 text-[#7B0046]" />
             Export CSV
           </button>
         </div>
@@ -401,7 +401,7 @@ export default function InquiriesPage() {
                           {inquiry.inquiry_type || "general"}
                         </span>
                       </td>
-                      <td className="px-5 py-4 text-sm font-bold text-[#7A1315] whitespace-nowrap">
+                      <td className="px-5 py-4 text-sm font-bold text-[#7B0046] whitespace-nowrap">
                         {inquiry.pr_no || "—"}
                       </td>
                       <td className="px-5 py-4 text-xs text-stone-500 whitespace-nowrap">
@@ -413,7 +413,7 @@ export default function InquiriesPage() {
                             setSelectedInquiry(inquiry);
                             setShowDetailModal(true);
                           }}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-[#7A1315] hover:text-[#4D0C0D] px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                          className="inline-flex items-center gap-1 text-xs font-bold text-[#7B0046] hover:text-[#4D002C] px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           View Log
@@ -434,7 +434,7 @@ export default function InquiriesPage() {
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 border border-stone-200 animate-in zoom-in-95 duration-150">
             <div className="flex justify-between items-center mb-5 pb-3 border-b border-stone-100">
               <div className="flex items-center gap-2">
-                <h3 className="text-xl font-bold text-[#4D0C0D]">Inquiry Detail</h3>
+                <h3 className="text-xl font-bold text-[#4D002C]">Inquiry Detail</h3>
                 <span
                   className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${getTypeBadge(
                     selectedInquiry.inquiry_type || "general"
@@ -463,7 +463,7 @@ export default function InquiriesPage() {
                 </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-stone-400 font-bold">PR Number</p>
-                  <p className="font-bold text-[#7A1315] text-sm mt-0.5">{selectedInquiry.pr_no || "N/A"}</p>
+                  <p className="font-bold text-[#7B0046] text-sm mt-0.5">{selectedInquiry.pr_no || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-stone-400 font-bold">Timestamp</p>
@@ -479,7 +479,7 @@ export default function InquiriesPage() {
               </div>
 
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-[#B88E13] font-bold mb-1.5">Isko BidDo AI Response</p>
+                <p className="text-[11px] uppercase tracking-wider text-[#F5AB26] font-bold mb-1.5">Isko BidDo AI Response</p>
                 <div className="p-3.5 bg-amber-50/40 rounded-xl border border-amber-200/80 text-sm text-stone-900 whitespace-pre-wrap leading-relaxed">
                   {selectedInquiry.bot_response || "No response recorded"}
                 </div>

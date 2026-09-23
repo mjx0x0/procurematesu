@@ -100,14 +100,14 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#FAF8F5] px-4 py-8 sm:py-12 flex flex-col justify-center items-center selection:bg-[#7A1315] selection:text-amber-200">
+    <div className="relative min-h-screen bg-[#FAF8F5] px-4 py-8 sm:py-12 flex flex-col justify-center items-center selection:bg-[#7B0046] selection:text-amber-200">
       {/* Top institutional gold/maroon accent ribbon */}
-      <div className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#4D0C0D] via-[#D4AF37] to-[#7A1315] z-50" />
+      <div className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046] z-50" />
 
       {/* Ambient background glow */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-96 w-[42rem] rounded-full bg-gradient-to-b from-[#7A1315]/10 via-[#D4AF37]/5 to-transparent blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-[#D4AF37]/8 blur-3xl" />
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-96 w-[42rem] rounded-full bg-gradient-to-b from-[#7B0046]/10 via-[#F5AB26]/5 to-transparent blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-[#F5AB26]/8 blur-3xl" />
       </div>
 
       <motion.div
@@ -125,9 +125,9 @@ export default function SignupPage() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.3 }}
-              className="mx-auto max-w-xl overflow-hidden rounded-3xl border border-[#D4AF37]/35 bg-white p-8 sm:p-10 shadow-[0_24px_60px_rgba(77,12,13,0.12)] text-center relative"
+              className="mx-auto max-w-xl overflow-hidden rounded-3xl border border-[#F5AB26]/35 bg-white p-8 sm:p-10 shadow-[0_24px_60px_rgba(77,0,44,0.12)] text-center relative"
             >
-              <div className="h-1.5 bg-gradient-to-r from-[#4D0C0D] via-[#D4AF37] to-[#7A1315] absolute top-0 left-0 right-0" />
+              <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046] absolute top-0 left-0 right-0" />
               <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-50 border border-emerald-200 shadow-sm relative">
                 <MsuLogo size={52} />
                 <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-white shadow-md border-2 border-white">
@@ -140,7 +140,7 @@ export default function SignupPage() {
                 Registration Received
               </div>
 
-              <h2 className="text-2xl font-black text-[#4D0C0D] tracking-tight">
+              <h2 className="text-2xl font-black text-[#4D002C] tracking-tight">
                 Account Successfully Created
               </h2>
 
@@ -155,7 +155,7 @@ export default function SignupPage() {
                     <Clock className="h-5 w-5 text-[#9A7205]" />
                   </div>
                   <div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-[#7A1315]">
+                    <h3 className="text-xs font-black uppercase tracking-wider text-[#7B0046]">
                       Pending Administrative Approval
                     </h3>
                     <p className="mt-1 text-xs text-amber-900/90 leading-relaxed">
@@ -172,7 +172,7 @@ export default function SignupPage() {
               <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
                   href="/"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] px-6 py-3 text-sm font-bold text-white shadow-md hover:shadow-lg transition-all border border-[#D4AF37]/40 hover:brightness-105"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#7B0046] via-[#8E0052] to-[#4D002C] px-6 py-3 text-sm font-bold text-white shadow-md hover:shadow-lg transition-all border border-[#F5AB26]/40 hover:brightness-105"
                 >
                   Return to Landing Page & Sign In <ArrowRight className="h-4 w-4 text-amber-300" />
                 </Link>
@@ -188,10 +188,10 @@ export default function SignupPage() {
             /* Registration Form with University Split-Hero Card */
             <div className="overflow-hidden rounded-3xl border border-stone-200/90 bg-white shadow-[0_24px_60px_rgba(40,4,6,0.14)] grid grid-cols-1 md:grid-cols-[340px_1fr] lg:grid-cols-[380px_1fr]">
               {/* Left Institutional Showcase Column */}
-              <div className="relative overflow-hidden bg-gradient-to-br from-[#4D0C0D] via-[#610E11] to-[#380406] p-7 sm:p-9 text-white flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#D4AF37]/20">
+              <div className="relative overflow-hidden bg-gradient-to-br from-[#4D002C] via-[#610037] to-[#380020] p-7 sm:p-9 text-white flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#F5AB26]/20">
                 {/* Decorative university watermark and gold aura */}
-                <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#D4AF37]/15 blur-2xl" />
-                <div className="pointer-events-none absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-[#8B1518]/30 blur-2xl" />
+                <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#F5AB26]/15 blur-2xl" />
+                <div className="pointer-events-none absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-[#8E0052]/30 blur-2xl" />
 
                 <div>
                   <Link href="/" className="inline-flex items-center gap-3 group">
@@ -263,10 +263,10 @@ export default function SignupPage() {
               <div className="p-6 sm:p-8 lg:p-9 flex flex-col justify-between">
                 <div>
                   <div className="border-b border-stone-100 pb-4 mb-5">
-                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#B88E13]">
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#F5AB26]">
                       Institutional Credentials
                     </p>
-                    <h2 className="text-xl font-black text-[#4D0C0D] tracking-tight">
+                    <h2 className="text-xl font-black text-[#4D002C] tracking-tight">
                       Create your account
                     </h2>
                   </div>
@@ -291,7 +291,7 @@ export default function SignupPage() {
                     {/* Full Name */}
                     <div className="space-y-1">
                       <label className="block text-xs font-bold text-stone-700">
-                        Complete Name
+                         Complete Name
                       </label>
                       <div className="relative flex items-center">
                         <div className="pointer-events-none absolute left-3.5 z-10 flex h-5 w-5 items-center justify-center text-stone-400">
@@ -304,7 +304,7 @@ export default function SignupPage() {
                           placeholder="e.g. Juan D. Dela Cruz"
                           autoComplete="name"
                           style={{ paddingLeft: "2.85rem", paddingRight: "1rem" }}
-                          className="w-full min-h-[44px] py-2.5 !pl-11 !pr-4 text-sm rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] transition-all bg-white"
+                          className="w-full min-h-[44px] py-2.5 !pl-11 !pr-4 text-sm rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046] transition-all bg-white"
                           required
                         />
                       </div>
@@ -333,12 +333,12 @@ export default function SignupPage() {
                           placeholder="username@msugensan.edu.ph"
                           autoComplete="email"
                           style={{ paddingLeft: "2.85rem", paddingRight: "1rem" }}
-                          className="w-full min-h-[44px] py-2.5 !pl-11 !pr-4 text-sm rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] transition-all bg-white"
+                          className="w-full min-h-[44px] py-2.5 !pl-11 !pr-4 text-sm rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046] transition-all bg-white"
                           required
                         />
                       </div>
                       <p className="flex items-center gap-1.5 text-[11px] text-stone-500">
-                        <Building2 className="h-3 w-3 text-[#7A1315] shrink-0" />
+                        <Building2 className="h-3 w-3 text-[#7B0046] shrink-0" />
                         Must be your official <strong className="text-stone-700">@msugensan.edu.ph</strong> account.
                       </p>
                     </div>
@@ -359,7 +359,7 @@ export default function SignupPage() {
                           placeholder="Create a strong password"
                           autoComplete="new-password"
                           style={{ paddingLeft: "2.85rem", paddingRight: "2.85rem" }}
-                          className="w-full min-h-[44px] py-2.5 !pl-11 !pr-11 text-sm rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] transition-all bg-white"
+                          className="w-full min-h-[44px] py-2.5 !pl-11 !pr-11 text-sm rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046] transition-all bg-white"
                           required
                         />
                         <button
@@ -426,7 +426,7 @@ export default function SignupPage() {
                           placeholder="Re-enter your password"
                           autoComplete="new-password"
                           style={{ paddingLeft: "2.85rem", paddingRight: "2.85rem" }}
-                          className="w-full min-h-[44px] py-2.5 !pl-11 !pr-11 text-sm rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315] transition-all bg-white"
+                          className="w-full min-h-[44px] py-2.5 !pl-11 !pr-11 text-sm rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046] transition-all bg-white"
                           required
                         />
                         <button
@@ -444,7 +444,7 @@ export default function SignupPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full min-h-[46px] rounded-xl bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#650709] hover:to-[#7A1315] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border border-[#D4AF37]/35 disabled:opacity-50 mt-2"
+                      className="w-full min-h-[46px] rounded-xl bg-gradient-to-r from-[#7B0046] via-[#8E0052] to-[#4D002C] hover:from-[#610037] hover:to-[#7B0046] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border border-[#F5AB26]/35 disabled:opacity-50 mt-2"
                     >
                       {loading ? (
                         <>
@@ -466,7 +466,7 @@ export default function SignupPage() {
                     Already have an account?{" "}
                     <Link
                       href="/"
-                      className="font-extrabold text-[#7A1315] hover:text-[#4D0C0D] underline decoration-amber-400 underline-offset-2"
+                      className="font-extrabold text-[#7B0046] hover:text-[#4D002C] underline decoration-[#F5AB26] underline-offset-2"
                     >
                       Sign In
                     </Link>

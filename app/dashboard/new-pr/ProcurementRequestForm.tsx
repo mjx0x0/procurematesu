@@ -179,7 +179,7 @@ export default function ProcurementRequestForm() {
   const confirmReview = () => { if (!validateBeforeReview()) return; setShowReview(false); reviewConfirmedRef.current = true; setTimeout(() => formRef.current?.requestSubmit(), 0); };
   const viewCreatedPR = () => { if (createdPRNo) router.push(`/dashboard/pr/${encodeURIComponent(createdPRNo)}`); };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><Loader2 className="h-10 w-10 animate-spin text-[#7A1315]" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" /></div>;
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] pb-16">
@@ -188,15 +188,15 @@ export default function ProcurementRequestForm() {
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <Link
             href="/dashboard"
-            className="flex items-center gap-3 text-[#4D0C0D] group"
+            className="flex items-center gap-3 text-[#4D002C] group"
           >
-            <div className="p-1.5 rounded-lg border border-stone-200 text-stone-600 group-hover:text-[#7A1315] group-hover:border-[#7A1315]/30 group-hover:bg-[#FAF7F2] transition-colors">
+            <div className="p-1.5 rounded-lg border border-stone-200 text-stone-600 group-hover:text-[#7B0046] group-hover:border-[#7B0046]/30 group-hover:bg-[#FAF7F2] transition-colors">
               <ArrowLeft className="h-4 w-4" />
             </div>
             <div className="flex items-center gap-3">
               <MsuLogo size={38} className="shrink-0" />
               <div>
-                <span className="font-extrabold text-lg text-[#4D0C0D] leading-tight block">New Purchase Request</span>
+                <span className="font-extrabold text-lg text-[#4D002C] leading-tight block">New Purchase Request</span>
                 <span className="text-[11px] text-stone-500 font-medium leading-none">Mindanao State University - General Santos</span>
               </div>
             </div>
@@ -207,7 +207,7 @@ export default function ProcurementRequestForm() {
       <main className="max-w-5xl mx-auto px-4 pt-6">
         <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
           {/* Header Banner */}
-          <div className="h-1.5 bg-gradient-to-r from-[#4D0C0D] via-[#B88E13] to-[#7A1315]" />
+          <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
           
           <div className="p-6 md:p-8">
             {/* Official University Header & Dedicated Logo Space */}
@@ -219,14 +219,14 @@ export default function ProcurementRequestForm() {
                 <p className="text-xs font-bold uppercase tracking-wider text-stone-500">
                   Republic of the Philippines
                 </p>
-                <h1 className="text-lg sm:text-xl md:text-2xl font-black text-[#4D0C0D] tracking-tight">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-black text-[#4D002C] tracking-tight">
                   MINDANAO STATE UNIVERSITY - GENERAL SANTOS
                 </h1>
                 <p className="text-xs sm:text-sm font-semibold text-[#8C6B13]">
                   Procurement Management Office &middot; Fatima, General Santos City
                 </p>
                 <div className="mt-2.5 inline-flex items-center gap-2 rounded-lg bg-red-50 border border-red-200/80 px-3 py-1">
-                  <span className="text-xs font-extrabold uppercase tracking-wide text-[#7A1315]">
+                  <span className="text-xs font-extrabold uppercase tracking-wide text-[#7B0046]">
                     PURCHASE REQUEST FORM (PR)
                   </span>
                 </div>
@@ -237,11 +237,11 @@ export default function ProcurementRequestForm() {
               {/* Physical Submission Notice */}
               <div className="rounded-xl border-2 border-amber-300/80 bg-[#FFFDF7] p-5 shadow-sm">
                 <div className="flex items-start gap-3.5">
-                  <div className="mt-0.5 h-10 w-10 rounded-xl bg-[#7A1315] text-amber-200 flex items-center justify-center shrink-0 shadow-sm">
+                  <div className="mt-0.5 h-10 w-10 rounded-xl bg-[#7B0046] text-amber-200 flex items-center justify-center shrink-0 shadow-sm">
                     <Printer className="h-5 w-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h2 className="text-sm font-black text-[#4D0C0D] tracking-tight uppercase">Important: Physical submission is required</h2>
+                    <h2 className="text-sm font-black text-[#4D002C] tracking-tight uppercase">Important: Physical submission is required</h2>
                     <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-stone-700">
                       Submitting this Purchase Request through ProcuremateSU only records and prepares the PR digitally. It does <strong>not</strong> replace the required physical submission to the Procurement Office.
                     </p>
@@ -256,9 +256,9 @@ export default function ProcurementRequestForm() {
                           setPhysicalSubmissionAcknowledged(e.target.checked);
                           if (e.target.checked && error?.includes("physical submission requirement")) setError(null);
                         }}
-                        className="mt-0.5 h-4 w-4 accent-[#7A1315] cursor-pointer shrink-0"
+                        className="mt-0.5 h-4 w-4 accent-[#7B0046] cursor-pointer shrink-0"
                       />
-                      <span className="text-xs font-bold leading-5 text-[#4D0C0D]">
+                      <span className="text-xs font-bold leading-5 text-[#4D002C]">
                         I understand that online submission does not replace physical submission, and I will print and physically submit my PR and required supporting documents to the Procurement Office.
                       </span>
                     </label>
@@ -270,7 +270,7 @@ export default function ProcurementRequestForm() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 pb-2 border-b border-stone-200">
                   <span className="text-[11px] font-black uppercase tracking-wider text-[#9A7410] bg-amber-50 px-2.5 py-0.5 rounded border border-amber-200">Section 1</span>
-                  <h3 className="text-base font-extrabold text-[#4D0C0D]">Document &amp; Department Information</h3>
+                  <h3 className="text-base font-extrabold text-[#4D002C]">Document &amp; Department Information</h3>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -325,7 +325,7 @@ export default function ProcurementRequestForm() {
                       onChange={(e) => setForm({ ...form, department: e.target.value })}
                       placeholder="e.g., College of Engineering, Cashier's Office"
                       required
-                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-xs"
+                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
                     />
                     <p className="text-[11px] text-stone-500">Enter the official name of your operating unit or department.</p>
                   </div>
@@ -339,7 +339,7 @@ export default function ProcurementRequestForm() {
                       value={form.section}
                       onChange={(e) => setForm({ ...form, section: e.target.value })}
                       placeholder="e.g., IT Support Section, Science Laboratory"
-                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-xs"
+                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
                     />
                     <p className="text-[11px] text-stone-500">Leave blank if not applicable.</p>
                   </div>
@@ -356,7 +356,7 @@ export default function ProcurementRequestForm() {
                     placeholder="State clearly the official purpose of this purchase request..."
                     rows={4}
                     required
-                    className="w-full min-h-[115px] p-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-xs resize-y leading-relaxed"
+                    className="w-full min-h-[115px] p-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs resize-y leading-relaxed"
                   />
                   <p className="text-[11px] text-stone-500">Provide an accurate justification and intended use for the requested items.</p>
                 </div>
@@ -367,14 +367,14 @@ export default function ProcurementRequestForm() {
                 <div className="flex items-center justify-between pb-2 border-b border-stone-200 flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] font-black uppercase tracking-wider text-[#9A7410] bg-amber-50 px-2.5 py-0.5 rounded border border-amber-200">Section 2</span>
-                    <h3 className="text-base font-extrabold text-[#4D0C0D]">Requested Items &amp; Cost Breakdown</h3>
+                    <h3 className="text-base font-extrabold text-[#4D002C]">Requested Items &amp; Cost Breakdown</h3>
                   </div>
                   <button
                     type="button"
                     onClick={addItem}
                     className="ui-button ui-button-secondary text-xs px-3 py-1.5 h-8 font-bold flex items-center gap-1.5"
                   >
-                    <Plus className="h-3.5 w-3.5 text-[#7A1315]" />
+                    <Plus className="h-3.5 w-3.5 text-[#7B0046]" />
                     <span>Add Item</span>
                   </button>
                 </div>
@@ -425,7 +425,7 @@ export default function ProcurementRequestForm() {
                                 value={item.description}
                                 onChange={(e) => updateItem(index, { description: e.target.value })}
                                 placeholder="e.g., Desktop Computer: Core i7 13th Gen, 16GB RAM, 512GB SSD, 24&quot; IPS Monitor, Win 11 Pro"
-                                className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
+                                className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-lg border border-stone-300 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
                               />
                               {item.description.trim().length > 0 && item.description.trim().length < 15 && (
                                 <p className="text-[10px] text-amber-700 font-medium mt-1">
@@ -453,14 +453,14 @@ export default function ProcurementRequestForm() {
                                     updateItem(index, { qty: 1 });
                                   }
                                 }}
-                                className="w-full h-11 px-2 text-center text-sm font-semibold rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
+                                className="w-full h-11 px-2 text-center text-sm font-semibold rounded-lg border border-stone-300 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
                               />
                             </td>
                             <td className="py-3 px-3">
                               <select
                                 value={item.unit}
                                 onChange={(e) => updateItem(index, { unit: e.target.value })}
-                                className="w-full h-11 px-2 text-center text-xs sm:text-sm font-medium rounded-lg border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all cursor-pointer shadow-2xs"
+                                className="w-full h-11 px-2 text-center text-xs sm:text-sm font-medium rounded-lg border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all cursor-pointer shadow-2xs"
                               >
                                 {STANDARD_UNITS.map((u) => (
                                   <option key={u.value} value={u.value}>
@@ -493,7 +493,7 @@ export default function ProcurementRequestForm() {
                                     updateItem(index, { unit_cost: 0 });
                                   }
                                 }}
-                                className="w-full h-11 px-3 text-right text-sm font-mono rounded-lg border border-stone-300 focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all"
+                                className="w-full h-11 px-3 text-right text-sm font-mono rounded-lg border border-stone-300 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
                               />
                             </td>
                             <td className="py-3 px-3 text-right font-mono font-bold text-stone-900 text-sm sm:text-base">
@@ -518,7 +518,7 @@ export default function ProcurementRequestForm() {
                           <td colSpan={4} className="py-3 px-4 text-right font-extrabold uppercase tracking-wider text-xs text-stone-600">
                             Estimated Total Amount:
                           </td>
-                          <td colSpan={2} className="py-3 px-4 text-right font-mono font-black text-base text-[#7A1315]">
+                          <td colSpan={2} className="py-3 px-4 text-right font-mono font-black text-base text-[#7B0046]">
                             ₱{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
                           <td />
@@ -533,7 +533,7 @@ export default function ProcurementRequestForm() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 pb-2 border-b border-stone-200">
                   <span className="text-[11px] font-black uppercase tracking-wider text-[#9A7410] bg-amber-50 px-2.5 py-0.5 rounded border border-amber-200">Section 3</span>
-                  <h3 className="text-base font-extrabold text-[#4D0C0D]">Signatories &amp; Responsibility</h3>
+                  <h3 className="text-base font-extrabold text-[#4D002C]">Signatories &amp; Responsibility</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -547,7 +547,7 @@ export default function ProcurementRequestForm() {
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
                       placeholder="Enter your actual full name"
-                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-xs"
+                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
                     />
                     <p className="text-[11px] text-stone-500">Provide your actual legal full name, not an email address.</p>
                     
@@ -560,7 +560,7 @@ export default function ProcurementRequestForm() {
                         value={form.requested_by_designation}
                         onChange={(e) => setForm({ ...form, requested_by_designation: e.target.value })}
                         placeholder="e.g., Faculty, Administrative Aide IV, Department Chair"
-                        className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-xs"
+                        className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
                       />
                     </div>
                   </div>
@@ -571,7 +571,7 @@ export default function ProcurementRequestForm() {
                       <div className="mt-2.5 p-3 rounded-lg border border-stone-300 bg-white shadow-xs">
                         <div className="font-bold text-stone-900 text-sm">Atty. Shidik T. Abantas, MDM, LLM</div>
                         <div className="text-xs text-stone-600 mt-0.5">Chancellor</div>
-                        <div className="text-[11px] text-[#7A1315] font-semibold mt-1">Mindanao State University - General Santos</div>
+                        <div className="text-[11px] text-[#7B0046] font-semibold mt-1">Mindanao State University - General Santos</div>
                       </div>
                     </div>
                     <p className="text-[11px] text-stone-500 mt-3">
@@ -617,15 +617,15 @@ export default function ProcurementRequestForm() {
       {showReview && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-[60] p-4 animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-stone-200">
-            <div className="h-1.5 bg-gradient-to-r from-[#4D0C0D] via-[#B88E13] to-[#7A1315] sticky top-0" />
+            <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046] sticky top-0" />
             <div className="p-6 sm:p-7">
               <div className="flex justify-between items-start mb-5 pb-4 border-b border-stone-100">
                 <div className="flex items-center gap-3">
-                  <div className="bg-[#7A1315] p-2.5 rounded-xl text-amber-200 shadow-sm shrink-0">
+                  <div className="bg-[#7B0046] p-2.5 rounded-xl text-amber-200 shadow-sm shrink-0">
                     <CheckCircle2 className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-[#4D0C0D]">Double-check your Purchase Request</h3>
+                    <h3 className="text-lg font-black text-[#4D002C]">Double-check your Purchase Request</h3>
                     <p className="text-xs text-stone-500 mt-0.5">Please verify the details below before official creation.</p>
                   </div>
                 </div>
@@ -663,7 +663,7 @@ export default function ProcurementRequestForm() {
                               {q} {item.unit} × ₱{c.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </div>
                           </div>
-                          <div className="font-mono font-bold text-xs text-[#7A1315] shrink-0">
+                          <div className="font-mono font-bold text-xs text-[#7B0046] shrink-0">
                             ₱{(q * c).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </div>
                         </div>
@@ -672,14 +672,14 @@ export default function ProcurementRequestForm() {
                   </div>
                   <div className="px-4 py-3 bg-[#FAF7F2] border-t border-stone-200 flex justify-between items-center font-extrabold">
                     <span className="text-xs uppercase tracking-wider text-stone-700">Total Amount:</span>
-                    <span className="text-base font-mono font-black text-[#7A1315]">
+                    <span className="text-base font-mono font-black text-[#7B0046]">
                       ₱{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
 
                 <div className="rounded-xl border border-amber-200 bg-amber-50/90 p-3.5 text-xs text-amber-950 flex items-start gap-2.5">
-                  <Printer className="h-4 w-4 shrink-0 text-[#7A1315] mt-0.5" />
+                  <Printer className="h-4 w-4 shrink-0 text-[#7B0046] mt-0.5" />
                   <div className="leading-relaxed">
                     <strong>Physical submission reminder:</strong> Creating this PR online does not complete the procurement submission. You must print the PR and physically submit the signed PR and required supporting documents to the Procurement Office.
                   </div>
@@ -713,23 +713,23 @@ export default function ProcurementRequestForm() {
       {createdPRNo && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-[70] p-4 animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-stone-200 text-center">
-            <div className="h-1.5 bg-gradient-to-r from-[#4D0C0D] via-[#B88E13] to-[#7A1315]" />
+            <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
             <div className="p-7">
               <div className="mx-auto w-14 h-14 rounded-2xl bg-green-50 border border-green-200 flex items-center justify-center shadow-xs">
                 <CheckCircle2 className="h-7 w-7 text-green-600" />
               </div>
-              <h3 className="text-xl font-black text-[#4D0C0D] mt-4">Purchase Request Created</h3>
+              <h3 className="text-xl font-black text-[#4D002C] mt-4">Purchase Request Created</h3>
               <p className="text-xs text-stone-600 mt-1.5">Your Purchase Request has been recorded in ProcuremateSU.</p>
               
               <div className="mt-5 rounded-xl border border-stone-200 bg-[#FAF7F2] p-4">
                 <div className="text-[10px] uppercase tracking-wider font-extrabold text-stone-500">Official PR Number</div>
-                <div className="text-2xl font-black text-[#7A1315] mt-1 font-mono tracking-tight">{createdPRNo}</div>
+                <div className="text-2xl font-black text-[#7B0046] mt-1 font-mono tracking-tight">{createdPRNo}</div>
               </div>
 
               <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/90 p-3.5 text-left flex items-start gap-2.5">
-                <Printer className="h-4 w-4 shrink-0 text-[#7A1315] mt-0.5" />
+                <Printer className="h-4 w-4 shrink-0 text-[#7B0046] mt-0.5" />
                 <p className="text-xs leading-relaxed text-amber-950">
-                  <span className="font-extrabold text-[#4D0C0D]">Next required step:</span> Open the PR, print the official form, sign it, and physically submit it to the Procurement Office.
+                  <span className="font-extrabold text-[#4D002C]">Next required step:</span> Open the PR, print the official form, sign it, and physically submit it to the Procurement Office.
                 </p>
               </div>
 
@@ -760,7 +760,7 @@ export default function ProcurementRequestForm() {
           role="alert"
           className="fixed bottom-6 right-6 z-[90] max-w-md w-[calc(100vw-2rem)] sm:w-[440px] bg-white rounded-2xl border-2 border-red-500 shadow-[0_16px_48px_rgba(180,20,20,0.32)] overflow-hidden transition-all animate-in slide-in-from-bottom-5 duration-200"
         >
-          <div className="h-1.5 bg-gradient-to-r from-red-600 via-amber-500 to-[#7A1315]" />
+          <div className="h-1.5 bg-gradient-to-r from-red-600 via-amber-500 to-[#7B0046]" />
           <div className="p-4 sm:p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
@@ -787,7 +787,7 @@ export default function ProcurementRequestForm() {
               <button
                 type="button"
                 onClick={() => setError(null)}
-                className="text-xs font-bold text-white bg-[#7A1315] hover:bg-[#5E0E10] px-4 py-1.5 rounded-lg transition-colors shadow-xs"
+                className="text-xs font-bold text-white bg-[#7B0046] hover:bg-[#610037] px-4 py-1.5 rounded-lg transition-colors shadow-xs"
               >
                 Dismiss
               </button>

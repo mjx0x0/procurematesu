@@ -114,7 +114,7 @@ export default function DashboardPage() {
     return (
       <div className="app-theme flex min-h-[100svh] items-center justify-center bg-[#F7F5F2] px-6">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-7 w-7 animate-spin text-[#7A1315]" />
+          <Loader2 className="h-7 w-7 animate-spin text-[#7B0046]" />
           <span className="text-center text-[9px] font-semibold uppercase tracking-[.16em] text-stone-400">Preparing your workspace</span>
         </div>
       </div>
@@ -123,13 +123,13 @@ export default function DashboardPage() {
 
   return (
     <div className="app-theme min-h-[100svh] overflow-x-hidden bg-[#F7F5F2] text-[#302725] dashboard-page">
-      <header className="sticky top-0 z-40 border-b border-[#7A1315]/10 bg-[#FCFBF9]/95 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-[#7B0046]/10 bg-[#FCFBF9]/95 backdrop-blur-xl">
         <div className="mx-auto flex min-h-[60px] max-w-[1220px] items-center justify-between gap-3 px-4 py-2.5 sm:min-h-[68px] sm:px-7 lg:px-8">
           <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
             <MsuLogo size={36} className="shrink-0" />
             <div className="min-w-0 leading-tight">
-              <div className="max-w-[210px] truncate text-xs sm:text-sm font-extrabold tracking-tight text-[#4D0C0D] sm:max-w-none">MSU GenSan Procurement Management</div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#B88E13]">End User Workspace</div>
+              <div className="max-w-[210px] truncate text-xs sm:text-sm font-extrabold tracking-tight text-[#4D002C] sm:max-w-none">MSU GenSan Procurement Management</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#F5AB26]">End User Workspace</div>
             </div>
           </Link>
 
@@ -140,18 +140,18 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setUserMenuOpen((prev) => !prev)}
-                className="flex items-center gap-2 rounded-xl border border-stone-200/80 bg-white px-2.5 py-1.5 transition hover:border-[#D4AF37]/60 hover:bg-[#FFFDF7] focus:outline-none focus:ring-2 focus:ring-[#7A1315]/20 cursor-pointer"
+                className="flex items-center gap-2 rounded-xl border border-stone-200/80 bg-white px-2.5 py-1.5 transition hover:border-[#F5AB26]/60 hover:bg-[#FFFDF7] focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 cursor-pointer"
                 aria-expanded={userMenuOpen}
                 aria-label="User account menu"
               >
-                <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/45 bg-[#FFF6D9] text-[9px] sm:text-[10px] font-black text-[#6B4F05]">
+                <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full border border-[#F5AB26]/45 bg-[#FFF6D9] text-[9px] sm:text-[10px] font-black text-[#6B4F05]">
                   {initials}
                 </div>
                 <div className="hidden max-w-[150px] text-left leading-tight sm:block">
                   <p className="truncate text-[10px] font-bold text-stone-800">{displayName}</p>
                   <p className="truncate text-[8px] text-stone-400">{user?.email}</p>
                 </div>
-                <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${userMenuOpen ? "rotate-180 text-[#7A1315]" : ""}`} />
+                <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${userMenuOpen ? "rotate-180 text-[#7B0046]" : ""}`} />
               </button>
 
               {userMenuOpen && (
@@ -169,9 +169,9 @@ export default function DashboardPage() {
                     <Link
                       href="/admin"
                       onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 hover:text-[#7A1315] transition"
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 hover:text-[#7B0046] transition"
                     >
-                      <ShieldCheck className="h-4 w-4 text-[#B88E13]" />
+                      <ShieldCheck className="h-4 w-4 text-[#F5AB26]" />
                       <span>Admin Portal</span>
                     </Link>
                   )}
@@ -190,7 +190,7 @@ export default function DashboardPage() {
       </header>
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
-        <section className="relative overflow-hidden rounded-[20px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#5A080A] via-[#760D10] to-[#4A0507] p-5 sm:p-8 md:p-9 shadow-[0_18px_45px_rgba(77,12,13,.12)]">
+        <section className="relative overflow-hidden rounded-[20px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-5 sm:p-8 md:p-9 shadow-[0_18px_45px_rgba(77,0,44,.12)]">
           <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
           <div className="relative grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
@@ -198,14 +198,14 @@ export default function DashboardPage() {
               <h1 className="mt-3 text-xl sm:text-3xl md:text-4xl font-extrabold leading-tight tracking-tight text-white">Good day, {displayName}.</h1>
               <p className="mt-2.5 max-w-[670px] text-xs sm:text-sm leading-relaxed text-white/80">Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.</p>
             </div>
-            <Link href="/dashboard/new-pr" className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#F0C83F]/50 bg-gradient-to-r from-[#F0C83F] to-[#D4A82C] px-5 py-3 text-xs sm:text-sm font-extrabold text-[#4D0C0D] shadow-[0_10px_25px_rgba(0,0,0,.16)] transition hover:-translate-y-0.5 sm:w-auto"><PlusCircle className="h-4 w-4" />Create Purchase Request</Link>
+            <Link href="/dashboard/new-pr" className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#F0C83F]/50 bg-gradient-to-r from-[#F0C83F] to-[#D4A82C] px-5 py-3 text-xs sm:text-sm font-extrabold text-[#4D002C] shadow-[0_10px_25px_rgba(0,0,0,.16)] transition hover:-translate-y-0.5 sm:w-auto"><PlusCircle className="h-4 w-4" />Create Purchase Request</Link>
           </div>
         </section>
 
         <section className="mt-4 grid grid-cols-2 gap-3 sm:mt-5 sm:grid-cols-3">
-          {[{n:stats.total,t:"Total Requests",s:"All submitted PRs",Icon:FileText,tone:"bg-[#FFF2F2] text-[#7A1315]"},{n:stats.pending,t:"In Progress",s:"Awaiting next stage",Icon:Clock,tone:"bg-[#FFF8E5] text-[#9A7205]"},{n:stats.completed,t:"Completed",s:"Successfully delivered",Icon:CheckCircle,tone:"bg-[#ECFFF5] text-[#087449]"}].map((item) => (
+          {[{n:stats.total,t:"Total Requests",s:"All submitted PRs",Icon:FileText,tone:"bg-[#FDF2F7] text-[#7B0046]"},{n:stats.pending,t:"In Progress",s:"Awaiting next stage",Icon:Clock,tone:"bg-[#FFF8E5] text-[#9A7205]"},{n:stats.completed,t:"Completed",s:"Successfully delivered",Icon:CheckCircle,tone:"bg-[#ECFFF5] text-[#087449]"}].map((item) => (
             <div key={item.t} className={`rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-5 shadow-[0_8px_24px_rgba(45,35,30,.04)] ${item.t === "Completed" ? "col-span-2 sm:col-span-1" : ""}`}>
-              <div className="flex items-center justify-between gap-2"><div><p className="text-xs font-bold uppercase tracking-wider text-stone-500">{item.t}</p><p className="mt-1 text-2xl sm:text-3xl font-black tracking-tight text-[#4D0C0D]">{item.n}</p><p className="mt-0.5 text-xs text-stone-500">{item.s}</p></div><div className={`flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl ${item.tone}`}><item.Icon className="h-5 w-5" /></div></div>
+              <div className="flex items-center justify-between gap-2"><div><p className="text-xs font-bold uppercase tracking-wider text-stone-500">{item.t}</p><p className="mt-1 text-2xl sm:text-3xl font-black tracking-tight text-[#4D002C]">{item.n}</p><p className="mt-0.5 text-xs text-stone-500">{item.s}</p></div><div className={`flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl ${item.tone}`}><item.Icon className="h-5 w-5" /></div></div>
             </div>
           ))}
         </section>
@@ -214,7 +214,7 @@ export default function DashboardPage() {
           <section className="overflow-hidden rounded-2xl border border-stone-200/80 bg-white shadow-[0_12px_34px_rgba(45,35,30,.045)]">
             <div className="flex items-center justify-between gap-3 border-b border-stone-100 px-5 py-4 sm:px-6 sm:py-4.5 bg-stone-50/50">
               <div>
-                <h2 className="text-base sm:text-lg font-extrabold text-[#4D0C0D]">Recent Purchase Requests</h2>
+                <h2 className="text-base sm:text-lg font-extrabold text-[#4D002C]">Recent Purchase Requests</h2>
                 <p className="mt-0.5 text-xs sm:text-sm text-stone-500">Select a request to view its procurement timeline and status.</p>
               </div>
               <span className="shrink-0 rounded-full bg-[#F8F2E8] border border-[#E9D9AE] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#9A7205]">
@@ -236,12 +236,12 @@ export default function DashboardPage() {
                     className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 transition hover:bg-[#FFFBF7]"
                   >
                     <div className="flex items-start gap-3 min-w-0 flex-1">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FFF3E8] text-[#7A1315] border border-[#F5D8C4] shadow-xs">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FDF2F7] text-[#7B0046] border border-[#F5D6E5] shadow-xs">
                         <FileText className="h-5 w-5" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono text-sm font-extrabold text-[#7A1315]">{pr.pr_no}</span>
+                          <span className="font-mono text-sm font-extrabold text-[#7B0046]">{pr.pr_no}</span>
                           <span className="text-xs text-stone-400 font-medium">· {new Date(pr.created_at).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}</span>
                         </div>
                         <p className="mt-1 truncate text-sm font-semibold text-stone-800">{pr.purpose || "Official procurement request"}</p>
@@ -256,7 +256,7 @@ export default function DashboardPage() {
                           {stageNumber(pr.current_stage) ? `Stage ${stageNumber(pr.current_stage)} · ` : ""}{statusLabel(pr.current_stage)}
                         </span>
                       </div>
-                      <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs font-bold text-[#7A1315] shadow-xs group-hover:bg-[#7A1315] group-hover:text-white group-hover:border-[#7A1315] transition-all shrink-0">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs font-bold text-[#7B0046] shadow-xs group-hover:bg-[#7B0046] group-hover:text-white group-hover:border-[#7B0046] transition-all shrink-0">
                         <Eye className="h-4 w-4" />
                         <span>Track PR</span>
                       </div>
@@ -268,7 +268,7 @@ export default function DashboardPage() {
           </section>
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-            <section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#5D090B] to-[#7A1315] p-5 text-white shadow-[0_16px_38px_rgba(77,12,13,.09)]">
+            <section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#4D002C] to-[#7B0046] p-5 text-white shadow-[0_16px_38px_rgba(77,0,44,.09)]">
               <div className="relative flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#F0C83F]/30 bg-[#F0C83F]/10 text-[#F0C83F]">
                   <Bot className="h-5 w-5" />
@@ -287,15 +287,15 @@ export default function DashboardPage() {
 
             <section className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-[0_10px_28px_rgba(45,35,30,.04)]">
               <div className="flex items-center gap-2.5">
-                <LayoutDashboard className="h-4 w-4 text-[#B88E13]" />
-                <h3 className="text-sm font-extrabold text-[#4D0C0D]">Current activity</h3>
+                <LayoutDashboard className="h-4 w-4 text-[#F5AB26]" />
+                <h3 className="text-sm font-extrabold text-[#4D002C]">Current activity</h3>
               </div>
               {activeRequest ? (
                 <div className="mt-3 rounded-xl border border-[#E9D9AE] bg-[#FFFDF6] p-3.5">
                   <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#A07A13]">Active request</p>
-                  <p className="mt-1 font-mono text-sm font-extrabold text-[#7A1315]">{activeRequest.pr_no}</p>
+                  <p className="mt-1 font-mono text-sm font-extrabold text-[#7B0046]">{activeRequest.pr_no}</p>
                   <p className="mt-1 truncate text-xs text-stone-600 font-medium">{statusLabel(activeRequest.current_stage)}</p>
-                  <Link href={`/dashboard/pr/${activeRequest.pr_no}`} className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold text-[#7A1315] hover:text-[#5A1420]">
+                  <Link href={`/dashboard/pr/${activeRequest.pr_no}`} className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold text-[#7B0046] hover:text-[#4D002C]">
                     <span>Continue tracking</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
@@ -307,11 +307,11 @@ export default function DashboardPage() {
 
             <section className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-[0_10px_28px_rgba(45,35,30,.04)]">
               <div className="flex items-center gap-2.5">
-                <BarChart3 className="h-4 w-4 text-[#B88E13]" />
-                <h3 className="text-sm font-extrabold text-[#4D0C0D]">Transparency Board</h3>
+                <BarChart3 className="h-4 w-4 text-[#F5AB26]" />
+                <h3 className="text-sm font-extrabold text-[#4D002C]">Transparency Board</h3>
               </div>
               <p className="mt-2 text-xs leading-relaxed text-stone-500">Browse official MSU-GenSan public procurement postings and bidding records.</p>
-              <Link href="/dashboard/transparency" className="mt-3.5 flex items-center justify-between rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs font-bold text-[#7A1315] hover:bg-[#7A1315] hover:text-white hover:border-[#7A1315] transition-all">
+              <Link href="/dashboard/transparency" className="mt-3.5 flex items-center justify-between rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs font-bold text-[#7B0046] hover:bg-[#7B0046] hover:text-white hover:border-[#7B0046] transition-all">
                 <span>View Transparency Board</span>
                 <ArrowUpRight className="h-4 w-4" />
               </Link>

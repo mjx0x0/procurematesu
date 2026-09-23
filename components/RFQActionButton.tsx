@@ -58,7 +58,7 @@ export default function RFQActionButton({ prNo, mode, className = "" }: RFQActio
 
   return <>
     <div className={`relative ${className}`}>
-      <button type="button" onClick={isGenerate || isReview ? openEditor : print} disabled={busy} className="px-3.5 py-2 rounded-xl bg-white border border-[#7C1D2E]/30 text-[#7C1D2E] text-xs font-bold flex items-center gap-1.5 hover:bg-red-50 transition-colors disabled:opacity-60" title={isGenerate ? "Open and complete the generated RFQ" : isReview ? "Review and correct the generated RFQ" : "Prepare the RFQ for Step 9 printing"}>
+      <button type="button" onClick={isGenerate || isReview ? openEditor : print} disabled={busy} className="px-3.5 py-2 rounded-xl bg-white border border-[#7B0046]/30 text-[#7B0046] text-xs font-bold flex items-center gap-1.5 hover:bg-[#FDF2F7] transition-colors disabled:opacity-60" title={isGenerate ? "Open and complete the generated RFQ" : isReview ? "Review and correct the generated RFQ" : "Prepare the RFQ for Step 9 printing"}>
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : isGenerate ? <FileDown className="h-4 w-4" /> : isReview ? <FileCheck2 className="h-4 w-4" /> : <Printer className="h-4 w-4" />}
         {busy ? "Preparing..." : isGenerate ? "Open RFQ Form" : isReview ? "Review RFQ" : "Print RFQ"}
       </button>

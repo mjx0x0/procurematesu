@@ -12,10 +12,10 @@ export default function ForgotPasswordPage() {
           <Link href="/" className="inline-block transition-transform hover:scale-105 mb-2" title="Return to Home">
             <MsuLogo size={88} />
           </Link>
-          <h1 className="text-2xl font-extrabold text-[#4D0C0D] tracking-tight">
-            Procuremate<span className="text-[#B88E13]">SU</span>
+          <h1 className="text-2xl font-extrabold text-[#4D002C] tracking-tight">
+            Procuremate<span className="text-[#F5AB26]">SU</span>
           </h1>
-          <p className="text-xs font-semibold text-[#7A1315] uppercase tracking-wide mt-0.5">
+          <p className="text-xs font-semibold text-[#7B0046] uppercase tracking-wide mt-0.5">
             Account Recovery • MSU-GenSan
           </p>
         </div>

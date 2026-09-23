@@ -52,13 +52,13 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
           transition={{ duration: 0.2 }}
           className="flex flex-col items-center justify-center rounded-2xl bg-white p-6 shadow-2xl border border-stone-200 text-center max-w-xs w-full"
         >
-          <div className="relative mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#4D0C0D]/10">
-            <FileText className="h-6 w-6 text-[#7A1315] animate-pulse" />
+          <div className="relative mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#4D002C]/10">
+            <FileText className="h-6 w-6 text-[#7B0046] animate-pulse" />
           </div>
-          <p className="text-sm font-bold text-[#4D0C0D]">Loading Purchase Request</p>
+          <p className="text-sm font-bold text-[#4D002C]">Loading Purchase Request</p>
           <p className="text-xs text-stone-500 mt-0.5">Fetching official record for {prNo}...</p>
           <div className="mt-4 w-40 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-[#7A1315] via-[#D4AF37] to-[#7A1315] rounded-full animate-progress-indeterminate" />
+            <div className="h-full bg-gradient-to-r from-[#7B0046] via-[#F5AB26] to-[#7B0046] rounded-full animate-progress-indeterminate" />
           </div>
         </motion.div>
       </div>
@@ -73,9 +73,9 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
           animate={{ opacity: 1, scale: 1 }}
           className="max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-stone-200 text-center"
         >
-          <h3 className="font-bold text-[#7C1D2E]">Purchase Request unavailable</h3>
+          <h3 className="font-bold text-[#7B0046]">Purchase Request unavailable</h3>
           <p className="mt-2 text-sm text-stone-600">{error}</p>
-          <button onClick={onClose} className="mt-4 rounded-xl bg-[#7C1D2E] px-5 py-2.5 text-xs font-bold text-white hover:bg-[#5A1420] transition-colors">
+          <button onClick={onClose} className="mt-4 rounded-xl bg-[#7B0046] px-5 py-2.5 text-xs font-bold text-white hover:bg-[#610037] transition-colors">
             Close
           </button>
         </motion.div>
@@ -93,11 +93,11 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
       >
         <header className="flex shrink-0 items-center justify-between border-b border-stone-200 bg-white px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-[#7C1D2E] p-2 text-[#D4A843] shadow-sm">
+            <div className="rounded-xl bg-[#7B0046] p-2 text-[#F5AB26] shadow-sm">
               <FileText className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-extrabold text-[#5A1420]">Complete Purchase Request — {prNo}</h2>
+              <h2 className="text-lg font-extrabold text-[#4D002C]">Complete Purchase Request — {prNo}</h2>
               <p className="text-xs text-stone-500">Read-only copy of the end-user&apos;s submitted PR for verification.</p>
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
           </div>
 
           <div className="mx-auto mt-5 max-w-4xl rounded-xl border border-stone-200 bg-white p-4 print:hidden">
-            <h3 className="mb-3 text-sm font-extrabold text-[#5A1420]">Submitted PR Record</h3>
+            <h3 className="mb-3 text-sm font-extrabold text-[#4D002C]">Submitted PR Record</h3>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               {visibleMeta.map(([key, value]) => (
                 <div key={key} className="rounded-lg border border-stone-100 bg-stone-50 px-3 py-2">
@@ -247,7 +247,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
             </div>
           </div>
           <div className="mx-auto mt-4 max-w-4xl rounded-xl border border-stone-200 bg-white p-4 print:hidden">
-            <h3 className="mb-3 text-sm font-extrabold text-[#5A1420]">Procurement History</h3>
+            <h3 className="mb-3 text-sm font-extrabold text-[#4D002C]">Procurement History</h3>
             {history.length ? (
               <div className="space-y-2">
                 {history.map((h, i) => (
@@ -263,7 +263,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
           </div>
         </div>
         <footer className="flex shrink-0 justify-end gap-2 border-t border-stone-200 bg-white px-5 py-3 print:hidden">
-          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-lg bg-[#7C1D2E] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#5A1420] transition-colors">
+          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-lg bg-[#7B0046] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#610037] transition-colors">
             <Printer className="h-4 w-4" />Print PR
           </button>
           <button onClick={onClose} className="rounded-lg border border-stone-200 px-4 py-2.5 text-xs font-bold hover:bg-stone-50 transition-colors">

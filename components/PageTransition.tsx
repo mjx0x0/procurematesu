@@ -53,7 +53,7 @@ export default function PageTransition() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[9999] h-[3px] overflow-hidden pointer-events-none">
-      <div className="h-full bg-gradient-to-r from-[#7A1315] via-[#F0C83F] to-[#7A1315] animate-progress-indeterminate shadow-[0_0_8px_rgba(212,175,55,0.7)]" />
+      <div className="h-full bg-gradient-to-r from-[#7B0046] via-[#F5AB26] to-[#7B0046] animate-progress-indeterminate shadow-[0_0_8px_rgba(245,171,38,0.7)]" />
     </div>
   );
 }

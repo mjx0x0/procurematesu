@@ -71,12 +71,12 @@ export function ForgotPasswordForm({
                   <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
                 {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full bg-gradient-to-r from-[#7A1315] to-[#91191C] hover:from-[#630E10] hover:to-[#7A1315] text-white font-semibold border border-amber-400/30 shadow-xs" disabled={isLoading}>
+                <Button type="submit" className="w-full bg-gradient-to-r from-[#7B0046] to-[#8E0052] hover:from-[#610037] hover:to-[#7B0046] text-white font-semibold border border-amber-400/30 shadow-xs" disabled={isLoading}>
                   {isLoading ? "Sending..." : "Send reset email"}
                 </Button>
               </div>
               <div className="mt-4 text-center text-sm text-stone-600">
-                Already have an account? <Link href="/" className="font-semibold text-[#7A1315] hover:underline">Sign in on the home page</Link>
+                Already have an account? <Link href="/" className="font-semibold text-[#7B0046] hover:underline">Sign in on the home page</Link>
               </div>
             </form>
           </CardContent>

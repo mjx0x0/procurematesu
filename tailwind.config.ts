@@ -53,23 +53,23 @@ export default {
         },
         msu: {
           maroon: {
-            DEFAULT: "#7A1315", // Signature MSU Deep Maroon
-            900: "#4D0C0D",
-            800: "#630E10",
-            700: "#7A1315",
-            600: "#91191C",
-            500: "#AA2023",
-            100: "#FBE9E9",
-            50: "#FDF5F5",
+            DEFAULT: "#7B0046", // Signature MSU Deep Purple / Magenta Plum
+            900: "#4D002C",
+            800: "#610037",
+            700: "#7B0046",
+            600: "#8E0052",
+            500: "#A1085F",
+            100: "#FDF2F7",
+            50: "#FBF0F5",
           },
           gold: {
-            DEFAULT: "#D4AF37", // Signature MSU Gold
+            DEFAULT: "#F5AB26", // Signature MSU Gold / Marigold
             900: "#7A5E0B",
             800: "#9A770F",
             700: "#B88E13",
             600: "#D4AF37",
-            500: "#E5C158",
-            400: "#F2D57E",
+            500: "#F5AB26",
+            400: "#FFBF2B",
             100: "#FEF7E6",
             50: "#FFFDF8",
           },

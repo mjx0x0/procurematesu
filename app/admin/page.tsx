@@ -197,7 +197,7 @@ export default function AdminDashboard() {
   };
   const logout = async () => { await supabase.auth.signOut(); router.push("/"); };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]"><Loader2 className="h-10 w-10 animate-spin text-[#7C1D2E]" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]"><Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" /></div>;
 
   const detailStage = currentStage(selectedPR);
   const detailIndex = currentIndex(selectedPR);
@@ -207,22 +207,22 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
       <nav className="bg-white/95 border-b border-stone-200 sticky top-0 z-40 shadow-[0_1px_12px_rgba(45,20,10,0.04)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0"><MsuLogo size={40} className="shrink-0" /><div className="min-w-0"><b className="block text-base sm:text-lg text-[#5A1420] truncate">MSU GenSan Procurement Management System</b><span className="text-[10px] sm:text-xs text-stone-500 font-semibold tracking-wide">ADMIN PORTAL</span></div></div>
+          <div className="flex items-center gap-3 min-w-0"><MsuLogo size={40} className="shrink-0" /><div className="min-w-0"><b className="block text-base sm:text-lg text-[#4D002C] truncate">MSU GenSan Procurement Management System</b><span className="text-[10px] sm:text-xs text-stone-500 font-semibold tracking-wide">ADMIN PORTAL</span></div></div>
           <div ref={adminMenuRef} className="relative shrink-0">
             <button
               type="button"
               onClick={() => setAdminMenuOpen((prev) => !prev)}
-              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7C1D2E]/20 cursor-pointer"
+              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 cursor-pointer"
               aria-expanded={adminMenuOpen}
               aria-label="Admin account menu"
             >
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7C1D2E]/10 text-[10px] font-bold text-[#7C1D2E]">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7B0046]/10 text-[10px] font-bold text-[#7B0046]">
                 <User className="h-3.5 w-3.5" />
               </div>
               <span className="hidden sm:inline font-medium text-xs max-w-[170px] truncate text-stone-800">
                 {user?.email}
               </span>
-              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7C1D2E]" : ""}`} />
+              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7B0046]" : ""}`} />
             </button>
 
             {adminMenuOpen && (
@@ -230,7 +230,7 @@ export default function AdminDashboard() {
                 <div className="border-b border-stone-100 px-3 py-2.5">
                   <p className="truncate text-xs font-bold text-stone-900">{user?.email}</p>
                   <div className="mt-1 flex items-center gap-1.5">
-                    <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-[#7C1D2E] border border-red-200/60">
+                    <span className="inline-flex items-center rounded-full bg-[#FDF2F7] px-2 py-0.5 text-[9px] font-bold text-[#7B0046] border border-[#F5D6E5]">
                       Administrator
                     </span>
                   </div>
@@ -249,9 +249,9 @@ export default function AdminDashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-7">
-        <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-[#9A7B2F] font-extrabold mb-2"><Sparkles className="h-3.5 w-3.5" /> Procurement Operations</div><h1 className="text-3xl font-extrabold tracking-tight text-[#5A1420]">Admin Dashboard</h1><p className="text-stone-600 mt-1 text-sm">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="flex flex-wrap gap-2 items-start"><Link href="/admin/users" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7C1D2E] hover:bg-red-50 flex items-center gap-2"><Users className="h-4 w-4" /> User Approvals</Link><Link href="/admin/inquiries" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7C1D2E] hover:bg-red-50 flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#7C1D2E] border border-[#7C1D2E] rounded-xl text-sm font-bold text-white hover:bg-[#5A1420] disabled:opacity-60 disabled:cursor-wait shadow-sm transition-all"><RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
+        <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-[#9A7B2F] font-extrabold mb-2"><Sparkles className="h-3.5 w-3.5" /> Procurement Operations</div><h1 className="text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1><p className="text-stone-600 mt-1 text-sm">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="flex flex-wrap gap-2 items-start"><Link href="/admin/users" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><Users className="h-4 w-4" /> User Approvals</Link><Link href="/admin/inquiries" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#7B0046] border border-[#7B0046] rounded-xl text-sm font-bold text-white hover:bg-[#4D002C] disabled:opacity-60 disabled:cursor-wait shadow-sm transition-all"><RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-7">{[[stats.total, "Total PRs", FileCheck, "text-[#7C1D2E]"], [stats.pending, "In Progress", Clock, "text-amber-600"], [stats.inProgress, "Beyond Receipt", AlertCircle, "text-orange-600"], [stats.completed, "Completed", CheckCircle, "text-emerald-700"], [stats.rejected, "Rejected", XCircle, "text-red-600"]].map(([n, l, I, c]: any) => <div key={l} className="bg-white rounded-2xl p-4 border border-stone-200 shadow-[0_5px_20px_rgba(45,20,10,0.035)]"><div className="flex justify-between items-center"><div><div className={`text-2xl font-bold ${c}`}>{n}</div><div className="text-xs font-semibold text-stone-600 mt-0.5">{l}</div></div><I className={`h-5 w-5 ${c}`} /></div></div>)}</div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-7">{[[stats.total, "Total PRs", FileCheck, "text-[#7B0046]"], [stats.pending, "In Progress", Clock, "text-amber-600"], [stats.inProgress, "Beyond Receipt", AlertCircle, "text-orange-600"], [stats.completed, "Completed", CheckCircle, "text-emerald-700"], [stats.rejected, "Rejected", XCircle, "text-red-600"]].map(([n, l, I, c]: any) => <div key={l} className="bg-white rounded-2xl p-4 border border-stone-200 shadow-[0_5px_20px_rgba(45,20,10,0.035)]"><div className="flex justify-between items-center"><div><div className={`text-2xl font-bold ${c}`}>{n}</div><div className="text-xs font-semibold text-stone-600 mt-0.5">{l}</div></div><I className={`h-5 w-5 ${c}`} /></div></div>)}</div>
 
         {/* Filter and Search Bar */}
         <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-5 shadow-[0_5px_20px_rgba(45,20,10,0.03)] flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
@@ -261,14 +261,14 @@ export default function AdminDashboard() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by PR number, purpose, or requesting department..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-[#7C1D2E]/20 focus:border-[#7C1D2E] text-sm"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046] text-sm"
             />
           </div>
           <div className="flex flex-wrap sm:flex-nowrap gap-3 items-center">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900 text-sm font-medium focus:ring-2 focus:ring-[#7C1D2E]/20 focus:border-[#7C1D2E]"
+              className="px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900 text-sm font-medium focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
             >
               <option value="all">All Statuses ({prs.length})</option>
               {STAGES.map((s) => (
@@ -281,7 +281,7 @@ export default function AdminDashboard() {
             <select
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900 text-sm font-medium focus:ring-2 focus:ring-[#7C1D2E]/20 focus:border-[#7C1D2E]"
+              className="px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900 text-sm font-medium focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
             >
               <option value="all">All Departments</option>
               {departments.map((d) => (
@@ -303,11 +303,11 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-[0_8px_30px_rgba(45,20,10,0.04)]">
           <div className="px-6 py-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-stone-50/50">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-[#5A1420]">Purchase Requests</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-[#4D002C]">Purchase Requests</h2>
               <p className="text-xs sm:text-sm text-stone-500 mt-0.5">Workflow stages are enforced sequentially in accordance with PMO procurement rules.</p>
             </div>
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-xs sm:text-sm font-bold text-stone-700 w-fit">
-              <span className="h-2 w-2 rounded-full bg-[#7C1D2E]" />
+              <span className="h-2 w-2 rounded-full bg-[#7B0046]" />
               {filtered.length} {filtered.length === 1 ? "Record" : "Records"}
             </span>
           </div>
@@ -342,7 +342,7 @@ export default function AdminDashboard() {
                         >
                           <td className="px-3 lg:px-4 py-3.5 align-middle whitespace-nowrap">
                             <div className="flex items-center gap-1.5 min-w-0">
-                              <span className="font-mono text-xs lg:text-sm font-extrabold text-[#7C1D2E] tracking-tight">{pr.pr_no}</span>
+                              <span className="font-mono text-xs lg:text-sm font-extrabold text-[#7B0046] tracking-tight">{pr.pr_no}</span>
                               {rfqMode && (
                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300 text-[#8B6009] text-[9px] font-black tracking-wider uppercase shrink-0">
                                   RFQ
@@ -375,9 +375,9 @@ export default function AdminDashboard() {
                             <button
                               onClick={() => void openDetails(pr)}
                               title={`View details and actions for ${pr.pr_no}`}
-                              className="inline-flex items-center gap-1 h-7.5 px-2.5 lg:px-3 rounded-lg lg:rounded-xl bg-white hover:bg-stone-50 text-[#7C1D2E] text-xs font-bold border border-stone-200 hover:border-[#7C1D2E]/40 transition-all shadow-2xs hover:shadow-xs active:scale-95"
+                              className="inline-flex items-center gap-1 h-7.5 px-2.5 lg:px-3 rounded-lg lg:rounded-xl bg-white hover:bg-stone-50 text-[#7B0046] text-xs font-bold border border-stone-200 hover:border-[#7B0046]/40 transition-all shadow-2xs hover:shadow-xs active:scale-95"
                             >
-                              <Eye className="h-3.5 w-3.5 text-[#7C1D2E]" />
+                              <Eye className="h-3.5 w-3.5 text-[#7B0046]" />
                               <span>View</span>
                             </button>
                           </td>
@@ -402,7 +402,7 @@ export default function AdminDashboard() {
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="font-mono text-sm font-extrabold text-[#7C1D2E] tracking-tight">{pr.pr_no}</span>
+                          <span className="font-mono text-sm font-extrabold text-[#7B0046] tracking-tight">{pr.pr_no}</span>
                           {rfqMode && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300 text-[#8B6009] text-[9px] font-black uppercase">
                               RFQ
@@ -427,7 +427,7 @@ export default function AdminDashboard() {
                         </span>
                         <button
                           onClick={(e) => { e.stopPropagation(); void openDetails(pr); }}
-                          className="inline-flex items-center gap-1 h-7 px-2.5 rounded-lg bg-white text-[#7C1D2E] text-xs font-bold border border-stone-200 shadow-2xs hover:bg-stone-50"
+                          className="inline-flex items-center gap-1 h-7 px-2.5 rounded-lg bg-white text-[#7B0046] text-xs font-bold border border-stone-200 shadow-2xs hover:bg-stone-50"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           <span>View</span>
@@ -449,7 +449,7 @@ export default function AdminDashboard() {
             <div className="sticky top-0 bg-white border-b border-stone-200 px-6 py-4 flex justify-between items-start z-10 shrink-0 shadow-2xs">
               <div>
                 <div className="flex items-center gap-3">
-                  <h3 className="text-xl font-extrabold text-[#5A1420] tracking-tight">PR {selectedPR.pr_no}</h3>
+                  <h3 className="text-xl font-extrabold text-[#4D002C] tracking-tight">PR {selectedPR.pr_no}</h3>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${COLORS[selectedPR.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
                     {detailStage ? `Stage ${detailStage.number}: ${detailStage.shortLabel}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
                   </span>
@@ -487,7 +487,7 @@ export default function AdminDashboard() {
               <div className="bg-[#FAF7F2] rounded-2xl border border-stone-200 p-5 shadow-2xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-4 border-b border-stone-200/80">
                   <div>
-                    <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#5A1420]">Workflow Actions & Management</h4>
+                    <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#4D002C]">Workflow Actions & Management</h4>
                     <p className="text-xs text-stone-500 mt-0.5">Execute stage advancement, evaluate RFQs, inspect submitted forms, or record remarks.</p>
                   </div>
                   <div className="text-xs font-bold text-stone-600 bg-white px-3 py-1 rounded-lg border border-stone-200 shrink-0">
@@ -500,7 +500,7 @@ export default function AdminDashboard() {
                   {selectedPR.current_stage === "rfq_generation" && (
                     <button
                       onClick={() => void openRfq(selectedPR, "generation")}
-                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gradient-to-r from-[#7C1D2E] to-[#5A1420] hover:from-[#650709] hover:to-[#4D0C0D] text-white text-xs sm:text-sm font-bold shadow-sm transition-all border border-[#7C1D2E] active:scale-98"
+                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-xs sm:text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
                     >
                       <FileText className="h-4 w-4 text-[#F0C83F]" />
                       <span>Generate Official RFQ</span>
@@ -509,7 +509,7 @@ export default function AdminDashboard() {
                   {selectedPR.current_stage === "rfq_evaluation" && (
                     <button
                       onClick={() => void openRfq(selectedPR, "evaluation")}
-                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gradient-to-r from-[#7C1D2E] to-[#5A1420] hover:from-[#650709] hover:to-[#4D0C0D] text-white text-xs sm:text-sm font-bold shadow-sm transition-all border border-[#7C1D2E] active:scale-98"
+                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-xs sm:text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
                     >
                       <FileText className="h-4 w-4 text-[#F0C83F]" />
                       <span>Review & Evaluate RFQ</span>
@@ -518,7 +518,7 @@ export default function AdminDashboard() {
                   {selectedPR.current_stage === "rfq_printing" && (
                     <button
                       onClick={() => void openRfq(selectedPR, "printing")}
-                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gradient-to-r from-[#7C1D2E] to-[#5A1420] hover:from-[#650709] hover:to-[#4D0C0D] text-white text-xs sm:text-sm font-bold shadow-sm transition-all border border-[#7C1D2E] active:scale-98"
+                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-xs sm:text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
                     >
                       <FileText className="h-4 w-4 text-[#F0C83F]" />
                       <span>Print RFQ (3-4 Copies)</span>
@@ -530,9 +530,9 @@ export default function AdminDashboard() {
                     <button
                       onClick={() => openAction("complete")}
                       title={`Advance to Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}`}
-                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#FFFDF7] hover:bg-[#FFF8E6] text-[#7C1D2E] text-xs sm:text-sm font-bold border-2 border-[#D4AF37] shadow-sm transition-all active:scale-98"
+                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#FFFDF7] hover:bg-[#FFF8E6] text-[#7B0046] text-xs sm:text-sm font-bold border-2 border-[#F5AB26] shadow-sm transition-all active:scale-98"
                     >
-                      <Check className="h-4 w-4 text-[#B88E13]" />
+                      <Check className="h-4 w-4 text-[#F5AB26]" />
                       <span>Stage {nextStage(selectedPR)?.number} · Complete Stage</span>
                     </button>
                   ) : selectedPR.current_stage === "completed" ? (
@@ -547,7 +547,7 @@ export default function AdminDashboard() {
                     onClick={() => setFullPrNo(selectedPR.pr_no)}
                     className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs sm:text-sm font-bold border border-stone-200 transition-colors shadow-2xs active:scale-98"
                   >
-                    <FileText className="h-4 w-4 text-[#7C1D2E]" />
+                    <FileText className="h-4 w-4 text-[#7B0046]" />
                     <span>View Submitted PR</span>
                   </button>
 
@@ -596,15 +596,15 @@ export default function AdminDashboard() {
               <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
-                    <h4 className="text-sm font-extrabold text-[#5A1420]">Procurement Workflow Progress</h4>
+                    <h4 className="text-sm font-extrabold text-[#4D002C]">Procurement Workflow Progress</h4>
                     <p className="text-xs text-stone-500">The current stage is always shown, even when no historical completion row has been recorded yet.</p>
                   </div>
-                  <span className="text-xs font-extrabold text-[#7C1D2E] bg-red-50 border border-red-100 px-2.5 py-1 rounded-full">
+                  <span className="text-xs font-extrabold text-[#7B0046] bg-[#FDF2F7] border border-[#F5D6E5] px-2.5 py-1 rounded-full">
                     {selectedPR.current_stage === "completed" ? "Completed" : detailIndex >= 0 ? `Stage ${detailIndex + 1}` : "—"}
                   </span>
                 </div>
                 <div className="h-2 rounded-full bg-stone-100 overflow-hidden mb-4">
-                  <div className="h-full rounded-full bg-gradient-to-r from-[#7C1D2E] to-[#D4A843]" style={{ width: `${detailPercent}%` }} />
+                  <div className="h-full rounded-full bg-gradient-to-r from-[#7B0046] to-[#F5AB26]" style={{ width: `${detailPercent}%` }} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[470px] overflow-y-auto pr-1">
                   {STAGES.map((stage, index) => {
@@ -627,7 +627,7 @@ export default function AdminDashboard() {
                           <div
                             className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-[10px] font-black ${
                               state === "current"
-                                ? "bg-[#7C1D2E] text-white"
+                                ? "bg-[#7B0046] text-white"
                                 : state === "completed"
                                 ? "bg-emerald-600 text-white"
                                 : "bg-stone-200 text-stone-600"
@@ -640,13 +640,13 @@ export default function AdminDashboard() {
                               <span className="text-[9px] uppercase tracking-[.12em] font-black text-stone-400">Stage {stage.number}</span>
                               <span
                                 className={`text-[9px] font-black ${
-                                  state === "current" ? "text-[#7C1D2E]" : state === "completed" ? "text-emerald-700" : "text-stone-400"
+                                  state === "current" ? "text-[#7B0046]" : state === "completed" ? "text-emerald-700" : "text-stone-400"
                                 }`}
                               >
                                 {state === "current" ? "CURRENT" : state === "completed" ? "COMPLETED" : "UPCOMING"}
                               </span>
                             </div>
-                            <p className={`text-xs font-bold mt-0.5 ${state === "current" ? "text-[#5A1420]" : "text-stone-700"}`}>{stage.label}</p>
+                            <p className={`text-xs font-bold mt-0.5 ${state === "current" ? "text-[#4D002C]" : "text-stone-700"}`}>{stage.label}</p>
                             {recorded?.completed_at && (
                               <p className="text-[9px] text-stone-400 mt-1">Recorded {new Date(recorded.completed_at).toLocaleString("en-PH")}</p>
                             )}
@@ -709,7 +709,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {action && selectedPR && <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className={`p-3 rounded-xl ${action === "reject" ? "bg-red-100 text-red-700" : action === "remark" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{action === "reject" ? <XCircle className="h-6 w-6" /> : action === "remark" ? <MessageSquare className="h-6 w-6" /> : <CheckCircle className="h-6 w-6" />}</div><div className="flex-1"><h3 className="text-lg font-bold text-gray-900">{action === "complete" ? "Complete Next Stage" : action === "remark" ? "Send Remark" : "Reject Purchase Request"}</h3><p className="text-xs text-stone-500 mt-1 font-medium">{selectedPR.pr_no}{action === "complete" && nextStage(selectedPR) ? ` · Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}` : ""}</p></div><button onClick={() => setAction(null)} className="p-1 text-stone-400 hover:text-stone-600"><X className="h-5 w-5" /></button></div>{action === "complete" && nextStage(selectedPR) && <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5"><div className="flex items-center gap-2 text-xs font-bold text-emerald-800 mb-1"><span>Advancing Stage</span><ArrowRight className="h-3.5 w-3.5" /><span>Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}</span></div><p className="text-xs text-emerald-700">{nextStage(selectedPR)?.description}</p></div>}<label className="block text-xs font-bold text-stone-600 uppercase tracking-wide mb-2">{action === "complete" ? "Remarks / completion note" : "Reason / remark"} {action !== "complete" && <span className="text-red-500">*</span>}</label><textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder={action === "reject" ? "Explain why this PR is being rejected..." : action === "remark" ? "Enter a procurement remark..." : "Add a note for this stage (optional)..."} className="w-full min-h-[110px] rounded-xl border border-stone-200 bg-white text-gray-900 placeholder:text-stone-400 p-3 text-sm outline-none focus:ring-2 focus:ring-[#7C1D2E]/20 focus:border-[#7C1D2E] resize-y" /><div className="flex justify-end gap-2.5 mt-5"><button onClick={() => setAction(null)} disabled={busy} className="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200">Cancel</button><button onClick={() => void submitAction()} disabled={busy || (action !== "complete" && !remarks.trim())} className={`px-4 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 ${action === "reject" ? "bg-red-600 hover:bg-red-700" : action === "remark" ? "bg-[#7C1D2E] hover:bg-[#5A1420]" : "bg-gradient-to-r from-[#7C1D2E] to-[#91191C]"}`}>{busy && <Loader2 className="h-4 w-4 animate-spin" />}{action === "complete" ? "Complete Stage" : action === "remark" ? "Send Remark" : "Reject PR"}</button></div></div></div>}
+      {action && selectedPR && <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className={`p-3 rounded-xl ${action === "reject" ? "bg-red-100 text-red-700" : action === "remark" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{action === "reject" ? <XCircle className="h-6 w-6" /> : action === "remark" ? <MessageSquare className="h-6 w-6" /> : <CheckCircle className="h-6 w-6" />}</div><div className="flex-1"><h3 className="text-lg font-bold text-gray-900">{action === "complete" ? "Complete Next Stage" : action === "remark" ? "Send Remark" : "Reject Purchase Request"}</h3><p className="text-xs text-stone-500 mt-1 font-medium">{selectedPR.pr_no}{action === "complete" && nextStage(selectedPR) ? ` · Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}` : ""}</p></div><button onClick={() => setAction(null)} className="p-1 text-stone-400 hover:text-stone-600"><X className="h-5 w-5" /></button></div>{action === "complete" && nextStage(selectedPR) && <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5"><div className="flex items-center gap-2 text-xs font-bold text-emerald-800 mb-1"><span>Advancing Stage</span><ArrowRight className="h-3.5 w-3.5" /><span>Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}</span></div><p className="text-xs text-emerald-700">{nextStage(selectedPR)?.description}</p></div>}<label className="block text-xs font-bold text-stone-600 uppercase tracking-wide mb-2">{action === "complete" ? "Remarks / completion note" : "Reason / remark"} {action !== "complete" && <span className="text-red-500">*</span>}</label><textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder={action === "reject" ? "Explain why this PR is being rejected..." : action === "remark" ? "Enter a procurement remark..." : "Add a note for this stage (optional)..."} className="w-full min-h-[110px] rounded-xl border border-stone-200 bg-white text-gray-900 placeholder:text-stone-400 p-3 text-sm outline-none focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046] resize-y" /><div className="flex justify-end gap-2.5 mt-5"><button onClick={() => setAction(null)} disabled={busy} className="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200">Cancel</button><button onClick={() => void submitAction()} disabled={busy || (action !== "complete" && !remarks.trim())} className={`px-4 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 ${action === "reject" ? "bg-red-600 hover:bg-red-700" : action === "remark" ? "bg-[#7B0046] hover:bg-[#4D002C]" : "bg-gradient-to-r from-[#7B0046] to-[#8E0052]"}`}>{busy && <Loader2 className="h-4 w-4 animate-spin" />}{action === "complete" ? "Complete Stage" : action === "remark" ? "Send Remark" : "Reject PR"}</button></div></div></div>}
 
       {deletePR && <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className="p-3 rounded-xl bg-red-50 text-red-600"><Trash2 className="h-6 w-6" /></div><div><h3 className="text-lg font-bold text-gray-900">Delete Purchase Request?</h3><p className="text-sm text-stone-600 mt-1"><b>{deletePR}</b> and its recorded stage history will be permanently removed.</p></div></div><div className="flex justify-end gap-2"><button onClick={() => setDeletePR(null)} className="px-4 py-2 rounded-lg bg-stone-100 text-stone-700 text-sm font-semibold">Cancel</button><button onClick={() => void deleteRequest()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold flex items-center gap-2"><Trash2 className="h-4 w-4" /> Delete Permanently</button></div></div></div>}
 

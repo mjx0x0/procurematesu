@@ -69,7 +69,7 @@ export default function PRPrintContent() {
       <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
         <div className="text-center">
           <p className="text-red-600 font-bold mb-3">No PR data found or invalid link.</p>
-          <Link href="/dashboard" className="text-[#7A1315] hover:underline font-semibold text-sm">
+          <Link href="/dashboard" className="text-[#7B0046] hover:underline font-semibold text-sm">
             ← Return to Dashboard
           </Link>
         </div>
@@ -89,7 +89,7 @@ export default function PRPrintContent() {
       <div className="max-w-4xl mx-auto mb-6 flex items-center justify-between print:hidden">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 text-stone-700 hover:text-[#7A1315] text-sm font-semibold transition-colors"
+          className="inline-flex items-center gap-2 text-stone-700 hover:text-[#7B0046] text-sm font-semibold transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
@@ -97,7 +97,7 @@ export default function PRPrintContent() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 bg-[#7A1315] hover:bg-[#5E0F10] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-all"
+            className="inline-flex items-center gap-2 bg-[#7B0046] hover:bg-[#610037] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-all"
           >
             <Printer className="h-4 w-4 text-amber-300" />
             Print Official PR

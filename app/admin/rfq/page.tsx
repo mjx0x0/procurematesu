@@ -62,20 +62,20 @@ export default function AdminRFQPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/admin"
-              className="p-2 rounded-xl text-stone-500 hover:text-[#7A1315] hover:bg-stone-100 transition-colors"
+              className="p-2 rounded-xl text-stone-500 hover:text-[#7B0046] hover:bg-stone-100 transition-colors"
               title="Back to Admin Dashboard"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
-            <div className="bg-[#4D0C0D] p-2 rounded-xl text-amber-300 shadow-sm">
+            <div className="bg-[#4D002C] p-2 rounded-xl text-amber-300 shadow-sm">
               <FileCheck2 className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <b className="text-xl font-black text-[#4D0C0D]">
-                  RFQ <span className="text-[#B88E13]">Workspace</span>
+                <b className="text-xl font-black text-[#4D002C]">
+                  RFQ <span className="text-[#F5AB26]">Workspace</span>
                 </b>
-                <span className="text-[11px] bg-red-50 text-[#7A1315] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                <span className="text-[11px] bg-red-50 text-[#7B0046] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
                   Admin Tool
                 </span>
               </div>
@@ -84,7 +84,7 @@ export default function AdminRFQPage() {
           </div>
           <Link
             href="/admin"
-            className="text-xs font-bold text-stone-600 hover:text-[#7A1315] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
+            className="text-xs font-bold text-stone-600 hover:text-[#7B0046] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
           </Link>
@@ -93,7 +93,7 @@ export default function AdminRFQPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-7">
         <div className="mb-6">
-          <h1 className="text-3xl font-black tracking-tight text-[#4D0C0D]">Requests for Quotation (RFQ)</h1>
+          <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Requests for Quotation (RFQ)</h1>
           <p className="text-sm text-stone-600 mt-1">
             Official PMO Sequence: <b>Step 7</b> (Generate RFQ) → <b>Step 8</b> (Evaluate Quotations) → <b>Step 9</b> (Print RFQ).
           </p>
@@ -124,7 +124,7 @@ export default function AdminRFQPage() {
         <div className="ui-card overflow-hidden">
           {loading ? (
             <div className="p-12 flex justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-[#7A1315]" />
+              <Loader2 className="h-8 w-8 animate-spin text-[#7B0046]" />
             </div>
           ) : filtered.length === 0 ? (
             <div className="p-12 text-center text-stone-500">
@@ -152,7 +152,7 @@ export default function AdminRFQPage() {
                 <tbody className="divide-y divide-stone-100">
                   {filtered.map((pr) => (
                     <tr key={pr.pr_no} className="hover:bg-amber-50/20 transition-colors">
-                      <td className="px-5 py-4 text-sm font-bold text-[#7A1315] whitespace-nowrap">{pr.pr_no}</td>
+                      <td className="px-5 py-4 text-sm font-bold text-[#7B0046] whitespace-nowrap">{pr.pr_no}</td>
                       <td className="px-5 py-4 text-sm max-w-md font-medium text-stone-900">{pr.purpose}</td>
                       <td className="px-5 py-4 text-sm text-stone-600 whitespace-nowrap">{pr.department}</td>
                       <td className="px-5 py-4 text-sm font-bold text-stone-800 whitespace-nowrap">

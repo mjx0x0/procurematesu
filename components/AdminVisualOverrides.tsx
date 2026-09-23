@@ -37,16 +37,16 @@ export default function AdminVisualOverrides() {
         min-width: 122px !important;
         min-height: 36px !important;
         padding: 0.55rem 0.8rem !important;
-        background: linear-gradient(135deg, #7c1d2e, #5a1420) !important;
+        background: linear-gradient(135deg, #7B0046, #4D002C) !important;
         color: #fff !important;
-        border: 1px solid #7c1d2e !important;
+        border: 1px solid #7B0046 !important;
         font-size: 10px !important;
         font-weight: 800 !important;
         letter-spacing: 0.01em !important;
       }
 
       .admin-shell .admin-dashboard-page table button[title^="Generate RFQ"]:hover {
-        background: linear-gradient(135deg, #5a1420, #4d0c0d) !important;
+        background: linear-gradient(135deg, #4D002C, #38001F) !important;
       }
     `}</style>
   );

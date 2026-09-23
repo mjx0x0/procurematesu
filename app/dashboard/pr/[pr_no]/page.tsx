@@ -139,8 +139,8 @@ export default function PRDetailPage() {
     });
   })();
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><Loader2 className="h-9 w-9 animate-spin text-[#7A1315]" /></div>;
-  if (error || !pr) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><div className="text-center"><XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" /><h2 className="text-xl font-bold text-stone-900">{error || "PR Not Found"}</h2><Link href="/dashboard" className="text-[#7A1315] font-semibold mt-3 inline-block">Back to Dashboard</Link></div></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><Loader2 className="h-9 w-9 animate-spin text-[#7B0046]" /></div>;
+  if (error || !pr) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><div className="text-center"><XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" /><h2 className="text-xl font-bold text-stone-900">{error || "PR Not Found"}</h2><Link href="/dashboard" className="text-[#7B0046] font-semibold mt-3 inline-block">Back to Dashboard</Link></div></div>;
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
@@ -149,10 +149,10 @@ export default function PRDetailPage() {
           <div className="flex items-center gap-3">
             <MsuLogo size={38} className="shrink-0" />
             <div>
-              <span className="font-extrabold text-lg sm:text-xl text-[#4D0C0D] tracking-tight">
-                Procuremate<span className="text-[#B88E13]">SU</span>
+              <span className="font-extrabold text-lg sm:text-xl text-[#4D002C] tracking-tight">
+                Procuremate<span className="text-[#F5AB26]">SU</span>
               </span>
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-50 text-[#7A1315] border border-amber-200/80 ml-2">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-50 text-[#7B0046] border border-amber-200/80 ml-2">
                 MSU-GenSan
               </span>
             </div>
@@ -161,7 +161,7 @@ export default function PRDetailPage() {
             href="/dashboard"
             className="ui-button ui-button-secondary ui-button-sm text-xs font-semibold"
           >
-            <ArrowLeft className="h-4 w-4 text-[#7A1315]" />
+            <ArrowLeft className="h-4 w-4 text-[#7B0046]" />
             <span>Back to Dashboard</span>
           </Link>
         </div>
@@ -171,7 +171,7 @@ export default function PRDetailPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-stone-200">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl sm:text-3xl font-black text-[#4D0C0D] font-mono tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-black text-[#4D002C] font-mono tracking-tight">
                 {pr.pr_no}
               </h1>
               <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClass(pr.current_stage)}`}>
@@ -231,8 +231,8 @@ export default function PRDetailPage() {
         <div className="pr-timeline bg-white rounded-xl p-6 shadow-sm border border-stone-200 mt-8 mb-8 print:hidden">
           <div className="flex items-end justify-between gap-4 pb-4 mb-5 border-b border-stone-200">
             <div>
-              <p className="text-[9px] font-bold tracking-[0.24em] uppercase text-[#B88E13] mb-1">MSU • PROCUREMENT FLOW</p>
-              <h3 className="font-bold text-[#4D0C0D] flex items-center gap-2"><Clock className="h-5 w-5 text-[#7A1315]" />Processing Timeline</h3>
+              <p className="text-[9px] font-bold tracking-[0.24em] uppercase text-[#F5AB26] mb-1">MSU • PROCUREMENT FLOW</p>
+              <h3 className="font-bold text-[#4D002C] flex items-center gap-2"><Clock className="h-5 w-5 text-[#7B0046]" />Processing Timeline</h3>
             </div>
             <div className="hidden sm:flex items-center gap-2 rounded-full border border-[#D8C58E] bg-[#FBF7EA] px-3 py-1.5 text-[9px] font-extrabold tracking-[0.16em] text-[#8E6A08] uppercase">
               <span>{timelineGroups.length}</span> recorded stage{timelineGroups.length === 1 ? "" : "s"}
@@ -250,7 +250,7 @@ export default function PRDetailPage() {
                     <div className="flex items-start">
                       <div className="w-[68px] shrink-0 self-stretch bg-[#FBF7F0] border-r border-stone-200 flex flex-col items-center justify-start pt-5">
                         <span className="text-[9px] font-extrabold tracking-[0.16em] text-[#9A7410] uppercase">Stage</span>
-                        <span className="mt-1 text-2xl leading-none font-black text-[#7A1315]">{group.stageNumber < 999 ? group.stageNumber : "—"}</span>
+                        <span className="mt-1 text-2xl leading-none font-black text-[#7B0046]">{group.stageNumber < 999 ? group.stageNumber : "—"}</span>
                       </div>
 
                       <div className="flex-1 min-w-0 p-4 sm:p-5">
@@ -268,7 +268,7 @@ export default function PRDetailPage() {
                         </div>
 
                         {event?.remarks || event?.notes ? (
-                          <div className="mt-4 rounded-lg border-l-2 border-[#7A1315] bg-[#FAF7F2] px-3.5 py-2.5">
+                          <div className="mt-4 rounded-lg border-l-2 border-[#7B0046] bg-[#FAF7F2] px-3.5 py-2.5">
                             <p className="text-[9px] font-extrabold tracking-[0.16em] uppercase text-[#9A7410] mb-1">Stage remark</p>
                             <p className="text-xs leading-relaxed text-stone-600">{event.remarks || event.notes}</p>
                           </div>
@@ -280,7 +280,7 @@ export default function PRDetailPage() {
                             <div className="space-y-1.5">
                               {group.remarks.map((remark) => (
                                 <div key={remark.id} className="flex items-start gap-2 text-xs text-stone-600">
-                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#B88E13]" />
+                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F5AB26]" />
                                   <div className="min-w-0 flex-1">
                                     <span className="leading-relaxed">{remark.remarks || remark.notes || "No remarks provided."}</span>
                                     <span className="ml-2 text-[10px] text-stone-400">{new Date(remark.completed_at).toLocaleString()}</span>

@@ -1,14 +1,14 @@
 /* Institutional portal UI - Premium, Luxurious & Clean */
 .portal-shell, .admin-shell {
-  --portal-bg: #F8F6F2;
-  --portal-maroon: #7A1315;
-  --portal-maroon-deep: #4D0C0D;
-  --portal-gold: #B88E13;
-  --portal-gold-bright: #D4AF37;
-  --portal-ink: #2D2522;
-  --portal-line: #E8E2D9;
+  --portal-bg: #F8F6F4;
+  --portal-maroon: #7B0046;
+  --portal-maroon-deep: #4D002C;
+  --portal-gold: #F5AB26;
+  --portal-gold-bright: #F5AB26;
+  --portal-ink: #2D2228;
+  --portal-line: #E8DDE3;
   min-height: 100vh;
-  background: #F8F6F2 !important;
+  background: #F8F6F4 !important;
   color: var(--portal-ink);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
@@ -31,8 +31,8 @@
 /* Common luxurious card & surface style */
 .portal-shell .bg-white,
 .admin-shell .bg-white {
-  border-color: rgba(122, 19, 21, 0.08) !important;
-  box-shadow: 0 4px 20px rgba(53, 7, 8, 0.035) !important;
+  border-color: rgba(123, 0, 70, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(56, 0, 32, 0.035) !important;
 }
 
 /* Common table styling */

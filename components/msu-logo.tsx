@@ -52,11 +52,11 @@ export function MsuLogo({ className = "", size = 120, showText = false }: MsuLog
         /* Designated MSU Logo Space for user to add in GitHub */
         <div
           style={{ width: size, height: size }}
-          className="rounded-full border-2 border-dashed border-[#7A1315]/40 bg-stone-50/90 flex flex-col items-center justify-center p-2 text-center text-[#7A1315] select-none shadow-inner group hover:border-[#7A1315] transition-colors"
+          className="rounded-full border-2 border-dashed border-[#7B0046]/40 bg-stone-50/90 flex flex-col items-center justify-center p-2 text-center text-[#7B0046] select-none shadow-inner group hover:border-[#7B0046] transition-colors"
           title="MSU Logo Space: Place msu-logo.png or msu-logo.svg in /public via GitHub"
         >
-          <Landmark className="w-1/3 h-1/3 text-[#7A1315] stroke-[1.5] mb-1 opacity-80" />
-          <span className="text-[10px] font-bold uppercase tracking-tight text-[#7A1315] leading-none">
+          <Landmark className="w-1/3 h-1/3 text-[#7B0046] stroke-[1.5] mb-1 opacity-80" />
+          <span className="text-[10px] font-bold uppercase tracking-tight text-[#7B0046] leading-none">
             MSU Logo Space
           </span>
           <span className="text-[8px] text-stone-500 font-mono scale-90 leading-tight mt-1">
@@ -67,10 +67,10 @@ export function MsuLogo({ className = "", size = 120, showText = false }: MsuLog
 
       {showText && (
         <div className="mt-3 text-center">
-          <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D0C0D] leading-tight">
+          <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C] leading-tight">
             Mindanao State University
           </h2>
-          <p className="text-xs font-semibold text-[#B88E13] tracking-widest uppercase mt-0.5">
+          <p className="text-xs font-semibold text-[#F5AB26] tracking-widest uppercase mt-0.5">
             General Santos City
           </p>
         </div>

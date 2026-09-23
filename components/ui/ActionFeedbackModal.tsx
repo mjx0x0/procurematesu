@@ -14,10 +14,10 @@ interface ActionFeedbackModalProps {
 }
 
 const toneConfig = {
-  success: { icon: CheckCircle2, iconWrap: "bg-emerald-50 text-emerald-600", accent: "bg-emerald-500", button: "bg-[#7C1D2E] hover:bg-[#5A1420]" },
+  success: { icon: CheckCircle2, iconWrap: "bg-emerald-50 text-emerald-600", accent: "bg-emerald-500", button: "bg-[#7B0046] hover:bg-[#610037]" },
   error: { icon: XCircle, iconWrap: "bg-red-50 text-red-600", accent: "bg-red-500", button: "bg-red-600 hover:bg-red-700" },
-  warning: { icon: AlertCircle, iconWrap: "bg-amber-50 text-amber-600", accent: "bg-amber-500", button: "bg-[#7C1D2E] hover:bg-[#5A1420]" },
-  info: { icon: Info, iconWrap: "bg-blue-50 text-blue-600", accent: "bg-blue-500", button: "bg-[#7C1D2E] hover:bg-[#5A1420]" },
+  warning: { icon: AlertCircle, iconWrap: "bg-amber-50 text-amber-600", accent: "bg-amber-500", button: "bg-[#7B0046] hover:bg-[#610037]" },
+  info: { icon: Info, iconWrap: "bg-blue-50 text-blue-600", accent: "bg-blue-500", button: "bg-[#7B0046] hover:bg-[#610037]" },
 };
 
 export function ActionFeedbackModal({ open, tone = "success", title, message, onClose, actionLabel = "Continue" }: ActionFeedbackModalProps) {
@@ -38,10 +38,10 @@ export function ActionFeedbackModal({ open, tone = "success", title, message, on
             <Icon className="h-9 w-9" strokeWidth={2.2} />
           </div>
           <div className="text-center">
-            <h2 id="feedback-modal-title" className="text-xl font-extrabold text-[#4D0C0D]">{title}</h2>
+            <h2 id="feedback-modal-title" className="text-xl font-extrabold text-[#4D002C]">{title}</h2>
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-stone-600">{message}</p>
           </div>
-          <button autoFocus onClick={onClose} className={`mt-7 w-full rounded-xl px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#7C1D2E]/30 ${config.button}`}>
+          <button autoFocus onClick={onClose} className={`mt-7 w-full rounded-xl px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#7B0046]/30 ${config.button}`}>
             {actionLabel}
           </button>
         </div>

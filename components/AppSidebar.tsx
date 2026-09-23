@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
+import { usePathname } from "next/navigation";
 import { MsuLogo } from "@/components/msu-logo";
-import { BarChart3, Bot, FilePlus2, FileText, LogOut, MessageSquare, ShieldCheck, Users, ClipboardCheck } from "lucide-react";
+import { BarChart3, Bot, FilePlus2, MessageSquare, ShieldCheck, Users, ClipboardCheck } from "lucide-react";
 
 interface AppSidebarProps {
   mode: "user" | "admin";
@@ -33,17 +32,11 @@ const adminItems: SidebarItem[] = [
 
 export default function AppSidebar({ mode }: AppSidebarProps) {
   const pathname = usePathname() || "";
-  const router = useRouter();
   const items = mode === "admin" ? adminItems : userItems;
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
-
   return (
-    <aside className="app-sidebar fixed inset-y-0 left-0 z-[55] hidden w-[230px] flex-col bg-gradient-to-b from-[#560608] via-[#6D0D10] to-[#420406] text-white shadow-[10px_0_30px_rgba(40,4,6,0.18)] border-r border-[#D4AF37]/20 lg:flex">
-      <div className="flex h-[72px] items-center gap-3 border-b border-[#D4AF37]/15 px-5 bg-black/10">
+    <aside className="app-sidebar fixed inset-y-0 left-0 z-[55] hidden w-[230px] flex-col bg-gradient-to-b from-[#4A002A] via-[#6B003E] to-[#3D0024] text-white shadow-[10px_0_30px_rgba(40,0,24,0.18)] border-r border-[#F5AB26]/20 lg:flex">
+      <div className="flex h-[72px] items-center gap-3 border-b border-[#F5AB26]/15 px-5 bg-black/10">
         <MsuLogo size={38} className="shrink-0" />
         <div className="min-w-0 leading-tight">
           <p className="truncate text-sm font-extrabold tracking-tight text-white">MSU GenSan</p>
@@ -68,14 +61,14 @@ export default function AppSidebar({ mode }: AppSidebarProps) {
               href={href}
               className={`group flex min-h-[44px] items-center gap-3 rounded-xl px-3.5 text-xs font-bold transition-all ${
                 active
-                  ? "bg-gradient-to-r from-[#99151B] to-[#7A1315] text-white shadow-[0_4px_16px_rgba(0,0,0,0.25)] border border-[#F0C83F]/30"
+                  ? "bg-gradient-to-r from-[#8E0052] to-[#7B0046] text-white shadow-[0_4px_16px_rgba(0,0,0,0.25)] border border-[#F0C83F]/30"
                   : "text-white/80 hover:bg-white/[0.08] hover:text-white hover:border-white/10"
               }`}
             >
               <Icon className={`h-4 w-4 shrink-0 transition-colors ${active ? "text-[#F0C83F]" : "text-white/60 group-hover:text-amber-300"}`} />
               <span className="truncate">{label}</span>
               {badge && (
-                <span className="ml-auto rounded-md bg-[#F0C83F] px-1.5 py-0.5 text-[9px] font-black text-[#4D0C0D] shadow-xs">
+                <span className="ml-auto rounded-md bg-[#F0C83F] px-1.5 py-0.5 text-[9px] font-black text-[#4D002C] shadow-xs">
                   {badge}
                 </span>
               )}
@@ -83,16 +76,6 @@ export default function AppSidebar({ mode }: AppSidebarProps) {
           );
         })}
       </nav>
-
-      <div className="border-t border-white/10 p-3 bg-black/10">
-        <button
-          onClick={logout}
-          className="flex w-full min-h-[40px] items-center gap-3 rounded-xl px-3.5 py-2 text-left text-xs font-bold text-white/70 hover:bg-white/[0.1] hover:text-white transition-colors"
-        >
-          <LogOut className="h-4 w-4 text-amber-200/60" />
-          <span>Sign out</span>
-        </button>
-      </div>
     </aside>
   );
 }

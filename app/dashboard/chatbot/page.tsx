@@ -497,7 +497,7 @@ export default function ChatbotDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-[#7A1315] mx-auto mb-3" />
+          <Loader2 className="h-10 w-10 animate-spin text-[#7B0046] mx-auto mb-3" />
           <p className="text-xs font-semibold text-stone-600">Connecting to MSU-GenSan Procurement Assistant...</p>
         </div>
       </div>
@@ -512,17 +512,17 @@ export default function ChatbotDashboard() {
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               onClick={() => router.push("/dashboard")}
-              className="p-1.5 sm:p-2 rounded-lg text-stone-600 hover:bg-red-50 hover:text-[#7A1315] transition-colors shrink-0"
+              className="p-1.5 sm:p-2 rounded-lg text-stone-600 hover:bg-stone-50 hover:text-[#7B0046] transition-colors shrink-0"
               aria-label="Back to dashboard"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
             <MsuLogo size={36} className="shrink-0" />
-            <div className="bg-[#7A1315] p-2 rounded-xl text-amber-300 border border-amber-400/30 shadow-xs shrink-0 hidden sm:flex">
+            <div className="bg-[#7B0046] p-2 rounded-xl text-amber-300 border border-amber-400/30 shadow-xs shrink-0 hidden sm:flex">
               <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="font-bold text-[#4D0C0D] text-sm sm:text-base truncate leading-tight">
+              <h1 className="font-bold text-[#4D002C] text-sm sm:text-base truncate leading-tight">
                 AI Procurement Assistant
               </h1>
               <p className="text-[10px] sm:text-xs text-stone-500 truncate hidden xs:block">
@@ -536,7 +536,7 @@ export default function ChatbotDashboard() {
             {/* Mobile History Toggle Button */}
             <button
               onClick={() => setMobileHistoryOpen(true)}
-              className="md:hidden p-2 rounded-lg text-stone-600 hover:bg-stone-100 hover:text-[#7A1315] text-xs font-medium flex items-center gap-1"
+              className="md:hidden p-2 rounded-lg text-stone-600 hover:bg-stone-100 hover:text-[#7B0046] text-xs font-medium flex items-center gap-1"
               title="Chat History"
             >
               <History className="h-4 w-4" />
@@ -545,7 +545,7 @@ export default function ChatbotDashboard() {
             <button
               onClick={startNewChat}
               disabled={loading}
-              className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-[#7A1315] hover:bg-[#630E10] text-white text-xs font-bold flex items-center gap-1 sm:gap-1.5 shadow-xs transition-colors border border-amber-400/30 disabled:opacity-50"
+              className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-[#7B0046] hover:bg-[#610037] text-white text-xs font-bold flex items-center gap-1 sm:gap-1.5 shadow-xs transition-colors border border-amber-400/30 disabled:opacity-50"
             >
               <MessageSquarePlus className="h-3.5 w-3.5 text-amber-300" />
               <span className="hidden sm:inline">New Chat</span>
@@ -571,8 +571,8 @@ export default function ChatbotDashboard() {
         <aside className="hidden md:flex flex-col w-72 shrink-0 bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
           <div className="p-4 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
             <div>
-              <h2 className="font-bold text-[#4D0C0D] text-sm flex items-center gap-1.5">
-                <History className="h-4 w-4 text-[#7A1315]" /> Chat History
+              <h2 className="font-bold text-[#4D002C] text-sm flex items-center gap-1.5">
+                <History className="h-4 w-4 text-[#7B0046]" /> Chat History
               </h2>
               <p className="text-[11px] text-stone-500 mt-0.5">Saved conversations</p>
             </div>
@@ -582,7 +582,7 @@ export default function ChatbotDashboard() {
             <button
               onClick={startNewChat}
               disabled={loading}
-              className="w-full py-2.5 rounded-xl border border-dashed border-[#7A1315]/40 text-[#7A1315] bg-red-50/50 hover:bg-red-50 text-xs font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              className="w-full py-2.5 rounded-xl border border-dashed border-[#7B0046]/40 text-[#7B0046] bg-purple-50/50 hover:bg-purple-50 text-xs font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
             >
               <MessageSquarePlus className="h-4 w-4" /> Start New Conversation
             </button>
@@ -593,14 +593,14 @@ export default function ChatbotDashboard() {
               <div
                 key={s.id}
                 className={`group flex items-center gap-1 rounded-xl transition-colors ${
-                  s.id === sessionId ? "bg-red-50 text-[#7A1315]" : "hover:bg-stone-50 text-stone-700"
+                  s.id === sessionId ? "bg-purple-50 text-[#7B0046]" : "hover:bg-stone-50 text-stone-700"
                 }`}
               >
                 <button
                   onClick={() => selectSession(s.id)}
                   className="flex-1 min-w-0 text-left px-3 py-2.5"
                 >
-                  <p className={`text-xs font-semibold truncate ${s.id === sessionId ? "text-[#7A1315]" : "text-stone-700"}`}>
+                  <p className={`text-xs font-semibold truncate ${s.id === sessionId ? "text-[#7B0046]" : "text-stone-700"}`}>
                     {s.title || "New conversation"}
                   </p>
                   <p className="text-[10px] text-stone-400 mt-0.5">
@@ -637,11 +637,11 @@ export default function ChatbotDashboard() {
             <div className="relative w-80 max-w-[85vw] bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-left duration-200">
               <div className="p-4 border-b border-stone-200 flex justify-between items-center bg-[#FAF8F5]">
                 <div className="flex items-center gap-2">
-                  <div className="bg-[#7A1315] p-1.5 rounded-lg text-amber-300">
+                  <div className="bg-[#7B0046] p-1.5 rounded-lg text-amber-300">
                     <History className="h-4 w-4" />
                   </div>
                   <div>
-                    <h2 className="font-bold text-[#4D0C0D] text-sm">Chat History</h2>
+                    <h2 className="font-bold text-[#4D002C] text-sm">Chat History</h2>
                     <p className="text-[11px] text-stone-500">Your saved conversations</p>
                   </div>
                 </div>
@@ -657,7 +657,7 @@ export default function ChatbotDashboard() {
                 <button
                   onClick={startNewChat}
                   disabled={loading}
-                  className="w-full py-2.5 rounded-xl border border-dashed border-[#7A1315]/40 text-[#7A1315] bg-red-50/50 hover:bg-red-50 text-xs font-bold flex items-center justify-center gap-2"
+                  className="w-full py-2.5 rounded-xl border border-dashed border-[#7B0046]/40 text-[#7B0046] bg-purple-50/50 hover:bg-purple-50 text-xs font-bold flex items-center justify-center gap-2"
                 >
                   <MessageSquarePlus className="h-4 w-4" /> New Conversation
                 </button>
@@ -668,14 +668,14 @@ export default function ChatbotDashboard() {
                   <div
                     key={s.id}
                     className={`flex items-center gap-1 rounded-xl transition-colors ${
-                      s.id === sessionId ? "bg-red-50 text-[#7A1315]" : "hover:bg-stone-50 text-stone-700"
+                      s.id === sessionId ? "bg-purple-50 text-[#7B0046]" : "hover:bg-stone-50 text-stone-700"
                     }`}
                   >
                     <button
                       onClick={() => selectSession(s.id)}
                       className="flex-1 min-w-0 text-left px-3 py-2.5"
                     >
-                      <p className={`text-xs font-semibold truncate ${s.id === sessionId ? "text-[#7A1315]" : "text-stone-700"}`}>
+                      <p className={`text-xs font-semibold truncate ${s.id === sessionId ? "text-[#7B0046]" : "text-stone-700"}`}>
                         {s.title || "New conversation"}
                       </p>
                       <p className="text-[10px] text-stone-400 mt-0.5">
@@ -716,15 +716,15 @@ export default function ChatbotDashboard() {
                 <div
                   className={`max-w-[92%] sm:max-w-[80%] rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm leading-relaxed ${
                     msg.role === "user"
-                      ? "bg-gradient-to-r from-[#7A1315] to-[#91191C] text-white rounded-tr-sm shadow-xs"
+                      ? "bg-gradient-to-r from-[#7B0046] to-[#610037] text-white rounded-tr-sm shadow-xs"
                       : "bg-[#FAF8F5] border border-stone-200 text-stone-800 rounded-tl-sm shadow-2xs"
                   }`}
                 >
                   {msg.isLoading ? (
                     <div className="flex items-center gap-1.5 py-1">
-                      <span className="w-2 h-2 rounded-full bg-[#7A1315] animate-bounce" />
-                      <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-bounce [animation-delay:150ms]" />
-                      <span className="w-2 h-2 rounded-full bg-[#7A1315] animate-bounce [animation-delay:300ms]" />
+                      <span className="w-2 h-2 rounded-full bg-[#7B0046] animate-bounce" />
+                      <span className="w-2 h-2 rounded-full bg-[#F5AB26] animate-bounce [animation-delay:150ms]" />
+                      <span className="w-2 h-2 rounded-full bg-[#7B0046] animate-bounce [animation-delay:300ms]" />
                       <span className="text-xs text-stone-500 ml-2">Consulting procurement guidelines...</span>
                     </div>
                   ) : (
@@ -734,7 +734,7 @@ export default function ChatbotDashboard() {
                       {/* Interactive Trackable PR Option Cards */}
                       {msg.prOptions && msg.prOptions.length > 0 && (
                         <div className="mt-3 space-y-2">
-                          <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A1315]">
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-[#7B0046]">
                             Select a PR to track:
                           </p>
                           {msg.prOptions.map((pr) => (
@@ -742,10 +742,10 @@ export default function ChatbotDashboard() {
                               key={pr.pr_no}
                               onClick={() => handlePRSelection(pr.pr_no)}
                               disabled={loading}
-                              className="w-full text-left p-3 rounded-xl border border-stone-200 bg-white hover:bg-red-50 hover:border-red-200 transition-colors shadow-2xs disabled:opacity-50 block group"
+                              className="w-full text-left p-3 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 hover:border-purple-200 transition-colors shadow-2xs disabled:opacity-50 block group"
                             >
                               <div className="flex justify-between items-center gap-2">
-                                <span className="text-xs sm:text-sm font-bold text-[#7A1315] group-hover:underline">
+                                <span className="text-xs sm:text-sm font-bold text-[#7B0046] group-hover:underline">
                                   {pr.pr_no}
                                 </span>
                                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-semibold border border-amber-200 truncate max-w-[140px]">
@@ -759,7 +759,7 @@ export default function ChatbotDashboard() {
                                 <span>
                                   ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </span>
-                                <span className="text-[#7A1315] font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                                <span className="text-[#7B0046] font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                                   Track Stage <ArrowRight className="h-3 w-3" />
                                 </span>
                               </div>
@@ -796,7 +796,7 @@ export default function ChatbotDashboard() {
             {loading && (
               <div className="flex justify-start">
                 <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl rounded-tl-sm p-3 text-xs text-stone-500 flex items-center gap-2">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#7A1315]" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#7B0046]" />
                   <span>Procurement Assistant is analyzing...</span>
                 </div>
               </div>
@@ -806,14 +806,14 @@ export default function ChatbotDashboard() {
 
           {/* Quick Suggestions Chips */}
           <div className="px-3 sm:px-4 py-2 bg-[#FAF8F5] border-t border-stone-200 flex items-center gap-2 overflow-x-auto no-scrollbar">
-            <Sparkles className="h-3.5 w-3.5 text-[#B88E13] shrink-0" />
+            <Sparkles className="h-3.5 w-3.5 text-[#F5AB26] shrink-0" />
             <span className="text-[11px] font-semibold text-stone-500 shrink-0 hidden xs:inline">Try:</span>
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
                 onClick={() => sendMessage(s)}
                 disabled={loading}
-                className="whitespace-nowrap text-[11px] sm:text-xs px-3 py-1.5 rounded-full bg-white border border-stone-200 hover:border-red-200 text-stone-700 hover:bg-red-50 hover:text-[#7A1315] transition-colors shadow-2xs disabled:opacity-50"
+                className="whitespace-nowrap text-[11px] sm:text-xs px-3 py-1.5 rounded-full bg-white border border-stone-200 hover:border-[#7B0046]/30 text-stone-700 hover:bg-[#FDF2F7] hover:text-[#7B0046] transition-colors shadow-2xs disabled:opacity-50"
               >
                 {s}
               </button>
@@ -830,12 +830,12 @@ export default function ChatbotDashboard() {
                 onKeyDown={keyDown}
                 disabled={loading}
                 placeholder="Ask about RA 12009, PR drafting, or type 'Track my PR'..."
-                className="flex-1 min-w-0 rounded-xl border border-stone-300 bg-white text-gray-900 placeholder:text-stone-400 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none focus:border-[#7A1315] focus:ring-2 focus:ring-[#7A1315]/15 transition-all shadow-2xs"
+                className="flex-1 min-w-0 rounded-xl border border-stone-300 bg-white text-gray-900 placeholder:text-stone-400 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-2xs"
               />
               <button
                 onClick={() => sendMessage()}
                 disabled={loading || !input.trim()}
-                className="shrink-0 h-10 sm:h-11 px-4 sm:px-5 rounded-xl bg-gradient-to-r from-[#7A1315] to-[#8B1518] hover:from-[#630E10] hover:to-[#7A1315] text-white disabled:opacity-40 transition-colors shadow-xs flex items-center justify-center border border-amber-400/20"
+                className="shrink-0 h-10 sm:h-11 px-4 sm:px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#8E0052] hover:from-[#610037] hover:to-[#7B0046] text-white disabled:opacity-40 transition-colors shadow-xs flex items-center justify-center border border-amber-400/20"
                 aria-label="Send message"
               >
                 <Send className="h-4 w-4 text-amber-200" />
@@ -900,7 +900,7 @@ export default function ChatbotDashboard() {
               </button>
               <button
                 onClick={handleConfirmClear}
-                className="px-4 py-2 rounded-xl bg-[#7A1315] hover:bg-[#630E10] text-white text-xs sm:text-sm font-semibold transition-colors"
+                className="px-4 py-2 rounded-xl bg-[#7B0046] hover:bg-[#610037] text-white text-xs sm:text-sm font-semibold transition-colors"
               >
                 Clear Messages
               </button>

@@ -36,7 +36,7 @@ export default function AIEvaluationPage() {
 
   const run = async () => { setRunning(true); setError(""); try { const { data: { session } } = await supabase.auth.getSession(); const headers: Record<string,string> = { "Content-Type": "application/json" }; if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`; const r = await fetch("/api/admin/ai-evaluation", { method: "POST", headers, credentials: "include", body: "{}" }); const d = await r.json(); if (!r.ok) throw new Error(d.error || "Evaluation failed"); setResults(d.results || []); setAverage(d.averageScore ?? null); const refreshed = await supabase.from("ai_response_evaluations").select("id,test_name,score,created_at,notes").order("created_at", { ascending: false }).limit(30); setHistory((refreshed.data || []) as Evaluation[]); } catch (e: any) { setError(e.message || "Unable to run evaluation."); } finally { setRunning(false); } };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]"><Loader2 className="h-9 w-9 animate-spin text-[#7C1D2E]" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]"><Loader2 className="h-9 w-9 animate-spin text-[#7B0046]" /></div>;
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">
       <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-40 shadow-xs">
@@ -44,20 +44,20 @@ export default function AIEvaluationPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/admin"
-              className="p-2 rounded-xl text-stone-500 hover:text-[#7A1315] hover:bg-stone-100 transition-colors"
+              className="p-2 rounded-xl text-stone-500 hover:text-[#7B0046] hover:bg-stone-100 transition-colors"
               title="Back to Admin Dashboard"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
-            <div className="bg-[#4D0C0D] p-2 rounded-xl text-amber-300 shadow-sm">
+            <div className="bg-[#4D002C] p-2 rounded-xl text-amber-300 shadow-sm">
               <Bot className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <b className="text-xl font-black text-[#4D0C0D]">
-                  AI <span className="text-[#B88E13]">Evaluation</span>
+                <b className="text-xl font-black text-[#4D002C]">
+                  AI <span className="text-[#F5AB26]">Evaluation</span>
                 </b>
-                <span className="text-[11px] bg-red-50 text-[#7A1315] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                <span className="text-[11px] bg-red-50 text-[#7B0046] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
                   Admin Tool
                 </span>
               </div>
@@ -66,7 +66,7 @@ export default function AIEvaluationPage() {
           </div>
           <Link
             href="/admin"
-            className="text-xs font-bold text-stone-600 hover:text-[#7A1315] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
+            className="text-xs font-bold text-stone-600 hover:text-[#7B0046] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
           </Link>
@@ -76,7 +76,7 @@ export default function AIEvaluationPage() {
       <main className="max-w-6xl mx-auto px-4 py-7">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-[#4D0C0D]">AI Response Evaluation</h1>
+            <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">AI Response Evaluation</h1>
             <p className="text-sm text-stone-600 mt-1">
               Run automated test questions to benchmark Isko BidDo retrieval grounding, concept coverage, and statutory references.
             </p>
@@ -106,7 +106,7 @@ export default function AIEvaluationPage() {
             <div className="text-[11px] uppercase tracking-wider text-stone-500 font-bold">
               Latest Composite Score
             </div>
-            <div className="text-4xl font-black text-[#4D0C0D] mt-1">{average}%</div>
+            <div className="text-4xl font-black text-[#4D002C] mt-1">{average}%</div>
             <div className="text-xs text-stone-500 mt-1 font-medium">
               Weighted breakdown: expected-concept coverage 55%, retrieval grounding 25%, sources 10%, response availability 10%.
             </div>
@@ -119,7 +119,7 @@ export default function AIEvaluationPage() {
               <article key={r.test_name} className="ui-card p-5">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div>
-                    <h2 className="font-bold text-[#4D0C0D] text-base">{r.test_name}</h2>
+                    <h2 className="font-bold text-[#4D002C] text-base">{r.test_name}</h2>
                     <p className="text-sm text-stone-600 mt-1 font-medium">{r.question}</p>
                   </div>
                   <span
@@ -153,7 +153,7 @@ export default function AIEvaluationPage() {
                 </div>
 
                 <details className="mt-4 pt-3 border-t border-stone-100">
-                  <summary className="cursor-pointer text-xs font-bold text-[#7A1315] hover:text-[#4D0C0D]">
+                  <summary className="cursor-pointer text-xs font-bold text-[#7B0046] hover:text-[#4D002C]">
                     Inspect AI Response Output
                   </summary>
                   <div className="mt-3 rounded-xl bg-stone-50 border border-stone-200 p-3.5 text-xs whitespace-pre-wrap text-stone-800 font-mono leading-relaxed">
@@ -167,15 +167,15 @@ export default function AIEvaluationPage() {
         )}
 
         <section className="ui-card overflow-hidden">
-          <div className="px-5 py-4 border-b border-stone-200 bg-stone-50/50 flex items-center gap-2 font-bold text-[#4D0C0D]">
-            <ShieldCheck className="h-4 w-4 text-[#B88E13]" />
+          <div className="px-5 py-4 border-b border-stone-200 bg-stone-50/50 flex items-center gap-2 font-bold text-[#4D002C]">
+            <ShieldCheck className="h-4 w-4 text-[#F5AB26]" />
             <span>Evaluation History</span>
           </div>
           <div className="divide-y divide-stone-100">
             {history.map((h) => (
               <div key={h.id} className="px-5 py-3.5 flex items-center justify-between gap-3 text-sm hover:bg-stone-50/50 transition-colors">
                 <div>
-                  <b className="text-[#4D0C0D]">{h.test_name}</b>
+                  <b className="text-[#4D002C]">{h.test_name}</b>
                   <div className="text-xs text-stone-400 mt-0.5">{new Date(h.created_at).toLocaleString("en-PH")}</div>
                 </div>
                 <span className={`font-black text-sm ${Number(h.score) >= 80 ? "text-emerald-700" : "text-amber-700"}`}>

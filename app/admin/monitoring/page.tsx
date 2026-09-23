@@ -89,7 +89,7 @@ export default function AdminMonitoringPage() {
     return { total: prs.length, delayed: risks.filter(r => r === "delayed").length, approaching: risks.filter(r => r === "approaching").length, active: prs.filter(p => !["completed", "rejected", "cancelled"].includes(p.current_stage)).length };
   }, [prs, latestStage]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]"><Loader2 className="h-9 w-9 animate-spin text-[#7C1D2E]" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]"><Loader2 className="h-9 w-9 animate-spin text-[#7B0046]" /></div>;
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">
@@ -98,20 +98,20 @@ export default function AdminMonitoringPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/admin"
-              className="p-2 rounded-xl text-stone-500 hover:text-[#7A1315] hover:bg-stone-100 transition-colors"
+              className="p-2 rounded-xl text-stone-500 hover:text-[#7B0046] hover:bg-stone-100 transition-colors"
               title="Back to Admin Dashboard"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
-            <div className="bg-[#4D0C0D] p-2 rounded-xl text-amber-300 shadow-sm">
+            <div className="bg-[#4D002C] p-2 rounded-xl text-amber-300 shadow-sm">
               <BarChart3 className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <b className="text-xl font-black text-[#4D0C0D]">
-                  Procurement <span className="text-[#B88E13]">Monitoring</span>
+                <b className="text-xl font-black text-[#4D002C]">
+                  Procurement <span className="text-[#F5AB26]">Monitoring</span>
                 </b>
-                <span className="text-[11px] bg-red-50 text-[#7A1315] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                <span className="text-[11px] bg-red-50 text-[#7B0046] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
                   Admin Tool
                 </span>
               </div>
@@ -120,7 +120,7 @@ export default function AdminMonitoringPage() {
           </div>
           <Link
             href="/admin"
-            className="text-xs font-bold text-stone-600 hover:text-[#7A1315] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
+            className="text-xs font-bold text-stone-600 hover:text-[#7B0046] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
           </Link>
@@ -129,7 +129,7 @@ export default function AdminMonitoringPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-7">
         <div className="mb-6">
-          <h1 className="text-3xl font-black tracking-tight text-[#4D0C0D]">Procurement Monitoring Dashboard</h1>
+          <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Procurement Monitoring Dashboard</h1>
           <p className="text-sm text-stone-600 mt-1">
             Track stages, detect turnaround delays, and proactively clear procurement bottlenecks across university departments.
           </p>
@@ -143,8 +143,8 @@ export default function AdminMonitoringPage() {
         </div>
 
         <section className="ui-card p-5 mb-6">
-          <div className="flex items-center gap-2 mb-4 font-bold text-[#4D0C0D]">
-            <SlidersHorizontal className="h-4 w-4 text-[#B88E13]" />
+          <div className="flex items-center gap-2 mb-4 font-bold text-[#4D002C]">
+            <SlidersHorizontal className="h-4 w-4 text-[#F5AB26]" />
             <span>Advanced Filters & Query</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -231,7 +231,7 @@ export default function AdminMonitoringPage() {
           </div>
           <div className="mt-3.5 pt-3 border-t border-stone-100 text-xs text-stone-500 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-1.5">
-              <Filter className="h-3.5 w-3.5 text-[#B88E13]" />
+              <Filter className="h-3.5 w-3.5 text-[#F5AB26]" />
               <span>Showing <b>{filtered.length}</b> of <b>{prs.length}</b> Purchase Requests.</span>
             </div>
             <span className="text-[11px] text-stone-400 italic">
@@ -242,7 +242,7 @@ export default function AdminMonitoringPage() {
 
         <section className="ui-card overflow-hidden">
           <div className="px-5 py-4 border-b border-stone-200 bg-stone-50/50 flex items-center justify-between">
-            <h2 className="font-bold text-[#4D0C0D] text-base">Procurement Records</h2>
+            <h2 className="font-bold text-[#4D002C] text-base">Procurement Records</h2>
             <span className="text-xs text-stone-500 font-medium">Sorted by date updated</span>
           </div>
           <div className="overflow-x-auto">
@@ -265,7 +265,7 @@ export default function AdminMonitoringPage() {
                   return (
                     <tr key={pr.pr_no} className="hover:bg-amber-50/20 transition-colors">
                       <td className="px-5 py-4">
-                        <div className="font-bold text-[#7A1315]">{pr.pr_no}</div>
+                        <div className="font-bold text-[#7B0046]">{pr.pr_no}</div>
                         <div className="text-xs text-stone-500 max-w-xs truncate mt-0.5">{pr.purpose}</div>
                       </td>
                       <td className="px-5 py-4">
@@ -273,7 +273,7 @@ export default function AdminMonitoringPage() {
                         <div className="text-xs text-stone-500">{pr.department}</div>
                       </td>
                       <td className="px-5 py-4">
-                        <span className="text-xs font-bold text-[#4D0C0D]">
+                        <span className="text-xs font-bold text-[#4D002C]">
                           Step {stageNumber(pr.current_stage) || "—"}
                         </span>
                         <div className="text-xs text-stone-500 max-w-xs truncate">{stageLabel(pr.current_stage)}</div>
@@ -287,7 +287,7 @@ export default function AdminMonitoringPage() {
                       <td className="px-5 py-4 text-right">
                         <Link
                           href={`/dashboard/pr/${encodeURIComponent(pr.pr_no)}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-[#7A1315] bg-red-50/60 hover:bg-red-50 border border-red-200 transition-colors shadow-xs"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-[#7B0046] bg-red-50/60 hover:bg-red-50 border border-red-200 transition-colors shadow-xs"
                         >
                           <Eye className="h-3.5 w-3.5" /> View PR
                         </Link>
@@ -354,7 +354,7 @@ function Metric({
       </div>
       <div
         className={`mt-2 text-2xl font-black ${
-          danger ? "text-red-700" : warning ? "text-amber-900" : "text-[#4D0C0D]"
+          danger ? "text-red-700" : warning ? "text-amber-900" : "text-[#4D002C]"
         }`}
       >
         {value}

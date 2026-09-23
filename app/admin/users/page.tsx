@@ -75,7 +75,7 @@ export default function AdminUsersPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]">
-        <Loader2 className="h-10 w-10 animate-spin text-[#7C1D2E]" />
+        <Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" />
       </div>
     );
   }
@@ -87,20 +87,20 @@ export default function AdminUsersPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/admin"
-              className="p-2 rounded-xl text-stone-500 hover:text-[#7A1315] hover:bg-stone-100 transition-colors"
+              className="p-2 rounded-xl text-stone-500 hover:text-[#7B0046] hover:bg-stone-100 transition-colors"
               title="Back to Admin Dashboard"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
-            <div className="bg-[#4D0C0D] p-2 rounded-xl text-amber-300 shadow-sm">
+            <div className="bg-[#4D002C] p-2 rounded-xl text-amber-300 shadow-sm">
               <Users className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <b className="text-xl font-black text-[#4D0C0D]">
-                  User <span className="text-[#B88E13]">Management</span>
+                <b className="text-xl font-black text-[#4D002C]">
+                  User <span className="text-[#F5AB26]">Management</span>
                 </b>
-                <span className="text-[11px] bg-red-50 text-[#7A1315] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                <span className="text-[11px] bg-red-50 text-[#7B0046] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
                   Admin Tool
                 </span>
               </div>
@@ -109,7 +109,7 @@ export default function AdminUsersPage() {
           </div>
           <Link
             href="/admin"
-            className="text-xs font-bold text-stone-600 hover:text-[#7A1315] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
+            className="text-xs font-bold text-stone-600 hover:text-[#7B0046] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
           </Link>
@@ -119,14 +119,14 @@ export default function AdminUsersPage() {
       <main className="max-w-6xl mx-auto px-4 py-7">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-[#4D0C0D]">End-User Accounts</h1>
+            <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">End-User Accounts</h1>
             <p className="text-sm text-stone-600 mt-1">Review and authorize institutional account registrations.</p>
           </div>
           <button
             onClick={loadUsers}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-stone-200 bg-white text-xs font-bold text-stone-700 hover:bg-stone-50 transition-colors shadow-xs"
           >
-            <RefreshCw className="h-3.5 w-3.5 text-[#B88E13]" /> Refresh Accounts
+            <RefreshCw className="h-3.5 w-3.5 text-[#F5AB26]" /> Refresh Accounts
           </button>
         </div>
 
@@ -154,13 +154,13 @@ export default function AdminUsersPage() {
               onClick={() => setFilter(value)}
               className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all shadow-xs ${
                 filter === value
-                  ? "bg-gradient-to-r from-[#7A1315] to-[#4D0C0D] text-white border-[#4D0C0D]"
+                  ? "bg-gradient-to-r from-[#7B0046] to-[#4D002C] text-white border-[#4D002C]"
                   : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
               }`}
             >
               {value[0].toUpperCase() + value.slice(1)}{" "}
               {value === "pending" && pendingCount > 0 ? (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-amber-300 text-[#4D0C0D] font-extrabold text-[10px]">
+                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-amber-300 text-[#4D002C] font-extrabold text-[10px]">
                   {pendingCount}
                 </span>
               ) : (
@@ -185,12 +185,12 @@ export default function AdminUsersPage() {
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex items-start gap-3.5 min-w-0">
-                    <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-[#7A1315]/10 to-[#B88E13]/20 border border-[#7A1315]/20 flex items-center justify-center font-bold text-[#7A1315] text-base shrink-0">
+                    <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-[#7B0046]/10 to-[#F5AB26]/20 border border-[#7B0046]/20 flex items-center justify-center font-bold text-[#7B0046] text-base shrink-0">
                       {user.full_name?.charAt(0) || "U"}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h2 className="font-bold text-[#4D0C0D] text-base">{user.full_name}</h2>
+                        <h2 className="font-bold text-[#4D002C] text-base">{user.full_name}</h2>
                         <span
                           className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-wider ${
                             user.status === "approved"

@@ -101,7 +101,7 @@ export default function PRDownloadButton({ pr, items = [] }: { pr: PRData; items
           <button 
             type="button" 
             onClick={() => window.print()} 
-            className="text-[#7A1315] underline font-bold hover:text-[#4D0C0D]"
+            className="text-[#7B0046] underline font-bold hover:text-[#4D002C]"
           >
             Or use Print to save as PDF
           </button>

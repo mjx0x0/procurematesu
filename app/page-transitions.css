@@ -50,11 +50,11 @@ main > section:has(> h3) {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(circle at 96% 8%, rgba(184,142,19,.10), transparent 23%),
-    linear-gradient(135deg, #fffdfa 0%, #f8f3eb 100%) !important;
-  border: 1px solid rgba(122,19,21,.13) !important;
+    radial-gradient(circle at 96% 8%, rgba(245,171,38,.10), transparent 23%),
+    linear-gradient(135deg, #fffdfa 0%, #fdf8fb 100%) !important;
+  border: 1px solid rgba(123,0,70,.13) !important;
   border-radius: 20px !important;
-  box-shadow: 0 16px 38px rgba(53,7,8,.065) !important;
+  box-shadow: 0 16px 38px rgba(56,0,32,.065) !important;
 }
 
 main > section:has(> h3)::before {
@@ -65,7 +65,7 @@ main > section:has(> h3)::before {
   font-size: 8px;
   font-weight: 800;
   letter-spacing: .22em;
-  color: rgba(122,19,21,.24);
+  color: rgba(123,0,70,.24);
   pointer-events: none;
 }
 
@@ -74,7 +74,7 @@ main > section:has(> h3) > h3 {
   align-items: center;
   padding-bottom: 15px;
   margin-bottom: 22px !important;
-  border-bottom: 1px solid rgba(122,19,21,.10);
+  border-bottom: 1px solid rgba(123,0,70,.10);
   font-size: 1.05rem;
   letter-spacing: -.01em;
 }
@@ -83,10 +83,10 @@ main > section:has(> h3) > h3::after {
   content: 'WORKFLOW TIMELINE';
   margin-left: auto;
   padding: 5px 9px;
-  border: 1px solid rgba(184,142,19,.38);
+  border: 1px solid rgba(245,171,38,.38);
   border-radius: 999px;
-  background: rgba(184,142,19,.08);
-  color: #8A6810;
+  background: rgba(245,171,38,.08);
+  color: #8A600D;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: .12em;
@@ -100,7 +100,7 @@ main > section:has(> h3) > div:last-child::before {
   top: 12px;
   bottom: 12px;
   width: 2px;
-  background: linear-gradient(to bottom, #7A1315 0%, #B88E13 52%, rgba(184,142,19,.16) 100%);
+  background: linear-gradient(to bottom, #7B0046 0%, #F5AB26 52%, rgba(245,171,38,.16) 100%);
   border-radius: 99px;
 }
 main > section:has(> h3) > div:last-child > div {
@@ -108,23 +108,23 @@ main > section:has(> h3) > div:last-child > div {
   z-index: 1;
   margin-bottom: 12px;
   padding: 13px 15px 13px 0;
-  border: 1px solid rgba(122,19,21,.09);
+  border: 1px solid rgba(123,0,70,.09);
   border-radius: 14px;
   background: rgba(255,255,255,.78);
-  box-shadow: 0 5px 16px rgba(53,7,8,.035);
+  box-shadow: 0 5px 16px rgba(56,0,32,.035);
   transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
 main > section:has(> h3) > div:last-child > div:hover {
   transform: translateX(3px);
-  border-color: rgba(122,19,21,.20);
-  box-shadow: 0 9px 22px rgba(53,7,8,.07);
+  border-color: rgba(123,0,70,.20);
+  box-shadow: 0 9px 22px rgba(56,0,32,.07);
 }
 main > section:has(> h3) > div:last-child > div > div:first-child { position: relative; z-index: 2; }
 main > section:has(> h3) > div:last-child > div > div:first-child > div,
-main > section:has(> h3) > div:last-child > div > div:first-child > span { box-shadow: 0 0 0 5px #f8f3eb; }
+main > section:has(> h3) > div:last-child > div > div:first-child > span { box-shadow: 0 0 0 5px #fdf8fb; }
 main > section:has(> h3) > div:last-child > div:nth-child(1) > div:first-child > div,
 main > section:has(> h3) > div:last-child > div:nth-child(2) > div:first-child > div,
-main > section:has(> h3) > div:last-child > div:nth-child(3) > div:first-child > div { box-shadow: 0 0 0 5px #f8f3eb, 0 0 18px rgba(184,142,19,.18); }
+main > section:has(> h3) > div:last-child > div:nth-child(3) > div:first-child > div { box-shadow: 0 0 0 5px #fdf8fb, 0 0 18px rgba(245,171,38,.18); }
 
 @media (max-width: 640px) {
   main > section:has(> h3)::before { display: none; }

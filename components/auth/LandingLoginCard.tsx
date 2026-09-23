@@ -110,16 +110,16 @@ export default function LandingLoginCard() {
 
   return (
     <div className={`w-full transition-all duration-500 ${redirecting ? "scale-[0.98] opacity-0" : "animate-fade-in-up"}`}>
-      <div className="overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-[0_24px_60px_rgba(40,4,6,0.18)] backdrop-blur-sm">
-        <div className="h-1.5 bg-gradient-to-r from-[#4D0C0D] via-[#D4AF37] to-[#7A1315]" />
+      <div className="overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-[0_24px_60px_rgba(40,0,24,0.18)] backdrop-blur-sm">
+        <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
         <div className="border-b border-stone-100 px-6 pb-4 pt-6 sm:px-7">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#B88E13]">Institutional Access</p>
-              <h2 className="mt-1 text-2xl font-black tracking-tight text-[#4D0C0D]">Welcome!</h2>
+              <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#F5AB26]">Institutional Access</p>
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-[#4D002C]">Welcome!</h2>
               <p className="mt-1 text-xs text-stone-500">Sign in to the MSU GenSan Procurement System.</p>
             </div>
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7A1315] to-[#4D0C0D] shadow-sm border border-[#D4AF37]/25">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7B0046] to-[#4D002C] shadow-sm border border-[#F5AB26]/25">
               <Lock className="h-5 w-5 text-amber-200" />
             </div>
           </div>
@@ -155,25 +155,20 @@ export default function LandingLoginCard() {
                 placeholder="name@msugensan.edu.ph"
                 autoComplete="email"
                 style={{ paddingLeft: "2.85rem", paddingRight: "1rem" }}
-                className="w-full !min-h-[44px] py-2.5 !pl-11 !pr-4 text-sm rounded-xl border-stone-200 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315]"
+                className="w-full !min-h-[44px] py-2.5 !pl-11 !pr-4 text-sm rounded-xl border-stone-200 focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
                 required
               />
             </div>
             <p className="flex items-center gap-1.5 text-xs text-stone-500">
-              <Building2 className="h-3.5 w-3.5 shrink-0 text-[#7A1315]" />
+              <Building2 className="h-3.5 w-3.5 shrink-0 text-[#7B0046]" />
               Official @msugensan.edu.ph accounts only.
             </p>
           </div>
 
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between gap-3">
-              <label htmlFor="landing-password" className="block text-xs font-bold text-stone-700">
-                Password
-              </label>
-              <Link href="/auth/forgot-password" className="text-xs font-bold text-[#7A1315] hover:text-[#4D0C0D]">
-                Forgot password?
-              </Link>
-            </div>
+            <label htmlFor="landing-password" className="block text-xs font-bold text-stone-700">
+              Password
+            </label>
             <div className="relative flex items-center">
               <div className="pointer-events-none absolute left-3.5 z-10 flex h-5 w-5 items-center justify-center text-stone-400">
                 <Lock className="h-4 w-4" />
@@ -186,7 +181,7 @@ export default function LandingLoginCard() {
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 style={{ paddingLeft: "2.85rem", paddingRight: "2.85rem" }}
-                className="w-full !min-h-[44px] py-2.5 !pl-11 !pr-11 text-sm rounded-xl border-stone-200 focus:ring-2 focus:ring-[#7A1315]/20 focus:border-[#7A1315]"
+                className="w-full !min-h-[44px] py-2.5 !pl-11 !pr-11 text-sm rounded-xl border-stone-200 focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
                 required
               />
               <button
@@ -203,7 +198,7 @@ export default function LandingLoginCard() {
           <button
             type="submit"
             disabled={loading || redirecting}
-            className="w-full min-h-[44px] rounded-xl bg-gradient-to-r from-[#7A1315] via-[#8B1518] to-[#4D0C0D] hover:from-[#650709] hover:to-[#7A1315] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border border-[#D4AF37]/35 disabled:opacity-50"
+            className="w-full min-h-[44px] rounded-xl bg-gradient-to-r from-[#7B0046] via-[#8E0052] to-[#4D002C] hover:from-[#610037] hover:to-[#7B0046] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border border-[#F5AB26]/35 disabled:opacity-50"
           >
             {loading ? (
               <>
@@ -224,12 +219,12 @@ export default function LandingLoginCard() {
           </div>
           <div className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-stone-50/80 px-4 py-3">
             <div className="flex min-w-0 items-start gap-2">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#B88E13]" />
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#F5AB26]" />
               <p className="text-xs leading-relaxed text-stone-600">
                 <span className="font-bold text-stone-700">New account?</span> Registration requires administrator approval.
               </p>
             </div>
-            <Link href="/auth/signup" className="shrink-0 text-xs font-extrabold text-[#7A1315] hover:text-[#4D0C0D] underline decoration-amber-400 underline-offset-2">
+            <Link href="/auth/signup" className="shrink-0 text-xs font-extrabold text-[#7B0046] hover:text-[#4D002C] underline decoration-[#F5AB26] underline-offset-2">
               Register
             </Link>
           </div>
@@ -243,10 +238,10 @@ export default function LandingLoginCard() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#FAF8F5]/98 backdrop-blur-md px-4 selection:bg-[#7A1315] selection:text-amber-200"
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#FAF8F5]/98 backdrop-blur-md px-4 selection:bg-[#7B0046] selection:text-amber-200"
           >
             {/* Decorative top accent */}
-            <div className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#4D0C0D] via-[#D4AF37] to-[#7A1315]" />
+            <div className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
 
             <motion.div
               initial={{ scale: 0.92, opacity: 0, y: 12 }}
@@ -256,18 +251,18 @@ export default function LandingLoginCard() {
             >
               {/* Pulsing University Seal with Gold Aura */}
               <div className="relative mb-6">
-                <div className="absolute -inset-2 rounded-full bg-[#D4AF37]/25 blur-xl animate-pulse" />
-                <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-white p-3 shadow-[0_20px_40px_rgba(77,12,13,0.18)] border border-[#D4AF37]/40">
+                <div className="absolute -inset-2 rounded-full bg-[#F5AB26]/25 blur-xl animate-pulse" />
+                <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-white p-3 shadow-[0_20px_40px_rgba(77,0,44,0.18)] border border-[#F5AB26]/40">
                   <MsuLogo size={56} />
                 </div>
               </div>
 
               {/* Text */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4D0C0D]/10 text-[#4D0C0D] text-[10px] font-black tracking-wider uppercase mb-2">
-                <Sparkles className="h-3 w-3 text-[#B88E13]" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4D002C]/10 text-[#4D002C] text-[10px] font-black tracking-wider uppercase mb-2">
+                <Sparkles className="h-3 w-3 text-[#F5AB26]" />
                 Institutional Authentication
               </div>
-              <h3 className="text-xl font-black text-[#4D0C0D] tracking-tight">
+              <h3 className="text-xl font-black text-[#4D002C] tracking-tight">
                 Authenticating Session
               </h3>
               <p className="mt-1 text-xs text-stone-500 font-medium leading-relaxed">
@@ -276,7 +271,7 @@ export default function LandingLoginCard() {
 
               {/* Shimmering Gold Progress Track */}
               <div className="mt-6 w-56 h-1.5 bg-stone-200/90 rounded-full overflow-hidden relative">
-                <div className="h-full bg-gradient-to-r from-[#7A1315] via-[#D4AF37] to-[#7A1315] rounded-full animate-progress-indeterminate" />
+                <div className="h-full bg-gradient-to-r from-[#7B0046] via-[#F5AB26] to-[#7B0046] rounded-full animate-progress-indeterminate" />
               </div>
 
               <p className="mt-5 text-[9px] font-extrabold text-stone-400 uppercase tracking-widest">
