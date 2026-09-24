@@ -41,7 +41,7 @@ export async function callGroq(
           { role: 'user', content: prompt },
         ],
         temperature,
-        max_tokens: options.maxOutputTokens ?? 1200,
+        max_tokens: options.maxOutputTokens ?? 1800,
         ...(options.responseFormat ? { response_format: options.responseFormat } : {}),
       }),
       signal: controller.signal,
