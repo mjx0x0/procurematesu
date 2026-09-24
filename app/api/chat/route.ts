@@ -109,7 +109,7 @@ async function callGeminiWithFallback(
   // available as a server-side fallback so the chatbot keeps working if
   // GROQ_API_KEY is missing or a Groq request is temporarily unavailable.
   const groqResponse = await callGroq(prompt, systemInstruction, temperature, {
-    maxOutputTokens: 1200,
+    maxOutputTokens: 1800,
     timeoutMs: 10000,
   });
   if (groqResponse) return groqResponse;
@@ -126,7 +126,7 @@ async function callGeminiWithFallback(
         config: {
           systemInstruction,
           temperature,
-          maxOutputTokens: 1200,
+          maxOutputTokens: 1800,
         },
       });
 
@@ -823,8 +823,11 @@ CRITICAL DIRECTIVES:
    - **Office Hours**: Monday to Friday, 8:00 AM – 5:00 PM (PST)
    - **Head of Procurement Office**: Prof. Engr. Nelson P. Benares, Jr.
 5. If the retrieved database context does not provide sufficient detail to answer a specific institutional inquiry, state what the law provides and advise the user to coordinate directly with the MSU-GenSan Procurement Management Office (PMO) or BAC Secretariat using the contact details above.
-6. Provide a helpful, clear, and structured answer using markdown headings, bullet points, and bold emphasis for key procurement terms.
-7. Do NOT use Markdown tables, pipe characters (|), HTML tags such as <br>, or escaped HTML. Use headings and bullet points instead.
+6. Answer the user's actual question directly and concisely. Prefer short paragraphs over lists.
+7. Use bullets only when they genuinely improve readability. Keep any single bullet list to a maximum of 4 bullets. Do not turn every sentence or fact into a bullet.
+8. For simple definition or "what is" questions, use 1 short heading followed by 1–3 concise paragraphs and, only if necessary, a small bullet list.
+9. For process questions, use a short numbered list only for the actual sequence of steps; add a brief explanatory paragraph rather than many nested bullets.
+10. Do NOT use Markdown tables, pipe characters (|), HTML tags such as <br>, or escaped HTML.
 `;
 
         const userPrompt = `
@@ -834,7 +837,7 @@ ${retrievedDocs || 'No specific document chunk found in database. Rely strictly 
 === USER INQUIRY ===
 "${trimmedMsg}"
 
-Please provide a clear, accurate, grounded response adhering strictly to the verified excerpts above.
+Please provide a clear, accurate, grounded response adhering strictly to the verified excerpts above. Keep the answer focused on the user's question and stop once the question is fully answered; do not add unrelated background or a long list of additional topics.
 `;
 
         const aiResponse = await callGeminiWithFallback(userPrompt, systemPrompt, 0.2);
