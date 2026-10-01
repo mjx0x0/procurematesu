@@ -10,17 +10,24 @@ const NEW_TOPIC_PATTERN = /\b(what is|what are|how does|how do|explain|tell me a
 const DRAFT_CONTINUATION_PATTERN = /\b(purpose|department|office|section|item|items|quantity|unit|price|cost|budget|supplier|description|yes|no|correct|continue|next)\b/i;
 // Treat both standalone cancellation commands ("cancel", "stop") and natural phrases
 // ("cancel drafting", "stop the PR", "never mind") as explicit draft cancellation.
-const STOP_DRAFTING_PATTERN = /^(?:stop|cancel|quit|exit|abort|end)\s*[.!?]*$|^(?:stop|cancel|quit|exit|abort|end)\s+(?:the\s+)?(?:draft|drafting|pr|purchase\s+request|form)\s*[.!?]*$|\b(?:stop|cancel|quit|exit|abort|end)\b.{0,40}\b(?:draft|drafting|purchase\s+request|pr|form)\b|\b(?:never\s*mind|nevermind|forget\s+it)\b/i;
+const STOP_DRAFTING_PATTERN = /^(?:stop|cancel|quit|exit|abort|end|never\s*mind|nevermind)\s*[.!?]*$|^(?:stop|cancel|quit|exit|abort|end)\s+(?:the\s+)?(?:draft|drafting|pr|purchase\s+request|form)\s*[.!?]*$|\b(?:stop|cancel|quit|exit|abort|end|cancel\s+that|don't\s+continue|do\s+not\s+continue)\b.{0,50}\b(?:draft|drafting|pr|purchase\s+request|form)\b|\b(?:never\s*mind|nevermind|forget\s+it|i(?:'|’)\s*(?:don't|do not)\s+(?:want|need)\s+to\s+continue)\b/i;
 const PR_PATTERN = /\bPR[- ]?(\d{4}[- ]?\d{4}|\d{4})\b/i;
 const PR_ACCESS_PATTERN = /\b(track|show|view|see|open|display|details?|status|progress|update|history|timeline|next)\b/i;
 const OTHER_USER_PR_PATTERN = /\b(another|other|someone\s+else|somebody\s+else|different)\s+(user|person|account|requester)|\b(?:someone\s+else'?s|another\s+user'?s|other\s+user'?s)\b/i;
 const PROCUREMENT_FLOW_PATTERN = /\b(?:MSU(?:[- ]?GenSan)?|Mindanao\s+State\s+University(?:\s*[-–—]\s*General\s+Santos)?|General\s+Santos)\b.{0,80}\b(?:procurement|purchas(?:e|ing)|PR|process|flow|procedure|steps?|stages?)\b|\b(?:procurement|purchasing|PR)\s+(?:flow|process|procedure|steps?|stages?)\b/i;
+const OFFICE_INFO_PATTERN = /\b(?:where(?:'s| is| can I find)|location|address|contact|contacts|phone|telephone|email|e-mail|how can I contact|how do I reach)\b.{0,50}\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO|BAC|procurement)\b|\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO)\b.{0,50}\b(?:where|location|address|contact|phone|telephone|email|reach)\b/i;
 const NEXT_PATTERN = /\b(what|where|which|how)\s+(happens?|comes?|is)\s+next\b|\bwhat'?s\s+next\b|\bnext\s+(step|stage)\b|\bwhat\s+do\s+i\s+do\s+next\b/i;
 
 let slotValidator: GoogleGenAI | null = null;
 function getSlotValidator() { const key = process.env.GEMINI_API_KEY; if (!key) return null; if (!slotValidator) slotValidator = new GoogleGenAI({ apiKey: key }); return slotValidator; }
 
-function shouldResetDrafting(message: string) { return NEW_TOPIC_PATTERN.test(message) && !DRAFT_CONTINUATION_PATTERN.test(message); }
+function shouldResetDrafting(message: string) {
+  if (STOP_DRAFTING_PATTERN.test(message)) return true;
+  if (OFFICE_INFO_PATTERN.test(message)) return true;
+  if (PROCUREMENT_FLOW_PATTERN.test(message)) return true;
+  return NEW_TOPIC_PATTERN.test(message) && !DRAFT_CONTINUATION_PATTERN.test(message);
+}
+
 function extractCurrentUserMessage(message: string): string { const marker = /(?:^|\n)Current user message:\s*/i; const match = message.match(marker); if (!match || match.index === undefined) return message.trim(); return message.slice(match.index + match[0].length).trim(); }
 function basicSlotCheck(step: string, message: string) {
   const text = message.trim(); const letters = (text.match(/[a-z]/gi) || []).length;
@@ -105,7 +112,22 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (draftState.drafting && shouldResetDrafting(message)) await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
+    if (draftState.drafting && shouldResetDrafting(message)) {
+      await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
+    }
+
+    if (OFFICE_INFO_PATTERN.test(message)) {
+      return NextResponse.json({
+        response:
+          "📍 **MSU-GenSan Procurement Management Office**\n\n" +
+          "The Procurement Management Office is under the Office of the Vice Chancellor for Administration and Finance. The university's official directory lists the campus address as **Fatima, General Santos City, South Cotabato, Philippines, 9500**.\n\n" +
+          "For procurement inquiries, the official university directory lists **Assoc. Prof. Nelson P. Benares, Jr.** as Director and **0908-810-5634** as the office contact number.\n\n" +
+          "Because MSU-GenSan issued a June 2026 advisory about temporary relocation of offices affected by Y-Building damage, please confirm the current temporary office assignment before visiting in person.\n\n" +
+          "If you want, I can also explain what the Procurement Office handles or help you prepare a Purchase Request.",
+        sources: ['MSU-GenSan University Directory', 'MSU-GenSan Temporary Office Relocation Advisory']
+      });
+    }
+
     if (PROCUREMENT_FLOW_PATTERN.test(message)) return NextResponse.json({ response: buildProcurementFlowResponse(), sources: ['ProcuremateSU procurement process'] });
     const prMatch = message.match(PR_PATTERN); const isPRAccessRequest = Boolean(prMatch) && PR_ACCESS_PATTERN.test(message);
     if (isPRAccessRequest) {
