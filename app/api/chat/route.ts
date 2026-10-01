@@ -731,10 +731,13 @@ export async function POST(req: NextRequest) {
           .eq('id', sessionId)
           .single();
         if (data?.state) {
-          currentState = { ...currentState, ...data.state };
+          // The database is authoritative for persistent chat state.
+          // Do not merge stale in-memory drafting state over a cleared DB state.
+          currentState = data.state as SessionState;
         }
         if ((currentState as SessionState).cancelledAt) {
           await supabase.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId);
+          inMemorySessions.delete(currentSessionId);
           return NextResponse.json({ response: '', sessionId: currentSessionId, state: {}, sources: [], cancelled: true });
         }
       } catch (err) {
@@ -864,6 +867,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
         const { data: liveSession } = await supabase.from('chat_sessions').select('state').eq('id', sessionId).single();
         if ((liveSession?.state as SessionState | null)?.cancelledAt) {
           await supabase.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId);
+          inMemorySessions.delete(currentSessionId);
           return NextResponse.json({ response: '', sessionId: currentSessionId, state: {}, sources: [], cancelled: true });
         }
       } catch {}
