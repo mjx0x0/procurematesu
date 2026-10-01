@@ -268,6 +268,18 @@ export default function ChatbotDashboard() {
 
   const stopResponse = async () => {
     if (!sessionId) return;
+
+    // Stop the browser request immediately so the user is never forced to wait
+    // for the cancellation endpoint before the UI becomes usable again.
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setLoading(false);
+    addLocal(
+      "assistant",
+      "🛑 **Response stopped.**\\n\\nIf you were drafting a Purchase Request, the draft was cancelled and nothing was submitted."
+    );
+
+    // Keep the server-side cancellation independent from the UI request.
     try {
       const token = await getAuthToken();
       const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -276,15 +288,11 @@ export default function ChatbotDashboard() {
         method: "POST",
         headers,
         credentials: "include",
+        keepalive: true,
         body: JSON.stringify({ sessionId }),
       });
     } catch (error) {
       console.warn("Unable to cancel server-side chat state:", error);
-    } finally {
-      abortRef.current?.abort();
-      abortRef.current = null;
-      setLoading(false);
-      addLocal("assistant", "🛑 **Response stopped.**\n\nIf you were drafting a Purchase Request, the draft was cancelled and nothing was submitted.");
     }
   };
 
