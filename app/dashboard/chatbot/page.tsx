@@ -55,6 +55,7 @@ const SUGGESTIONS = [
   "What is RA 12009?",
   "Help me draft a PR",
   "Track my PR",
+  "Where is the Procurement Office?",
   "How does Small Value Procurement work?",
   "Explain the bidding process",
   "MSU-GenSan Procurement Flow",
@@ -64,7 +65,7 @@ const WELCOME: Message = {
   id: "welcome",
   role: "assistant",
   content:
-    "👋 Kumusta! I am your official **AI Procurement Assistant for Mindanao State University - General Santos**.\n\nI can help you with:\n• **RA 12009 & RA 9184** procurement guidelines\n• **Purchase Request drafting** step-by-step\n• **PR tracking** and live milestone timeline status\n• **Procurement Office (PMO) & BAC** requirements\n• **Small Value Procurement (SVP)** and PhilGEPS thresholds\n\nYour conversations are automatically saved. Ask me anything or choose a quick prompt below!",
+    "👋 **Kumusta! I’m Gab AI**, your procurement assistant for MSU-General Santos.\n\nI can help explain procurement rules, guide you through Purchase Request drafting, track submitted PRs, and answer questions about the Procurement Office and procurement procedures.\n\nAsk me anything. I’ll keep responses clear, practical, friendly, and grounded in the university’s procurement references.",
   timestamp: new Date(),
 };
 
