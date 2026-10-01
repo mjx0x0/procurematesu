@@ -26,6 +26,7 @@ const supabase = isSupabaseConfigured
 // In-memory session and message cache for seamless state tracking
 interface SessionState {
   drafting?: boolean;
+  cancelledAt?: string;
   step?: 'purpose' | 'department' | 'items' | null;
   collected?: {
     purpose?: string;
@@ -109,7 +110,7 @@ async function callGeminiWithFallback(
   // available as a server-side fallback so the chatbot keeps working if
   // GROQ_API_KEY is missing or a Groq request is temporarily unavailable.
   const groqResponse = await callGroq(prompt, systemInstruction, temperature, {
-    maxOutputTokens: 1800,
+    maxOutputTokens: 1600,
     timeoutMs: 10000,
   });
   if (groqResponse) return groqResponse;
@@ -126,7 +127,7 @@ async function callGeminiWithFallback(
         config: {
           systemInstruction,
           temperature,
-          maxOutputTokens: 1800,
+          maxOutputTokens: 1600,
         },
       });
 
@@ -732,6 +733,10 @@ export async function POST(req: NextRequest) {
         if (data?.state) {
           currentState = { ...currentState, ...data.state };
         }
+        if ((currentState as SessionState).cancelledAt) {
+          await supabase.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId);
+          return NextResponse.json({ response: '', sessionId: currentSessionId, state: {}, sources: [], cancelled: true });
+        }
       } catch (err) {
         console.warn('Could not read session from Supabase, using in-memory state');
       }
@@ -823,11 +828,13 @@ CRITICAL DIRECTIVES:
    - **Office Hours**: Monday to Friday, 8:00 AM – 5:00 PM (PST)
    - **Head of Procurement Office**: Prof. Engr. Nelson P. Benares, Jr.
 5. If the retrieved database context does not provide sufficient detail to answer a specific institutional inquiry, state what the law provides and advise the user to coordinate directly with the MSU-GenSan Procurement Management Office (PMO) or BAC Secretariat using the contact details above.
-6. Answer the user's actual question directly and concisely. Prefer short paragraphs over lists.
-7. Use bullets only when they genuinely improve readability. Keep any single bullet list to a maximum of 4 bullets. Do not turn every sentence or fact into a bullet.
-8. For simple definition or "what is" questions, use 1 short heading followed by 1–3 concise paragraphs and, only if necessary, a small bullet list.
-9. For process questions, use a short numbered list only for the actual sequence of steps; add a brief explanatory paragraph rather than many nested bullets.
-10. Do NOT use Markdown tables, pipe characters (|), HTML tags such as <br>, or escaped HTML.
+6. Be friendly, warm, and professional. Answer the user's actual question directly.
+7. Aim for a medium-length response: usually about 120–250 words for a normal question. Do not stop mid-sentence or omit the conclusion.
+8. Prefer 2–4 short paragraphs over long bullet lists. Use bullets only when they genuinely improve readability, with no more than 4 bullets in one list.
+9. For simple definition or location/contact questions, give a direct answer first, followed by the most relevant supporting details.
+10. For process questions, use a short numbered list for the actual sequence of steps and a brief explanation afterward.
+11. If the user asks a very simple question, do not pad the answer just to reach a word count.
+12. Do NOT use Markdown tables, pipe characters (|), HTML tags such as <br>, or escaped HTML.
 `;
 
         const userPrompt = `
@@ -837,7 +844,7 @@ ${retrievedDocs || 'No specific document chunk found in database. Rely strictly 
 === USER INQUIRY ===
 "${trimmedMsg}"
 
-Please provide a clear, accurate, grounded response adhering strictly to the verified excerpts above. Keep the answer focused on the user's question and stop once the question is fully answered; do not add unrelated background or a long list of additional topics.
+Please provide a clear, accurate, grounded response adhering strictly to the verified excerpts above. Keep the answer focused on the user's question and finish the thought completely. Do not add unrelated background or a long list of additional topics.
 `;
 
         const aiResponse = await callGeminiWithFallback(userPrompt, systemPrompt, 0.2);
@@ -851,7 +858,18 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
       }
     }
 
-    // Normalize model-generated HTML/escape artifacts before returning or storing the response.\n    responseText = cleanAIResponse(responseText);\n\n    // 3. Update session in memory
+    // Normalize model-generated HTML/escape artifacts before returning or storing the response.\n    responseText = cleanAIResponse(responseText);\n\n    // If the user cancelled while the model was generating, discard the in-flight answer.
+    if (supabase && sessionId) {
+      try {
+        const { data: liveSession } = await supabase.from('chat_sessions').select('state').eq('id', sessionId).single();
+        if ((liveSession?.state as SessionState | null)?.cancelledAt) {
+          await supabase.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId);
+          return NextResponse.json({ response: '', sessionId: currentSessionId, state: {}, sources: [], cancelled: true });
+        }
+      } catch {}
+    }
+
+    // 3. Update session in memory
     sessionData.state = updatedState;
     sessionData.messages.push(
       { sender: 'user', content: trimmedMsg, time: new Date().toISOString() },
