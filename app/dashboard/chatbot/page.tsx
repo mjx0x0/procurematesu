@@ -17,6 +17,7 @@ import {
   Sparkles,
   Trash2,
   X,
+  Square,
   Clock,
   ArrowRight,
 } from "lucide-react";
@@ -262,6 +263,30 @@ export default function ChatbotDashboard() {
       },
     ]);
 
+  const abortRef = useRef<AbortController | null>(null);
+
+  const stopResponse = async () => {
+    if (!sessionId) return;
+    try {
+      const token = await getAuthToken();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      await fetch("/api/chat/cancel", {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({ sessionId }),
+      });
+    } catch (error) {
+      console.warn("Unable to cancel server-side chat state:", error);
+    } finally {
+      abortRef.current?.abort();
+      abortRef.current = null;
+      setLoading(false);
+      addLocal("assistant", "🛑 **Response stopped.**\n\nIf you were drafting a Purchase Request, the draft was cancelled and nothing was submitted.");
+    }
+  };
+
   const sendMessage = async (message?: string) => {
     const text = (message ?? input).trim();
     if (!text || loading) return;
@@ -272,6 +297,7 @@ export default function ChatbotDashboard() {
     addLocal("user", text);
     setInput("");
     setLoading(true);
+    abortRef.current = new AbortController();
 
     try {
       if (isTrackMyPR(text)) {
@@ -301,6 +327,7 @@ export default function ChatbotDashboard() {
         headers,
         credentials: "include",
         body: JSON.stringify({ message: text, sessionId: sid, history }),
+        signal: abortRef.current.signal,
       });
 
       const data = await response.json();
@@ -313,6 +340,7 @@ export default function ChatbotDashboard() {
         .eq("id", sid);
       if (userId) await loadSessions(userId);
     } catch (e: any) {
+      if (e?.name === "AbortError") return;
       console.error("Chat error:", e);
       setMessages((prev) =>
         prev.concat({
@@ -323,6 +351,7 @@ export default function ChatbotDashboard() {
         })
       );
     } finally {
+      abortRef.current = null;
       setLoading(false);
       setTimeout(() => inputRef.current?.focus(), 100);
     }
@@ -833,12 +862,12 @@ export default function ChatbotDashboard() {
                 className="flex-1 min-w-0 rounded-xl border border-stone-300 bg-white text-gray-900 placeholder:text-stone-400 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-2xs"
               />
               <button
-                onClick={() => sendMessage()}
-                disabled={loading || !input.trim()}
+                onClick={() => loading ? stopResponse() : sendMessage()}
+                disabled={!loading && !input.trim()}
                 className="shrink-0 h-10 sm:h-11 px-4 sm:px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#8E0052] hover:from-[#610037] hover:to-[#7B0046] text-white disabled:opacity-40 transition-colors shadow-xs flex items-center justify-center border border-amber-400/20"
-                aria-label="Send message"
+                aria-label={loading ? "Stop response" : "Send message"}
               >
-                <Send className="h-4 w-4 text-amber-200" />
+                {loading ? <Square className="h-4 w-4 text-amber-200 fill-current" /> : <Send className="h-4 w-4 text-amber-200" />}
               </button>
             </div>
             <p className="text-[10px] text-stone-400 mt-2 text-center sm:text-left">
