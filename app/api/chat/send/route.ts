@@ -95,25 +95,47 @@ export async function POST(request: NextRequest) {
     if (sessionError || !session) return NextResponse.json({ error: 'Chat session not found.' }, { status: 404 });
     if (session.is_active === false) return NextResponse.json({ error: 'This conversation is closed. Start a new chat.' }, { status: 409 });
 
-    const draftState = (session.state || {}) as { drafting?: boolean; step?: string | null; collected?: any };
+    let draftState = (session.state || {}) as { drafting?: boolean; step?: string | null; collected?: any; cancelledAt?: string };
+
+    // Handle stale cancellation state before any PR slot logic.
+    if (draftState.cancelledAt) {
+      await clientToUse
+        .from('chat_sessions')
+        .update({ state: {}, updated_at: new Date().toISOString() })
+        .eq('id', sessionId)
+        .eq('user_id', user.id);
+      draftState = {};
+    }
+
     if (draftState.drafting) {
-      // Cancellation is checked BEFORE slot validation so commands like "cancel" or
-      // "stop" can never be rejected as an invalid answer to the current slot.
+      // Stop and new-topic commands must be handled BEFORE slot validation.
+      // Otherwise a question such as "What is RA 12009?" can be mistaken for
+      // the current PR field and recorded as the purpose.
       if (STOP_DRAFTING_PATTERN.test(message.trim())) {
         await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
         return NextResponse.json({ response: '🛑 **PR drafting stopped.**\n\nI did not create or submit a Purchase Request. Your draft has been cancelled.\n\nWhenever you are ready, you can say **"Help me draft a PR"** to start again.', sources: ['PR drafting session'] });
       }
-      if (draftState.step) {
-        const validation = await validateSlotAnswer(draftState.step, message, draftState.collected);
-        if (!validation.valid) {
-          const prompts: Record<string, string> = { purpose: 'Please answer with the **purpose of the procurement** — what the purchase is for or why it is needed.', department: 'Please provide your **department, office, college, school, or unit**.', items: 'Please provide the **items/services needed**, preferably with quantities and units.' };
-          return NextResponse.json({ response: `⚠️ **That answer doesn't match the current field.**\n\n${validation.reason || 'Please provide information relevant to the field I asked for.'}\n\n${prompts[draftState.step] || 'Please answer the current question.'}`, sources: ['PR drafting validation'] });
-        }
+
+      if (shouldResetDrafting(message)) {
+        await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
+        draftState = {};
       }
     }
 
-    if (draftState.drafting && shouldResetDrafting(message)) {
-      await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
+    // Only validate a slot when the current message is still part of an active draft.
+    if (draftState.drafting && draftState.step) {
+      const validation = await validateSlotAnswer(draftState.step, message, draftState.collected);
+      if (!validation.valid) {
+        const prompts: Record<string, string> = {
+          purpose: 'Please answer with the **purpose of the procurement** — what the purchase is for or why it is needed.',
+          department: 'Please provide your **department, office, college, school, or unit**.',
+          items: 'Please provide the **items/services needed**, preferably with quantities and units.',
+        };
+        return NextResponse.json({
+          response: `⚠️ **That answer doesn't match the current field.**\\n\\n${validation.reason || 'Please provide information relevant to the field I asked for.'}\\n\\n${prompts[draftState.step] || 'Please answer the current question.'}`,
+          sources: ['PR drafting validation'],
+        });
+      }
     }
 
     if (OFFICE_INFO_PATTERN.test(message)) {
