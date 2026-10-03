@@ -65,7 +65,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // generic procurement passage even for a very specific institutional question.
   if (supabase && terms.length) {
     try {
-      const searches = [];
+      const searches: any[] = [];
 
       const phrase = normalizedQuery.replace(/\s+/g, ' ').trim();
       if (phrase.length >= 8) {
