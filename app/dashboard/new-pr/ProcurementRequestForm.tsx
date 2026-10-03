@@ -77,6 +77,7 @@ export default function ProcurementRequestForm() {
   const [createdPRNo, setCreatedPRNo] = useState<string | null>(null);
   const [physicalSubmissionAcknowledged, setPhysicalSubmissionAcknowledged] = useState(false);
   const [form, setForm] = useState({ purpose: "", department: "", section: "", requested_by_designation: "" });
+  const [departmentOther, setDepartmentOther] = useState(false);
   const [items, setItems] = useState<Item[]>([emptyItem()]);
 
   useEffect(() => {
@@ -98,6 +99,9 @@ export default function ProcurementRequestForm() {
     if (!searchParams) return;
     const department = searchParams.get("department"); const purpose = searchParams.get("purpose"); const totalParam = searchParams.get("total"); const itemsParam = searchParams.get("items");
     setForm(prev => ({ ...prev, ...(department ? { department } : {}), ...(purpose ? { purpose } : {}) }));
+    if (department && !MSU_DEPARTMENTS.includes(department as typeof MSU_DEPARTMENTS[number])) {
+      setDepartmentOther(true);
+    }
     if (itemsParam) {
       try {
         const parsed = JSON.parse(itemsParam);
@@ -334,21 +338,52 @@ export default function ProcurementRequestForm() {
                     </label>
                     <select
                       id="pr-dept"
-                      value={form.department}
-                      onChange={(e) => setForm({ ...form, department: e.target.value })}
+                      value={departmentOther ? "__other__" : form.department}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "__other__") {
+                          setDepartmentOther(true);
+                          setForm({ ...form, department: "" });
+                        } else {
+                          setDepartmentOther(false);
+                          setForm({ ...form, department: value });
+                        }
+                      }}
                       required
                       className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs cursor-pointer"
                     >
                       <option value="" disabled>
-                        Select your college or institute
+                        Select your college, institute, or office
                       </option>
                       {MSU_DEPARTMENTS.map((department) => (
                         <option key={department} value={department}>
                           {department}
                         </option>
                       ))}
+                      <option value="__other__">Others — My office is not listed</option>
                     </select>
-                    <p className="text-[11px] text-stone-500">Select the official MSU-General Santos college or institute responsible for this request.</p>
+
+                    {departmentOther && (
+                      <div className="mt-2.5">
+                        <input
+                          id="pr-dept-other"
+                          type="text"
+                          value={form.department}
+                          onChange={(e) => setForm({ ...form, department: e.target.value })}
+                          placeholder="Enter your official office, department, or unit"
+                          required
+                          autoFocus
+                          className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
+                        />
+                        <p className="mt-1 text-[11px] text-stone-500">
+                          Enter the official name of your MSU-General Santos office, department, or unit.
+                        </p>
+                      </div>
+                    )}
+
+                    <p className="text-[11px] text-stone-500">
+                      Select your official MSU-General Santos college or institute. Choose <strong>Others</strong> if your office or unit is not listed.
+                    </p>
                   </div>
                   <div className="space-y-1.5">
                     <label htmlFor="pr-section" className="block text-sm font-bold text-stone-800">
