@@ -58,21 +58,21 @@ export default function LandingPage() {
           </div>
         </header>
 
-        <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1240px] items-center gap-10 px-6 pt-28 pb-16 sm:px-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:py-24">
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-            <h1 className="text-center lg:text-left font-black tracking-[-0.03em] leading-tight text-white w-full">
-              <span className="block text-2xl sm:text-4xl lg:text-[3.25rem] font-black tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
+        <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1200px] items-center gap-10 px-6 pt-24 pb-16 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:py-20">
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left w-full">
+            <h1 className="text-center lg:text-left font-black tracking-[-0.03em] leading-[1.08] text-white w-full">
+              <span className="block text-3xl sm:text-5xl lg:text-[3.35rem] font-black tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]">
                 MSU GenSan
               </span>
-              <span className="block mt-1 sm:mt-2 text-4xl sm:text-6xl lg:text-[4.35rem] font-black tracking-tight leading-[0.98] text-transparent bg-clip-text bg-gradient-to-r from-[#FFF2C6] via-[#F5AB26] to-[#E69910] drop-shadow-[0_4px_28px_rgba(245,171,38,0.4)]">
+              <span className="block mt-1 sm:mt-1.5 text-3xl sm:text-5xl lg:text-[3.35rem] font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FFE599] via-[#F5AB26] to-[#F0C83F] drop-shadow-[0_2px_20px_rgba(245,171,38,0.35)]">
                 Procurement
               </span>
-              <span className="block mt-1 sm:mt-2 text-2xl sm:text-4xl lg:text-[3rem] font-extrabold tracking-tight text-[#FAF3EB] drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]">
+              <span className="block mt-1 sm:mt-1.5 text-3xl sm:text-5xl lg:text-[3.35rem] font-black tracking-tight text-[#FAF3EB] drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)]">
                 Management System
               </span>
             </h1>
 
-            <p className="mt-6 max-w-[580px] text-center lg:text-left text-sm sm:text-base leading-relaxed text-amber-50/95 lg:border-l-2 lg:border-[#F5AB26] lg:pl-5 font-normal">
+            <p className="mt-6 max-w-[540px] text-center lg:text-left text-sm sm:text-base leading-relaxed text-amber-50/90 lg:border-l-2 lg:border-[#F5AB26] lg:pl-5 font-normal mx-auto lg:mx-0 text-pretty">
               A centralized institutional workspace for Purchase Request preparation, standardized university procurement workflow monitoring, public transparency records, and automated policy guidance powered by <strong className="font-bold text-[#F5AB26]">Gab AI</strong>.
             </p>
           </div>
