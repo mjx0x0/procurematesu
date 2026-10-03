@@ -740,21 +740,48 @@ async function handleDraftPRFlow(
     case 'department': {
       collected.department = message.trim();
 
-      // If item details were already extracted from the previous message,
-      // finalize now instead of asking the user to repeat them.
+      // Only finalize if every previously extracted item has all required
+      // fields. If something is missing, ask only for that missing detail.
       if (collected.extracted?.items?.length) {
         const extracted = {
           ...collected.extracted,
           department: collected.department,
           purpose: collected.purpose || collected.extracted.purpose,
         };
+        const incompleteItems = extracted.items.filter(
+          (item: any) =>
+            String(item.item_description || '').trim().length <= 2 ||
+            Number(item.quantity) <= 0 ||
+            String(item.unit || '').trim().length === 0 ||
+            Number(item.unit_cost) <= 0
+        );
+
+        if (incompleteItems.length === 0) {
+          newState.collected = { ...collected, extracted };
+          return buildDraftCompletionResponse(extracted, {
+            ...newState,
+            drafting: false,
+            step: null,
+            collected: { ...collected, extracted },
+          });
+        }
+
+        const first = incompleteItems[0];
+        const missing: string[] = [];
+        if (String(first.item_description || '').trim().length <= 2) missing.push('item description');
+        if (Number(first.quantity) <= 0) missing.push('quantity');
+        if (String(first.unit || '').trim().length === 0) missing.push('unit');
+        if (Number(first.unit_cost) <= 0) missing.push('estimated unit cost');
+
         newState.collected = { ...collected, extracted };
-        return buildDraftCompletionResponse(extracted, {
-          ...newState,
-          drafting: false,
-          step: null,
-          collected: { ...collected, extracted },
-        });
+        newState.step = 'items';
+        return {
+          response:
+            `✅ Department set: **"${collected.department}"**\n\n` +
+            `📦 I already captured the item information you provided. I still need: **${missing.join(', ')}**.\n\n` +
+            `Please provide only the missing detail(s); you do not need to repeat the information already given.`,
+          newState,
+        };
       }
 
       newState.collected = collected;
@@ -781,10 +808,23 @@ async function handleDraftPRFlow(
       const fullText = `Department: ${collected.department}. Purpose: ${collected.purpose}. Items: ${collected.items_raw}`;
       const extracted = await extractPRDetails(fullText);
 
-      if (isDone || (extracted.items && extracted.items.length > 0 && !isDone && message.length > 15)) {
-        if (extracted.items && extracted.items.length > 0) {
-          return buildDraftCompletionResponse(extracted, newState);
-        }
+      const completeItems = (extracted.items || []).filter(
+        (item: any) =>
+          String(item.item_description || '').trim().length > 2 &&
+          Number(item.quantity) > 0 &&
+          String(item.unit || '').trim().length > 0 &&
+          Number(item.unit_cost) > 0
+      );
+
+      if (
+        completeItems.length > 0 &&
+        completeItems.length === (extracted.items || []).length &&
+        (isDone || message.length > 15)
+      ) {
+        return buildDraftCompletionResponse(
+          { ...extracted, items: completeItems },
+          newState
+        );
       }
 
       return {
