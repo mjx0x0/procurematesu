@@ -346,33 +346,46 @@ interface ExtractedPR {
 }
 
 async function extractPRDetails(text: string): Promise<ExtractedPR> {
+  // Deterministic extraction runs first for explicit procurement patterns. This
+  // prevents a model response from dropping quantity/unit/cost that the user
+  // already supplied in the same message.
+  const ruleBased = extractPRDetailsRuleBased(text);
+  const hasExplicitItemDetails =
+    ruleBased.items.length > 0 &&
+    ruleBased.items.some(
+      (item) =>
+        Number(item.quantity) > 0 &&
+        String(item.unit || '').trim().length > 0 &&
+        Number(item.unit_cost) > 0 &&
+        String(item.item_description || '').trim().length > 2
+    );
+
+  if (hasExplicitItemDetails) {
+    return ruleBased;
+  }
+
   const extractionPrompt = `
 You are an expert procurement assistant parsing purchase request details from user input.
 Input: "${text}"
 
-Extract procurement details even when the user combines the purpose, item description, quantity, and price in one natural-language sentence.
+Extract procurement details even when the user combines the purpose, item description, quantity, unit, price, and department in one natural-language message.
 
 Important parsing rules:
-- If the text says something like "Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses, 10 pieces, 500 pesos per unit", treat "laboratory glassware and supplies" as the item_description, quantity as 10, unit as "pieces", and unit_cost as 500. Do NOT discard the item details just because the quantity and price occur after the purpose.
-- Phrases such as "10 pieces", "10 pcs", "10 units", "10 sets", etc. provide quantity and unit.
-- Phrases such as "500 pesos per unit", "₱500 each", "at PHP 500 each", or "500 per piece" provide unit_cost.
-- "for 1st Semester Chemistry courses" is part of the procurement purpose/context, not the item description.
-- If a department/college/office is not explicitly stated, return null.
-- If a quantity and unit price are present but the item name is embedded in the purpose, use the relevant noun phrase immediately before the quantity as the item description.
-- Preserve the user's intended purpose rather than reducing it to only the item name.
+- Preserve every explicit detail supplied by the user. Never ask for a field that is already present in the input.
+- If the text says "Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses, 10 pieces, 500 pesos per unit", extract:
+  item_description = "laboratory glassware and supplies"
+  quantity = 10
+  unit = "pcs"
+  unit_cost = 500
+  purpose = "Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses"
+- "10 pieces", "10 pcs", "10 units", "10 sets", etc. provide quantity and unit.
+- "500 pesos per unit", "₱500 each", "PHP 500 each", "500 per piece", etc. provide unit_cost.
+- If a department/college/office is explicitly stated, extract it. Otherwise return null.
+- If any item field is genuinely missing, do NOT invent it. Use quantity 0, unit "", and/or unit_cost 0 so the application can ask a follow-up.
+- "for 1st Semester Chemistry courses" is purpose/context unless it names a requesting department.
+- If quantity and price are present but the item name is embedded in the purpose, use the relevant noun phrase before the quantity as the item description.
 
-Extract:
-1. department (e.g. "College of Science and Mathematics", or null if not specified)
-2. purpose (brief but complete summary of the procurement purpose)
-3. items: list of items with:
-   - item_description: string
-   - quantity: integer (minimum 1)
-   - unit: string (e.g. "pcs", "units", "sets", "reams", "boxes")
-   - unit_cost: number (estimated unit price in PHP)
-   - total_cost: number (quantity * unit_cost)
-4. total_amount: number (sum of total_cost of all items)
-
-Return ONLY a valid JSON object in this exact shape, with no markdown, no comments, no extra text:
+Return ONLY valid JSON:
 {
   "department": null,
   "purpose": null,
@@ -386,20 +399,25 @@ Return ONLY a valid JSON object in this exact shape, with no markdown, no commen
     if (raw) {
       const clean = raw.replace(/```json/gi, '').replace(/```/gi, '').trim();
       const parsed = JSON.parse(clean);
+
       if (Array.isArray(parsed.items) && parsed.items.length > 0) {
         const sanitizedItems = parsed.items.map((i: any) => {
-          const qty = Number(i.quantity) || 1;
-          const cost = Number(i.unit_cost) || 0;
+          const qty = Math.max(0, Number(i.quantity) || 0);
+          const cost = Math.max(0, Number(i.unit_cost) || 0);
+          const unit = String(i.unit || '').trim();
           return {
-            item_description: String(i.item_description || 'General Supplies Item').trim(),
+            item_description: String(i.item_description || '').trim(),
             quantity: qty,
-            unit: String(i.unit || 'pcs').trim(),
+            unit,
             unit_cost: cost,
             total_cost: qty * cost,
           };
         });
 
-        const total = sanitizedItems.reduce((acc: number, item: any) => acc + item.total_cost, 0);
+        const total = sanitizedItems.reduce(
+          (acc: number, item: any) => acc + item.total_cost,
+          0
+        );
 
         return {
           department: parsed.department ? String(parsed.department).trim() : null,
@@ -410,10 +428,10 @@ Return ONLY a valid JSON object in this exact shape, with no markdown, no commen
       }
     }
   } catch (e) {
-    console.warn('AI Extraction failed, using rule-based parser:', e);
+    console.warn('AI Extraction failed, using deterministic parser:', e);
   }
 
-  return extractPRDetailsRuleBased(text);
+  return ruleBased;
 }
 
 function extractPRDetailsRuleBased(text: string): ExtractedPR {
@@ -630,41 +648,93 @@ async function handleDraftPRFlow(
 
   switch (step) {
     case 'purpose': {
-      // Extract details from the purpose message itself. Users should not have
-      // to repeat quantity, unit, price, or item details that were already given.
       const extracted = await extractPRDetails(message);
+
       collected.purpose = extracted.purpose || message.trim();
+      collected.extracted = extracted;
 
-      if (extracted.items.length > 0) {
-        collected.items_raw = message.trim();
-        collected.extracted = extracted;
-      }
-
-      // If the department was also included in the same message, complete
-      // immediately; otherwise ask only for the missing department.
       if (extracted.department) {
         collected.department = extracted.department;
-        newState.collected = collected;
+      }
+
+      const itemDetails = extracted.items || [];
+      const completeItems = itemDetails.filter(
+        (item) =>
+          String(item.item_description || '').trim().length > 2 &&
+          Number(item.quantity) > 0 &&
+          String(item.unit || '').trim().length > 0 &&
+          Number(item.unit_cost) > 0
+      );
+
+      const incompleteItems = itemDetails.filter(
+        (item) =>
+          String(item.item_description || '').trim().length <= 2 ||
+          Number(item.quantity) <= 0 ||
+          String(item.unit || '').trim().length === 0 ||
+          Number(item.unit_cost) <= 0
+      );
+
+      const missingFields: string[] = [];
+      if (!extracted.department) missingFields.push('department, college, or office');
+      if (itemDetails.length === 0) {
+        missingFields.push('item description, quantity, unit, and estimated unit cost');
+      } else if (incompleteItems.length > 0) {
+        const first = incompleteItems[0];
+        const missingItemFields: string[] = [];
+        if (String(first.item_description || '').trim().length <= 2) missingItemFields.push('item description');
+        if (Number(first.quantity) <= 0) missingItemFields.push('quantity');
+        if (String(first.unit || '').trim().length === 0) missingItemFields.push('unit');
+        if (Number(first.unit_cost) <= 0) missingItemFields.push('estimated unit cost');
+        missingFields.push(missingItemFields.join(', '));
+      }
+
+      // If every required field is already present in one message, finish
+      // immediately. The user should never have to repeat information.
+      if (
+        extracted.department &&
+        itemDetails.length > 0 &&
+        completeItems.length === itemDetails.length
+      ) {
         return buildDraftCompletionResponse(
-          { ...extracted, department: extracted.department },
+          { ...extracted, items: completeItems },
           { ...newState, drafting: false, step: null, collected }
         );
       }
 
       newState.collected = collected;
-      newState.step = 'department';
 
-      const itemNote = extracted.items.length > 0
-        ? `\n\n📦 I also captured **${extracted.items.length} item(s)** from that message, including the quantity and unit price. You do not need to repeat them.`
-        : '';
+      if (!extracted.department) {
+        newState.step = 'department';
+        const captured =
+          completeItems.length > 0
+            ? `\n\n📦 I already captured **${completeItems.length} complete item(s)**, including quantity, unit, and estimated unit cost. You do not need to repeat them.`
+            : '';
 
-      return {
-        response:
-          `✅ Purpose recorded: **"${collected.purpose}"**${itemNote}\n\n` +
-          `Next, which **department, college, or office** is requesting this?\n` +
-          `*(Example: 'College of Science and Mathematics' or 'Office of the University Registrar')*`,
-        newState,
-      };
+        return {
+          response:
+            `✅ Purpose recorded: **"${collected.purpose}"**${captured}\n\n` +
+            `Next, which **department, college, or office** is requesting this?\n` +
+            `*(Example: 'College of Science and Mathematics' or 'Office of the University Registrar')*`,
+          newState,
+        };
+      }
+
+      if (incompleteItems.length > 0) {
+        newState.step = 'items';
+        return {
+          response:
+            `✅ I captured the **${extracted.department}** as the requesting office and extracted the purpose.\n\n` +
+            `📦 I still need the following item detail(s): **${missingFields.filter((f) => !f.includes('department')).join('; ')}**.\n\n` +
+            `Please provide the missing information. You do not need to repeat the details you already gave.`,
+          newState,
+        };
+      }
+
+      // Department exists and all item fields are complete.
+      return buildDraftCompletionResponse(
+        { ...extracted, items: completeItems },
+        { ...newState, drafting: false, step: null, collected }
+      );
     }
 
     case 'department': {
