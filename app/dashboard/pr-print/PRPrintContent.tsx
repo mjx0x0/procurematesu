@@ -4,7 +4,6 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Printer } from "lucide-react";
-import { MsuLogo } from "@/components/msu-logo";
 
 interface PRItem {
   item_description: string;
@@ -110,10 +109,7 @@ export default function PRPrintContent() {
         {/* Outer Form Box matching standard COA/MSU-Gensan template */}
         <div className="border-[2px] border-black text-black">
           {/* Header */}
-          <div className="border-b-[2px] border-black text-center py-3 px-4 relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 hidden sm:block">
-              <MsuLogo size={42} />
-            </div>
+          <div className="border-b-[2px] border-black text-center py-3 px-4">
             <h1 className="text-xl font-black uppercase tracking-wider font-serif">
               PURCHASE REQUEST
             </h1>

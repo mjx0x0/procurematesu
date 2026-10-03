@@ -32,9 +32,32 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#F8F6F2] font-sans antialiased text-[#25201D]">
       {/* Hero Section */}
       <section id="home" className="relative min-h-screen overflow-x-clip bg-[#4A002A] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_40%,rgba(245,171,38,0.22),transparent_32%),radial-gradient(circle_at_85%_15%,rgba(123,0,70,0.65),transparent_40%),linear-gradient(135deg,#5C0035_0%,#4A002A_50%,#2C001A_100%)]" />
-        <div className="absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-[#F5AB26]/15 blur-3xl pointer-events-none" />
-        <div className="absolute -right-32 -bottom-32 h-[32rem] w-[32rem] rounded-full bg-[#7B0046]/25 blur-3xl pointer-events-none" />
+        {/* Animated ambient background layers */}
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-[#5C0035] via-[#4A002A] to-[#2C001A] bg-[length:200%_200%] pointer-events-none"
+          style={{ animation: "hero-gradient-shift 18s ease infinite" }}
+        />
+
+        {/* Animated floating color orbs */}
+        <div
+          className="absolute -left-28 top-1/4 h-[30rem] w-[30rem] rounded-full bg-gradient-to-tr from-[#F5AB26]/25 via-[#F5AB26]/12 to-transparent blur-3xl pointer-events-none"
+          style={{ animation: "hero-orb-float-1 20s ease-in-out infinite alternate" }}
+        />
+        <div
+          className="absolute -right-28 top-12 h-[36rem] w-[36rem] rounded-full bg-gradient-to-bl from-[#8E0052]/35 via-[#7B0046]/20 to-transparent blur-3xl pointer-events-none"
+          style={{ animation: "hero-orb-float-2 24s ease-in-out infinite alternate" }}
+        />
+        <div
+          className="absolute left-1/3 -bottom-24 h-[32rem] w-[32rem] rounded-full bg-gradient-to-t from-[#F5AB26]/20 via-[#7B0046]/18 to-transparent blur-3xl pointer-events-none"
+          style={{ animation: "hero-orb-float-3 22s ease-in-out infinite alternate" }}
+        />
+        <div
+          className="absolute right-1/4 bottom-1/4 h-80 w-80 rounded-full bg-[#FFE599]/12 blur-2xl pointer-events-none"
+          style={{ animation: "hero-shimmer-pulse 14s ease-in-out infinite" }}
+        />
+
+        {/* Subtle grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(#F5AB26_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
 
         <header className="fixed inset-x-0 top-0 z-50 border-b border-[#F5AB26]/25 bg-[#4A002A]/90 backdrop-blur-md transition-all shadow-[0_4px_24px_rgba(30,0,18,0.35)]">
           <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-6 px-6 py-3.5 sm:px-8">

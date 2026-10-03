@@ -150,7 +150,7 @@ export default function PRDetailPage() {
             <MsuLogo size={38} className="shrink-0" />
             <div>
               <span className="font-extrabold text-lg sm:text-xl text-[#4D002C] tracking-tight">
-                Procuremate<span className="text-[#F5AB26]">SU</span>
+                Purchase Requests <span className="text-[#F5AB26]">Tracking</span>
               </span>
               <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-50 text-[#7B0046] border border-amber-200/80 ml-2">
                 MSU-GenSan
@@ -199,7 +199,10 @@ export default function PRDetailPage() {
 
         <section className="bg-white rounded-2xl shadow-xs border border-stone-300 p-4 sm:p-8 overflow-x-auto print:p-0 print:border-0 print:shadow-none">
           <div className="min-w-[700px] border-2 border-black text-black bg-white">
-            <div className="border-b-2 border-black text-center py-3 px-4 relative"><div className="absolute left-4 top-1/2 -translate-y-1/2 hidden sm:block"><MsuLogo size={42} /></div><h2 className="text-xl font-black uppercase tracking-wider font-serif">PURCHASE REQUEST</h2><p className="text-sm font-bold mt-0.5 tracking-wide font-serif">MINDANAO STATE UNIVERSITY - General Santos City</p></div>
+            <div className="border-b-2 border-black text-center py-3 px-4">
+              <h2 className="text-xl font-black uppercase tracking-wider font-serif">PURCHASE REQUEST</h2>
+              <p className="text-sm font-bold mt-0.5 tracking-wide font-serif">MINDANAO STATE UNIVERSITY - General Santos City</p>
+            </div>
             <div className="grid grid-cols-12 border-b-2 border-black text-xs">
               <div className="col-span-6 border-r-2 border-black p-3 space-y-2"><div className="flex items-end"><span className="font-semibold w-24 shrink-0">Department</span><span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold uppercase">{pr.department || ""}</span></div><div className="flex items-end"><span className="font-semibold w-24 shrink-0">Section</span><span className="flex-1 border-b border-black pl-2 pb-0.5">{pr.section || ""}</span></div></div>
               <div className="col-span-6 p-3 space-y-2"><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">PR No.</span><span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold">{pr.pr_no}</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black pl-1 pb-0.5 text-center">{new Date(pr.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span></div></div><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">SAI No.</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div></div><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">ALOBS No.</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div></div></div>

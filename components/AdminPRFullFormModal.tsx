@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FileText, Loader2, Printer, X } from "lucide-react";
-import { MsuLogo } from "@/components/msu-logo";
 import { motion } from "motion/react";
 
 interface PRItem { item_description?: string; quantity?: number; unit?: string; stock_no?: string; unit_cost?: number; total_cost?: number; [key: string]: unknown; }
@@ -109,10 +108,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
         <div className="overflow-y-auto p-4 sm:p-6">
           <div id="admin-pr-print" className="mx-auto max-w-4xl bg-white text-black shadow-sm print:border-0 print:shadow-none">
             <div className="border-2 border-black text-black">
-              <div className="relative border-b-2 border-black px-4 py-3 text-center">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <MsuLogo size={42} />
-                </div>
+              <div className="border-b-2 border-black px-4 py-3 text-center">
                 <h1 className="font-serif text-xl font-black uppercase tracking-wider">PURCHASE REQUEST</h1>
                 <p className="mt-0.5 font-serif text-sm font-bold tracking-wide">MINDANAO STATE UNIVERSITY - General Santos City</p>
               </div>

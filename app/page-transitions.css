@@ -132,3 +132,38 @@ main > section:has(> h3) > div:last-child > div:nth-child(3) > div:first-child >
   main > section:has(> h3) > div:last-child::before { left: 15px; }
   main > section:has(> h3) > div:last-child > div { padding-right: 10px; }
 }
+
+/* --------------------------------------------------------------------------
+   Hero Animated Ambient Background
+   -------------------------------------------------------------------------- */
+@keyframes hero-gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes hero-orb-float-1 {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(60px, -45px) scale(1.15); }
+  66% { transform: translate(-35px, 50px) scale(0.95); }
+  100% { transform: translate(45px, -20px) scale(1.08); }
+}
+
+@keyframes hero-orb-float-2 {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(-70px, 50px) scale(1.2); }
+  66% { transform: translate(50px, -40px) scale(0.9); }
+  100% { transform: translate(-50px, 25px) scale(1.1); }
+}
+
+@keyframes hero-orb-float-3 {
+  0% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(55px, 65px) scale(1.22); }
+  100% { transform: translate(-40px, -30px) scale(0.92); }
+}
+
+@keyframes hero-shimmer-pulse {
+  0%, 100% { opacity: 0.25; transform: scale(0.95) translateY(0); }
+  50% { opacity: 0.6; transform: scale(1.06) translateY(-15px); }
+}
+

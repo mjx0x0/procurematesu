@@ -109,7 +109,7 @@ export default function AdminMonitoringPage() {
             <div>
               <div className="flex items-center gap-2">
                 <b className="text-xl font-black text-[#4D002C]">
-                  Procurement <span className="text-[#F5AB26]">Monitoring</span>
+                  Purchase Requests <span className="text-[#F5AB26]">Tracking</span>
                 </b>
                 <span className="text-[11px] bg-red-50 text-[#7B0046] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
                   Admin Tool
@@ -129,7 +129,7 @@ export default function AdminMonitoringPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-7">
         <div className="mb-6">
-          <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Procurement Monitoring Dashboard</h1>
+          <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Purchase Requests Tracking Dashboard</h1>
           <p className="text-sm text-stone-600 mt-1">
             Track stages, detect turnaround delays, and proactively clear procurement bottlenecks across university departments.
           </p>
