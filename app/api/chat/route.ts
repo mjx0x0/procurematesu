@@ -350,9 +350,20 @@ async function extractPRDetails(text: string): Promise<ExtractedPR> {
 You are an expert procurement assistant parsing purchase request details from user input.
 Input: "${text}"
 
+Extract procurement details even when the user combines the purpose, item description, quantity, and price in one natural-language sentence.
+
+Important parsing rules:
+- If the text says something like "Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses, 10 pieces, 500 pesos per unit", treat "laboratory glassware and supplies" as the item_description, quantity as 10, unit as "pieces", and unit_cost as 500. Do NOT discard the item details just because the quantity and price occur after the purpose.
+- Phrases such as "10 pieces", "10 pcs", "10 units", "10 sets", etc. provide quantity and unit.
+- Phrases such as "500 pesos per unit", "₱500 each", "at PHP 500 each", or "500 per piece" provide unit_cost.
+- "for 1st Semester Chemistry courses" is part of the procurement purpose/context, not the item description.
+- If a department/college/office is not explicitly stated, return null.
+- If a quantity and unit price are present but the item name is embedded in the purpose, use the relevant noun phrase immediately before the quantity as the item description.
+- Preserve the user's intended purpose rather than reducing it to only the item name.
+
 Extract:
 1. department (e.g. "College of Science and Mathematics", or null if not specified)
-2. purpose (brief summary of the purpose of procurement)
+2. purpose (brief but complete summary of the procurement purpose)
 3. items: list of items with:
    - item_description: string
    - quantity: integer (minimum 1)
@@ -407,40 +418,77 @@ Return ONLY a valid JSON object in this exact shape, with no markdown, no commen
 
 function extractPRDetailsRuleBased(text: string): ExtractedPR {
   let department: string | null = null;
-  const deptMatch = text.match(/(?:for|department:?|dept:?)\s*([A-Za-z\s]+?(?:College|Department|Office|Laboratory|Center|Unit)[A-Za-z\s]*)/i);
+  const deptMatch = text.match(/(?:department|dept|college|office)\s*[:\-]?\s*([^.;,]+?)(?=\s+(?:purpose|items?)\s*[:\-]?|[.;]|$)/i);
   if (deptMatch) {
     department = deptMatch[1].trim();
   }
 
-  let purpose = text;
-  const purposeMatch = text.match(/(?:purpose:?|for the procurement of|for|in order to)\s*([^.,;\n]+)/i);
-  if (purposeMatch) {
-    purpose = purposeMatch[1].trim();
-  }
+  // Detect a natural-language "quantity + unit + price per unit" pattern even
+  // when the item name and purpose appear earlier in the same sentence.
+  const qtyPriceMatch = text.match(
+    /\b(\d+)\s*(pieces?|pcs?|units?|sets?|reams?|boxes?|packs?|rolls?)\b\s*(?:,|and)?\s*(?:for\s+)?(?:₱|PHP|Php)?\s*([\d,]+(?:\.\d+)?)\s*(?:pesos?|php|₱)?\s*(?:per\s+(?:unit|piece|pc|item)|each)\b/i
+  );
 
   const items: Array<any> = [];
-  const lines = text.split(/[.,;\n]/).filter(l => l.trim().length > 3);
 
+  if (qtyPriceMatch) {
+    const qty = parseInt(qtyPriceMatch[1], 10);
+    const rawUnit = qtyPriceMatch[2].toLowerCase();
+    const unit = rawUnit.startsWith('piece') || rawUnit.startsWith('pc') ? 'pcs'
+      : rawUnit.startsWith('unit') ? 'units'
+      : rawUnit.startsWith('set') ? 'sets'
+      : rawUnit.startsWith('ream') ? 'reams'
+      : rawUnit.startsWith('box') ? 'boxes'
+      : rawUnit.startsWith('pack') ? 'packs'
+      : rawUnit.startsWith('roll') ? 'rolls' : 'pcs';
+    const unitCost = parseFloat(qtyPriceMatch[3].replace(/,/g, '')) || 0;
+
+    const beforeQuantity = text.slice(0, qtyPriceMatch.index || 0)
+      .replace(/^.*?\b(?:procurement of|purchase of|procure|buying|for the procurement of)\s+/i, '')
+      .replace(/\s+for\s+(?:the\s+)?(?:\d+(?:st|nd|rd|th)\s+semester|[A-Za-z]+\s+courses?)\s*$/i, '')
+      .trim()
+      .replace(/[,;:]+\s*$/, '');
+
+    const description = beforeQuantity || 'Procurement Item';
+    const purposeMatch = text.match(/(?:purpose\s*[:\-]?\s*|procurement of\s+)([^,;]+(?:\s+for\s+[^,;]+)?)/i);
+    const purpose = purposeMatch
+      ? purposeMatch[0].replace(/^purpose\s*[:\-]?\s*/i, '').trim()
+      : text.trim();
+
+    items.push({
+      item_description: description,
+      quantity: qty,
+      unit,
+      unit_cost: unitCost,
+      total_cost: qty * unitCost,
+    });
+
+    return {
+      department,
+      purpose,
+      items,
+      total_amount: qty * unitCost,
+    };
+  }
+
+  // Conventional "10 units Laptop at 45000 each" / multi-item parsing.
+  const lines = text.split(/[.;\n]/).filter(l => l.trim().length > 3);
   for (const line of lines) {
-    // Check for qty, description, and optional cost
     const match = line.match(/(\d+)\s*([a-zA-Z]+)?\s*([^@\d]+?)(?:(?:at|@|costing|cost)\s*(?:₱|PHP|Php)?\s*([\d,]+))?$/i);
     if (match) {
       const qty = parseInt(match[1], 10);
-      const unit = match[2] && ['pcs', 'units', 'sets', 'reams', 'boxes', 'packs', 'rolls'].includes(match[2].toLowerCase())
-        ? match[2].toLowerCase()
-        : 'pcs';
+      const rawUnit = (match[2] || '').toLowerCase();
+      const unit = ['pcs','pc','pieces','piece'].includes(rawUnit) ? 'pcs'
+        : ['units','unit'].includes(rawUnit) ? 'units'
+        : ['sets','set'].includes(rawUnit) ? 'sets'
+        : ['reams','ream'].includes(rawUnit) ? 'reams'
+        : ['boxes','box'].includes(rawUnit) ? 'boxes'
+        : ['packs','pack'].includes(rawUnit) ? 'packs'
+        : ['rolls','roll'].includes(rawUnit) ? 'rolls' : 'pcs';
       const desc = (match[3] || line).trim();
-      const rawCost = match[4] ? match[4].replace(/,/g, '') : '0';
-      const unitCost = parseFloat(rawCost) || 0;
-
-      if (desc && desc.length > 2 && !desc.toLowerCase().startsWith('purpose') && !desc.toLowerCase().startsWith('department')) {
-        items.push({
-          item_description: desc,
-          quantity: qty,
-          unit,
-          unit_cost: unitCost,
-          total_cost: qty * unitCost,
-        });
+      const unitCost = match[4] ? parseFloat(match[4].replace(/,/g, '')) || 0 : 0;
+      if (desc.length > 2) {
+        items.push({ item_description: desc, quantity: qty, unit, unit_cost: unitCost, total_cost: qty * unitCost });
       }
     }
   }
@@ -450,7 +498,6 @@ function extractPRDetailsRuleBased(text: string): ExtractedPR {
     const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
     const costMatch = text.match(/(?:₱|PHP|Php)?\s*([\d,]+)(?:\.00)?/);
     const cost = costMatch ? parseFloat(costMatch[1].replace(/,/g, '')) || 0 : 0;
-
     items.push({
       item_description: text.trim().slice(0, 100),
       quantity: qty,
@@ -460,14 +507,9 @@ function extractPRDetailsRuleBased(text: string): ExtractedPR {
     });
   }
 
+  const purpose = text.trim();
   const total = items.reduce((sum, item) => sum + item.total_cost, 0);
-
-  return {
-    department,
-    purpose,
-    items,
-    total_amount: total,
-  };
+  return { department, purpose, items, total_amount: total };
 }
 
 // ============================================================
@@ -588,12 +630,37 @@ async function handleDraftPRFlow(
 
   switch (step) {
     case 'purpose': {
-      collected.purpose = message.trim();
+      // Extract details from the purpose message itself. Users should not have
+      // to repeat quantity, unit, price, or item details that were already given.
+      const extracted = await extractPRDetails(message);
+      collected.purpose = extracted.purpose || message.trim();
+
+      if (extracted.items.length > 0) {
+        collected.items_raw = message.trim();
+        collected.extracted = extracted;
+      }
+
+      // If the department was also included in the same message, complete
+      // immediately; otherwise ask only for the missing department.
+      if (extracted.department) {
+        collected.department = extracted.department;
+        newState.collected = collected;
+        return buildDraftCompletionResponse(
+          { ...extracted, department: extracted.department },
+          { ...newState, drafting: false, step: null, collected }
+        );
+      }
+
       newState.collected = collected;
       newState.step = 'department';
+
+      const itemNote = extracted.items.length > 0
+        ? `\n\n📦 I also captured **${extracted.items.length} item(s)** from that message, including the quantity and unit price. You do not need to repeat them.`
+        : '';
+
       return {
         response:
-          `✅ Purpose recorded: **"${collected.purpose}"**\n\n` +
+          `✅ Purpose recorded: **"${collected.purpose}"**${itemNote}\n\n` +
           `Next, which **department, college, or office** is requesting this?\n` +
           `*(Example: 'College of Science and Mathematics' or 'Office of the University Registrar')*`,
         newState,
@@ -602,6 +669,24 @@ async function handleDraftPRFlow(
 
     case 'department': {
       collected.department = message.trim();
+
+      // If item details were already extracted from the previous message,
+      // finalize now instead of asking the user to repeat them.
+      if (collected.extracted?.items?.length) {
+        const extracted = {
+          ...collected.extracted,
+          department: collected.department,
+          purpose: collected.purpose || collected.extracted.purpose,
+        };
+        newState.collected = { ...collected, extracted };
+        return buildDraftCompletionResponse(extracted, {
+          ...newState,
+          drafting: false,
+          step: null,
+          collected: { ...collected, extracted },
+        });
+      }
+
       newState.collected = collected;
       newState.step = 'items';
       return {
