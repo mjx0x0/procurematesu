@@ -445,7 +445,7 @@ function extractPRDetailsRuleBased(text: string): ExtractedPR {
 
     const beforeQuantity = text.slice(0, qtyPriceMatch.index || 0)
       .replace(/^.*?\b(?:procurement of|purchase of|procure|buying|for the procurement of)\s+/i, '')
-      .replace(/\s+for\s+(?:the\s+)?(?:\d+(?:st|nd|rd|th)\s+semester|[A-Za-z]+\s+courses?)\s*$/i, '')
+      .replace(/\s+for\s+(?:the\s+)?(?:\d+(?:st|nd|rd|th)\s+semester\s+)?[^,;]+?\s+courses?\s*$/i, '')
       .trim()
       .replace(/[,;:]+\s*$/, '');
 
