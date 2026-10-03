@@ -33,7 +33,8 @@ function getSupabase(): SupabaseClient | null {
  */
 export async function retrieveDocumentChunks(query: string, limit: number = 6): Promise<RetrievalResult> {
   const supabase = getSupabase();
-  const candidates = new Map<string, RetrievedChunk & { score: number }>();
+  type RankedChunk = RetrievedChunk & { score: number };
+  const candidates = new Map<string, RankedChunk>();
 
   // Expand common procurement/institutional aliases before searching. This makes
   // short questions such as "PRO director" searchable without requiring the user
@@ -64,14 +65,14 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // generic procurement passage even for a very specific institutional question.
   if (supabase && terms.length) {
     try {
-      const searches: Promise<any>[] = [];
+      const searches = [];
 
       const phrase = normalizedQuery.replace(/\s+/g, ' ').trim();
       if (phrase.length >= 8) {
         searches.push(
           supabase
             .from('document_chunks')
-            .select('id, document_name, document_type, chunk_text, metadata')
+            .select('id, document_name, document_type, chunk_text')
             .ilike('chunk_text', `%${phrase}%`)
             .limit(Math.min(8, limit * 2))
         );
