@@ -26,6 +26,20 @@ const emptyItem = (): Item => ({
   total_cost: 0,
 });
 
+const MSU_DEPARTMENTS = [
+  "College of Agriculture",
+  "College of Business Administration and Accountancy (CBAA)",
+  "College of Education (CED)",
+  "College of Engineering",
+  "College of Fisheries & Aquatic Sciences",
+  "College of Health Sciences",
+  "College of Law",
+  "College of Medicine",
+  "College of Natural Sciences and Mathematics (CNSM)",
+  "College of Social Sciences and Humanities (CSSH)",
+  "Institute of Islamic, Arabic, and International Studies (IIAIS)",
+] as const;
+
 const STANDARD_UNITS = [
   { value: "pcs", label: "pcs (Pieces)" },
   { value: "unit", label: "unit (Units)" },
@@ -318,16 +332,23 @@ export default function ProcurementRequestForm() {
                     <label htmlFor="pr-dept" className="block text-sm font-bold text-stone-800">
                       Department / College / Office <span className="text-[#9E1A1D]">*</span>
                     </label>
-                    <input
+                    <select
                       id="pr-dept"
-                      type="text"
                       value={form.department}
                       onChange={(e) => setForm({ ...form, department: e.target.value })}
-                      placeholder="e.g., College of Engineering, Cashier's Office"
                       required
-                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
-                    />
-                    <p className="text-[11px] text-stone-500">Enter the official name of your operating unit or department.</p>
+                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs cursor-pointer"
+                    >
+                      <option value="" disabled>
+                        Select your college or institute
+                      </option>
+                      {MSU_DEPARTMENTS.map((department) => (
+                        <option key={department} value={department}>
+                          {department}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-[11px] text-stone-500">Select the official MSU-General Santos college or institute responsible for this request.</p>
                   </div>
                   <div className="space-y-1.5">
                     <label htmlFor="pr-section" className="block text-sm font-bold text-stone-800">
