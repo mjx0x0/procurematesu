@@ -9,23 +9,12 @@ interface MsuLogoProps {
   showText?: boolean;
 }
 
-/**
- * Dedicated MSU Logo component.
- * To use your own official MSU logo file from GitHub:
- * 1. Add your logo file to /public/msu-logo.png (or /public/msu-logo.svg)
- * 2. It will automatically be rendered here.
- */
 export function MsuLogo({ className = "", size = 120, showText = false }: MsuLogoProps) {
   const [loadFailed, setLoadFailed] = useState(false);
   const [currentSrcIndex, setCurrentSrcIndex] = useState(0);
 
   // Search candidate paths in /public that user can add in GitHub
-  const candidates = [
-    "/msu-logo.png",
-    "/msu-logo.svg",
-    "/msu-gensan-logo.svg",
-    "/logo.png",
-  ];
+  const candidates = ["/procuremate-logo.svg"];
 
   const handleImgError = () => {
     if (currentSrcIndex < candidates.length - 1) {
@@ -41,7 +30,7 @@ export function MsuLogo({ className = "", size = 120, showText = false }: MsuLog
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={candidates[currentSrcIndex]}
-          alt="Mindanao State University - General Santos Logo"
+          alt="MSU GenSan Procurement Management System Logo"
           width={size}
           height={size}
           onError={handleImgError}
@@ -49,11 +38,11 @@ export function MsuLogo({ className = "", size = 120, showText = false }: MsuLog
           style={{ width: size, height: size, maxHeight: size, maxWidth: size }}
         />
       ) : (
-        /* Designated MSU Logo Space for user to add in GitHub */
+        /* Logo fallback */
         <div
           style={{ width: size, height: size }}
           className="rounded-full border-2 border-dashed border-[#7B0046]/40 bg-stone-50/90 flex flex-col items-center justify-center p-2 text-center text-[#7B0046] select-none shadow-inner group hover:border-[#7B0046] transition-colors"
-          title="MSU Logo Space: Place msu-logo.png or msu-logo.svg in /public via GitHub"
+          title="Procurement system logo"
         >
           <Landmark className="w-1/3 h-1/3 text-[#7B0046] stroke-[1.5] mb-1 opacity-80" />
           <span className="text-[10px] font-bold uppercase tracking-tight text-[#7B0046] leading-none">

@@ -43,8 +43,9 @@ export const metadata: Metadata = {
     description: "Digital procurement management for MSU GenSan with Gab AI assistance.",
   },
   icons: {
-    icon: [{ url: "/favicon.ico", sizes: "any" }, { url: "/icon.png", type: "image/png" }],
-    apple: [{ url: "/apple-icon.png" }],
+    icon: [{ url: "/procuremate-logo.svg", type: "image/svg+xml" }],
+    shortcut: [{ url: "/procuremate-logo.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/procuremate-logo.svg", type: "image/svg+xml" }],
   },
   robots: {
     index: true,
