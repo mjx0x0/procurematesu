@@ -223,15 +223,12 @@ function generateOfflineProcurementResponse(query: string, retrievedContext: str
     q.includes('number')
   ) {
     return (
-      "📞 **Mindanao State University - General Santos Procurement Management Office (PMO)**\n\n" +
-      "Here are the official contact details for procurement inquiries, PR document submissions, and supplier coordination:\n\n" +
-      "• **Office Name**: Procurement Management Office\n" +
-      "• **Office Location**: STTC, Mindanao State University - General Santos City, Fatima, General Santos City, 9500 South Cotabato, Philippines\n" +
-      "• **Email**: `procurement@msugensan.edu.ph`\n" +
+      "📞 **MSU-GenSan Procurement Management Office**\n\n" +
+      "The MSU-GenSan University Directory lists **Assoc. Prof. Nelson P. Benares, Jr.** as Director of the Procurement Management Office.\n\n" +
       "• **Contact No.**: +63 908 810 5634\n" +
-      "• **Office Hours**: Monday to Friday, 8:00 AM – 5:00 PM (Philippine Standard Time, excluding non-working holidays)\n" +
-      "• **Head of the Procurement Management Office**: Prof. Nelson P. Benares, Jr.\n\n" +
-      "Feel free to coordinate directly with the PMO for hardcopy attachments, canvass evaluations, or PhilGEPS postings."
+      "• **Office**: Procurement Management Office, under the Office of the Vice Chancellor for Administration and Finance\n" +
+      "• **Campus address listed by the university**: Fatima, General Santos City, South Cotabato, Philippines, 9500\n\n" +
+      "The university also issued a June 12, 2026 temporary office relocation advisory. Because the verified source does not specify a current temporary PMO room or building, I will not invent one."
     );
   }
 
@@ -249,12 +246,8 @@ function generateOfflineProcurementResponse(query: string, retrievedContext: str
   }
 
   return (
-    "AI Procurement Assistant for Mindanao State University - General Santos: In accordance with Republic Act No. 12009 (New Government Procurement Act) and the MSU-GenSan Procurement Manual, all university procurement must adhere to transparency, competitiveness, efficiency, and strict budget alignment (PPMP/APP).\n\n" +
-    "You can ask me about:\n" +
-    "• Specific procurement modes (Competitive Bidding, SVP, Shopping)\n" +
-    "• How to draft a new Purchase Request (say *'Help me draft a PR'*)\n" +
-    "• Tracking a current purchase request (say *'Track PR-2026-0001'*)\n" +
-    "• Official contact details of the MSU-GenSan Procurement Office"
+    "I could not find enough verified information in the procurement knowledge base to answer that specific question accurately.\n\n" +
+    "Please try asking about a specific procurement rule, procedure, document, Purchase Request, or the MSU-GenSan Procurement Management Office. I will use the most relevant verified information available rather than guessing."
   );
 }
 
@@ -865,7 +858,7 @@ export async function POST(req: NextRequest) {
 You are the official AI Procurement Assistant for Mindanao State University - General Santos (MSU-GenSan).
 
 CRITICAL DIRECTIVES:
-1. You have been provided with verified excerpts retrieved directly from the university's `document_chunks` database table.
+1. You have been provided with verified excerpts retrieved directly from the university's "document_chunks" database table.
 2. Ground answers firmly in the retrieved evidence. Do not invent facts that are absent from the evidence.
 3. Cite the document source naturally when explaining procurement rules, thresholds, requirements, or institutional facts.
 4. Treat specific institutional questions as high-precision questions. Use the retrieved institutional source that directly names the office, person, role, or contact information.
@@ -904,7 +897,10 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
       }
     }
 
-    // Normalize model-generated HTML/escape artifacts before returning or storing the response.\n    responseText = cleanAIResponse(responseText);\n\n    // If the user cancelled while the model was generating, discard the in-flight answer.
+    // Normalize model-generated HTML/escape artifacts before returning or storing the response.
+    responseText = cleanAIResponse(responseText);
+
+    // If the user cancelled while the model was generating, discard the in-flight answer.
     if (supabase && sessionId) {
       try {
         const { data: liveSession } = await supabase.from('chat_sessions').select('state').eq('id', sessionId).single();
