@@ -703,6 +703,46 @@ function buildDraftCompletionResponse(
 }
 
 // ============================================================
+// VERIFIED INSTITUTIONAL FACTS
+// ============================================================
+
+function getVerifiedInstitutionalAnswer(query: string): string | null {
+  const q = query.toLowerCase().replace(/\s+/g, ' ').trim();
+  const procurementOffice = /\b(procurement(?: management)? office|procurement office|pmo|pro)\b/i.test(q);
+  const asksDirector =
+    /\b(who(?: is|['’]s)?|what is the name of|name of|identify|tell me)\b.*\b(director|head|officer|in charge)\b/i.test(q) ||
+    /\b(director|head|officer|in charge)\b.*\b(who|name|person)\b/i.test(q);
+  const asksContact = /\b(contact|phone|telephone|number|hotline|reach|email)\b/i.test(q);
+  const asksLocation = /\b(where|location|address|located|office location)\b/i.test(q);
+
+  if (!procurementOffice) return null;
+
+  if (asksDirector) {
+    return "👤 **Procurement Management Office Director**\n\n" +
+      "The official MSU-General Santos University Directory lists **Assoc. Prof. Nelson P. Benares, Jr.** as the **Director of the Procurement Management Office**.\n\n" +
+      "The office is under the **Office of the Vice Chancellor for Administration and Finance**.\n\n" +
+      "📚 **Source:** MSU-GenSan University Directory";
+  }
+
+  if (asksContact) {
+    return "📞 **Procurement Management Office Contact**\n\n" +
+      "**Director:** Assoc. Prof. Nelson P. Benares, Jr.\n" +
+      "**Contact Number:** +63 908 810 5634\n\n" +
+      "The office is listed under the Office of the Vice Chancellor for Administration and Finance.\n\n" +
+      "📚 **Source:** MSU-GenSan University Directory";
+  }
+
+  if (asksLocation) {
+    return "📍 **Procurement Management Office**\n\n" +
+      "The university directory lists the MSU-General Santos campus at **Fatima, General Santos City, South Cotabato, Philippines, 9500**, and identifies the Procurement Management Office under the Office of the Vice Chancellor for Administration and Finance.\n\n" +
+      "A June 12, 2026 university advisory states that offices affected by Y-Building/Admin Building damage were to temporarily relocate to designated locations. Because the advisory does not establish a permanent current PMO location in the source used here, Gab AI should not invent a temporary office address.\n\n" +
+      "📚 **Sources:** MSU-GenSan University Directory; MSU-GenSan Temporary Office Relocation Advisory";
+  }
+
+  return null;
+}
+
+// ============================================================
 // MAIN ROUTE HANDLER
 // ============================================================
 
@@ -809,9 +849,14 @@ export async function POST(req: NextRequest) {
           responseText = `📋 **Purchase Request Tracking**\n\nPlease provide your Purchase Request Number (e.g., **"Track PR-2026-0001"**) to view its current stage and timeline.`;
         }
       } else {
-        // General Q&A / Procurement Assistant with RAG grounded in Supabase document_chunks
-        inquiryType = 'procurement_guidance';
-        const retrieval = await retrieveDocumentChunks(trimmedMsg, 4);
+        const institutionalAnswer = getVerifiedInstitutionalAnswer(trimmedMsg);
+        if (institutionalAnswer) {
+          inquiryType = 'institutional_information';
+          responseText = institutionalAnswer;
+        } else {
+          // General Q&A / Procurement Assistant with RAG grounded in Supabase document_chunks
+          inquiryType = 'procurement_guidance';
+          const retrieval = await retrieveDocumentChunks(trimmedMsg, 6);
         const retrievedDocs = retrieval.formattedContext;
         const sourcesList = retrieval.sources;
         citedSources = sourcesList;
@@ -823,15 +868,12 @@ CRITICAL DIRECTIVES:
 1. You have been provided with verified excerpts retrieved directly from the university's \`document_chunks\` database table, containing official texts of Republic Act No. 12009 (New Government Procurement Act - NGPA), Republic Act No. 9184, its Implementing Rules and Regulations (IRR), and the MSU-GenSan Procurement Operations Manual.
 2. Ground all answers firmly in these verified document chunks to prevent hallucinations.
 3. Explicitly cite the document source (e.g. "[Source: RA 12009]", "[Source: MSU Procurement Manual]", "[Source: IRR 2016]") when explaining procurement rules, thresholds, and requirements.
-4. If the user asks for the contact details, address, phone number, email, or office location of the MSU-GenSan Procurement Management Office or BAC Secretariat, provide these verified official details:
-   - **Office**: Procurement Management Office
-   - **Location**: STTC, Mindanao State University - General Santos City, Fatima, General Santos City, 9500 South Cotabato, Philippines
-   - **Email**: procurement@msugensan.edu.ph
-   - **Contact Number**: +63 908 810 5634
-   - **Office Hours**: Monday to Friday, 8:00 AM – 5:00 PM (PST)
-   - **Head of Procurement Office**: Prof. Engr. Nelson P. Benares, Jr.
-5. If the retrieved database context does not provide sufficient detail to answer a specific institutional inquiry, state what the law provides and advise the user to coordinate directly with the MSU-GenSan Procurement Management Office (PMO) or BAC Secretariat using the contact details above.
-6. Be friendly, warm, and professional. Answer the user's actual question directly.
+4. Treat specific institutional questions as high-precision questions. If the user asks about an MSU-GenSan office, official, director, contact, address, or role, use the retrieved institutional source that directly names that office/person. Do not substitute a generic procurement-law excerpt for a specific university fact.
+5. Never invent an institutional email, office hours, temporary location, title, or person's name. If the retrieved evidence does not support a requested fact, say that the knowledge base does not contain enough verified information.
+6. The MSU-GenSan University Directory currently identifies **Assoc. Prof. Nelson P. Benares, Jr.** as Director of the Procurement Management Office and lists **+63 908 810 5634** as the contact number. Use this only for Procurement Management Office questions.
+7. The June 12, 2026 university advisory states that offices affected by Y-Building/Admin Building damage were temporarily relocated to designated locations. Do not invent a temporary PMO location.
+8. Prefer the most specific retrieved source over generic law/manual excerpts. If multiple excerpts conflict, explicitly state the conflict instead of choosing silently.
+9. Be friendly, warm, and professional. Answer the user's actual question directly.6. Be friendly, warm, and professional. Answer the user's actual question directly.
 7. Aim for a medium-length response: usually about 120–250 words for a normal question. Do not stop mid-sentence or omit the conclusion.
 8. Prefer 2–4 short paragraphs over long bullet lists. Use bullets only when they genuinely improve readability, with no more than 4 bullets in one list.
 9. For simple definition or location/contact questions, give a direct answer first, followed by the most relevant supporting details.
@@ -857,6 +899,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
         } else {
           // Fallback to offline knowledge engine grounded in retrieved chunks
           responseText = generateOfflineProcurementResponse(trimmedMsg, retrievedDocs, sourcesList);
+        }
         }
       }
     }
