@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, ClipboardList, ExternalLink, MessageCircle, Search, Sparkles, Workflow } from "lucide-react";
+import { ArrowRight, CheckCircle2, ClipboardList, ExternalLink, MessageCircle, Search, Workflow } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MsuLogo } from "@/components/msu-logo";
 import LandingLoginCard from "@/components/auth/LandingLoginCard";
@@ -58,36 +58,23 @@ export default function LandingPage() {
           </div>
         </header>
 
-        <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1240px] items-center gap-12 px-6 pt-28 pb-16 sm:px-8 lg:grid-cols-[1.18fr_0.82fr] lg:gap-14 lg:py-24">
-          <div className="flex flex-col items-start text-left">
-            <h1 className="text-left text-3xl sm:text-5xl lg:text-[3.5rem] font-black tracking-[-0.035em] leading-[1.06] text-white">
-              <span className="block text-white">MSU GenSan</span>
-              <span className="block mt-1.5 text-transparent bg-clip-text bg-gradient-to-r from-[#FFE599] via-[#F5AB26] to-[#F0C83F] drop-shadow-[0_2px_20px_rgba(245,171,38,0.3)]">
+        <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1240px] items-center gap-10 px-6 pt-28 pb-16 sm:px-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:py-24">
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+            <h1 className="text-center lg:text-left font-black tracking-[-0.03em] leading-tight text-white w-full">
+              <span className="block text-2xl sm:text-4xl lg:text-[3.25rem] font-black tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
+                MSU GenSan
+              </span>
+              <span className="block mt-1 sm:mt-2 text-4xl sm:text-6xl lg:text-[4.35rem] font-black tracking-tight leading-[0.98] text-transparent bg-clip-text bg-gradient-to-r from-[#FFF2C6] via-[#F5AB26] to-[#E69910] drop-shadow-[0_4px_28px_rgba(245,171,38,0.4)]">
                 Procurement
               </span>
-              <span className="block mt-1 text-2xl sm:text-4xl lg:text-[2.65rem] font-extrabold tracking-[-0.025em] text-[#F9EFE6]">
+              <span className="block mt-1 sm:mt-2 text-2xl sm:text-4xl lg:text-[3rem] font-extrabold tracking-tight text-[#FAF3EB] drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]">
                 Management System
               </span>
             </h1>
 
-            <p className="mt-6 max-w-[560px] text-left text-sm sm:text-base leading-relaxed text-amber-50/90 border-l-2 border-[#F5AB26] pl-4 sm:pl-5 text-pretty font-normal">
+            <p className="mt-6 max-w-[580px] text-center lg:text-left text-sm sm:text-base leading-relaxed text-amber-50/95 lg:border-l-2 lg:border-[#F5AB26] lg:pl-5 font-normal">
               A centralized institutional workspace for Purchase Request preparation, standardized university procurement workflow monitoring, public transparency records, and automated policy guidance powered by <strong className="font-bold text-[#F5AB26]">Gab AI</strong>.
             </p>
-
-            <div className="mt-8 flex flex-wrap items-center gap-2.5 sm:gap-3">
-              <div className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3.5 py-2 text-xs font-semibold text-white/95 backdrop-blur-md shadow-xs transition-colors hover:bg-white/15">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-                <span>RA 9184 Standardized</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3.5 py-2 text-xs font-semibold text-white/95 backdrop-blur-md shadow-xs transition-colors hover:bg-white/15">
-                <Workflow className="h-3.5 w-3.5 text-[#F5AB26]" />
-                <span>PMO End-to-End Tracking</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3.5 py-2 text-xs font-semibold text-white/95 backdrop-blur-md shadow-xs transition-colors hover:bg-white/15">
-                <Sparkles className="h-3.5 w-3.5 text-[#F5AB26]" />
-                <span>Gab AI Policy Guide</span>
-              </div>
-            </div>
           </div>
 
           <div className="w-full max-w-[420px] justify-self-center lg:justify-self-end">
