@@ -149,11 +149,8 @@ export default function PRDetailPage() {
           <div className="flex items-center gap-3">
             <MsuLogo size={38} className="shrink-0" />
             <div>
-              <span className="font-extrabold text-lg sm:text-xl text-[#4D002C] tracking-tight">
+              <span className="font-extrabold text-sm sm:text-base text-[#4D002C] tracking-tight">
                 Purchase Requests <span className="text-[#F5AB26]">Tracking</span>
-              </span>
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-50 text-[#7B0046] border border-amber-200/80 ml-2">
-                MSU-GenSan
               </span>
             </div>
           </div>

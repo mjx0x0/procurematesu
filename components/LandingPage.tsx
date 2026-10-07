@@ -64,11 +64,11 @@ export default function LandingPage() {
             <Link href="#home" className="flex min-w-0 items-center gap-3.5 group">
               <MsuLogo size={40} />
               <div className="min-w-0 leading-tight">
-                <div className="text-sm font-extrabold tracking-tight sm:text-base text-white group-hover:text-[#F0C83F] transition-colors">
-                  MSU GenSan <span className="text-[#F0C83F]">Procurement</span>
+                <div className="text-sm font-extrabold tracking-tight sm:text-base text-white group-hover:text-amber-200 transition-colors">
+                  Procure<span className="text-amber-200/90 font-black">M</span>ate<span className="text-amber-200/90 font-black">SU</span>
                 </div>
                 <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-200/70">
-                  Digital Procurement Management System
+                  MSU – General Santos Procurement
                 </div>
               </div>
             </Link>
@@ -83,19 +83,19 @@ export default function LandingPage() {
 
         <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1200px] items-center gap-10 px-6 pt-24 pb-16 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:py-20">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left w-full">
-            <h1 className="text-center lg:text-left font-black tracking-[-0.03em] leading-[1.08] text-white w-full">
-              <span className="block text-3xl sm:text-5xl lg:text-[3.35rem] font-black tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]">
-                MSU GenSan
+            <h1 className="text-center lg:text-left font-black tracking-[-0.03em] leading-[1.05] text-white w-full">
+              <span className="block text-3xl sm:text-5xl lg:text-[3.4rem] font-black tracking-tight text-white drop-shadow-[0_3px_16px_rgba(0,0,0,0.55)]">
+                MSU – General Santos
               </span>
-              <span className="block mt-1 sm:mt-1.5 text-3xl sm:text-5xl lg:text-[3.35rem] font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FFE599] via-[#F5AB26] to-[#F0C83F] drop-shadow-[0_2px_20px_rgba(245,171,38,0.35)]">
+              <span className="block mt-1 sm:mt-2 text-4xl sm:text-6xl lg:text-[4.25rem] font-black tracking-tight leading-[1.02] text-transparent bg-clip-text bg-gradient-to-r from-[#FFF5D6] via-[#F5AB26] to-[#E5960B] drop-shadow-[0_4px_30px_rgba(245,171,38,0.38)]">
                 Procurement
               </span>
-              <span className="block mt-1 sm:mt-1.5 text-3xl sm:text-5xl lg:text-[3.35rem] font-black tracking-tight text-[#FAF3EB] drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)]">
+              <span className="block mt-1 sm:mt-2 text-3xl sm:text-5xl lg:text-[3.5rem] font-black tracking-tight text-[#FAF3EB] drop-shadow-[0_3px_16px_rgba(0,0,0,0.45)]">
                 Management System
               </span>
             </h1>
 
-            <p className="mt-6 max-w-[540px] text-center lg:text-left text-sm sm:text-base leading-relaxed text-amber-50/90 lg:border-l-2 lg:border-[#F5AB26] lg:pl-5 font-normal mx-auto lg:mx-0 text-pretty">
+            <p className="mt-6 max-w-[560px] text-center lg:text-left text-sm sm:text-base leading-relaxed text-amber-50/90 lg:border-l-2 lg:border-[#F5AB26] lg:pl-5 font-normal mx-auto lg:mx-0 text-pretty">
               A centralized institutional workspace for Purchase Request preparation, standardized university procurement workflow monitoring, public transparency records, and automated policy guidance powered by <strong className="font-bold text-[#F5AB26]">Gab AI</strong>.
             </p>
           </div>
@@ -293,7 +293,7 @@ export default function LandingPage() {
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#F0C83F]">
               Mindanao State University - General Santos
             </p>
-            <h2 className="mt-1 text-xl font-extrabold tracking-tight">MSU GenSan Procurement System</h2>
+            <h2 className="mt-1 text-xl font-extrabold tracking-tight">Procurement Management System</h2>
             <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-white/60">
               Centralized platform for Purchase Requests, standardized procurement workflows, transparency disclosures, and Gab AI assistance.
             </p>
