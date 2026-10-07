@@ -484,102 +484,114 @@ export default function AdminDashboard() {
             {/* Modal Body */}
             <div className="overflow-y-auto p-6 space-y-6">
               {/* Procurement Actions & Workflow Controls Card */}
-              <div className="bg-[#FAF7F2] rounded-2xl border border-stone-200 p-5 shadow-2xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-4 border-b border-stone-200/80">
-                  <div>
-                    <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#4D002C]">Workflow Actions & Management</h4>
-                    <p className="text-xs text-stone-500 mt-0.5">Execute stage advancement, evaluate RFQs, inspect submitted forms, or record remarks.</p>
+              <div className="bg-white rounded-2xl border border-stone-200/90 p-4 sm:p-5 shadow-[0_4px_20px_rgba(45,20,10,0.03)] space-y-3.5">
+                {/* Primary Stage Action Card */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 bg-gradient-to-r from-[#FAF6F0] via-[#FFFDF9] to-[#FDF4EB] p-3.5 sm:p-4 rounded-xl border border-[#F0C83F]/35 shadow-xs">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#7B0046] text-[#F0C83F] font-mono font-black text-xs shadow-xs">
+                      {detailStage?.number ? `0${detailStage.number}`.slice(-2) : "PR"}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-wider text-[#8C6B13]">Workflow Next Step</p>
+                      <p className="text-xs sm:text-sm font-extrabold text-[#4D002C] truncate">
+                        {nextStage(selectedPR) ? `Advance to Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}` : detailStage ? `Stage ${detailStage.number}: ${detailStage.label}` : "Procurement Workflow"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-xs font-bold text-stone-600 bg-white px-3 py-1 rounded-lg border border-stone-200 shrink-0">
-                    {detailStage ? `Stage ${detailStage.number}: ${detailStage.label}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
+
+                  <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                    {/* RFQ Action buttons */}
+                    {selectedPR.current_stage === "rfq_generation" && (
+                      <button
+                        onClick={() => void openRfq(selectedPR, "generation")}
+                        className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
+                      >
+                        <FileText className="h-4.5 w-4.5 text-[#F0C83F]" />
+                        <span>Generate Official RFQ</span>
+                      </button>
+                    )}
+                    {selectedPR.current_stage === "rfq_evaluation" && (
+                      <button
+                        onClick={() => void openRfq(selectedPR, "evaluation")}
+                        className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
+                      >
+                        <FileText className="h-4.5 w-4.5 text-[#F0C83F]" />
+                        <span>Review & Evaluate RFQ</span>
+                      </button>
+                    )}
+                    {selectedPR.current_stage === "rfq_printing" && (
+                      <button
+                        onClick={() => void openRfq(selectedPR, "printing")}
+                        className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
+                      >
+                        <FileText className="h-4.5 w-4.5 text-[#F0C83F]" />
+                        <span>Print RFQ (3-4 Copies)</span>
+                      </button>
+                    )}
+
+                    {/* Stage Advancement */}
+                    {nextStage(selectedPR) ? (
+                      <button
+                        onClick={() => openAction("complete")}
+                        title={`Advance to Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}`}
+                        className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#6B003E] hover:to-[#380020] text-white text-sm font-bold shadow-sm transition-all border border-[#7B0046]/40 active:scale-98"
+                      >
+                        <Check className="h-4.5 w-4.5 text-[#F0C83F]" />
+                        <span>Complete Stage {detailStage?.number || ""}</span>
+                      </button>
+                    ) : selectedPR.current_stage === "completed" ? (
+                      <div className="inline-flex items-center gap-2 h-11 px-4 rounded-xl bg-emerald-50 text-emerald-800 text-sm font-bold border border-emerald-200">
+                        <CheckCircle className="h-4.5 w-4.5 text-emerald-600" />
+                        <span>All Stages Completed</span>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2.5">
-                  {/* RFQ Action buttons */}
-                  {selectedPR.current_stage === "rfq_generation" && (
+                {/* Secondary Tools & Operations Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-0.5">
+                  {/* Documentary & Communication Tools */}
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
-                      onClick={() => void openRfq(selectedPR, "generation")}
-                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-xs sm:text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
+                      onClick={() => setFullPrNo(selectedPR.pr_no)}
+                      className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-stone-50 hover:bg-[#FAF3F7] text-stone-700 hover:text-[#7B0046] text-xs font-bold border border-stone-200/90 shadow-2xs transition-all active:scale-98"
                     >
-                      <FileText className="h-4 w-4 text-[#F0C83F]" />
-                      <span>Generate Official RFQ</span>
+                      <FileText className="h-3.5 w-3.5 text-[#7B0046]" />
+                      <span>View Full PR Form</span>
                     </button>
-                  )}
-                  {selectedPR.current_stage === "rfq_evaluation" && (
-                    <button
-                      onClick={() => void openRfq(selectedPR, "evaluation")}
-                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-xs sm:text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
-                    >
-                      <FileText className="h-4 w-4 text-[#F0C83F]" />
-                      <span>Review & Evaluate RFQ</span>
-                    </button>
-                  )}
-                  {selectedPR.current_stage === "rfq_printing" && (
-                    <button
-                      onClick={() => void openRfq(selectedPR, "printing")}
-                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-xs sm:text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
-                    >
-                      <FileText className="h-4 w-4 text-[#F0C83F]" />
-                      <span>Print RFQ (3-4 Copies)</span>
-                    </button>
-                  )}
 
-                  {/* Stage Advancement */}
-                  {nextStage(selectedPR) ? (
-                    <button
-                      onClick={() => openAction("complete")}
-                      title={`Advance to Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}`}
-                      className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#FFFDF7] hover:bg-[#FFF8E6] text-[#7B0046] text-xs sm:text-sm font-bold border-2 border-[#F5AB26] shadow-sm transition-all active:scale-98"
-                    >
-                      <Check className="h-4 w-4 text-[#F5AB26]" />
-                      <span>Stage {nextStage(selectedPR)?.number} · Complete Stage</span>
-                    </button>
-                  ) : selectedPR.current_stage === "completed" ? (
-                    <div className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-emerald-50 text-emerald-800 text-xs sm:text-sm font-bold border border-emerald-200">
-                      <CheckCircle className="h-4 w-4 text-emerald-600" />
-                      <span>Procurement Completed — All Stages Finished</span>
-                    </div>
-                  ) : null}
-
-                  {/* Full Submitted PR View */}
-                  <button
-                    onClick={() => setFullPrNo(selectedPR.pr_no)}
-                    className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs sm:text-sm font-bold border border-stone-200 transition-colors shadow-2xs active:scale-98"
-                  >
-                    <FileText className="h-4 w-4 text-[#7B0046]" />
-                    <span>View Submitted PR</span>
-                  </button>
-
-                  {/* Remarks and Reject (if not final) */}
-                  {!["completed", "rejected", "cancelled"].includes(selectedPR.current_stage) && (
-                    <>
+                    {!["completed", "rejected", "cancelled"].includes(selectedPR.current_stage) && (
                       <button
                         onClick={() => openAction("remark")}
-                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs sm:text-sm font-bold border border-stone-200 transition-colors shadow-2xs active:scale-98"
+                        className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-stone-50 hover:bg-amber-50/70 text-stone-700 hover:text-amber-800 text-xs font-bold border border-stone-200/90 shadow-2xs transition-all active:scale-98"
                       >
-                        <MessageSquare className="h-4 w-4 text-amber-600" />
+                        <MessageSquare className="h-3.5 w-3.5 text-amber-600" />
                         <span>Add Remark</span>
                       </button>
+                    )}
+                  </div>
+
+                  {/* Governance & Exception Operations */}
+                  <div className="flex items-center gap-2">
+                    {!["completed", "rejected", "cancelled"].includes(selectedPR.current_stage) && (
                       <button
                         onClick={() => openAction("reject")}
-                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 text-xs sm:text-sm font-bold border border-red-200 transition-colors active:scale-98"
+                        className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-red-50/70 hover:bg-red-100/80 text-red-700 text-xs font-bold border border-red-200/80 shadow-2xs transition-all active:scale-98"
                       >
-                        <XCircle className="h-4 w-4 text-red-600" />
+                        <XCircle className="h-3.5 w-3.5 text-red-500" />
                         <span>Reject PR</span>
                       </button>
-                    </>
-                  )}
+                    )}
 
-                  {/* Delete PR Button */}
-                  <button
-                    onClick={() => setDeletePR(selectedPR.pr_no)}
-                    className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-white hover:bg-red-50 text-red-600 text-xs sm:text-sm font-bold border border-red-200 transition-colors sm:ml-auto active:scale-98"
-                    title={`Permanently delete ${selectedPR.pr_no}`}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-600" />
-                    <span>Delete PR</span>
-                  </button>
+                    <button
+                      onClick={() => setDeletePR(selectedPR.pr_no)}
+                      className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-stone-50 hover:bg-red-50 text-stone-600 hover:text-red-700 text-xs font-bold border border-stone-200/80 hover:border-red-200 shadow-2xs transition-all active:scale-98"
+                      title={`Permanently delete ${selectedPR.pr_no}`}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                      <span>Delete</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
