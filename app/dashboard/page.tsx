@@ -242,6 +242,11 @@ export default function DashboardPage() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-mono text-sm font-extrabold text-[#7B0046]">{pr.pr_no}</span>
+                          {pr.pr_no?.includes("TEMP") && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
+                              Temporary No.
+                            </span>
+                          )}
                           <span className="text-xs text-stone-400 font-medium">· {new Date(pr.created_at).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}</span>
                         </div>
                         <p className="mt-1 truncate text-sm font-semibold text-stone-800">{pr.purpose || "Official procurement request"}</p>

@@ -129,7 +129,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
                   <div className="grid min-h-[27px] grid-cols-12 items-end gap-2">
                     <div className="col-span-7 flex items-end">
                       <span className="w-16 shrink-0 font-semibold">PR No.</span>
-                      <span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold">{String(pr.pr_no || "DRAFT")}</span>
+                      <span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold">{String(pr.pr_no || "DRAFT")}{String(pr.pr_no || "").includes("TEMP") ? " (TEMPORARY)" : ""}</span>
                     </div>
                     <div className="col-span-5 flex items-end">
                       <span className="w-10 shrink-0 font-semibold">Date</span>

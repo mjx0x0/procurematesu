@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
     const newStatus = typeof body?.newStatus === 'string' ? body.newStatus.trim() : '';
     const remarks = typeof body?.remarks === 'string' ? body.remarks.trim() : '';
     const action: Action = body?.action === 'remark' || body?.action === 'reject' ? body.action : 'complete';
+    let rawOfficialPrNo = typeof body?.officialPrNo === 'string' ? body.officialPrNo.trim() : '';
 
     if (!prNo) return NextResponse.json({ error: 'PR number is required.' }, { status: 400, headers: JSON_HEADERS });
     if (!/^PR-[A-Z0-9-]{3,40}$/i.test(prNo)) return NextResponse.json({ error: 'Invalid PR number format.' }, { status: 400, headers: JSON_HEADERS });
@@ -125,12 +126,43 @@ export async function POST(req: NextRequest) {
     const nextIndex = PROCUREMENT_STAGE_KEYS.indexOf(newStatus as any);
     if (currentIndex < 0 || nextIndex !== currentIndex + 1) return NextResponse.json({ error: 'Invalid stage transition. The PR must follow the official procurement workflow sequence.' }, { status: 409, headers: JSON_HEADERS });
 
+    let effectivePrNo = prNo;
+    if (rawOfficialPrNo) {
+      if (!rawOfficialPrNo.toUpperCase().startsWith("PR-")) rawOfficialPrNo = `PR-${rawOfficialPrNo}`;
+      const candidateOfficialPrNo = rawOfficialPrNo.toUpperCase();
+      if (candidateOfficialPrNo.includes("TEMP")) {
+        return NextResponse.json({ error: "The official PR number cannot contain 'TEMP'." }, { status: 400, headers: JSON_HEADERS });
+      }
+      if (!/^PR-[A-Z0-9-]{3,40}$/i.test(candidateOfficialPrNo)) {
+        return NextResponse.json({ error: "Invalid official PR number format (e.g., PR-2026-0001)." }, { status: 400, headers: JSON_HEADERS });
+      }
+      if (candidateOfficialPrNo !== prNo) {
+        const { data: conflict } = await db.from("purchase_requests").select("pr_no").eq("pr_no", candidateOfficialPrNo).maybeSingle();
+        if (conflict) {
+          return NextResponse.json({ error: `Official PR number '${candidateOfficialPrNo}' is already assigned to another request.` }, { status: 409, headers: JSON_HEADERS });
+        }
+        const { data: fullOldPR } = await db.from("purchase_requests").select("*").eq("pr_no", prNo).single();
+        if (fullOldPR) {
+          await db.from("purchase_requests").insert({ ...fullOldPR, pr_no: candidateOfficialPrNo, updated_at: now });
+          await db.from("pr_items").update({ pr_no: candidateOfficialPrNo }).eq("pr_no", prNo);
+          await db.from("pr_stages_completed").update({ pr_no: candidateOfficialPrNo }).eq("pr_no", prNo);
+          await db.from("rfqs").update({ pr_no: candidateOfficialPrNo, reference_no: candidateOfficialPrNo }).eq("pr_no", prNo);
+          await db.from("purchase_requests").delete().eq("pr_no", prNo);
+          effectivePrNo = candidateOfficialPrNo;
+        }
+      }
+    } else if (pr.current_stage === "pr_pre_numbering" && prNo.includes("TEMP")) {
+      return NextResponse.json({
+        error: "Official PR number is required to complete Step 4 (Pre-Numbering and Control of PRs). Please input the official PR number.",
+      }, { status: 400, headers: JSON_HEADERS });
+    }
+
     // Step 7: an RFQ record is mandatory before the PR can leave the generation stage.
     if (pr.current_stage === RFQ_GENERATION_STAGE && newStatus === RFQ_EVALUATION_STAGE) {
       const { data: rfq, error: rfqError } = await db
         .from('rfqs')
         .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,form_data,created_at,updated_at')
-        .eq('pr_no', prNo)
+        .eq('pr_no', effectivePrNo)
         .maybeSingle();
 
       if (rfqError) {
@@ -148,7 +180,7 @@ export async function POST(req: NextRequest) {
     // Step 9 remains locked behind Step 8 because the normal sequential transition
     // check above only permits rfq_evaluation -> rfq_printing.
     if (pr.current_stage === RFQ_EVALUATION_STAGE && newStatus === RFQ_PRINTING_STAGE) {
-      const { data: rfq, error: rfqError } = await db.from('rfqs').select('id,form_data').eq('pr_no', prNo).maybeSingle();
+      const { data: rfq, error: rfqError } = await db.from('rfqs').select('id,form_data').eq('pr_no', effectivePrNo).maybeSingle();
       if (rfqError || !rfq || !isRFQFormComplete(rfq.form_data)) {
         return NextResponse.json({ error: 'RFQ evaluation cannot be completed because the saved RFQ form is missing or incomplete. Open the RFQ, verify it, and save any corrections before proceeding to Step 9: RFQ Printing.' }, { status: 409, headers: JSON_HEADERS });
       }
@@ -164,7 +196,7 @@ export async function POST(req: NextRequest) {
       const { data: existingRFQ, error: existingRFQError } = await db
         .from('rfqs')
         .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,form_data,created_at,updated_at')
-        .eq('pr_no', prNo)
+        .eq('pr_no', effectivePrNo)
         .maybeSingle();
 
       if (existingRFQError) {
@@ -180,9 +212,9 @@ export async function POST(req: NextRequest) {
         const { data: newRFQ, error: rfqError } = await db
           .from('rfqs')
           .insert({
-            pr_no: pr.pr_no,
+            pr_no: effectivePrNo,
             template_type: templateType,
-            reference_no: pr.pr_no,
+            reference_no: effectivePrNo,
             project_name: pr.purpose,
             location: '',
             generated_by: user.id,
@@ -200,22 +232,23 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const { error: updateError } = await db.from('purchase_requests').update({ current_stage: newStatus, current_status: newStatus, updated_at: now }).eq('pr_no', prNo).eq('current_stage', pr.current_stage);
+    const { error: updateError } = await db.from('purchase_requests').update({ current_stage: newStatus, current_status: newStatus, updated_at: now }).eq('pr_no', effectivePrNo).eq('current_stage', pr.current_stage);
     if (updateError) {
       if (createdRFQ) await db.from('rfqs').delete().eq('id', generatedRFQ?.id || '00000000-0000-0000-0000-000000000000');
       return NextResponse.json({ error: 'Failed to update purchase request.' }, { status: 500, headers: JSON_HEADERS });
     }
 
-    const { error: historyError } = await db.from('pr_stages_completed').insert({ pr_no: prNo, stage_name: PROCUREMENT_STAGE_LABELS[newStatus], stage_key: newStatus, status: 'completed', completed_at: now, remarks: remarks || 'No remarks provided.' });
+    const stageRemarks = remarks || (effectivePrNo !== prNo ? `Official PR Control Number assigned: ${effectivePrNo} (previously ${prNo}).` : 'No remarks provided.');
+    const { error: historyError } = await db.from('pr_stages_completed').insert({ pr_no: effectivePrNo, stage_name: PROCUREMENT_STAGE_LABELS[newStatus], stage_key: newStatus, status: 'completed', completed_at: now, remarks: stageRemarks });
     if (historyError) {
-      await db.from('purchase_requests').update({ current_stage: pr.current_stage, current_status: pr.current_status, updated_at: new Date().toISOString() }).eq('pr_no', prNo).eq('current_stage', newStatus);
+      await db.from('purchase_requests').update({ current_stage: pr.current_stage, current_status: pr.current_status, updated_at: new Date().toISOString() }).eq('pr_no', effectivePrNo).eq('current_stage', newStatus);
       if (createdRFQ) await db.from('rfqs').delete().eq('id', generatedRFQ?.id || '00000000-0000-0000-0000-000000000000');
       return NextResponse.json({ error: 'Stage history could not be recorded. No stage change was kept.' }, { status: 500, headers: JSON_HEADERS });
     }
 
     const [{ data: updatedPR }, { data: stageHistory }] = await Promise.all([
-      db.from('purchase_requests').select('*').eq('pr_no', prNo).single(),
-      db.from('pr_stages_completed').select('stage_name, stage_key, completed_at, remarks, status').eq('pr_no', prNo).order('completed_at', { ascending: true }),
+      db.from('purchase_requests').select('*').eq('pr_no', effectivePrNo).single(),
+      db.from('pr_stages_completed').select('stage_name, stage_key, completed_at, remarks, status').eq('pr_no', effectivePrNo).order('completed_at', { ascending: true }),
     ]);
 
     return NextResponse.json({
@@ -224,6 +257,8 @@ export async function POST(req: NextRequest) {
       newStatus,
       updatedPR,
       stageHistory,
+      officialPrNo: effectivePrNo,
+      oldPrNo: prNo !== effectivePrNo ? prNo : undefined,
       rfqGenerated: newStatus === RFQ_GENERATION_STAGE,
       rfqCreated: createdRFQ,
       rfq: generatedRFQ,

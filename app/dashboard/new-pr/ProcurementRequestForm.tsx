@@ -314,16 +314,18 @@ export default function ProcurementRequestForm() {
                   <div className="space-y-1">
                     <label className="block text-xs font-bold text-stone-700">SAI No.</label>
                     <input
-                      value="Auto-generated"
+                      value=""
+                      readOnly
                       disabled
                       className="w-full h-11 px-3.5 font-mono text-sm font-semibold text-stone-500 bg-stone-100 rounded-xl border border-stone-200"
                     />
                     <p className="text-[11px] text-stone-500">Accounting reference</p>
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-bold text-stone-700">ALOBs No.</label>
+                    <label className="block text-xs font-bold text-stone-700">Alobs No.</label>
                     <input
-                      value="Auto-generated"
+                      value=""
+                      readOnly
                       disabled
                       className="w-full h-11 px-3.5 font-mono text-sm font-semibold text-stone-500 bg-stone-100 rounded-xl border border-stone-200"
                     />
@@ -775,17 +777,23 @@ export default function ProcurementRequestForm() {
                 <CheckCircle2 className="h-7 w-7 text-green-600" />
               </div>
               <h3 className="text-xl font-black text-[#4D002C] mt-4">Purchase Request Created</h3>
-              <p className="text-xs text-stone-600 mt-1.5">Your Purchase Request has been recorded in ProcuremateSU.</p>
+              <p className="text-xs text-stone-600 mt-1.5">Your Purchase Request has been recorded with a temporary control number.</p>
               
-              <div className="mt-5 rounded-xl border border-stone-200 bg-[#FAF7F2] p-4">
-                <div className="text-[10px] uppercase tracking-wider font-extrabold text-stone-500">Official PR Number</div>
+              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50/70 p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] uppercase tracking-wider font-extrabold text-amber-900">Temporary Tracking Number</span>
+                  <span className="text-[10px] font-bold text-amber-800 bg-amber-200/80 px-2 py-0.5 rounded-full">Temporary</span>
+                </div>
                 <div className="text-2xl font-black text-[#7B0046] mt-1 font-mono tracking-tight">{createdPRNo}</div>
+                <p className="text-[11px] text-amber-900 mt-2 leading-relaxed text-left border-t border-amber-200/80 pt-2">
+                  ℹ️ The official PR number will be assigned by the PMO during <strong>Step 4 (Pre-Numbering and Control of PRs)</strong>. Once entered by the admin, this temporary number will automatically update in your data.
+                </p>
               </div>
 
-              <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/90 p-3.5 text-left flex items-start gap-2.5">
+              <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 p-3.5 text-left flex items-start gap-2.5">
                 <Printer className="h-4 w-4 shrink-0 text-[#7B0046] mt-0.5" />
-                <p className="text-xs leading-relaxed text-amber-950">
-                  <span className="font-extrabold text-[#4D002C]">Next required step:</span> Open the PR, print the official form, sign it, and physically submit it to the Procurement Office.
+                <p className="text-xs leading-relaxed text-stone-700">
+                  <span className="font-extrabold text-[#4D002C]">Next required step:</span> Open the PR, print the form, sign it, and physically submit it to the Procurement Office.
                 </p>
               </div>
 

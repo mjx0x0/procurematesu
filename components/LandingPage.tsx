@@ -204,8 +204,8 @@ export default function LandingPage() {
       </section>
 
       {/* Transparency Section */}
-      <section id="transparency" className="scroll-mt-20 bg-[#F8F6F2]">
-        <div className="mx-auto w-full max-w-[1100px] px-6 py-18 sm:px-8 sm:py-20">
+      <section id="transparency" className="scroll-mt-20 bg-stone-50/60 border-t border-stone-200/80">
+        <div className="mx-auto w-full max-w-[1100px] px-6 py-16 sm:px-8 sm:py-20">
           <div className="text-center">
             <span className="inline-flex rounded-full border border-[#F5AB26]/40 bg-[#FFFDF5] px-4 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-[#9A7205]">
               Public Disclosure & Accountability
@@ -219,14 +219,14 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="inline-flex flex-wrap gap-1.5 rounded-xl border border-stone-200 bg-white p-1.5 shadow-xs">
+            <div className="inline-flex flex-wrap gap-1 rounded-xl border border-stone-200 bg-white p-1.5 shadow-2xs">
               {CATEGORIES.map((x) => (
                 <button
                   key={x}
                   onClick={() => setCategory(x)}
-                  className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${
+                  className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all ${
                     category === x
-                      ? "bg-gradient-to-r from-[#7B0046] to-[#4D002C] text-white shadow-xs"
+                      ? "bg-[#7B0046] text-white shadow-2xs"
                       : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
                   }`}
                 >
@@ -241,7 +241,7 @@ export default function LandingPage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search projects or references..."
-                className="h-10 w-full rounded-xl border border-stone-200 bg-white pl-10 pr-3.5 text-xs sm:text-sm text-stone-800 shadow-xs outline-none focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15"
+                className="h-10 w-full rounded-xl border border-stone-200 bg-white pl-10 pr-3.5 text-xs sm:text-sm text-stone-800 shadow-2xs outline-none focus:border-[#7B0046] focus:ring-1 focus:ring-[#7B0046]"
               />
             </div>
           </div>
@@ -250,27 +250,27 @@ export default function LandingPage() {
             {projects.map((p, i) => (
               <article
                 key={`${p.year}-${p.reference || p.title}-${i}`}
-                className="rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_6px_22px_rgba(40,20,10,0.03)] transition-all hover:border-[#F5AB26]/50"
+                className="rounded-2xl border border-stone-200 bg-white p-5 shadow-2xs transition-all hover:border-stone-300 hover:shadow-xs"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <span className="rounded-lg border border-[#7B0046]/20 bg-[#FDF2F7] px-2.5 py-1 text-xs font-extrabold text-[#7B0046]">
+                  <span className="rounded-lg border border-stone-200 bg-stone-50 px-2.5 py-1 font-mono text-xs font-bold text-stone-800">
                     {p.reference || `PUBLIC-${p.year}`}
                   </span>
-                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-0.5 text-xs font-bold text-emerald-700">
+                  <span className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-0.5 text-[11px] font-semibold text-stone-600">
                     Public Notice
                   </span>
                 </div>
                 <h3 className="mt-3 text-sm sm:text-base font-bold leading-snug text-stone-900">{p.title}</h3>
-                <p className="mt-1 text-xs font-semibold text-[#F5AB26]">{p.category}</p>
+                <p className="mt-1.5 text-xs font-medium text-stone-500">{p.category}</p>
                 <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-3 text-xs text-stone-500">
-                  <span>Year: {p.year} · Category: {p.category}</span>
-                  <span className="font-bold text-[#7B0046]">Public Record</span>
+                  <span>Year: {p.year}</span>
+                  <span className="font-semibold text-stone-700">Official Record</span>
                 </div>
               </article>
             ))}
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-white px-5 py-4 shadow-xs">
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-stone-200 bg-white px-5 py-3.5 shadow-2xs">
             <p className="text-xs text-stone-600">
               Listings are public procurement disclosures maintained for university transparency and statutory compliance.
             </p>
@@ -278,7 +278,7 @@ export default function LandingPage() {
               href={TRANSPARENCY_SOURCE_URL}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#7B0046] hover:text-[#F5AB26] transition-colors underline decoration-[#F5AB26] underline-offset-4"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7B0046] hover:text-stone-900 transition-colors"
             >
               Official University Source <ExternalLink className="h-3.5 w-3.5" />
             </Link>

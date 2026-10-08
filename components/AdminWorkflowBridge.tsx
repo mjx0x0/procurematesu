@@ -43,7 +43,7 @@ export default function AdminWorkflowBridge(){
       const modals=Array.from(document.querySelectorAll(".fixed.inset-0")) as HTMLElement[];
       const modal=modals.find(el=>/RECORDED STAGE TIMELINE/i.test(el.textContent||"")&&/CURRENT STAGE/i.test(el.textContent||""));
       if(!modal)return;
-      const match=(modal.textContent||"").match(/PR\s+(PR-\d{4}-\d+)/i);
+      const match=(modal.textContent||"").match(/PR\s+(PR-(?:TEMP-)?\d{4}-\d+|PR-[A-Z0-9-]+)/i);
       const prNo=match?.[1];
       if(!prNo)return;
 

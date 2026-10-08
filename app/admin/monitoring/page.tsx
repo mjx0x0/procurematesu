@@ -265,7 +265,14 @@ export default function AdminMonitoringPage() {
                   return (
                     <tr key={pr.pr_no} className="hover:bg-amber-50/20 transition-colors">
                       <td className="px-5 py-4">
-                        <div className="font-bold text-[#7B0046]">{pr.pr_no}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#7B0046]">{pr.pr_no}</span>
+                          {pr.pr_no?.includes("TEMP") && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-100 text-amber-800 border border-amber-300">
+                              Temp #
+                            </span>
+                          )}
+                        </div>
                         <div className="text-xs text-stone-500 max-w-xs truncate mt-0.5">{pr.purpose}</div>
                       </td>
                       <td className="px-5 py-4">

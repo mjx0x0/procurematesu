@@ -143,7 +143,7 @@ export default function PRPrintContent() {
                 <div className="col-span-7 flex items-end">
                   <span className="font-semibold text-stone-800 w-16 shrink-0">PR No.</span>
                   <span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold">
-                    {data.pr_no || "DRAFT"}
+                    {data.pr_no || "DRAFT"}{data.pr_no?.includes("TEMP") ? " (TEMPORARY)" : ""}
                   </span>
                 </div>
                 <div className="col-span-5 flex items-end">

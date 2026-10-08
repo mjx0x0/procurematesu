@@ -73,12 +73,27 @@ export default function PRDetailPage() {
           user = session?.user || null;
         }
         if (!user) { router.push("/"); return; }
-        const { data: prData, error: prError } = await supabase.from("purchase_requests").select("*").eq("pr_no", prNo).single();
-        if (prError || !prData) { setError("Purchase request not found"); return; }
+        let targetPrNo = prNo;
+        let { data: prData, error: prError } = await supabase.from("purchase_requests").select("*").eq("pr_no", targetPrNo).maybeSingle();
+        if (!prData) {
+          // Check if this was a temporary PR that has since been updated with an official PR number
+          const { data: renamedStage } = await supabase
+            .from("pr_stages_completed")
+            .select("pr_no")
+            .ilike("remarks", `%${prNo}%`)
+            .limit(1);
+          if (renamedStage && renamedStage.length > 0 && renamedStage[0]?.pr_no) {
+            targetPrNo = renamedStage[0].pr_no;
+            const { data: updatedData } = await supabase.from("purchase_requests").select("*").eq("pr_no", targetPrNo).maybeSingle();
+            prData = updatedData;
+            router.replace(`/dashboard/pr/${encodeURIComponent(targetPrNo)}`);
+          }
+        }
+        if (!prData) { setError("Purchase request not found"); return; }
         setPr(prData);
         const [{ data: itemData }, { data: stageData }] = await Promise.all([
-          supabase.from("pr_items").select("*").eq("pr_no", prNo).order("created_at", { ascending: true }),
-          supabase.from("pr_stages_completed").select("*").eq("pr_no", prNo).order("completed_at", { ascending: true }),
+          supabase.from("pr_items").select("*").eq("pr_no", targetPrNo).order("created_at", { ascending: true }),
+          supabase.from("pr_stages_completed").select("*").eq("pr_no", targetPrNo).order("completed_at", { ascending: true }),
         ]);
         setItems(itemData || []);
         setStages(stageData || []);
@@ -167,10 +182,19 @@ export default function PRDetailPage() {
       <main className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-stone-200">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-black text-[#4D002C] font-mono tracking-tight">
                 {pr.pr_no}
               </h1>
+              {pr.pr_no?.includes("TEMP") ? (
+                <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-300">
+                  Temporary PR Number
+                </span>
+              ) : (
+                <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-300">
+                  Official PR Number
+                </span>
+              )}
               <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClass(pr.current_stage)}`}>
                 {statusLabel(pr.current_stage)}
               </span>
@@ -180,6 +204,14 @@ export default function PRDetailPage() {
               <span>•</span>
               <span>Created on {new Date(pr.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
             </div>
+            {pr.pr_no?.includes("TEMP") && (
+              <div className="mt-3 bg-amber-50/90 border border-amber-300 text-amber-950 p-3 rounded-xl text-xs flex items-start gap-2.5">
+                <span className="font-bold text-sm">ℹ️</span>
+                <p className="leading-relaxed">
+                  <strong>Temporary Tracking Number:</strong> This request is currently assigned a temporary PR number (<code>{pr.pr_no}</code>). The official university PR control number will be assigned by the Procurement Office at <strong>Step 4 (Pre-Numbering and Control of PRs)</strong> and will update automatically here.
+                </p>
+              </div>
+            )}
           </div>
           <div className="flex gap-2.5 flex-wrap items-center">
             <PRDownloadButton pr={pr} items={items} />
@@ -202,7 +234,7 @@ export default function PRDetailPage() {
             </div>
             <div className="grid grid-cols-12 border-b-2 border-black text-xs">
               <div className="col-span-6 border-r-2 border-black p-3 space-y-2"><div className="flex items-end"><span className="font-semibold w-24 shrink-0">Department</span><span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold uppercase">{pr.department || ""}</span></div><div className="flex items-end"><span className="font-semibold w-24 shrink-0">Section</span><span className="flex-1 border-b border-black pl-2 pb-0.5">{pr.section || ""}</span></div></div>
-              <div className="col-span-6 p-3 space-y-2"><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">PR No.</span><span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold">{pr.pr_no}</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black pl-1 pb-0.5 text-center">{new Date(pr.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span></div></div><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">SAI No.</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div></div><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">ALOBS No.</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div></div></div>
+              <div className="col-span-6 p-3 space-y-2"><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">PR No.</span><span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold">{pr.pr_no}{pr.pr_no?.includes("TEMP") ? " (TEMPORARY)" : ""}</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black pl-1 pb-0.5 text-center">{new Date(pr.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span></div></div><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">SAI No.</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div></div><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">ALOBS No.</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div></div></div>
             </div>
             <div className="grid grid-cols-12 border-b-2 border-black text-center font-bold text-xs"><div className="col-span-1 border-r-2 border-black py-2">Quantity</div><div className="col-span-1 border-r-2 border-black py-2">Unit</div><div className="col-span-5 border-r-2 border-black py-2 italic">ITEM DESCRIPTION</div><div className="col-span-1 border-r-2 border-black py-2">Stock No.</div><div className="col-span-2 border-r-2 border-black py-2 italic">Estimated Unit Cost</div><div className="col-span-2 py-2 italic">Estimated Cost</div></div>
             <div className="divide-y divide-black text-xs">{items.map(item => <div key={item.id} className="grid grid-cols-12 min-h-[26px] items-center"><div className="col-span-1 border-r-2 border-black py-1.5 text-center">{item.quantity}</div><div className="col-span-1 border-r-2 border-black py-1.5 text-center">{item.unit}</div><div className="col-span-5 border-r-2 border-black py-1.5 px-2.5">{item.item_description}</div><div className="col-span-1 border-r-2 border-black py-1.5 text-center">{item.stock_no || ""}</div><div className="col-span-2 border-r-2 border-black py-1.5 px-2 text-right">{Number(item.unit_cost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div><div className="col-span-2 py-1.5 px-2 text-right font-semibold">{Number(item.total_cost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>)}<div className="grid grid-cols-12 min-h-[24px]"><div className="col-span-1 border-r-2 border-black"/><div className="col-span-1 border-r-2 border-black"/><div className="col-span-5 border-r-2 border-black py-1 text-center font-bold">****Nothing Follows****</div><div className="col-span-1 border-r-2 border-black"/><div className="col-span-2 border-r-2 border-black"/><div className="col-span-2"/></div>{Array.from({ length: Math.max(0, 5 - items.length) }).map((_, i) => <div key={i} className="grid grid-cols-12 min-h-[24px]"><div className="col-span-1 border-r-2 border-black"/><div className="col-span-1 border-r-2 border-black"/><div className="col-span-5 border-r-2 border-black"/><div className="col-span-1 border-r-2 border-black"/><div className="col-span-2 border-r-2 border-black"/><div className="col-span-2"/></div>)}</div>

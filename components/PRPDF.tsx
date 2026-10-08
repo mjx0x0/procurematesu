@@ -450,7 +450,7 @@ export default function PRPDF({ pr = {}, items = [] }: PRPDFProps) {
               <View style={styles.metaSplitRow}>
                 <View style={styles.metaSubColLeft}>
                   <Text style={styles.metaLabel}>PR No.</Text>
-                  <Text style={styles.metaUnderlineVal}>{safePr.pr_no || ""}</Text>
+                  <Text style={styles.metaUnderlineVal}>{safePr.pr_no ? `${safePr.pr_no}${safePr.pr_no.includes("TEMP") ? " (TEMPORARY)" : ""}` : ""}</Text>
                 </View>
                 <View style={styles.metaSubColRight}>
                   <Text style={styles.metaLabel}>Date</Text>

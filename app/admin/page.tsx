@@ -71,6 +71,8 @@ export default function AdminDashboard() {
   const [busy, setBusy] = useState(false);
   const [deletePR, setDeletePR] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ open: boolean; tone: FeedbackTone; title: string; message: string }>({ open: false, tone: "success", title: "", message: "" });
+  const [officialPrInput, setOfficialPrInput] = useState("");
+  const [showOfficialPrModal, setShowOfficialPrModal] = useState(false);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const adminMenuRef = useRef<HTMLDivElement>(null);
 
@@ -148,7 +150,12 @@ export default function AdminDashboard() {
   const currentIndex = (pr: PR | null) => pr ? STAGES.findIndex((s) => s.key === pr.current_stage) : -1;
   const nextStage = (pr: PR) => { const i = currentIndex(pr); return i >= 0 && i < STAGES.length - 1 ? STAGES[i + 1] : null; };
   const openDetails = async (pr: PR) => { setSelectedPR(pr); setHistory([]); setShowDetails(true); await loadHistory(pr.pr_no); };
-  const openAction = (type: "complete" | "remark" | "reject", targetPR?: PR) => { if (targetPR) setSelectedPR(targetPR); setAction(type); setRemarks(""); };
+  const openAction = (type: "complete" | "remark" | "reject", targetPR?: PR) => {
+    if (targetPR) setSelectedPR(targetPR);
+    setAction(type);
+    setRemarks("");
+    setOfficialPrInput("");
+  };
   const openRfq = async (pr: PR, mode: RfqMode) => {
     if (mode === "generation") {
       const response = await fetch("/api/admin/rfq", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prNo: pr.pr_no }) });
@@ -158,21 +165,89 @@ export default function AdminDashboard() {
     setRfq({ prNo: pr.pr_no, mode });
   };
 
+  const submitOfficialPrAssignment = async () => {
+    if (!selectedPR || busy) return;
+    const cleanNo = officialPrInput.trim();
+    if (!cleanNo) {
+      showFeedback("warning", "PR Number Required", "Please enter the official PR number.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const response = await fetch("/api/admin/assign-official-pr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPrNo: selectedPR.pr_no,
+          officialPrNo: cleanNo,
+          remarks: remarks.trim(),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Failed to assign official PR number");
+      setShowOfficialPrModal(false);
+      setOfficialPrInput("");
+      setRemarks("");
+      if (result.updatedPR) {
+        setSelectedPR(result.updatedPR);
+        setPrs((prev) => prev.map((p) => p.pr_no === result.oldPrNo ? result.updatedPR : p));
+      }
+      if (result.stageHistory) setHistory(result.stageHistory);
+      void loadData();
+      showFeedback("success", "Official PR Number Assigned", `Successfully updated ${result.oldPrNo} to official number ${result.officialPrNo}. Data is synchronized across both end-user and admin portals.`);
+    } catch (e: any) {
+      console.error(e);
+      showFeedback("error", "Assignment Failed", e.message || "Unable to assign official PR number.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const submitAction = async () => {
     if (!selectedPR || !action || busy) return;
     if ((action === "remark" || action === "reject") && !remarks.trim()) { showFeedback("warning", "Remark Required", "Please provide a remark before continuing."); return; }
     if (action === "complete" && !nextStage(selectedPR)) { showFeedback("info", "Process Complete", "This purchase request has already reached the final stage."); return; }
+    if (
+      action === "complete" &&
+      selectedPR.current_stage === "pr_pre_numbering" &&
+      selectedPR.pr_no.includes("TEMP") &&
+      !officialPrInput.trim()
+    ) {
+      showFeedback("warning", "Official PR Number Required", "Please enter the official PR number to complete Step 4: Pre-Numbering and Control of PRs.");
+      return;
+    }
     setBusy(true);
     try {
-      const response = await fetch("/api/admin/complete-stage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prNo: selectedPR.pr_no, action, newStatus: action === "complete" ? nextStage(selectedPR)?.key : undefined, remarks: remarks.trim() }) });
+      const response = await fetch("/api/admin/complete-stage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prNo: selectedPR.pr_no,
+          action,
+          newStatus: action === "complete" ? nextStage(selectedPR)?.key : undefined,
+          remarks: remarks.trim(),
+          officialPrNo: officialPrInput.trim() || undefined,
+        })
+      });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Action failed");
-      setAction(null); setRemarks("");
-      if (result.updatedPR) { setSelectedPR(result.updatedPR); setPrs((prev) => prev.map((p) => p.pr_no === result.updatedPR.pr_no ? result.updatedPR : p)); }
+      setAction(null); setRemarks(""); setOfficialPrInput("");
+      const oldNo = selectedPR.pr_no;
+      if (result.updatedPR) {
+        setSelectedPR(result.updatedPR);
+        setPrs((prev) => prev.map((p) => (p.pr_no === oldNo || p.pr_no === result.updatedPR.pr_no) ? result.updatedPR : p));
+      }
       if (result.stageHistory) setHistory(result.stageHistory);
       void loadData();
       const nextInfo = action === "complete" && result.newStatus ? STAGES.find((s) => s.key === result.newStatus) : null;
-      if (action === "complete") showFeedback("success", "Stage Completed Successfully", `${selectedPR.pr_no} has been advanced to ${nextInfo ? `Stage ${nextInfo.number}: ${nextInfo.label}` : "the next stage"}.`);
+      const finalPrNo = result.officialPrNo || selectedPR.pr_no;
+      if (action === "complete") {
+        showFeedback(
+          "success",
+          "Stage Completed Successfully",
+          `${finalPrNo} has been advanced to ${nextInfo ? `Stage ${nextInfo.number}: ${nextInfo.label}` : "the next stage"}.${result.oldPrNo ? ` PR number was updated from ${result.oldPrNo} to official number ${result.officialPrNo}.` : ""}`
+        );
+      }
       else if (action === "remark") showFeedback("success", "Remark Recorded", `Your procurement remark for ${selectedPR.pr_no} has been recorded.`);
       else showFeedback("success", "Purchase Request Rejected", `${selectedPR.pr_no} has been marked as rejected.`);
     } catch (e: any) { console.error(e); showFeedback("error", "Action Failed", e.message || "Unable to complete the requested action."); }
@@ -343,6 +418,11 @@ export default function AdminDashboard() {
                           <td className="px-3 lg:px-4 py-3.5 align-middle whitespace-nowrap">
                             <div className="flex items-center gap-1.5 min-w-0">
                               <span className="font-mono text-xs lg:text-sm font-extrabold text-[#7B0046] tracking-tight">{pr.pr_no}</span>
+                              {pr.pr_no.includes("TEMP") && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 text-[9px] font-black uppercase tracking-wider shrink-0" title="Temporary PR Number (Awaiting Pre-Numbering at Step 4)">
+                                  Temp #
+                                </span>
+                              )}
                               {rfqMode && (
                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300 text-[#8B6009] text-[9px] font-black tracking-wider uppercase shrink-0">
                                   RFQ
@@ -403,6 +483,11 @@ export default function AdminDashboard() {
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span className="font-mono text-sm font-extrabold text-[#7B0046] tracking-tight">{pr.pr_no}</span>
+                          {pr.pr_no.includes("TEMP") && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 text-[9px] font-black uppercase">
+                              Temp #
+                            </span>
+                          )}
                           {rfqMode && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300 text-[#8B6009] text-[9px] font-black uppercase">
                               RFQ
@@ -448,8 +533,13 @@ export default function AdminDashboard() {
             {/* Modal Header */}
             <div className="sticky top-0 bg-white border-b border-stone-200 px-6 py-4 flex justify-between items-start z-10 shrink-0 shadow-2xs">
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <h3 className="text-xl font-extrabold text-[#4D002C] tracking-tight">PR {selectedPR.pr_no}</h3>
+                  {selectedPR.pr_no.includes("TEMP") && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">
+                      Temporary Control #
+                    </span>
+                  )}
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${COLORS[selectedPR.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
                     {detailStage ? `Stage ${detailStage.number}: ${detailStage.shortLabel}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
                   </span>
@@ -482,50 +572,71 @@ export default function AdminDashboard() {
             </div>
 
             {/* Modal Body */}
-            <div className="overflow-y-auto p-6 space-y-6">
+            <div className="overflow-y-auto p-5 sm:p-6 space-y-5">
               {/* Procurement Actions & Workflow Controls Card */}
-              <div className="bg-white rounded-2xl border border-stone-200/90 p-4 sm:p-5 shadow-[0_4px_20px_rgba(45,20,10,0.03)] space-y-3.5">
+              <div className="bg-white rounded-2xl border border-stone-200/90 p-4 sm:p-5 shadow-xs space-y-3.5">
                 {/* Primary Stage Action Card */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 bg-gradient-to-r from-[#FAF6F0] via-[#FFFDF9] to-[#FDF4EB] p-3.5 sm:p-4 rounded-xl border border-[#F0C83F]/35 shadow-xs">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#7B0046] text-[#F0C83F] font-mono font-black text-xs shadow-xs">
-                      {detailStage?.number ? `0${detailStage.number}`.slice(-2) : "PR"}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-stone-50/90 p-4 sm:p-5 rounded-xl border border-stone-200/90 shadow-xs">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#7B0046] text-white shadow-xs border border-[#630038]">
+                      <span className="font-mono font-bold text-lg leading-none tracking-tight">
+                        {detailStage?.number ? detailStage.number : "PR"}
+                      </span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-wider text-[#8C6B13]">Workflow Next Step</p>
-                      <p className="text-xs sm:text-sm font-extrabold text-[#4D002C] truncate">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 bg-stone-200/60 px-2 py-0.5 rounded">
+                          Current Stage {detailStage?.number || ""}
+                        </span>
+                      </div>
+                      <p className="text-sm sm:text-base font-bold text-stone-900 truncate mt-1">
                         {nextStage(selectedPR) ? `Advance to Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}` : detailStage ? `Stage ${detailStage.number}: ${detailStage.label}` : "Procurement Workflow"}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     {/* RFQ Action buttons */}
                     {selectedPR.current_stage === "rfq_generation" && (
                       <button
                         onClick={() => void openRfq(selectedPR, "generation")}
-                        className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
+                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#7B0046] hover:bg-[#630038] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-[#7B0046] active:scale-98"
                       >
-                        <FileText className="h-4.5 w-4.5 text-[#F0C83F]" />
+                        <FileText className="h-4 w-4 text-white" />
                         <span>Generate Official RFQ</span>
                       </button>
                     )}
                     {selectedPR.current_stage === "rfq_evaluation" && (
                       <button
                         onClick={() => void openRfq(selectedPR, "evaluation")}
-                        className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
+                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#7B0046] hover:bg-[#630038] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-[#7B0046] active:scale-98"
                       >
-                        <FileText className="h-4.5 w-4.5 text-[#F0C83F]" />
+                        <FileText className="h-4 w-4 text-white" />
                         <span>Review & Evaluate RFQ</span>
                       </button>
                     )}
                     {selectedPR.current_stage === "rfq_printing" && (
                       <button
                         onClick={() => void openRfq(selectedPR, "printing")}
-                        className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#610037] hover:to-[#380020] text-white text-sm font-bold shadow-sm transition-all border border-[#7B0046] active:scale-98"
+                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#7B0046] hover:bg-[#630038] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-[#7B0046] active:scale-98"
                       >
-                        <FileText className="h-4.5 w-4.5 text-[#F0C83F]" />
+                        <FileText className="h-4 w-4 text-white" />
                         <span>Print RFQ (3-4 Copies)</span>
+                      </button>
+                    )}
+
+                    {/* Step 4 Official PR Assignment button */}
+                    {(selectedPR.current_stage === "pr_pre_numbering" || selectedPR.pr_no.includes("TEMP")) && (
+                      <button
+                        onClick={() => {
+                          setOfficialPrInput(selectedPR.pr_no.includes("TEMP") ? "" : selectedPR.pr_no);
+                          setShowOfficialPrModal(true);
+                        }}
+                        title="Manually input official university PR control number"
+                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-stone-900 active:scale-98"
+                      >
+                        <FileCheck className="h-4 w-4 text-white" />
+                        <span>{selectedPR.pr_no.includes("TEMP") ? "Input Official PR #" : "Edit Official PR #"}</span>
                       </button>
                     )}
 
@@ -534,38 +645,64 @@ export default function AdminDashboard() {
                       <button
                         onClick={() => openAction("complete")}
                         title={`Advance to Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}`}
-                        className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] hover:from-[#6B003E] hover:to-[#380020] text-white text-sm font-bold shadow-sm transition-all border border-[#7B0046]/40 active:scale-98"
+                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#7B0046] hover:bg-[#630038] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-[#7B0046] active:scale-98"
                       >
-                        <Check className="h-4.5 w-4.5 text-[#F0C83F]" />
+                        <Check className="h-4 w-4 text-white" />
                         <span>Complete Stage {detailStage?.number || ""}</span>
                       </button>
                     ) : selectedPR.current_stage === "completed" ? (
-                      <div className="inline-flex items-center gap-2 h-11 px-4 rounded-xl bg-emerald-50 text-emerald-800 text-sm font-bold border border-emerald-200">
-                        <CheckCircle className="h-4.5 w-4.5 text-emerald-600" />
+                      <div className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-stone-100 text-stone-800 text-xs sm:text-sm font-semibold border border-stone-200">
+                        <CheckCircle className="h-4 w-4 text-stone-600" />
                         <span>All Stages Completed</span>
                       </div>
                     ) : null}
                   </div>
                 </div>
 
+                {/* Pre-Numbering Banner if Temporary Number */}
+                {selectedPR.pr_no.includes("TEMP") && (
+                  <div className="bg-stone-50 border border-stone-200 rounded-xl p-3.5 flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-stone-200/70 text-stone-700 shrink-0 mt-0.5">
+                      <AlertCircle className="h-4.5 w-4.5" />
+                    </div>
+                    <div className="flex-1 text-xs">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <p className="font-bold text-stone-900 text-xs sm:text-sm">Step 4 Pre-Numbering Pending: {selectedPR.pr_no}</p>
+                        <button
+                          onClick={() => {
+                            setOfficialPrInput("");
+                            setShowOfficialPrModal(true);
+                          }}
+                          className="px-3 py-1.5 bg-stone-900 hover:bg-stone-800 text-white rounded-lg font-semibold text-xs transition-colors shadow-2xs"
+                        >
+                          Input Official PR #
+                        </button>
+                      </div>
+                      <p className="text-stone-600 mt-1 leading-relaxed">
+                        This Purchase Request was created with a temporary number. At <strong>Step 4 (Pre-Numbering and Control of PRs)</strong>, you manually input the official PR number. Once entered, the temporary PR number will update in both the end user&apos;s and admin&apos;s PR data.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Secondary Tools & Operations Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-0.5">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-1 border-t border-stone-100">
                   {/* Documentary & Communication Tools */}
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => setFullPrNo(selectedPR.pr_no)}
-                      className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-stone-50 hover:bg-[#FAF3F7] text-stone-700 hover:text-[#7B0046] text-xs font-bold border border-stone-200/90 shadow-2xs transition-all active:scale-98"
+                      className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-semibold border border-stone-200 shadow-2xs transition-all active:scale-98"
                     >
-                      <FileText className="h-3.5 w-3.5 text-[#7B0046]" />
+                      <FileText className="h-4 w-4 text-stone-600" />
                       <span>View Full PR Form</span>
                     </button>
 
                     {!["completed", "rejected", "cancelled"].includes(selectedPR.current_stage) && (
                       <button
                         onClick={() => openAction("remark")}
-                        className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-stone-50 hover:bg-amber-50/70 text-stone-700 hover:text-amber-800 text-xs font-bold border border-stone-200/90 shadow-2xs transition-all active:scale-98"
+                        className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-semibold border border-stone-200 shadow-2xs transition-all active:scale-98"
                       >
-                        <MessageSquare className="h-3.5 w-3.5 text-amber-600" />
+                        <MessageSquare className="h-4 w-4 text-stone-600" />
                         <span>Add Remark</span>
                       </button>
                     )}
@@ -576,19 +713,19 @@ export default function AdminDashboard() {
                     {!["completed", "rejected", "cancelled"].includes(selectedPR.current_stage) && (
                       <button
                         onClick={() => openAction("reject")}
-                        className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-red-50/70 hover:bg-red-100/80 text-red-700 text-xs font-bold border border-red-200/80 shadow-2xs transition-all active:scale-98"
+                        className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg bg-white hover:bg-red-50 text-stone-600 hover:text-red-700 text-xs font-semibold border border-stone-200 hover:border-red-200 shadow-2xs transition-all active:scale-98"
                       >
-                        <XCircle className="h-3.5 w-3.5 text-red-500" />
+                        <XCircle className="h-4 w-4 text-red-500" />
                         <span>Reject PR</span>
                       </button>
                     )}
 
                     <button
                       onClick={() => setDeletePR(selectedPR.pr_no)}
-                      className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-stone-50 hover:bg-red-50 text-stone-600 hover:text-red-700 text-xs font-bold border border-stone-200/80 hover:border-red-200 shadow-2xs transition-all active:scale-98"
+                      className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg bg-white hover:bg-red-50 text-stone-600 hover:text-red-700 text-xs font-semibold border border-stone-200 hover:border-red-200 shadow-2xs transition-all active:scale-98"
                       title={`Permanently delete ${selectedPR.pr_no}`}
                     >
-                      <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                      <Trash2 className="h-4 w-4 text-red-500" />
                       <span>Delete</span>
                     </button>
                   </div>
@@ -597,26 +734,25 @@ export default function AdminDashboard() {
 
               {/* Current PMO Stage banner */}
               {detailStage && (
-                <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-4">
-                  <p className="text-[10px] uppercase tracking-wide text-amber-800 font-extrabold mb-1">Current PMO Stage</p>
-                  <p className="text-sm font-extrabold text-stone-900">Stage {detailStage.number}: {detailStage.label}</p>
-                  <p className="text-xs text-stone-600 mt-1">{detailStage.description}</p>
+                <div className="bg-stone-50 border border-stone-200/80 rounded-xl p-3.5">
+                  <p className="text-[10px] uppercase tracking-wider text-stone-500 font-bold mb-0.5">Current PMO Stage</p>
+                  <p className="text-xs sm:text-sm font-bold text-stone-900">Stage {detailStage.number}: {detailStage.label}</p>
+                  <p className="text-xs text-stone-500 mt-0.5 leading-relaxed">{detailStage.description}</p>
                 </div>
               )}
 
               {/* Procurement Progress */}
-              <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm">
+              <div className="bg-white border border-stone-200 rounded-2xl p-4 sm:p-5 shadow-xs">
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
-                    <h4 className="text-sm font-extrabold text-[#4D002C]">Procurement Workflow Progress</h4>
-                    <p className="text-xs text-stone-500">The current stage is always shown, even when no historical completion row has been recorded yet.</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-stone-900">Procurement Workflow Progress</h4>
                   </div>
-                  <span className="text-xs font-extrabold text-[#7B0046] bg-[#FDF2F7] border border-[#F5D6E5] px-2.5 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-stone-700 bg-stone-100 border border-stone-200 px-2.5 py-0.5 rounded-md">
                     {selectedPR.current_stage === "completed" ? "Completed" : detailIndex >= 0 ? `Stage ${detailIndex + 1}` : "—"}
                   </span>
                 </div>
                 <div className="h-2 rounded-full bg-stone-100 overflow-hidden mb-4">
-                  <div className="h-full rounded-full bg-gradient-to-r from-[#7B0046] to-[#F5AB26]" style={{ width: `${detailPercent}%` }} />
+                  <div className="h-full rounded-full bg-[#7B0046] transition-all" style={{ width: `${detailPercent}%` }} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[470px] overflow-y-auto pr-1">
                   {STAGES.map((stage, index) => {
@@ -627,44 +763,44 @@ export default function AdminDashboard() {
                     return (
                       <div
                         key={stage.key}
-                        className={`rounded-xl border p-3 ${
+                        className={`rounded-xl border p-3 transition-colors ${
                           state === "current"
-                            ? "border-[#D4AF37] bg-amber-50 shadow-sm"
+                            ? "border-stone-300 bg-stone-50 shadow-2xs ring-1 ring-stone-900/5"
                             : state === "completed"
-                            ? "border-emerald-100 bg-emerald-50/50"
-                            : "border-stone-200 bg-stone-50/40"
+                            ? "border-stone-200/80 bg-white"
+                            : "border-stone-200/50 bg-stone-50/30"
                         }`}
                       >
                         <div className="flex items-start gap-3">
                           <div
-                            className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-[10px] font-black ${
+                            className={`w-7 h-7 shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold ${
                               state === "current"
-                                ? "bg-[#7B0046] text-white"
+                                ? "bg-[#7B0046] text-white shadow-2xs"
                                 : state === "completed"
-                                ? "bg-emerald-600 text-white"
-                                : "bg-stone-200 text-stone-600"
+                                ? "bg-stone-800 text-white"
+                                : "bg-stone-150 text-stone-400 border border-stone-200/80"
                             }`}
                           >
                             {state === "completed" ? "✓" : stage.number}
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-[9px] uppercase tracking-[.12em] font-black text-stone-400">Stage {stage.number}</span>
+                              <span className="text-[9px] uppercase tracking-[.12em] font-bold text-stone-400">Stage {stage.number}</span>
                               <span
-                                className={`text-[9px] font-black ${
-                                  state === "current" ? "text-[#7B0046]" : state === "completed" ? "text-emerald-700" : "text-stone-400"
+                                className={`text-[9px] font-bold ${
+                                  state === "current" ? "text-[#7B0046]" : state === "completed" ? "text-stone-600" : "text-stone-400"
                                 }`}
                               >
                                 {state === "current" ? "CURRENT" : state === "completed" ? "COMPLETED" : "UPCOMING"}
                               </span>
                             </div>
-                            <p className={`text-xs font-bold mt-0.5 ${state === "current" ? "text-[#4D002C]" : "text-stone-700"}`}>{stage.label}</p>
+                            <p className={`text-xs font-semibold mt-0.5 ${state === "current" ? "text-stone-900" : "text-stone-700"}`}>{stage.label}</p>
                             {recorded?.completed_at && (
                               <p className="text-[9px] text-stone-400 mt-1">Recorded {new Date(recorded.completed_at).toLocaleString("en-PH")}</p>
                             )}
                             {recorded?.remarks && <p className="text-[9px] text-stone-500 mt-1">{recorded.remarks}</p>}
                           </div>
-                          {state === "current" && <ChevronRight className="h-4 w-4 text-[#D4A843] shrink-0 mt-1" />}
+                          {state === "current" && <ChevronRight className="h-4 w-4 text-stone-400 shrink-0 mt-1" />}
                         </div>
                       </div>
                     );
@@ -673,37 +809,37 @@ export default function AdminDashboard() {
               </div>
 
               {/* Purpose */}
-              <div className="bg-stone-50 rounded-xl p-4 border border-stone-200">
+              <div className="bg-stone-50/70 rounded-xl p-3.5 border border-stone-200/80">
                 <p className="text-xs uppercase tracking-wide text-stone-400 font-semibold mb-1">Purpose</p>
-                <p className="text-sm text-stone-700">{selectedPR.purpose || "N/A"}</p>
+                <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">{selectedPR.purpose || "N/A"}</p>
               </div>
 
               {/* Recorded Activity */}
-              <div className="border border-stone-200 rounded-xl p-4">
+              <div className="border border-stone-200 rounded-xl p-4 bg-white">
                 <h4 className="text-xs uppercase tracking-wide text-stone-400 font-semibold mb-3">Recorded Activity</h4>
                 {history.length ? (
                   <div className="space-y-2">
                     {history.map((h, i) => (
-                      <div key={`${h.stage_key}-${h.completed_at}-${i}`} className="border border-stone-200 rounded-lg p-3 bg-white">
+                      <div key={`${h.stage_key}-${h.completed_at}-${i}`} className="border border-stone-200/80 rounded-lg p-3 bg-stone-50/30">
                         <div className="flex justify-between gap-3">
                           <div>
                             <p className="font-semibold text-xs text-stone-800">{h.stage_name || LABELS[h.stage_key] || h.stage_key}</p>
                             <p className="text-[10px] text-stone-400 mt-1">{h.completed_at ? new Date(h.completed_at).toLocaleString("en-PH") : ""}</p>
                           </div>
                           <span
-                            className={`text-[9px] px-2 py-1 rounded-full font-bold h-fit ${
+                            className={`text-[9px] px-2 py-0.5 rounded-md font-semibold h-fit border ${
                               h.status === "rejected"
-                                ? "bg-red-100 text-red-700"
+                                ? "bg-red-50 text-red-700 border-red-200/70"
                                 : h.status === "remark"
-                                ? "bg-amber-100 text-amber-700"
-                                : "bg-emerald-100 text-emerald-700"
+                                ? "bg-stone-100 text-stone-700 border-stone-200"
+                                : "bg-stone-100 text-stone-800 border-stone-200"
                             }`}
                           >
                             {h.status === "remark" ? "Remark" : h.status === "rejected" ? "Rejected" : "Recorded"}
                           </span>
                         </div>
                         {h.remarks && (
-                          <div className="mt-2 bg-stone-50 border-l-4 border-[#D4A843] pl-3 py-1.5 text-[10px] text-stone-700 rounded-r-md">
+                          <div className="mt-2 bg-white border border-stone-200 border-l-2 border-l-[#7B0046] pl-3 py-1.5 text-[11px] text-stone-700 rounded-r-md">
                             <b className="text-stone-900">Note:</b> {h.remarks}
                           </div>
                         )}
@@ -721,7 +857,205 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {action && selectedPR && <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className={`p-3 rounded-xl ${action === "reject" ? "bg-red-100 text-red-700" : action === "remark" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{action === "reject" ? <XCircle className="h-6 w-6" /> : action === "remark" ? <MessageSquare className="h-6 w-6" /> : <CheckCircle className="h-6 w-6" />}</div><div className="flex-1"><h3 className="text-lg font-bold text-gray-900">{action === "complete" ? "Complete Next Stage" : action === "remark" ? "Send Remark" : "Reject Purchase Request"}</h3><p className="text-xs text-stone-500 mt-1 font-medium">{selectedPR.pr_no}{action === "complete" && nextStage(selectedPR) ? ` · Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}` : ""}</p></div><button onClick={() => setAction(null)} className="p-1 text-stone-400 hover:text-stone-600"><X className="h-5 w-5" /></button></div>{action === "complete" && nextStage(selectedPR) && <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5"><div className="flex items-center gap-2 text-xs font-bold text-emerald-800 mb-1"><span>Advancing Stage</span><ArrowRight className="h-3.5 w-3.5" /><span>Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}</span></div><p className="text-xs text-emerald-700">{nextStage(selectedPR)?.description}</p></div>}<label className="block text-xs font-bold text-stone-600 uppercase tracking-wide mb-2">{action === "complete" ? "Remarks / completion note" : "Reason / remark"} {action !== "complete" && <span className="text-red-500">*</span>}</label><textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder={action === "reject" ? "Explain why this PR is being rejected..." : action === "remark" ? "Enter a procurement remark..." : "Add a note for this stage (optional)..."} className="w-full min-h-[110px] rounded-xl border border-stone-200 bg-white text-gray-900 placeholder:text-stone-400 p-3 text-sm outline-none focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046] resize-y" /><div className="flex justify-end gap-2.5 mt-5"><button onClick={() => setAction(null)} disabled={busy} className="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200">Cancel</button><button onClick={() => void submitAction()} disabled={busy || (action !== "complete" && !remarks.trim())} className={`px-4 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 ${action === "reject" ? "bg-red-600 hover:bg-red-700" : action === "remark" ? "bg-[#7B0046] hover:bg-[#4D002C]" : "bg-gradient-to-r from-[#7B0046] to-[#8E0052]"}`}>{busy && <Loader2 className="h-4 w-4 animate-spin" />}{action === "complete" ? "Complete Stage" : action === "remark" ? "Send Remark" : "Reject PR"}</button></div></div></div>}
+      {action && selectedPR && (
+        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-5 border border-stone-200">
+            <div className="flex items-center justify-between gap-3 pb-3 mb-3.5 border-b border-stone-100">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${action === "reject" ? "bg-red-50 text-red-600" : action === "remark" ? "bg-stone-100 text-stone-600" : "bg-[#7B0046]/10 text-[#7B0046]"}`}>
+                  {action === "reject" ? <XCircle className="h-4.5 w-4.5" /> : action === "remark" ? <MessageSquare className="h-4.5 w-4.5" /> : <CheckCircle className="h-4.5 w-4.5" />}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-stone-900 truncate">
+                    {action === "complete" ? "Advance Stage" : action === "remark" ? "Send Remark" : "Reject Purchase Request"}
+                  </h3>
+                  <p className="text-[11px] text-stone-500 truncate font-mono">
+                    {selectedPR.pr_no}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setAction(null)}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {action === "complete" && nextStage(selectedPR) && (
+                <div className="bg-stone-50 border border-stone-200/80 rounded-xl p-3">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-stone-800">
+                    <span className="text-stone-400 font-normal">Next:</span>
+                    <span className="text-[#7B0046] font-bold">Stage {nextStage(selectedPR)?.number}:</span>
+                    <span>{nextStage(selectedPR)?.label}</span>
+                  </div>
+                  {nextStage(selectedPR)?.description && (
+                    <p className="text-[11px] text-stone-500 mt-1 leading-snug">{nextStage(selectedPR)?.description}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Official PR Number Input for Step 4 Pre-Numbering */}
+              {action === "complete" && (nextStage(selectedPR)?.key === "pr_pre_numbering" || selectedPR.current_stage === "pr_pre_numbering" || selectedPR.pr_no.includes("TEMP")) && (
+                <div className="border border-stone-200 rounded-xl p-3 bg-stone-50/60">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-semibold text-stone-800 flex items-center gap-1.5">
+                      <FileCheck className="h-3.5 w-3.5 text-stone-500" />
+                      <span>Official PR Control Number</span>
+                      {selectedPR.current_stage === "pr_pre_numbering" && selectedPR.pr_no.includes("TEMP") && (
+                        <span className="text-red-500 font-medium text-[11px]">*Required</span>
+                      )}
+                    </label>
+                    <span className="text-[10px] font-semibold text-stone-600 bg-stone-200/70 px-2 py-0.5 rounded-md">
+                      Step 4
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    value={officialPrInput}
+                    onChange={(e) => setOfficialPrInput(e.target.value.toUpperCase())}
+                    placeholder="e.g. PR-2026-0001"
+                    className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white font-mono text-xs font-bold text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[#7B0046] focus:ring-1 focus:ring-[#7B0046]"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  {action === "complete" ? "Remarks / completion note" : "Reason / remark"}{" "}
+                  {action !== "complete" ? (
+                    <span className="text-red-500">*</span>
+                  ) : (
+                    <span className="text-stone-400 font-normal text-[11px]">(Optional)</span>
+                  )}
+                </label>
+                <textarea
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  placeholder={
+                    action === "reject"
+                      ? "Explain why this PR is being rejected..."
+                      : action === "remark"
+                      ? "Enter a procurement remark..."
+                      : "Add a note for this stage (optional)..."
+                  }
+                  rows={2}
+                  className="w-full min-h-[76px] rounded-lg border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 p-2.5 text-xs outline-none focus:border-[#7B0046] focus:ring-1 focus:ring-[#7B0046] resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 mt-4 border-t border-stone-100">
+              <button
+                type="button"
+                onClick={() => setAction(null)}
+                disabled={busy}
+                className="px-3.5 py-2 rounded-lg text-xs font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void submitAction()}
+                disabled={busy || (action !== "complete" && !remarks.trim())}
+                className={`px-4 py-2 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs ${
+                  action === "reject"
+                    ? "bg-red-600 hover:bg-red-700"
+                    : action === "remark"
+                    ? "bg-stone-800 hover:bg-stone-900"
+                    : "bg-[#7B0046] hover:bg-[#630038]"
+                }`}
+              >
+                {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                <span>{action === "complete" ? "Complete Stage" : action === "remark" ? "Send Remark" : "Reject PR"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Standalone Step 4: Official PR Number Assignment Modal */}
+      {showOfficialPrModal && selectedPR && (
+        <div className="fixed inset-0 z-[75] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200">
+            <div className="flex items-start justify-between gap-3 mb-4 pb-3 border-b border-stone-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2.5 rounded-xl bg-amber-100 text-[#7B0046]">
+                  <FileCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-[#4D002C]">Step 4: PR Pre-Numbering &amp; Control</h3>
+                  <p className="text-xs text-stone-500">Assign official university PR control number</p>
+                </div>
+              </div>
+              <button onClick={() => setShowOfficialPrModal(false)} className="p-1 text-stone-400 hover:text-stone-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-stone-50 rounded-xl p-3 border border-stone-200 text-xs">
+                <span className="text-stone-500 block font-semibold">Current PR Tracking Number:</span>
+                <span className="font-mono font-black text-sm text-[#7B0046]">{selectedPR.pr_no}</span>
+                {selectedPR.pr_no.includes("TEMP") && (
+                  <span className="ml-2 inline-flex text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+                    Temporary
+                  </span>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase tracking-wide text-stone-700 mb-1.5">
+                  Official PR Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={officialPrInput}
+                  onChange={(e) => setOfficialPrInput(e.target.value.toUpperCase())}
+                  placeholder="e.g. PR-2026-0001"
+                  className="w-full h-11 px-3.5 rounded-xl border border-stone-300 bg-white font-mono text-sm font-black text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wide text-stone-600 mb-1.5">
+                  Logbook / Control Remarks <span className="text-stone-400 font-normal">(Optional)</span>
+                </label>
+                <textarea
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  placeholder="e.g. Recorded in PMO PR control logbook Vol. 3, page 15..."
+                  rows={2}
+                  className="w-full p-3 rounded-xl border border-stone-300 bg-white text-xs text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2.5 mt-6 pt-3 border-t border-stone-100">
+              <button
+                type="button"
+                onClick={() => { setShowOfficialPrModal(false); setOfficialPrInput(""); }}
+                disabled={busy}
+                className="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-700 text-xs font-bold hover:bg-stone-200 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void submitOfficialPrAssignment()}
+                disabled={busy || !officialPrInput.trim()}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] text-white text-xs font-black flex items-center gap-2 hover:opacity-95 disabled:opacity-50 cursor-pointer shadow-sm"
+              >
+                {busy && <Loader2 className="h-4 w-4 animate-spin text-amber-300" />}
+                <span>Assign &amp; Update PR Number</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {deletePR && <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className="p-3 rounded-xl bg-red-50 text-red-600"><Trash2 className="h-6 w-6" /></div><div><h3 className="text-lg font-bold text-gray-900">Delete Purchase Request?</h3><p className="text-sm text-stone-600 mt-1"><b>{deletePR}</b> and its recorded stage history will be permanently removed.</p></div></div><div className="flex justify-end gap-2"><button onClick={() => setDeletePR(null)} className="px-4 py-2 rounded-lg bg-stone-100 text-stone-700 text-sm font-semibold">Cancel</button><button onClick={() => void deleteRequest()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold flex items-center gap-2"><Trash2 className="h-4 w-4" /> Delete Permanently</button></div></div></div>}
 
