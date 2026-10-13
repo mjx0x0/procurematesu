@@ -73,6 +73,7 @@ export default function AdminDashboard() {
   const [feedback, setFeedback] = useState<{ open: boolean; tone: FeedbackTone; title: string; message: string }>({ open: false, tone: "success", title: "", message: "" });
   const [officialPrInput, setOfficialPrInput] = useState("");
   const [showOfficialPrModal, setShowOfficialPrModal] = useState(false);
+  const [approvalGroupFilter, setApprovalGroupFilter] = useState<"all" | "approved" | "drafts">("all");
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const adminMenuRef = useRef<HTMLDivElement>(null);
 
@@ -132,11 +133,20 @@ export default function AdminDashboard() {
     return () => { void supabase.removeChannel(channel); };
   }, []);
 
+  const isApprovedPR = (pr: PR) => {
+    const stage = STAGES.find((s) => s.key === pr.current_stage);
+    return stage ? stage.number >= 4 : ["completed"].includes(pr.current_stage);
+  };
+
   const filtered = useMemo(() => prs.filter((p) => {
     const q = searchTerm.trim().toLowerCase();
-    return (!q || p.pr_no.toLowerCase().includes(q) || String(p.purpose || "").toLowerCase().includes(q) || String(p.department || "").toLowerCase().includes(q)) &&
-      (statusFilter === "all" || p.current_stage === statusFilter) && (departmentFilter === "all" || p.department === departmentFilter);
-  }), [prs, searchTerm, statusFilter, departmentFilter]);
+    const matchesSearch = !q || p.pr_no.toLowerCase().includes(q) || String(p.purpose || "").toLowerCase().includes(q) || String(p.department || "").toLowerCase().includes(q);
+    const matchesStatus = statusFilter === "all" || p.current_stage === statusFilter;
+    const matchesDept = departmentFilter === "all" || p.department === departmentFilter;
+    const isApproved = isApprovedPR(p);
+    const matchesGroup = approvalGroupFilter === "all" || (approvalGroupFilter === "approved" ? isApproved : !isApproved);
+    return matchesSearch && matchesStatus && matchesDept && matchesGroup;
+  }), [prs, searchTerm, statusFilter, departmentFilter, approvalGroupFilter]);
   const departments = useMemo(() => [...new Set(prs.map((p) => p.department).filter(Boolean))], [prs]);
   const stats = useMemo(() => ({
     total: prs.length,
@@ -282,7 +292,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
       <nav className="bg-white/95 border-b border-stone-200 sticky top-0 z-40 shadow-[0_1px_12px_rgba(45,20,10,0.04)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0"><MsuLogo size={40} className="shrink-0" /><div className="min-w-0"><b className="block text-base sm:text-lg text-[#4D002C] truncate">MSU GenSan Procurement Management System</b><span className="text-[10px] sm:text-xs text-stone-500 font-semibold tracking-wide">ADMIN PORTAL</span></div></div>
+          <div className="flex items-center gap-3 min-w-0"><MsuLogo size={40} className="shrink-0" /><div className="min-w-0"><b className="block text-base sm:text-lg text-[#4D002C] truncate">MSU GenSan Procurement Management System</b></div></div>
           <div ref={adminMenuRef} className="relative shrink-0">
             <button
               type="button"
@@ -301,7 +311,7 @@ export default function AdminDashboard() {
             </button>
 
             {adminMenuOpen && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,20,10,0.12)]">
                 <div className="border-b border-stone-100 px-3 py-2.5">
                   <p className="truncate text-xs font-bold text-stone-900">{user?.email}</p>
                   <div className="mt-1 flex items-center gap-1.5">
@@ -324,7 +334,7 @@ export default function AdminDashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-7">
-        <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-[#9A7B2F] font-extrabold mb-2"><Sparkles className="h-3.5 w-3.5" /> Procurement Operations</div><h1 className="text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1><p className="text-stone-600 mt-1 text-sm">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="flex flex-wrap gap-2 items-start"><Link href="/admin/users" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><Users className="h-4 w-4" /> User Approvals</Link><Link href="/admin/inquiries" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#7B0046] border border-[#7B0046] rounded-xl text-sm font-bold text-white hover:bg-[#4D002C] disabled:opacity-60 disabled:cursor-wait shadow-sm transition-all"><RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
+        <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><h1 className="text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1><p className="text-stone-600 mt-1 text-sm">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="flex flex-wrap gap-2 items-start"><Link href="/admin/users" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><Users className="h-4 w-4" /> User Approvals</Link><Link href="/admin/inquiries" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#7B0046] border border-[#7B0046] rounded-xl text-sm font-bold text-white hover:bg-[#4D002C] disabled:opacity-60 disabled:cursor-wait shadow-sm transition-all"><RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">{[[stats.total, "Total PRs", FileCheck, "text-[#7B0046]"], [stats.pending, "In Progress", Clock, "text-amber-600"], [stats.completed, "Completed", CheckCircle, "text-emerald-700"], [stats.rejected, "Rejected", XCircle, "text-red-600"]].map(([n, l, I, c]: any) => <div key={l} className="bg-white rounded-2xl p-4 border border-stone-200 shadow-[0_5px_20px_rgba(45,20,10,0.035)]"><div className="flex justify-between items-center"><div><div className={`text-2xl font-bold ${c}`}>{n}</div><div className="text-xs font-semibold text-stone-600 mt-0.5">{l}</div></div><I className={`h-5 w-5 ${c}`} /></div></div>)}</div>
 
@@ -381,10 +391,47 @@ export default function AdminDashboard() {
               <h2 className="text-lg sm:text-xl font-bold text-[#4D002C]">Purchase Requests</h2>
               <p className="text-xs sm:text-sm text-stone-500 mt-0.5">Workflow stages are enforced sequentially in accordance with PMO procurement rules.</p>
             </div>
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-xs sm:text-sm font-bold text-stone-700 w-fit">
-              <span className="h-2 w-2 rounded-full bg-[#7B0046]" />
-              {filtered.length} {filtered.length === 1 ? "Record" : "Records"}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1 p-1 bg-stone-100 border border-stone-200/80 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setApprovalGroupFilter("all")}
+                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    approvalGroupFilter === "all"
+                      ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
+                      : "text-stone-600 hover:text-stone-900 font-semibold"
+                  }`}
+                >
+                  All <span className="ml-1 text-[11px] font-medium text-stone-500">({prs.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setApprovalGroupFilter("approved")}
+                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    approvalGroupFilter === "approved"
+                      ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
+                      : "text-stone-600 hover:text-stone-900 font-semibold"
+                  }`}
+                >
+                  Approved <span className="ml-1 text-[11px] font-medium text-stone-500">({prs.filter(isApprovedPR).length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setApprovalGroupFilter("drafts")}
+                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    approvalGroupFilter === "drafts"
+                      ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
+                      : "text-stone-600 hover:text-stone-900 font-semibold"
+                  }`}
+                >
+                  Under Review <span className="ml-1 text-[11px] font-medium text-stone-500">({prs.filter((p) => !isApprovedPR(p)).length})</span>
+                </button>
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-xs font-bold text-stone-700 w-fit">
+                <span className="h-2 w-2 rounded-full bg-[#7B0046]" />
+                {filtered.length} {filtered.length === 1 ? "Record" : "Records"}
+              </span>
+            </div>
           </div>
           {filtered.length === 0 ? (
             <div className="p-12 text-center text-sm font-medium text-stone-500">No purchase requests found matching the filter criteria.</div>

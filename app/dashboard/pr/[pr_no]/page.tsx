@@ -186,15 +186,6 @@ export default function PRDetailPage() {
               <h1 className="text-2xl sm:text-3xl font-black text-[#4D002C] font-mono tracking-tight">
                 {pr.pr_no}
               </h1>
-              {pr.pr_no?.includes("TEMP") ? (
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-300">
-                  Temporary PR Number
-                </span>
-              ) : (
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-300">
-                  Official PR Number
-                </span>
-              )}
               <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClass(pr.current_stage)}`}>
                 {statusLabel(pr.current_stage)}
               </span>

@@ -115,8 +115,7 @@ export default function LandingLoginCard() {
         <div className="border-b border-stone-100 px-6 pb-4 pt-6 sm:px-7">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#F5AB26]">Institutional Access</p>
-              <h2 className="mt-1 text-2xl font-black tracking-tight text-[#4D002C]">Welcome!</h2>
+              <h2 className="text-2xl font-black tracking-tight text-[#4D002C]">Welcome!</h2>
               <p className="mt-1 text-xs text-stone-500">Sign in to the MSU GenSan Procurement System.</p>
             </div>
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7B0046] to-[#4D002C] shadow-sm border border-[#F5AB26]/25">
@@ -212,11 +211,6 @@ export default function LandingLoginCard() {
             )}
           </button>
 
-          <div className="flex items-center gap-2.5 text-[10px] font-semibold tracking-[0.14em] text-stone-400 pt-1">
-            <div className="h-px flex-1 bg-stone-200" />
-            <span>ACCOUNT ACCESS</span>
-            <div className="h-px flex-1 bg-stone-200" />
-          </div>
           <div className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-stone-50/80 px-4 py-3">
             <div className="flex min-w-0 items-start gap-2">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#F5AB26]" />
