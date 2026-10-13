@@ -236,7 +236,7 @@ export default function AdminDashboard() {
           action,
           newStatus: action === "complete" ? nextStage(selectedPR)?.key : undefined,
           remarks: remarks.trim(),
-          officialPrNo: officialPrInput.trim() || undefined,
+          officialPrNo: (action === "complete" && selectedPR.current_stage === "pr_pre_numbering") ? (officialPrInput.trim() || undefined) : undefined,
         })
       });
       const result = await response.json();
@@ -442,10 +442,10 @@ export default function AdminDashboard() {
                 <table className="w-full table-fixed border-collapse">
                   <thead className="bg-[#FAF7F2] border-b border-stone-200 text-stone-600">
                     <tr>
-                      <th className="w-[14%] lg:w-[13%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">PR #</th>
-                      <th className="w-[24%] lg:w-[23%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Purpose</th>
-                      <th className="w-[16%] lg:w-[15%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Department</th>
-                      <th className="w-[15%] lg:w-[13%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Amount</th>
+                      <th className="w-[18%] lg:w-[17%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">PR #</th>
+                      <th className="w-[22%] lg:w-[21%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Purpose</th>
+                      <th className="w-[15%] lg:w-[14%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Department</th>
+                      <th className="w-[14%] lg:w-[12%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Amount</th>
                       <th className="w-[19%] lg:w-[17%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Current Status</th>
                       <th className="hidden lg:table-cell lg:w-[10%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Date</th>
                       <th className="w-[12%] lg:w-[9%] px-3 lg:px-4 py-3.5 text-right text-xs uppercase tracking-wider font-bold pr-4 lg:pr-6">Action</th>
@@ -462,11 +462,19 @@ export default function AdminDashboard() {
                           onClick={() => void openDetails(pr)}
                           className={`hover:bg-[#FFFDF7] transition-colors cursor-pointer ${rfqMode ? "bg-amber-50/25" : ""}`}
                         >
-                          <td className="px-3 lg:px-4 py-3.5 align-middle whitespace-nowrap">
-                            <div className="flex items-center gap-1.5 min-w-0">
-                              <span className="font-mono text-xs lg:text-sm font-extrabold text-[#7B0046] tracking-tight">{pr.pr_no}</span>
+                          <td className="px-3 lg:px-4 py-3.5 align-middle">
+                            <div className="flex flex-col items-start gap-1 min-w-0 max-w-full">
+                              <span
+                                className="font-mono text-xs lg:text-sm font-extrabold text-[#7B0046] tracking-tight truncate max-w-full block"
+                                title={pr.pr_no}
+                              >
+                                {pr.pr_no}
+                              </span>
                               {pr.pr_no.includes("TEMP") && (
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 text-[9px] font-black uppercase tracking-wider shrink-0" title="Temporary PR Number (Awaiting Pre-Numbering at Step 4)">
+                                <span
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 text-[9px] font-black uppercase tracking-wider shrink-0"
+                                  title="Temporary PR Number (Awaiting Pre-Numbering at Step 4)"
+                                >
                                   Temp #
                                 </span>
                               )}
@@ -528,8 +536,8 @@ export default function AdminDashboard() {
                       className={`p-4 hover:bg-[#FFFDF7] transition-colors cursor-pointer flex flex-col gap-2.5 ${rfqMode ? "bg-amber-50/25" : ""}`}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="font-mono text-sm font-extrabold text-[#7B0046] tracking-tight">{pr.pr_no}</span>
+                        <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                          <span className="font-mono text-xs sm:text-sm font-extrabold text-[#7B0046] tracking-tight truncate max-w-[200px]" title={pr.pr_no}>{pr.pr_no}</span>
                           {pr.pr_no.includes("TEMP") && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 text-[9px] font-black uppercase">
                               Temp #
@@ -672,8 +680,8 @@ export default function AdminDashboard() {
                       </button>
                     )}
 
-                    {/* Step 4 Official PR Assignment button */}
-                    {(selectedPR.current_stage === "pr_pre_numbering" || selectedPR.pr_no.includes("TEMP")) && (
+                    {/* Step 4 Official PR Assignment button - Only at Stage 4 */}
+                    {selectedPR.current_stage === "pr_pre_numbering" && (
                       <button
                         onClick={() => {
                           setOfficialPrInput(selectedPR.pr_no.includes("TEMP") ? "" : selectedPR.pr_no);
@@ -706,8 +714,8 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Pre-Numbering Banner if Temporary Number */}
-                {selectedPR.pr_no.includes("TEMP") && (
+                {/* Pre-Numbering Banner - Only displayed at Stage 4 if still Temporary Number */}
+                {selectedPR.current_stage === "pr_pre_numbering" && selectedPR.pr_no.includes("TEMP") && (
                   <div className="bg-stone-50 border border-stone-200 rounded-xl p-3.5 flex items-start gap-3">
                     <div className="p-2 rounded-lg bg-stone-200/70 text-stone-700 shrink-0 mt-0.5">
                       <AlertCircle className="h-4.5 w-4.5" />
@@ -944,14 +952,14 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {/* Official PR Number Input for Step 4 Pre-Numbering */}
-              {action === "complete" && (nextStage(selectedPR)?.key === "pr_pre_numbering" || selectedPR.current_stage === "pr_pre_numbering" || selectedPR.pr_no.includes("TEMP")) && (
+              {/* Official PR Number Input for Step 4 Pre-Numbering - Only shown when completing Stage 4 */}
+              {action === "complete" && selectedPR.current_stage === "pr_pre_numbering" && (
                 <div className="border border-stone-200 rounded-xl p-3 bg-stone-50/60">
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-xs font-semibold text-stone-800 flex items-center gap-1.5">
                       <FileCheck className="h-3.5 w-3.5 text-stone-500" />
                       <span>Official PR Control Number</span>
-                      {selectedPR.current_stage === "pr_pre_numbering" && selectedPR.pr_no.includes("TEMP") && (
+                      {selectedPR.pr_no.includes("TEMP") && (
                         <span className="text-red-500 font-medium text-[11px]">*Required</span>
                       )}
                     </label>
