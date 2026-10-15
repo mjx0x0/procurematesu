@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import PageTransition from "@/components/PageTransition";
 import ConsoleSanitizer from "@/components/ConsoleSanitizer";
 import AppThemeShell from "@/components/AppThemeShell";

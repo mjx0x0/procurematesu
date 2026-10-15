@@ -9,36 +9,6 @@ import {
 
 type Action = 'complete' | 'remark' | 'reject';
 const JSON_HEADERS = { 'Cache-Control': 'no-store' };
-const RFQ_GENERATION_STAGE = 'rfq_generation';
-const RFQ_EVALUATION_STAGE = 'rfq_evaluation';
-const RFQ_PRINTING_STAGE = 'rfq_printing';
-
-type RFQRecord = {
-  id: string;
-  pr_no: string;
-  template_type: 'less_than_50k' | 'more_than_50k';
-  reference_no: string;
-  project_name: string;
-  location: string;
-  rfq_date: string;
-  generated_by: string;
-  form_data?: any;
-  created_at: string;
-  updated_at: string;
-};
-
-function isRFQFormComplete(formData: any) {
-  if (!formData || typeof formData !== 'object') return false;
-  const requiredText = ['reference_no', 'project_name', 'location', 'rfq_date', 'purpose', 'office', 'instructions'];
-  if (requiredText.some((key) => typeof formData[key] !== 'string' || !formData[key].trim())) return false;
-  if (!Array.isArray(formData.items) || formData.items.length === 0) return false;
-  return formData.items.every((item: any) =>
-    Number(item?.quantity) > 0 &&
-    Number(item?.abc) > 0 &&
-    typeof item?.technical_specifications === 'string' && item.technical_specifications.trim() &&
-    typeof item?.supplier_unit === 'string' && item.supplier_unit.trim()
-  );
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -157,84 +127,8 @@ export async function POST(req: NextRequest) {
       }, { status: 400, headers: JSON_HEADERS });
     }
 
-    // Step 7: an RFQ record is mandatory before the PR can leave the generation stage.
-    if (pr.current_stage === RFQ_GENERATION_STAGE && newStatus === RFQ_EVALUATION_STAGE) {
-      const { data: rfq, error: rfqError } = await db
-        .from('rfqs')
-        .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,form_data,created_at,updated_at')
-        .eq('pr_no', effectivePrNo)
-        .maybeSingle();
-
-      if (rfqError) {
-        console.error('[complete-stage] RFQ validation lookup failed:', rfqError.message);
-        return NextResponse.json({ error: 'Unable to verify the RFQ form. Please open the RFQ form, complete it, and save it before proceeding.' }, { status: 500, headers: JSON_HEADERS });
-      }
-      if (!rfq) {
-        return NextResponse.json({ error: 'RFQ form is required before Step 8. Open the RFQ form, fill in the required sections, and save it first.' }, { status: 409, headers: JSON_HEADERS });
-      }
-      if (!isRFQFormComplete(rfq.form_data)) {
-        return NextResponse.json({ error: 'RFQ form is incomplete. Please open Step 7 RFQ Generation, complete all required administrative fields and item details, then save the RFQ before proceeding to Step 8: RFQ Evaluation.' }, { status: 409, headers: JSON_HEADERS });
-      }
-    }
-
-    // Step 9 remains locked behind Step 8 because the normal sequential transition
-    // check above only permits rfq_evaluation -> rfq_printing.
-    if (pr.current_stage === RFQ_EVALUATION_STAGE && newStatus === RFQ_PRINTING_STAGE) {
-      const { data: rfq, error: rfqError } = await db.from('rfqs').select('id,form_data').eq('pr_no', effectivePrNo).maybeSingle();
-      if (rfqError || !rfq || !isRFQFormComplete(rfq.form_data)) {
-        return NextResponse.json({ error: 'RFQ evaluation cannot be completed because the saved RFQ form is missing or incomplete. Open the RFQ, verify it, and save any corrections before proceeding to Step 9: RFQ Printing.' }, { status: 409, headers: JSON_HEADERS });
-      }
-    }
-
-    let generatedRFQ: RFQRecord | null = null;
-    let createdRFQ = false;
-
-    // Step 7 is the RFQ-generation milestone. Create the RFQ record as part of
-    // the same controlled server-side stage transition so advancing the PR cannot
-    // leave Step 7 without its corresponding RFQ record.
-    if (newStatus === RFQ_GENERATION_STAGE) {
-      const { data: existingRFQ, error: existingRFQError } = await db
-        .from('rfqs')
-        .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,form_data,created_at,updated_at')
-        .eq('pr_no', effectivePrNo)
-        .maybeSingle();
-
-      if (existingRFQError) {
-        console.error('[complete-stage] RFQ lookup failed:', existingRFQError.message);
-        return NextResponse.json({ error: 'Unable to verify the RFQ record for this Purchase Request.' }, { status: 500, headers: JSON_HEADERS });
-      }
-
-      if (existingRFQ) {
-        generatedRFQ = existingRFQ as RFQRecord;
-      } else {
-        const total = Number(pr.total || 0);
-        const templateType = total < 50000 ? 'less_than_50k' : 'more_than_50k';
-        const { data: newRFQ, error: rfqError } = await db
-          .from('rfqs')
-          .insert({
-            pr_no: effectivePrNo,
-            template_type: templateType,
-            reference_no: effectivePrNo,
-            project_name: pr.purpose,
-            location: '',
-            generated_by: user.id,
-          })
-          .select('id,pr_no,template_type,reference_no,project_name,location,rfq_date,generated_by,form_data,created_at,updated_at')
-          .single();
-
-        if (rfqError || !newRFQ) {
-          console.error('[complete-stage] Automatic RFQ creation failed:', rfqError?.message);
-          return NextResponse.json({ error: 'RFQ could not be generated for this Purchase Request. The PR was not advanced.' }, { status: 500, headers: JSON_HEADERS });
-        }
-
-        generatedRFQ = newRFQ as RFQRecord;
-        createdRFQ = true;
-      }
-    }
-
     const { error: updateError } = await db.from('purchase_requests').update({ current_stage: newStatus, current_status: newStatus, updated_at: now }).eq('pr_no', effectivePrNo).eq('current_stage', pr.current_stage);
     if (updateError) {
-      if (createdRFQ) await db.from('rfqs').delete().eq('id', generatedRFQ?.id || '00000000-0000-0000-0000-000000000000');
       return NextResponse.json({ error: 'Failed to update purchase request.' }, { status: 500, headers: JSON_HEADERS });
     }
 
@@ -242,7 +136,6 @@ export async function POST(req: NextRequest) {
     const { error: historyError } = await db.from('pr_stages_completed').insert({ pr_no: effectivePrNo, stage_name: PROCUREMENT_STAGE_LABELS[newStatus], stage_key: newStatus, status: 'completed', completed_at: now, remarks: stageRemarks });
     if (historyError) {
       await db.from('purchase_requests').update({ current_stage: pr.current_stage, current_status: pr.current_status, updated_at: new Date().toISOString() }).eq('pr_no', effectivePrNo).eq('current_stage', newStatus);
-      if (createdRFQ) await db.from('rfqs').delete().eq('id', generatedRFQ?.id || '00000000-0000-0000-0000-000000000000');
       return NextResponse.json({ error: 'Stage history could not be recorded. No stage change was kept.' }, { status: 500, headers: JSON_HEADERS });
     }
 
@@ -259,9 +152,6 @@ export async function POST(req: NextRequest) {
       stageHistory,
       officialPrNo: effectivePrNo,
       oldPrNo: prNo !== effectivePrNo ? prNo : undefined,
-      rfqGenerated: newStatus === RFQ_GENERATION_STAGE,
-      rfqCreated: createdRFQ,
-      rfq: generatedRFQ,
     }, { headers: JSON_HEADERS });
   } catch (error) {
     console.error('[complete-stage] Unexpected API error:', error);

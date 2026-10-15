@@ -6,7 +6,6 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { ActionFeedbackModal, type FeedbackTone } from "@/components/ui/ActionFeedbackModal";
-import RFQEditorModal from "@/components/RFQEditorModal";
 import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
 import { MsuLogo } from "@/components/msu-logo";
 import {
@@ -34,7 +33,6 @@ interface StageHistory {
   remarks?: string;
   status?: string;
 }
-type RfqMode = "generation" | "evaluation" | "printing";
 
 const STAGES = PROCUREMENT_STAGES;
 const LABELS: Record<string, string> = { ...PROCUREMENT_STAGE_LABELS, draft: "Draft", rejected: "Rejected", cancelled: "Cancelled", completed: "Completed" };
@@ -65,7 +63,6 @@ export default function AdminDashboard() {
   const [history, setHistory] = useState<StageHistory[]>([]);
   const [showDetails, setShowDetails] = useState(false);
   const [fullPrNo, setFullPrNo] = useState<string | null>(null);
-  const [rfq, setRfq] = useState<{ prNo: string; mode: RfqMode } | null>(null);
   const [action, setAction] = useState<"complete" | "remark" | "reject" | null>(null);
   const [remarks, setRemarks] = useState("");
   const [busy, setBusy] = useState(false);
@@ -165,14 +162,6 @@ export default function AdminDashboard() {
     setAction(type);
     setRemarks("");
     setOfficialPrInput("");
-  };
-  const openRfq = async (pr: PR, mode: RfqMode) => {
-    if (mode === "generation") {
-      const response = await fetch("/api/admin/rfq", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prNo: pr.pr_no }) });
-      const result = await response.json();
-      if (!response.ok) { showFeedback("error", "RFQ Preparation Failed", result.error || "Unable to prepare the RFQ."); return; }
-    }
-    setRfq({ prNo: pr.pr_no, mode });
   };
 
   const submitOfficialPrAssignment = async () => {
@@ -442,10 +431,10 @@ export default function AdminDashboard() {
                 <table className="w-full table-fixed border-collapse">
                   <thead className="bg-[#FAF7F2] border-b border-stone-200 text-stone-600">
                     <tr>
-                      <th className="w-[18%] lg:w-[17%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">PR #</th>
-                      <th className="w-[22%] lg:w-[21%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Purpose</th>
-                      <th className="w-[15%] lg:w-[14%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Department</th>
-                      <th className="w-[14%] lg:w-[12%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Amount</th>
+                      <th className="w-[22%] lg:w-[20%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">PR #</th>
+                      <th className="w-[20%] lg:w-[19%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Purpose</th>
+                      <th className="w-[14%] lg:w-[13%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Department</th>
+                      <th className="w-[13%] lg:w-[12%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Amount</th>
                       <th className="w-[19%] lg:w-[17%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Current Status</th>
                       <th className="hidden lg:table-cell lg:w-[10%] px-3 lg:px-4 py-3.5 text-left text-xs uppercase tracking-wider font-bold">Date</th>
                       <th className="w-[12%] lg:w-[9%] px-3 lg:px-4 py-3.5 text-right text-xs uppercase tracking-wider font-bold pr-4 lg:pr-6">Action</th>
@@ -455,32 +444,26 @@ export default function AdminDashboard() {
                     {filtered.map((pr) => {
                       const stepInfo = currentStage(pr);
                       const stageNumber = stepInfo?.number || 0;
-                      const rfqMode: RfqMode | null = pr.current_stage === "rfq_generation" ? "generation" : pr.current_stage === "rfq_evaluation" ? "evaluation" : pr.current_stage === "rfq_printing" ? "printing" : null;
                       return (
                         <tr
                           key={pr.pr_no}
                           onClick={() => void openDetails(pr)}
-                          className={`hover:bg-[#FFFDF7] transition-colors cursor-pointer ${rfqMode ? "bg-amber-50/25" : ""}`}
+                          className="hover:bg-[#FFFDF7] transition-colors cursor-pointer"
                         >
-                          <td className="px-3 lg:px-4 py-3.5 align-middle">
-                            <div className="flex flex-col items-start gap-1 min-w-0 max-w-full">
+                          <td className="px-3 lg:px-4 py-3.5 align-middle max-w-0 overflow-hidden">
+                            <div className="flex flex-col items-start gap-1 min-w-0 max-w-full overflow-hidden">
                               <span
-                                className="font-mono text-xs lg:text-sm font-extrabold text-[#7B0046] tracking-tight truncate max-w-full block"
+                                className="font-mono text-xs font-extrabold text-[#7B0046] tracking-tight truncate max-w-full block min-w-0 select-all"
                                 title={pr.pr_no}
                               >
                                 {pr.pr_no}
                               </span>
                               {pr.pr_no.includes("TEMP") && (
                                 <span
-                                  className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 text-[9px] font-black uppercase tracking-wider shrink-0"
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 text-[9px] font-black uppercase tracking-wider shrink-0 max-w-full whitespace-nowrap"
                                   title="Temporary PR Number (Awaiting Pre-Numbering at Step 4)"
                                 >
                                   Temp #
-                                </span>
-                              )}
-                              {rfqMode && (
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300 text-[#8B6009] text-[9px] font-black tracking-wider uppercase shrink-0">
-                                  RFQ
                                 </span>
                               )}
                             </div>
@@ -528,26 +511,22 @@ export default function AdminDashboard() {
                 {filtered.map((pr) => {
                   const stepInfo = currentStage(pr);
                   const stageNumber = stepInfo?.number || 0;
-                  const rfqMode: RfqMode | null = pr.current_stage === "rfq_generation" ? "generation" : pr.current_stage === "rfq_evaluation" ? "evaluation" : pr.current_stage === "rfq_printing" ? "printing" : null;
                   return (
                     <div
                       key={pr.pr_no}
                       onClick={() => void openDetails(pr)}
-                      className={`p-4 hover:bg-[#FFFDF7] transition-colors cursor-pointer flex flex-col gap-2.5 ${rfqMode ? "bg-amber-50/25" : ""}`}
+                      className="p-4 hover:bg-[#FFFDF7] transition-colors cursor-pointer flex flex-col gap-2.5"
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-                          <span className="font-mono text-xs sm:text-sm font-extrabold text-[#7B0046] tracking-tight truncate max-w-[200px]" title={pr.pr_no}>{pr.pr_no}</span>
-                          {pr.pr_no.includes("TEMP") && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 text-[9px] font-black uppercase">
-                              Temp #
-                            </span>
-                          )}
-                          {rfqMode && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300 text-[#8B6009] text-[9px] font-black uppercase">
-                              RFQ
-                            </span>
-                          )}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex flex-col items-start gap-1 min-w-0 max-w-[210px]">
+                          <span className="font-mono text-xs sm:text-sm font-extrabold text-[#7B0046] tracking-tight truncate max-w-full block" title={pr.pr_no}>{pr.pr_no}</span>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {pr.pr_no.includes("TEMP") && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 text-[9px] font-black uppercase">
+                                Temp #
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <span className="font-mono text-sm font-bold text-stone-900 shrink-0">
                           ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -651,35 +630,6 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 shrink-0">
-                    {/* RFQ Action buttons */}
-                    {selectedPR.current_stage === "rfq_generation" && (
-                      <button
-                        onClick={() => void openRfq(selectedPR, "generation")}
-                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#7B0046] hover:bg-[#630038] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-[#7B0046] active:scale-98"
-                      >
-                        <FileText className="h-4 w-4 text-white" />
-                        <span>Generate Official RFQ</span>
-                      </button>
-                    )}
-                    {selectedPR.current_stage === "rfq_evaluation" && (
-                      <button
-                        onClick={() => void openRfq(selectedPR, "evaluation")}
-                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#7B0046] hover:bg-[#630038] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-[#7B0046] active:scale-98"
-                      >
-                        <FileText className="h-4 w-4 text-white" />
-                        <span>Review & Evaluate RFQ</span>
-                      </button>
-                    )}
-                    {selectedPR.current_stage === "rfq_printing" && (
-                      <button
-                        onClick={() => void openRfq(selectedPR, "printing")}
-                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#7B0046] hover:bg-[#630038] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-[#7B0046] active:scale-98"
-                      >
-                        <FileText className="h-4 w-4 text-white" />
-                        <span>Print RFQ (3-4 Copies)</span>
-                      </button>
-                    )}
-
                     {/* Step 4 Official PR Assignment button - Only at Stage 4 */}
                     {selectedPR.current_stage === "pr_pre_numbering" && (
                       <button
@@ -1114,7 +1064,6 @@ export default function AdminDashboard() {
 
       {deletePR && <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className="p-3 rounded-xl bg-red-50 text-red-600"><Trash2 className="h-6 w-6" /></div><div><h3 className="text-lg font-bold text-gray-900">Delete Purchase Request?</h3><p className="text-sm text-stone-600 mt-1"><b>{deletePR}</b> and its recorded stage history will be permanently removed.</p></div></div><div className="flex justify-end gap-2"><button onClick={() => setDeletePR(null)} className="px-4 py-2 rounded-lg bg-stone-100 text-stone-700 text-sm font-semibold">Cancel</button><button onClick={() => void deleteRequest()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold flex items-center gap-2"><Trash2 className="h-4 w-4" /> Delete Permanently</button></div></div></div>}
 
-      {rfq && <RFQEditorModal prNo={rfq.prNo} mode={rfq.mode} onClose={() => setRfq(null)} onSaved={() => { void loadData(); }} />}
       {fullPrNo && <AdminPRFullFormModal prNo={fullPrNo} onClose={() => setFullPrNo(null)} />}
       <ActionFeedbackModal open={feedback.open} tone={feedback.tone} title={feedback.title} message={feedback.message} onClose={() => setFeedback((f) => ({ ...f, open: false }))} actionLabel="Done" />
       <style jsx global>{`

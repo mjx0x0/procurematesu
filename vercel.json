@@ -6,6 +6,6 @@
       "use": "@vercel/next"
     }
   ],
-  "buildCommand": "next build",
+  "buildCommand": "NODE_ENV=production next build",
   "outputDirectory": ".next"
 }

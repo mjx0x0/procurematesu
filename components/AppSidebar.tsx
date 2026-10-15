@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MsuLogo } from "@/components/msu-logo";
-import { BarChart3, Bot, FilePlus2, MessageSquare, ShieldCheck, Users, ClipboardCheck } from "lucide-react";
+import { BarChart3, Bot, FilePlus2, MessageSquare, ShieldCheck, Users } from "lucide-react";
 
 interface AppSidebarProps {
   mode: "user" | "admin";
@@ -27,7 +27,6 @@ const adminItems: SidebarItem[] = [
   { href: "/admin", label: "Dashboard", icon: BarChart3 },
   { href: "/admin/users", label: "User Approvals", icon: Users },
   { href: "/admin/inquiries", label: "Inquiries", icon: MessageSquare },
-  { href: "/admin/rfq", label: "RFQ Workspace", icon: ClipboardCheck },
 ];
 
 export default function AppSidebar({ mode }: AppSidebarProps) {
