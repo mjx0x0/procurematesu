@@ -228,15 +228,9 @@ export default function InquiriesPage() {
               <MessageSquare className="h-5 w-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <b className="text-xl font-black text-[#4D002C]">
-                  Inquiry <span className="text-[#F5AB26]">Monitoring</span>
-                </b>
-                <span className="text-[11px] bg-red-50 text-[#7B0046] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                  Admin Tool
-                </span>
-              </div>
-              <p className="text-[10px] text-stone-500">Isko BidDo assistant interaction logs & procurement knowledge inquiries</p>
+              <b className="text-xl font-black text-[#4D002C]">
+                Inquiry <span className="text-[#F5AB26]">Monitoring</span>
+              </b>
             </div>
           </div>
           <div ref={adminMenuRef} className="relative shrink-0">

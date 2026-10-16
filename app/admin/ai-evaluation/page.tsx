@@ -1,22 +1,40 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { ArrowLeft, Bot, CheckCircle, Loader2, Play, ShieldCheck, TriangleAlert } from "lucide-react";
+import { ArrowLeft, Bot, CheckCircle, ChevronDown, Loader2, LogOut, Play, ShieldCheck, TriangleAlert, User } from "lucide-react";
 
 interface Result { test_name: string; question: string; response: string; score: number; keyword_coverage: number; retrieval_grounded: boolean; sources_present: boolean; notes: string; sources?: string[]; matchedKeywords?: string[]; }
 interface Evaluation { id: string; test_name: string; score: number; created_at: string; notes: string | null; }
 
 export default function AIEvaluationPage() {
   const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const adminMenuRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState<Result[]>([]);
   const [average, setAverage] = useState<number | null>(null);
   const [history, setHistory] = useState<Evaluation[]>([]);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target as Node)) {
+        setAdminMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
 
   useEffect(() => {
     (async () => {
@@ -28,6 +46,7 @@ export default function AIEvaluationPage() {
       if (!user) { router.replace("/"); return; }
       const { data: profile } = await supabase.from("users").select("role,is_active").eq("id", user.id).maybeSingle();
       if (!profile || profile.role !== "admin" || profile.is_active === false) { router.replace("/dashboard"); return; }
+      setCurrentUser(user);
       const { data } = await supabase.from("ai_response_evaluations").select("id,test_name,score,created_at,notes").order("created_at", { ascending: false }).limit(30);
       setHistory((data || []) as Evaluation[]);
       setLoading(false);
@@ -53,23 +72,48 @@ export default function AIEvaluationPage() {
               <Bot className="h-5 w-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <b className="text-xl font-black text-[#4D002C]">
-                  AI <span className="text-[#F5AB26]">Evaluation</span>
-                </b>
-                <span className="text-[11px] bg-red-50 text-[#7B0046] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                  Admin Tool
-                </span>
-              </div>
-              <p className="text-[10px] text-stone-500">Benchmark Isko BidDo AI accuracy, concept coverage, and grounding</p>
+              <b className="text-xl font-black text-[#4D002C]">
+                AI <span className="text-[#F5AB26]">Evaluation</span>
+              </b>
             </div>
           </div>
-          <Link
-            href="/admin"
-            className="text-xs font-bold text-stone-600 hover:text-[#7B0046] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
-          </Link>
+          <div ref={adminMenuRef} className="relative shrink-0">
+            <button
+              type="button"
+              onClick={() => setAdminMenuOpen((prev) => !prev)}
+              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 cursor-pointer"
+              aria-expanded={adminMenuOpen}
+              aria-label="Admin account menu"
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7B0046]/10 text-[10px] font-bold text-[#7B0046]">
+                <User className="h-3.5 w-3.5" />
+              </div>
+              <span className="hidden sm:inline font-medium text-xs max-w-[170px] truncate text-stone-800">
+                {currentUser?.email || "procurement@msugensan.edu.ph"}
+              </span>
+              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7B0046]" : ""}`} />
+            </button>
+
+            {adminMenuOpen && (
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">
+                <div className="border-b border-stone-100 px-3 py-2.5">
+                  <p className="truncate text-xs font-bold text-stone-900">{currentUser?.email || "Procurement Admin"}</p>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-[#7B0046] border border-red-200/60">
+                      Administrator
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 

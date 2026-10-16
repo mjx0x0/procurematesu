@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, CheckCircle, Loader2, UserCheck, UserX, Users, RefreshCw, AlertCircle } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
+import { ArrowLeft, CheckCircle, ChevronDown, Loader2, LogOut, User, UserCheck, UserX, Users, RefreshCw, AlertCircle } from "lucide-react";
 
 interface UserAccount {
   id: string;
@@ -19,11 +20,45 @@ interface UserAccount {
 
 export default function AdminUsersPage() {
   const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const adminMenuRef = useRef<HTMLDivElement>(null);
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target as Node)) {
+        setAdminMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        let { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          const { data: { session } } = await supabase.auth.getSession();
+          user = session?.user || null;
+        }
+        setCurrentUser(user);
+      } catch (err) {
+        console.error("Error fetching current user:", err);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
 
   const loadUsers = useCallback(async () => {
     setError(null);
@@ -96,23 +131,48 @@ export default function AdminUsersPage() {
               <Users className="h-5 w-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <b className="text-xl font-black text-[#4D002C]">
-                  User <span className="text-[#F5AB26]">Management</span>
-                </b>
-                <span className="text-[11px] bg-red-50 text-[#7B0046] border border-red-200/80 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                  Admin Tool
-                </span>
-              </div>
-              <p className="text-[10px] text-stone-500">Review, authorize, and verify university personnel registrations</p>
+              <b className="text-xl font-black text-[#4D002C]">
+                User <span className="text-[#F5AB26]">Management</span>
+              </b>
             </div>
           </div>
-          <Link
-            href="/admin"
-            className="text-xs font-bold text-stone-600 hover:text-[#7B0046] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
-          </Link>
+          <div ref={adminMenuRef} className="relative shrink-0">
+            <button
+              type="button"
+              onClick={() => setAdminMenuOpen((prev) => !prev)}
+              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 cursor-pointer"
+              aria-expanded={adminMenuOpen}
+              aria-label="Admin account menu"
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7B0046]/10 text-[10px] font-bold text-[#7B0046]">
+                <User className="h-3.5 w-3.5" />
+              </div>
+              <span className="hidden sm:inline font-medium text-xs max-w-[170px] truncate text-stone-800">
+                {currentUser?.email || "procurement@msugensan.edu.ph"}
+              </span>
+              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7B0046]" : ""}`} />
+            </button>
+
+            {adminMenuOpen && (
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">
+                <div className="border-b border-stone-100 px-3 py-2.5">
+                  <p className="truncate text-xs font-bold text-stone-900">{currentUser?.email || "Procurement Admin"}</p>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-[#7B0046] border border-red-200/60">
+                      Administrator
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -220,7 +280,7 @@ export default function AdminUsersPage() {
                     </div>
                   </div>
 
-                  {user.role !== "admin" && (
+                  {user.role !== "admin" && user.status === "pending" && (
                     <div className="flex items-center gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-stone-100">
                       <button
                         disabled={busyId === user.id}
