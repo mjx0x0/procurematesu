@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
@@ -446,7 +447,7 @@ function getStageFriendlyName(stage: string): string {
   return map[stage] || stage.replace(/_/g, ' ').toUpperCase();
 }
 
-async function handleTrackPR(prNo: string): Promise<string> {
+async function handleTrackPR(prNo: string, authenticatedUserId: string, isAdmin: boolean): Promise<string> {
   const cleanPR = prNo.trim().toUpperCase();
 
   const notFoundResponse =
@@ -459,11 +460,14 @@ async function handleTrackPR(prNo: string): Promise<string> {
   }
 
   try {
-    const { data: pr, error } = await supabase
+    let query = supabase
       .from('purchase_requests')
       .select('*, pr_stages_completed(*)')
-      .eq('pr_no', cleanPR)
-      .single();
+      .eq('pr_no', cleanPR);
+
+    // Enforce ownership at the data query, not from a client-supplied userId.
+    if (!isAdmin) query = query.eq('user_id', authenticatedUserId);
+    const { data: pr, error } = await query.single();
 
     if (error) {
       // PGRST116 is Supabase/PostgREST's single-row result error. Treat it
@@ -864,8 +868,45 @@ function getVerifiedInstitutionalAnswer(query: string): string | null {
 
 export async function POST(req: NextRequest) {
   try {
+    // This route is also imported by /api/chat/send, but it remains a public
+    // HTTP endpoint. Authenticate here as well so callers cannot bypass the
+    // newer route's authorization checks by posting directly.
+    let authenticatedUser: { id: string } | null = null;
+    const authorization = req.headers.get('authorization');
+    if (authorization?.startsWith('Bearer ') && supabase) {
+      const { data, error } = await supabase.auth.getUser(authorization.slice(7).trim());
+      if (!error && data.user) authenticatedUser = { id: data.user.id };
+    }
+    if (!authenticatedUser) {
+      const authClient = await createServerClient();
+      const { data, error } = await authClient.auth.getUser();
+      if (!error && data.user) authenticatedUser = { id: data.user.id };
+    }
+    if (!authenticatedUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (!supabase) {
+      return NextResponse.json({ error: 'Chat service is not configured.' }, { status: 503 });
+    }
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('is_active, role')
+      .eq('id', authenticatedUser.id)
+      .maybeSingle();
+    if (profileError) {
+      console.error('[chat] Failed to verify account profile:', profileError.message);
+      return NextResponse.json({ error: 'Unable to verify your account.' }, { status: 500 });
+    }
+    if (!profile || profile.is_active !== true) {
+      return NextResponse.json({ error: 'Account is not authorized.' }, { status: 403 });
+    }
+
     const body = await req.json();
-    const { message, userId, sessionId } = body;
+    const message = body?.message;
+    // Never trust a userId supplied in the request body.
+    const userId = authenticatedUser.id;
+    const isAdmin = profile.role === 'admin';
+    const sessionId = body?.sessionId;
 
     if (!message || typeof message !== 'string' || !message.trim()) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -881,18 +922,26 @@ export async function POST(req: NextRequest) {
     // If real Supabase is configured, try loading DB session state
     if (supabase && sessionId) {
       try {
-        const { data } = await supabase
+        const { data, error: sessionError } = await supabase
           .from('chat_sessions')
           .select('state')
           .eq('id', sessionId)
-          .single();
+          .eq('user_id', userId)
+          .maybeSingle();
+        if (sessionError) {
+          console.warn('[chat] Session lookup failed:', sessionError.message);
+          return NextResponse.json({ error: 'Unable to verify chat session.' }, { status: 500 });
+        }
+        if (!data) {
+          return NextResponse.json({ error: 'Chat session not found.' }, { status: 404 });
+        }
         if (data?.state) {
           // The database is authoritative for persistent chat state.
           // Do not merge stale in-memory drafting state over a cleared DB state.
           currentState = data.state as SessionState;
         }
         if ((currentState as SessionState).cancelledAt) {
-          await supabase.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId);
+          await supabase.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', userId);
           inMemorySessions.delete(currentSessionId);
           return NextResponse.json({ response: '', sessionId: currentSessionId, state: {}, sources: [], cancelled: true });
         }
@@ -930,7 +979,7 @@ export async function POST(req: NextRequest) {
         inquiryType = 'track_pr';
         const rawPR = prMatch[1].replace(/\s+/g, '');
         const formattedPR = rawPR.startsWith('2026') ? `PR-${rawPR}` : (rawPR.startsWith('PR') ? rawPR : `PR-${rawPR}`);
-        responseText = await handleTrackPR(formattedPR);
+        responseText = await handleTrackPR(formattedPR, userId, isAdmin);
       } else if (isListMyPRsIntent) {
         inquiryType = 'track_pr';
         if (supabase) {
@@ -939,7 +988,7 @@ export async function POST(req: NextRequest) {
               .from('purchase_requests')
               .select('pr_no, purpose, total, current_stage, created_at, department')
               .order('created_at', { ascending: false });
-            if (userId) {
+            if (!isAdmin) {
               q = q.eq('user_id', userId);
             }
             const { data: userPrs } = await q.limit(10);
@@ -1060,7 +1109,8 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
           await supabase
             .from('chat_sessions')
             .update({ state: updatedState, updated_at: new Date().toISOString() })
-            .eq('id', sessionId);
+            .eq('id', sessionId)
+            .eq('user_id', userId);
         }
 
         await supabase.from('chat_messages').insert([
