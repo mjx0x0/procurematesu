@@ -518,7 +518,7 @@ async function handleTrackPR(prNo: string): Promise<string> {
     const { data: pr, error } = await supabase
       .from('purchase_requests')
       .select('*, pr_stages_completed(*)')
-      .ilike('pr_no', `%${cleanPR}%`)
+      .eq('pr_no', cleanPR)
       .single();
 
     if (error) {
