@@ -12,6 +12,8 @@ const TESTS = [
   { name: 'PR tracking', question: 'How does ProcuremateSU help users track a Purchase Request?', keywords: ['purchase request', 'status', 'stage'] },
   { name: 'Next step', question: 'What information should a user need to know about what happens next in a procurement process?', keywords: ['next', 'stage', 'process'] },
   { name: 'Grounding', question: 'Answer using the authorized procurement references available to the system, and say when the references do not support a claim.', keywords: ['authorized', 'references'] },
+  { name: 'RFQ definition', question: 'What does RFQ stand for in procurement, and what is it used for?', keywords: ['request for quotation', 'quotation', 'price'] },
+  { name: 'Compound procurement question', question: 'Explain the purpose of a Purchase Request, define RFQ, list the main procurement stages, and identify who leads procurement at MSU-GenSan.', keywords: ['purchase request', 'request for quotation', 'stages', 'director'] },
 ];
 
 async function getAuthorizedUser(request: NextRequest) {
