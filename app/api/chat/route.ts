@@ -109,102 +109,35 @@ async function callGeminiWithFallback(
 
 function generateOfflineProcurementResponse(query: string, retrievedContext: string, sources: string[] = []): string {
   const q = query.toLowerCase();
-  const explicitlyRequestsSources = /\\b(source|sources|citation|citations|reference|references|where did you get|provide the link|link to the law)\\b/i.test(query);
+  const explicitlyRequestsSources = /\b(source|sources|citation|citations|reference|references|where did you get|provide the link|link to the law)\b/i.test(query);
 
-  // Keep the fallback conversational; show document references only on request.
+  // Only use retrieved excerpts when they overlap meaningfully with the user's
+  // question. A failed model call must never turn an unrelated top-ranked chunk
+  // into a confident answer (the previous behavior often repeated the workflow).
   if (retrievedContext && retrievedContext.length > 50) {
     const excerpts = retrievedContext
-      .split(/\\n\\n========================================\\n\\n/)
-      .map((part) => part.replace(/^\\[DOCUMENT EXCERPT \\d+: [^\\]]+\\]\\s*/i, '').trim())
+      .split(/\n\n========================================\n\n/)
+      .map((part) => part.replace(/^\[DOCUMENT EXCERPT \d+: [^\]]+\]\s*/i, '').trim())
       .filter(Boolean);
-    const answer = excerpts.slice(0, 3).map((part) => part.slice(0, 650)).join('\\n\\n');
-    const sourceNote = explicitlyRequestsSources && sources.length
-      ? '\\n\\n**Sources:** ' + sources.join('; ')
-      : '';
-    return answer + sourceNote;
+
+    const stopWords = new Set(['what','when','where','which','who','whom','whose','about','how','does','the','this','that','from','with','tell','give','please','can','you','could','would','is','are','was','were','for','and','or','to','of','in','on','a','an','my','me','it','its','their','there','office','information','question','explain','list','main','purpose']);
+    const terms = Array.from(new Set(q.replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/)
+      .filter((term) => term.length >= 3 && !stopWords.has(term))));
+    const rankedExcerpts = excerpts.map((part) => {
+      const lower = part.toLowerCase();
+      const matched = terms.filter((term) => lower.includes(term));
+      return { part, score: matched.length, ratio: matched.length / Math.max(terms.length, 1) };
+    }).filter((item) => item.score >= 2 && item.ratio >= 0.2)
+      .sort((a, b) => b.ratio - a.ratio || b.score - a.score);
+
+    if (rankedExcerpts.length) {
+      const answer = rankedExcerpts.slice(0, 2).map((item) => item.part.slice(0, 900)).join('\n\n');
+      const sourceNote = explicitlyRequestsSources && sources.length
+        ? '\n\n**Sources:** ' + sources.join('; ')
+        : '';
+      return answer + sourceNote;
+    }
   }
-
-  if (q.includes('ra 12009') || q.includes('12009') || q.includes('new government procurement act')) {
-    return (
-      "🏛️ **Republic Act No. 12009 (New Government Procurement Act - NGPA)**\n\n" +
-      "Republic Act No. 12009 was signed into law to modernize and revise RA 9184. It establishes a modernized, transparent, and sustainable public procurement framework across all government agencies and state universities, including **MSU-GenSan**.\n\n" +
-      "**Key Pillars of RA 12009:**\n" +
-      "1. **Strategic Procurement Planning**: Stronger linkage between Project Procurement Management Plans (PPMP), the Annual Procurement Plan (APP), and verified budget allocations.\n" +
-      "2. **Transparency & Open Data**: Mandatory posting in PhilGEPS and agency procurement portals.\n" +
-      "3. **Fit-for-Purpose Modalities**: Clearer parameters for Competitive Bidding (primary mode) and Alternative Methods.\n" +
-      "4. **Green & Sustainable Procurement**: Whole-of-lifecycle evaluation prioritizing environmental sustainability and local value creation.\n" +
-      "5. **Professionalization**: Standard qualification and continuous training for Bids and Awards Committees (BAC), TWGs, and Procurement Officers."
-    );
-  }
-
-  if (q.includes('svp') || q.includes('small value') || q.includes('threshold')) {
-    return (
-      "📋 **Small Value Procurement (SVP) under RA 12009 & RA 9184**\n\n" +
-      "Small Value Procurement is an Alternative Method of Procurement utilized for procurement of goods, infrastructure projects, and consulting services where the amount does not exceed the threshold prescribed in the procurement rules.\n\n" +
-      "**Key Rules for MSU-GenSan:**\n" +
-      "• **Approved Budget for the Contract (ABC)**: Must be within authorized institutional thresholds and included in the approved PPMP and APP.\n" +
-      "• **Canvassing Requirements**: Request for Quotation (RFQ) must be sent to at least three (3) suppliers of known qualifications.\n" +
-      "• **PhilGEPS Posting**: For transactions exceeding ₱50,000, posting in the PhilGEPS portal and MSU website for a minimum of three (3) calendar days is required.\n" +
-      "• **Prohibition Against Splitting**: Splitting of government contracts into smaller amounts to avoid competitive bidding is strictly prohibited by law."
-    );
-  }
-
-  if (q.includes('step') || q.includes('flow') || q.includes('process') || q.includes('procedure')) {
-    return (
-      "🔄 **MSU-GenSan Procurement Process Flow**\n\n" +
-      "1. **Preparation & Submission**: The requesting department prepares the Purchase Request (PR) based on the approved PPMP.\n" +
-      "2. **Budget Certification**: The Budget Office validates fund availability and issues the ALOBS/Certification.\n" +
-      "3. **PMO Verification & Control**: The Procurement Management Office verifies specifications and assigns control numbers.\n" +
-      "4. **BAC Resolution & Canvass**: The Bids and Awards Committee assigns the procurement mode (Bidding or SVP/Shopping) and releases Requests for Quotations (RFQs).\n" +
-      "5. **Abstract of Quotation (AOQ)**: Supplier bids are opened, evaluated, and the Lowest Calculated and Responsive Bid is selected.\n" +
-      "6. **Award & Purchase Order**: Notice of Award and Purchase Order (PO) are approved by the Chancellor / Head of Procuring Entity (HoPE).\n" +
-      "7. **Delivery & Inspection**: Delivered items undergo inspection, acceptance, and accounting processing for payment."
-    );
-  }
-
-  if (
-    q.includes('contact') ||
-    q.includes('phone') ||
-    q.includes('telephone') ||
-    q.includes('email') ||
-    q.includes('call') ||
-    q.includes('location') ||
-    q.includes('address') ||
-    q.includes('procurement office') ||
-    q.includes('bac secretariat') ||
-    q.includes('reach') ||
-    q.includes('hotline') ||
-    q.includes('number')
-  ) {
-    return (
-      "📞 **MSU-GenSan Procurement Management Office**\n\n" +
-      "The MSU-GenSan University Directory lists **Assoc. Prof. Nelson P. Benares, Jr.** as Director of the Procurement Management Office.\n\n" +
-      "• **Contact No.**: +63 908 810 5634\n" +
-      "• **Office**: Procurement Management Office, under the Office of the Vice Chancellor for Administration and Finance\n" +
-      "• **Campus address listed by the university**: Fatima, General Santos City, South Cotabato, Philippines, 9500\n\n" +
-      "The university also issued a June 12, 2026 temporary office relocation advisory. Because the verified source does not specify a current temporary PMO room or building, I will not invent one."
-    );
-  }
-
-  if (q.includes('hello') || q.includes('hi') || q.includes('hey') || q.includes('who are you')) {
-    return (
-      "👋 Kumusta! I am your official **AI Procurement Assistant for Mindanao State University - General Santos**.\n\n" +
-      "I can help you with:\n" +
-      "• **RA 12009 & RA 9184 rules**, legal principles, and procurement modes\n" +
-      "• **Drafting Purchase Requests** step-by-step with instant print & form generation (try saying *'Help me draft a PR'*)\n" +
-      "• **Tracking PR status** and timeline stages (e.g. *'Track PR-2026-0001'*)\n" +
-      "• **Contact details** of the Procurement Management Office and BAC Secretariat\n" +
-      "• **Small Value Procurement (SVP)** thresholds and PhilGEPS requirements\n\n" +
-      "How may I assist you today?"
-    );
-  }
-
-  return (
-    "I could not find enough verified information in the procurement knowledge base to answer that specific question accurately.\n\n" +
-    "Please try asking about a specific procurement rule, procedure, document, Purchase Request, or the MSU-GenSan Procurement Management Office. I will use the most relevant verified information available rather than guessing."
-  );
-}
-
 function cleanAIResponse(text: string): string {
   if (!text) return text;
 
