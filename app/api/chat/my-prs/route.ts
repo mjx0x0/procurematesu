@@ -53,7 +53,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unable to verify your account.' }, { status: 500 });
     }
 
-    if (profile && profile.is_active === false) {
+    // Match the authorization rule used by the main chatbot endpoint:
+    // missing or inactive profiles must not access the PR tracking API.
+    if (!profile || profile.is_active !== true) {
       return NextResponse.json({ error: 'Account is not authorized.' }, { status: 403 });
     }
 
