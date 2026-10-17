@@ -155,10 +155,10 @@ export async function POST(request: NextRequest) {
     // otherwise any mention of procurement stages hijacks the entire message.
     const asksOnlyForWorkflow =
       PROCUREMENT_FLOW_PATTERN.test(message) &&
-      (message.match(/\\?/g) || []).length <= 1 &&
-      !/\\b(purpose|request for quotation|\\brfq\\b|who handles|who is|director|contact|explain what|what is|define|sources?|citations?|references?)\\b/i.test(message) &&
-      !/\\b(and|also|additionally|plus|as well as)\\b/i.test(message) &&
-      message.trim().split(/\\s+/).length <= 14;
+      (message.match(/\?/g) || []).length <= 1 &&
+      !/\b(purpose|request for quotation|rfq|who handles|who is|director|contact|explain what|what is|define|sources?|citations?|references?)\b/i.test(message) &&
+      !/\b(and|also|additionally|plus|as well as)\b/i.test(message) &&
+      message.trim().split(/\s+/).length <= 14;
     if (asksOnlyForWorkflow) return NextResponse.json({ response: buildProcurementFlowResponse(), sources: ['ProcuremateSU procurement process'] });
     const prMatch = message.match(PR_PATTERN); const isPRAccessRequest = Boolean(prMatch) && PR_ACCESS_PATTERN.test(message);
     if (isPRAccessRequest) {
