@@ -194,21 +194,7 @@ export default function SignupPage() {
                 <div className="pointer-events-none absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-[#8E0052]/30 blur-2xl" />
 
                 <div>
-                  <Link href="/" className="inline-flex items-center gap-3 group">
-                    <div className="transition-transform group-hover:scale-105">
-                      <MsuLogo size={54} />
-                    </div>
-                    <div>
-                      <div className="text-sm font-black tracking-tight text-white group-hover:text-[#F0C83F] transition-colors">
-                        MSU GenSan <span className="text-[#F0C83F]">Procurement</span>
-                      </div>
-                      <div className="text-[9px] font-bold uppercase tracking-[0.16em] text-amber-200/70">
-                        Institutional Portal
-                      </div>
-                    </div>
-                  </Link>
-
-                  <div className="mt-8">
+                  <div>
                     <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight tracking-tight">
                       End-User <span className="text-[#F0C83F]">Registration</span>
                     </h1>
@@ -251,21 +237,12 @@ export default function SignupPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* Footer note */}
-                <div className="mt-8 pt-4 border-t border-white/10 text-[10px] text-white/60 flex items-center justify-between">
-                  <span>Mindanao State University</span>
-                  <span className="text-[#F0C83F] font-bold">RA 12009 Compliant</span>
-                </div>
               </div>
 
               {/* Right Form Column */}
               <div className="p-6 sm:p-8 lg:p-9 flex flex-col justify-between">
                 <div>
                   <div className="border-b border-stone-100 pb-4 mb-5">
-                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#F5AB26]">
-                      Institutional Credentials
-                    </p>
                     <h2 className="text-xl font-black text-[#4D002C] tracking-tight">
                       Create your account
                     </h2>

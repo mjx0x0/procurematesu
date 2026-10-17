@@ -20,6 +20,8 @@ import {
   Square,
   Clock,
   ArrowRight,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { MsuLogo } from "@/components/msu-logo";
@@ -56,9 +58,6 @@ const SUGGESTIONS = [
   "Help me draft a PR",
   "Track my PR",
   "Where is the Procurement Office?",
-  "How does Small Value Procurement work?",
-  "Explain the bidding process",
-  "MSU-GenSan Procurement Flow",
 ];
 
 const WELCOME: Message = {
@@ -79,6 +78,7 @@ export default function ChatbotDashboard() {
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [mobileHistoryOpen, setMobileHistoryOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showClearModal, setShowClearModal] = useState(false);
@@ -542,9 +542,9 @@ export default function ChatbotDashboard() {
     );
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] flex flex-col">
+    <div className="h-screen h-[100dvh] max-h-screen bg-[#FAF8F5] flex flex-col overflow-hidden">
       {/* Top Navbar */}
-      <nav className="bg-white border-b border-stone-200 sticky top-0 z-40 shadow-xs">
+      <nav className="bg-white border-b border-stone-200 shrink-0 z-40 shadow-xs">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
           {/* Left: Back & Title */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -571,6 +571,26 @@ export default function ChatbotDashboard() {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Desktop Sidebar Toggle Button */}
+            <button
+              onClick={() => setSidebarOpen((prev) => !prev)}
+              className="hidden md:flex px-2.5 py-1.5 sm:py-2 rounded-xl text-stone-600 hover:bg-stone-100 hover:text-[#7B0046] text-xs font-semibold items-center gap-1.5 transition-all border border-stone-200"
+              title={sidebarOpen ? "Hide chat history" : "Show chat history"}
+              aria-label={sidebarOpen ? "Hide chat history" : "Show chat history"}
+            >
+              {sidebarOpen ? (
+                <>
+                  <PanelLeftClose className="h-3.5 w-3.5 text-stone-500" />
+                  <span className="hidden lg:inline text-stone-600">Hide History</span>
+                </>
+              ) : (
+                <>
+                  <PanelLeftOpen className="h-3.5 w-3.5 text-[#7B0046]" />
+                  <span className="hidden lg:inline text-[#7B0046] font-bold">Show History</span>
+                </>
+              )}
+            </button>
+
             {/* Mobile History Toggle Button */}
             <button
               onClick={() => setMobileHistoryOpen(true)}
@@ -604,19 +624,31 @@ export default function ChatbotDashboard() {
       </nav>
 
       {/* Main Layout */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 md:p-6 flex gap-4 min-h-0">
-        {/* Desktop Sidebar: Chat History */}
-        <aside className="hidden md:flex flex-col w-72 shrink-0 bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
-            <div>
-              <h2 className="font-bold text-[#4D002C] text-sm flex items-center gap-1.5">
-                <History className="h-4 w-4 text-[#7B0046]" /> Chat History
+      <main className="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 md:p-6 flex gap-4 min-h-0 overflow-hidden">
+        {/* Desktop Sidebar: Chat History with toggleable collapse & expand */}
+        <aside
+          className={`hidden md:flex flex-col shrink-0 bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden h-full transition-all duration-300 ease-in-out ${
+            sidebarOpen ? "w-72 opacity-100" : "w-0 p-0 border-0 opacity-0 pointer-events-none -mr-4"
+          }`}
+        >
+          <div className="p-4 border-b border-stone-100 flex justify-between items-center bg-stone-50/50 shrink-0">
+            <div className="min-w-0">
+              <h2 className="font-bold text-[#4D002C] text-sm flex items-center gap-1.5 truncate">
+                <History className="h-4 w-4 text-[#7B0046] shrink-0" /> Chat History
               </h2>
-              <p className="text-[11px] text-stone-500 mt-0.5">Saved conversations</p>
+              <p className="text-[11px] text-stone-500 mt-0.5 truncate">Saved conversations</p>
             </div>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-200/60 transition-colors shrink-0"
+              title="Hide chat history"
+              aria-label="Hide chat history"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+            </button>
           </div>
 
-          <div className="p-3">
+          <div className="p-3 shrink-0">
             <button
               onClick={startNewChat}
               disabled={loading}
@@ -626,7 +658,7 @@ export default function ChatbotDashboard() {
             </button>
           </div>
 
-          <div className="flex-1 px-2 pb-3 overflow-y-auto space-y-1">
+          <div className="flex-1 min-h-0 px-2 pb-3 overflow-y-auto space-y-1">
             {visibleSessions.map((s) => (
               <div
                 key={s.id}
@@ -743,9 +775,9 @@ export default function ChatbotDashboard() {
         )}
 
         {/* Chat Area */}
-        <section className="flex-1 min-w-0 bg-white rounded-2xl border border-stone-200 shadow-sm flex flex-col overflow-hidden">
+        <section className="flex-1 min-w-0 bg-white rounded-2xl border border-stone-200 shadow-sm flex flex-col overflow-hidden h-full">
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 min-h-[55vh]">
+          <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 space-y-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -843,15 +875,15 @@ export default function ChatbotDashboard() {
           </div>
 
           {/* Quick Suggestions Chips */}
-          <div className="px-3 sm:px-4 py-2 bg-[#FAF8F5] border-t border-stone-200 flex items-center gap-2 overflow-x-auto no-scrollbar">
-            <Sparkles className="h-3.5 w-3.5 text-[#F5AB26] shrink-0" />
-            <span className="text-[11px] font-semibold text-stone-500 shrink-0 hidden xs:inline">Try:</span>
+          <div className="shrink-0 px-3 py-1.5 bg-[#FAF8F5] border-t border-stone-200/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <Sparkles className="h-3 w-3 text-[#F5AB26] shrink-0" />
+            <span className="text-[10px] font-semibold text-stone-500 shrink-0 hidden xs:inline">Try:</span>
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
                 onClick={() => sendMessage(s)}
                 disabled={loading}
-                className="whitespace-nowrap text-[11px] sm:text-xs px-3 py-1.5 rounded-full bg-white border border-stone-200 hover:border-[#7B0046]/30 text-stone-700 hover:bg-[#FDF2F7] hover:text-[#7B0046] transition-colors shadow-2xs disabled:opacity-50"
+                className="whitespace-nowrap text-[11px] px-2.5 py-1 rounded-full bg-white border border-stone-200 hover:border-[#7B0046]/30 text-stone-700 hover:bg-[#FDF2F7] hover:text-[#7B0046] transition-colors shadow-2xs disabled:opacity-50"
               >
                 {s}
               </button>
@@ -859,7 +891,7 @@ export default function ChatbotDashboard() {
           </div>
 
           {/* Input Box */}
-          <div className="p-3 sm:p-4 border-t border-stone-200 bg-white">
+          <div className="shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 border-t border-stone-200 bg-white mt-auto">
             <div className="flex gap-2 items-center">
               <input
                 ref={inputRef}
@@ -868,20 +900,17 @@ export default function ChatbotDashboard() {
                 onKeyDown={keyDown}
                 disabled={loading}
                 placeholder="Ask about RA 12009, PR drafting, or type 'Track my PR'..."
-                className="flex-1 min-w-0 rounded-xl border border-stone-300 bg-white text-gray-900 placeholder:text-stone-400 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-2xs"
+                className="flex-1 min-w-0 rounded-xl border border-stone-300 bg-white text-gray-900 placeholder:text-stone-400 px-3.5 py-2 text-xs sm:text-sm outline-none focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-2xs"
               />
               <button
                 onClick={() => loading ? stopResponse() : sendMessage()}
                 disabled={!loading && !input.trim()}
-                className="shrink-0 h-10 sm:h-11 px-4 sm:px-5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#8E0052] hover:from-[#610037] hover:to-[#7B0046] text-white disabled:opacity-40 transition-colors shadow-xs flex items-center justify-center border border-amber-400/20"
+                className="shrink-0 h-9 sm:h-9.5 px-3.5 sm:px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#8E0052] hover:from-[#610037] hover:to-[#7B0046] text-white disabled:opacity-40 transition-colors shadow-xs flex items-center justify-center border border-amber-400/20"
                 aria-label={loading ? "Stop response" : "Send message"}
               >
-                {loading ? <Square className="h-4 w-4 text-amber-200 fill-current" /> : <Send className="h-4 w-4 text-amber-200" />}
+                {loading ? <Square className="h-3.5 w-3.5 text-amber-200 fill-current" /> : <Send className="h-3.5 w-3.5 text-amber-200" />}
               </button>
             </div>
-            <p className="text-[10px] text-stone-400 mt-2 text-center sm:text-left">
-              Official procurement assistant for MSU-GenSan. Inquiries are grounded in RA 12009 & university regulations.
-            </p>
           </div>
         </section>
       </main>
