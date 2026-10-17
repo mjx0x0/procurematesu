@@ -109,16 +109,19 @@ async function callGeminiWithFallback(
 
 function generateOfflineProcurementResponse(query: string, retrievedContext: string, sources: string[] = []): string {
   const q = query.toLowerCase();
+  const explicitlyRequestsSources = /\\b(source|sources|citation|citations|reference|references|where did you get|provide the link|link to the law)\\b/i.test(query);
 
-  // If we have verified context from document_chunks, prioritize summarizing it directly to prevent hallucinations
+  // Keep the fallback conversational; show document references only on request.
   if (retrievedContext && retrievedContext.length > 50) {
-    const sourceList = sources.length > 0 ? sources.join(', ') : 'RA 12009 & MSU Procurement Manual';
-    return (
-      `🏛️ **Verified Guidance from University Procurement Documents (${sourceList})**\n\n` +
-      `${retrievedContext.slice(0, 1000)}\n\n` +
-      `---\n` +
-      `*(Grounded in verified database records from \`document_chunks\`. For official endorsement, coordinate with the MSU-GenSan Procurement Management Office).*`
-    );
+    const excerpts = retrievedContext
+      .split(/\\n\\n========================================\\n\\n/)
+      .map((part) => part.replace(/^\\[DOCUMENT EXCERPT \\d+: [^\\]]+\\]\\s*/i, '').trim())
+      .filter(Boolean);
+    const answer = excerpts.slice(0, 3).map((part) => part.slice(0, 650)).join('\\n\\n');
+    const sourceNote = explicitlyRequestsSources && sources.length
+      ? '\\n\\n**Sources:** ' + sources.join('; ')
+      : '';
+    return answer + sourceNote;
   }
 
   if (q.includes('ra 12009') || q.includes('12009') || q.includes('new government procurement act')) {
@@ -1047,12 +1050,14 @@ CRITICAL DIRECTIVES:
 8. Prefer the most specific retrieved source over generic law/manual excerpts. If sources conflict, explicitly state the conflict rather than silently choosing one.
 9. If the retrieved evidence does not answer a specific institutional question, say that the knowledge base does not contain enough verified information instead of guessing.
 10. Be friendly, warm, and professional. Answer the user's actual question directly.
-11. Aim for a medium-length response: usually about 120–250 words for a normal question. Do not stop mid-sentence or omit the conclusion.
-12. Prefer 2–4 short paragraphs over long bullet lists. Use bullets only when they genuinely improve readability, with no more than 4 bullets in one list.
-13. For simple definition or location/contact questions, give a direct answer first, followed by the most relevant supporting details.
-14. For process questions, use a short numbered list for the actual sequence of steps and a brief explanation afterward.
-15. If the user asks a very simple question, do not pad the answer just to reach a word count.
-16. Do NOT use Markdown tables, pipe characters (|), HTML tags such as <br>, or escaped HTML.`;
+11. Answer every distinct question in the user's message. For multi-part questions, structure the answer by sub-question so no part is silently skipped. If the user asks several unrelated questions, answer each one concisely.
+12. Aim for a medium-length response: usually about 120–250 words for a normal question, but use more space when needed to answer all parts accurately. Do not stop mid-sentence or omit the conclusion.
+13. Prefer 2–4 short paragraphs over long bullet lists. Use bullets or numbered steps when they genuinely improve readability.
+14. For simple definition or location/contact questions, give a direct answer first, followed by the most relevant supporting details.
+15. For process questions, use a short numbered list for the actual sequence of steps and a brief explanation afterward.
+16. Do not include source names, citations, or a source list in the answer by default. Use retrieved excerpts to inform the answer, and provide sources only when the user explicitly asks for sources, citations, references, or links.
+17. If the user asks a very simple question, do not pad the answer just to reach a word count.
+18. Do NOT use Markdown tables, pipe characters (|), HTML tags such as <br>, or escaped HTML.`;
 
         const userPrompt = `
 === VERIFIED EXCERPTS FROM SUPABASE \`document_chunks\` ===
