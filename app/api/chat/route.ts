@@ -1078,7 +1078,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
     // If the user cancelled while the model was generating, discard the in-flight answer.
     if (supabase && sessionId) {
       try {
-        const { data: liveSession } = await supabase.from('chat_sessions').select('state').eq('id', sessionId).single();
+        const { data: liveSession } = await supabase.from('chat_sessions').select('state').eq('id', sessionId).eq('user_id', userId).maybeSingle();
         if ((liveSession?.state as SessionState | null)?.cancelledAt) {
           await supabase.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId);
           inMemorySessions.delete(currentSessionId);
