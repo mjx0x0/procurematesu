@@ -38,55 +38,6 @@ interface SessionState {
 
 const inMemorySessions = new Map<string, { state: SessionState; messages: Array<{ sender: string; content: string; time: string }> }>();
 
-// Seed PRs for tracking if Supabase is offline or not configured
-const MOCK_PRS: Record<string, any> = {
-  'PR-2026-0001': {
-    pr_no: 'PR-2026-0001',
-    purpose: 'IT Equipment and Desktop Workstations for Computer Science Laboratory',
-    total: 485000,
-    current_stage: 'po_issued',
-    department: 'College of Science and Mathematics',
-    section: 'Computer Science Department',
-    pr_date: '2026-02-15',
-    stages: [
-      { stage_name: 'PR Preparation & Submission', completed_at: '2026-02-15T09:00:00.000Z' },
-      { stage_name: 'Budget Office Certification', completed_at: '2026-02-16T14:30:00.000Z' },
-      { stage_name: 'PMO Validation & Control', completed_at: '2026-02-18T10:15:00.000Z' },
-      { stage_name: 'BAC Small Value Procurement Posting', completed_at: '2026-02-20T16:00:00.000Z' },
-      { stage_name: 'Abstract of Quotations (AOQ)', completed_at: '2026-02-23T11:45:00.000Z' },
-      { stage_name: 'Purchase Order (PO) Issued', completed_at: '2026-02-25T15:20:00.000Z' },
-    ],
-  },
-  'PR-2026-0002': {
-    pr_no: 'PR-2026-0002',
-    purpose: 'Laboratory Reagents and Borosilicate Glassware for Chemistry Department',
-    total: 178500,
-    current_stage: 'budget_office',
-    department: 'College of Natural Sciences',
-    section: 'Chemistry Laboratory',
-    pr_date: '2026-02-28',
-    stages: [
-      { stage_name: 'PR Preparation & Submission', completed_at: '2026-02-28T10:30:00.000Z' },
-      { stage_name: 'Budget Office Certification (In Review)', completed_at: '2026-03-01T09:00:00.000Z' },
-    ],
-  },
-  'PR-2026-0003': {
-    pr_no: 'PR-2026-0003',
-    purpose: 'Air Conditioning Units 2.5HP Inverter Split-Type for Graduate School Classrooms',
-    total: 240000,
-    current_stage: 'bidding',
-    department: 'College of Education',
-    section: 'Graduate School Office',
-    pr_date: '2026-02-10',
-    stages: [
-      { stage_name: 'PR Preparation & Submission', completed_at: '2026-02-10T08:00:00.000Z' },
-      { stage_name: 'Budget Office Certification', completed_at: '2026-02-11T13:00:00.000Z' },
-      { stage_name: 'BAC Canvassing & RFQ Posting', completed_at: '2026-02-15T10:00:00.000Z' },
-      { stage_name: 'Public Canvass / Bidding Stage', completed_at: '2026-02-22T14:00:00.000Z' },
-    ],
-  },
-};
-
 // ============================================================
  // AI API CALL WITH GROQ PRIMARY + GEMINI FALLBACK
 // ============================================================
@@ -554,56 +505,55 @@ function getStageFriendlyName(stage: string): string {
 async function handleTrackPR(prNo: string): Promise<string> {
   const cleanPR = prNo.trim().toUpperCase();
 
-  // 1. Try real Supabase if configured
-  if (supabase) {
-    try {
-      const { data: pr } = await supabase
-        .from('purchase_requests')
-        .select('*, pr_stages_completed(*)')
-        .ilike('pr_no', `%${cleanPR}%`)
-        .single();
+  const notFoundResponse =
+    `🔍 I could not find a Purchase Request matching **${prNo}** in our database.\n\nPlease check the PR number (example formats: *PR-2026-0001* or *PR-2026-0002*). You can also view all your requests directly in the **Dashboard**.`;
 
-      if (pr) {
-        let text = `📋 **Purchase Request Tracking: ${pr.pr_no}**\n\n`;
-        text += `• **Current Status**: ${getStageFriendlyName(pr.current_stage)}\n`;
-        text += `• **Department**: ${pr.department || 'N/A'}\n`;
-        text += `• **Purpose**: ${pr.purpose || 'N/A'}\n`;
-        text += `• **Approved Budget / Total**: ₱${(Number(pr.total) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}\n`;
-
-        const stages = pr.pr_stages_completed || [];
-        if (stages.length > 0) {
-          text += `\n**Timeline Progress:**\n`;
-          stages.forEach((s: any) => {
-            const dateStr = s.completed_at ? new Date(s.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Completed';
-            text += `✅ ${s.stage_name} — *${dateStr}*\n`;
-          });
-        }
-        return text;
-      }
-    } catch (e) {
-      console.warn('Database PR lookup error, falling back to mock records:', e);
-    }
+  // Never substitute sample data for a real procurement record. If the
+  // database is unavailable, say so instead of presenting a mock PR as real.
+  if (!supabase) {
+    return `⚠️ PR tracking is temporarily unavailable because the database is not configured. Please try again later or check your Dashboard.`;
   }
 
-  // 2. Fallback to mock PRs
-  for (const [key, pr] of Object.entries(MOCK_PRS)) {
-    if (cleanPR.includes(key) || key.includes(cleanPR) || cleanPR.includes(key.slice(-4))) {
-      let text = `📋 **Purchase Request Tracking: ${pr.pr_no}**\n\n`;
-      text += `• **Current Stage**: ${getStageFriendlyName(pr.current_stage)}\n`;
-      text += `• **Department**: ${pr.department}\n`;
-      text += `• **Section**: ${pr.section}\n`;
-      text += `• **Purpose**: ${pr.purpose}\n`;
-      text += `• **Total Amount**: ₱${pr.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}\n\n`;
-      text += `**Timeline Progress:**\n`;
-      pr.stages.forEach((s: any) => {
-        const dateStr = new Date(s.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  try {
+    const { data: pr, error } = await supabase
+      .from('purchase_requests')
+      .select('*, pr_stages_completed(*)')
+      .ilike('pr_no', `%${cleanPR}%`)
+      .single();
+
+    if (error) {
+      // PGRST116 is Supabase/PostgREST's single-row result error. Treat it
+      // as no matching record; other errors indicate a lookup failure.
+      if (error.code !== 'PGRST116') {
+        console.warn('Database PR lookup failed:', error);
+        return `⚠️ I could not verify **${prNo}** right now because the database lookup failed. Please try again shortly.`;
+      }
+      return notFoundResponse;
+    }
+
+    if (!pr) return notFoundResponse;
+
+    let text = `📋 **Purchase Request Tracking: ${pr.pr_no}**\n\n`;
+    text += `• **Current Status**: ${getStageFriendlyName(pr.current_stage)}\n`;
+    text += `• **Department**: ${pr.department || 'N/A'}\n`;
+    text += `• **Purpose**: ${pr.purpose || 'N/A'}\n`;
+    text += `• **Approved Budget / Total**: ₱${(Number(pr.total) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}\n`;
+
+    const stages = pr.pr_stages_completed || [];
+    if (stages.length > 0) {
+      text += `\n**Timeline Progress:**\n`;
+      stages.forEach((s: any) => {
+        const dateStr = s.completed_at
+          ? new Date(s.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          : 'Completed';
         text += `✅ ${s.stage_name} — *${dateStr}*\n`;
       });
-      return text;
     }
+    return text;
+  } catch (error) {
+    console.warn('Database PR lookup failed:', error);
+    return `⚠️ I could not verify **${prNo}** right now because the database lookup failed. Please try again shortly.`;
   }
-
-  return `🔍 I could not find a Purchase Request matching **${prNo}** in our database.\n\nPlease check the PR number (example formats: *PR-2026-0001* or *PR-2026-0002*). You can also view all your requests directly in the **Dashboard**.`;
 }
 
 // ============================================================
