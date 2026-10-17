@@ -748,33 +748,67 @@ async function handleDraftPRFlow(
     }
 
     case 'items': {
-      const existingRaw = collected.items_raw ? collected.items_raw + '; ' : '';
-      collected.items_raw = existingRaw + message.trim();
+      const isDone =
+        lower === 'done' ||
+        lower.includes('finish') ||
+        lower.includes("that's all") ||
+        lower.includes('thats all');
+
+      // Do not store the finalization command as if it were an item.
+      if (!isDone) {
+        const existingRaw = collected.items_raw ? collected.items_raw + '; ' : '';
+        collected.items_raw = existingRaw + message.trim();
+      }
       newState.collected = collected;
 
-      const isDone = lower === 'done' || lower.includes('finish') || lower.includes("that's all") || lower.includes('thats all');
-
-      // If user typed items or done, attempt extraction
-      const fullText = `Department: ${collected.department}. Purpose: ${collected.purpose}. Items: ${collected.items_raw}`;
+      const fullText = `Department: ${collected.department}. Purpose: ${collected.purpose}. Items: ${collected.items_raw || ''}`;
       const extracted = await extractPRDetails(fullText);
+      const items = extracted.items || [];
 
-      const completeItems = (extracted.items || []).filter(
-        (item: any) =>
-          String(item.item_description || '').trim().length > 2 &&
-          Number(item.quantity) > 0 &&
-          String(item.unit || '').trim().length > 0 &&
-          Number(item.unit_cost) > 0
-      );
+      const isCompleteItem = (item: any) =>
+        String(item.item_description || '').trim().length > 2 &&
+        Number(item.quantity) > 0 &&
+        String(item.unit || '').trim().length > 0 &&
+        Number(item.unit_cost) > 0;
+
+      const completeItems = items.filter(isCompleteItem);
+      const incompleteItems = items.filter((item: any) => !isCompleteItem(item));
 
       if (
         completeItems.length > 0 &&
-        completeItems.length === (extracted.items || []).length &&
+        completeItems.length === items.length &&
         (isDone || message.length > 15)
       ) {
         return buildDraftCompletionResponse(
           { ...extracted, items: completeItems },
           newState
         );
+      }
+
+      // If the user is ready to finish but an item is incomplete, ask for
+      // the exact missing fields instead of repeating the same "type done"
+      // prompt indefinitely. Keep the draft state so the user can fill them in.
+      if (isDone && incompleteItems.length > 0) {
+        const missingDetails = incompleteItems.map((item: any, index: number) => {
+          const missing: string[] = [];
+          const description = String(item.item_description || '').trim();
+          if (description.length <= 2) missing.push('item description');
+          if (Number(item.quantity) <= 0) missing.push('quantity');
+          if (!String(item.unit || '').trim()) missing.push('unit');
+          if (Number(item.unit_cost) <= 0) missing.push('estimated unit cost');
+          const label = description ? `"${description}"` : `item ${index + 1}`;
+          return `• ${label}: ${missing.join(', ')}`;
+        });
+
+        newState.step = 'items';
+        newState.collected = collected;
+        return {
+          response:
+            `Almost done! I have the following details, but I need a few missing fields before I can finalize your Purchase Request:\n\n` +
+            missingDetails.join('\n') +
+            `\n\nPlease send only the missing details. For example: *"10 pcs, estimated unit cost ₱500 each."* I will keep the details you already provided.`,
+          newState,
+        };
       }
 
       return {
