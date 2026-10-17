@@ -1145,13 +1145,59 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
 
   } catch (error: any) {
     console.error('❌ Chat API caught error:', error);
-    return NextResponse.json(
-      {
-        response:
-          "👋 Hello! I am your AI Procurement Assistant for Mindanao State University - General Santos. How can I help you today with RA 12009, Purchase Requests, contact details, or procurement tracking?",
+
+    // A failure in session persistence, retrieval, or the primary response path
+    // must not turn an actual user question into a generic greeting. Make one
+    // best-effort, read-only knowledge-base fallback; never simulate PR actions.
+    let query = '';
+    try {
+      const recoveryBody = await req.clone().json();
+      query = typeof recoveryBody?.message === 'string' ? recoveryBody.message.trim() : '';
+    } catch {
+      // The request may not contain readable JSON; use the safe fallback below.
+    }
+
+    if (query && query.length <= 12000) {
+      const isActionOrTrackingRequest =
+        /\b(help me draft|create a pr|new purchase request|draft a purchase request|track|status of|show me my pr|my purchase requests)\b/i.test(query) ||
+        /\bPR[- ]?\d{4}(?:[- ]?\d{4})?\b/i.test(query);
+
+      if (!isActionOrTrackingRequest) {
+        try {
+          const retrieval = await retrieveDocumentChunks(query, 6);
+          const fallback = generateOfflineProcurementResponse(
+            query,
+            retrieval.formattedContext,
+            retrieval.sources
+          );
+          if (fallback.trim()) {
+            return NextResponse.json({
+              response: cleanAIResponse(fallback),
+              sessionId: 'sess_recovery',
+              sources: retrieval.sources,
+              degradedMode: true,
+            }, { status: 200 });
+          }
+        } catch (fallbackError) {
+          console.error('[chat] Knowledge fallback also failed:', fallbackError);
+        }
+      }
+
+      return NextResponse.json({
+        response: isActionOrTrackingRequest
+          ? 'I could not safely complete that Purchase Request or tracking action right now. No new request or status change was made. Please retry in a moment, or use the Dashboard to check your saved requests.'
+          : 'I’m having trouble generating a complete answer right now, and the local knowledge lookup did not recover it. Please try again shortly or rephrase the question. I will not invent procurement rules or university details.',
         sessionId: 'sess_recovery',
-      },
-      { status: 200 }
-    );
+        sources: [],
+        degradedMode: true,
+      }, { status: 200 });
+    }
+
+    return NextResponse.json({
+      response: 'I’m temporarily unable to process that message. Please try again shortly.',
+      sessionId: 'sess_recovery',
+      sources: [],
+      degradedMode: true,
+    }, { status: 200 });
   }
 }
