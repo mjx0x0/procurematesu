@@ -52,13 +52,21 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     'me','it','its','their','there','office','information','question'
   ]);
 
+  // Preserve useful terms from multi-question messages instead of letting the
+  // first clause dominate retrieval. Split on sentence boundaries and common
+  // follow-up connectors, then search a bounded set of distinct terms.
+  const queryParts = normalizedQuery
+    .split(/[?;.!\n]+|\b(?:and also|also|plus|what about|additionally)\b/i)
+    .map(part => part.trim())
+    .filter(Boolean);
   const terms = Array.from(new Set(
-    normalizedQuery
-      .replace(/[^a-z0-9\s-]/g, ' ')
-      .split(/\s+/)
-      .map(t => t.trim())
-      .filter(t => t.length >= 3 && !stopWords.has(t))
-  )).slice(0, 8);
+    [...queryParts, normalizedQuery]
+      .flatMap(part => part
+        .replace(/[^a-z0-9\s-]/g, ' ')
+        .split(/\s+/)
+        .map(t => t.trim())
+        .filter(t => t.length >= 3 && !stopWords.has(t)))
+  )).slice(0, 12);
 
   // Search both the exact phrase and several meaningful terms. The old
   // implementation searched only one "target term", which could retrieve a
@@ -67,13 +75,17 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     try {
       const searches: any[] = [];
 
-      const phrase = normalizedQuery.replace(/\s+/g, ' ').trim();
-      if (phrase.length >= 8) {
+      const phrase = normalizedQuery.replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim();
+      const phrases = Array.from(new Set(
+        [phrase, ...queryParts.map(part => part.replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim())]
+          .filter(part => part.length >= 8)
+      )).slice(0, 4);
+      for (const searchPhrase of phrases) {
         searches.push(
           supabase
             .from('document_chunks')
-            .select('id, document_name, document_type, chunk_text')
-            .ilike('chunk_text', `%${phrase}%`)
+            .select('id, document_name, document_type, chunk_text, metadata')
+            .ilike('chunk_text', `%${searchPhrase}%`)
             .limit(Math.min(8, limit * 2))
         );
       }
@@ -98,11 +110,20 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const haystack = `${doc.document_name || ''} ${text}`.toLowerCase();
           let score = 0;
 
-          if (phrase.length >= 8 && haystack.includes(phrase)) score += 20;
+          for (const searchPhrase of phrases) {
+            if (haystack.includes(searchPhrase)) score += searchPhrase === phrase ? 12 : 8;
+          }
+          let matchedTerms = 0;
           for (const term of terms) {
             const occurrences = haystack.split(term).length - 1;
-            if (occurrences > 0) score += Math.min(occurrences, 3) * 2;
+            if (occurrences > 0) {
+              matchedTerms += 1;
+              score += Math.min(occurrences, 3) * 2;
+            }
           }
+          // Prefer chunks that cover more of the user's distinct concepts,
+          // especially when a message contains multiple separate questions.
+          score += Math.round((matchedTerms / Math.max(terms.length, 1)) * 12);
 
           // Institutional directory/office questions should strongly prefer
           // chunks that contain both the office and a person's role/name.
