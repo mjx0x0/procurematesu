@@ -62,8 +62,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // If profile still does not exist, but user is authenticated with a valid @msugensan.edu.ph account,
-    // auto-provision them so existing university members are never locked out
+    // Never grant approval or administrator privileges merely because an Auth
+    // identity has an institutional email. If the public profile is missing,
+    // provision it as an inactive end-user and require the normal admin approval
+    // workflow. This avoids email-substring privilege escalation (e.g. an email
+    // containing "admin" or "procurement") and preserves the signup approval gate.
     if (!profile && email.endsWith("@msugensan.edu.ph")) {
       const fullName =
         authUser.user_metadata?.full_name ||
@@ -73,9 +76,9 @@ export async function POST(request: NextRequest) {
         id: authUser.id,
         email,
         full_name: fullName,
-        role: email.includes("admin") || email.includes("procurement") ? "admin" : "end_user",
-        is_active: true,
-        status: "approved",
+        role: "end_user",
+        is_active: false,
+        status: "pending",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -83,10 +86,12 @@ export async function POST(request: NextRequest) {
       const { data: inserted, error: insertError } = await admin
         .from("users")
         .upsert(newRecord, { onConflict: "id" })
-        .select()
+        .select("id, email, full_name, role, is_active, status, department")
         .single();
 
-      if (!insertError && inserted) {
+      if (insertError) {
+        console.error("[api/auth/profile] pending profile provisioning failed:", insertError);
+      } else if (inserted) {
         profile = inserted;
       }
     }
