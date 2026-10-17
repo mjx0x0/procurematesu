@@ -56,7 +56,9 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // first clause dominate retrieval. Split on sentence boundaries and common
   // follow-up connectors, then search a bounded set of distinct terms.
   const queryParts = normalizedQuery
-    .split(/[?;.!\n]+|\b(?:and also|also|plus|what about|additionally)\b/i)
+    // Split compound prompts into separate retrieval intents, including comma-
+    // separated instructions such as "explain X, list Y, and tell me Z".
+    .split(/[?;.!\n]+|,\s*(?=(?:and\s+)?(?:explain|define|describe|list|tell|identify|name|who|what|why|how|when|where)\b)|\b(?:and also|also|plus|what about|additionally)\b/i)
     .map(part => part.trim())
     .filter(Boolean);
   const terms = Array.from(new Set(
@@ -66,7 +68,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         .split(/\s+/)
         .map(t => t.trim())
         .filter(t => t.length >= 3 && !stopWords.has(t)))
-  )).slice(0, 12);
+  )).slice(0, 24);
 
   // Search both the exact phrase and several meaningful terms. The old
   // implementation searched only one "target term", which could retrieve a
