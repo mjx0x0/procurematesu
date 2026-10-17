@@ -138,6 +138,8 @@ function generateOfflineProcurementResponse(query: string, retrievedContext: str
       return answer + sourceNote;
     }
   }
+}
+
 function cleanAIResponse(text: string): string {
   if (!text) return text;
 
