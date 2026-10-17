@@ -138,6 +138,12 @@ function generateOfflineProcurementResponse(query: string, retrievedContext: str
       return answer + sourceNote;
     }
   }
+
+  
+  // Never substitute an unrelated procurement workflow when the retrieved
+  // excerpts do not answer the question. Be explicit that the fallback lacks
+  // enough evidence rather than guessing.
+  return "I couldn’t find enough relevant verified information to answer that specific question reliably. Please try rephrasing the question or ask about a specific procurement rule, document, or procedure.";
 }
 
 function cleanAIResponse(text: string): string {
