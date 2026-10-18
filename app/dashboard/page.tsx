@@ -91,31 +91,8 @@ export default function DashboardPage() {
     router.replace("/");
   };
 
-  const statusColor = (status: string) => {
-    if (status === "completed") return "border-emerald-200 bg-emerald-50 text-emerald-700";
-    if (status === "rejected" || status === "cancelled") return "border-red-200 bg-red-50 text-red-700";
-    return "border-amber-200 bg-amber-50 text-amber-700";
-  };
-
-  const statusLabel = (status: string) => {
-    if (status === "completed") return "Completed";
-    if (status === "rejected") return "Rejected";
-    if (status === "cancelled") return "Cancelled";
-    return PROCUREMENT_STAGE_LABELS[status] || status.replace(/_/g, " ");
-  };
-
-  const stageNumber = (status: string) => PROCUREMENT_STAGES.find((stage) => stage.key === status)?.number;
-  const isApprovedStage = (status: string) => {
-    const num = stageNumber(status);
-    return num !== undefined && num >= 4;
-  };
-
   const displayName = user?.user_metadata?.full_name || "Requisitioner";
   const initials = displayName.slice(0, 2).toUpperCase();
-  const approvedPRs = prs.filter((pr) => isApprovedStage(pr.current_stage));
-  const draftPRs = prs.filter((pr) => !isApprovedStage(pr.current_stage));
-  const activeRequest = prs.find((pr) => !TERMINAL_STAGES.includes(pr.current_stage));
-  const [prViewTab, setPrViewTab] = useState<"all" | "approved" | "drafts">("all");
 
   if (loading) {
     return (
@@ -197,410 +174,108 @@ export default function DashboardPage() {
       </header>
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
-        <section className="relative overflow-hidden rounded-[20px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-5 sm:p-8 md:p-9 shadow-[0_18px_45px_rgba(77,0,44,.12)]">
+        <section className="relative overflow-hidden rounded-[24px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-8 sm:p-12 md:p-14 shadow-[0_18px_45px_rgba(77,0,44,.12)]">
           <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
-          <div className="relative grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div className="relative">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F0C83F]/35 bg-[#F0C83F]/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-[#F5D766]"><Sparkles className="h-3.5 w-3.5" />Institutional Procurement</span>
-              <h1 className="mt-3 text-xl sm:text-3xl md:text-4xl font-extrabold leading-tight tracking-tight text-white">Good day, {displayName}.</h1>
-              <p className="mt-2.5 max-w-[670px] text-xs sm:text-sm leading-relaxed text-white/80">Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.</p>
+
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-white">Good day, {displayName}.</h1>
+              <p className="mt-2.5 max-w-[850px] text-xs sm:text-sm leading-relaxed text-white/80">Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.</p>
             </div>
-            <Link href="/dashboard/new-pr" className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#F0C83F]/50 bg-gradient-to-r from-[#F0C83F] to-[#D4A82C] px-5 py-3 text-xs sm:text-sm font-extrabold text-[#4D002C] shadow-[0_10px_25px_rgba(0,0,0,.16)] transition hover:-translate-y-0.5 sm:w-auto"><PlusCircle className="h-4 w-4" />Create Purchase Request</Link>
           </div>
         </section>
 
-        <section className="mt-4 grid grid-cols-2 gap-3 sm:mt-5 sm:grid-cols-3">
-          {[{n:stats.total,t:"Total Requests",s:"All submitted PRs",Icon:FileText,tone:"bg-[#FDF2F7] text-[#7B0046]"},{n:stats.pending,t:"In Progress",s:"Awaiting next stage",Icon:Clock,tone:"bg-[#FFF8E5] text-[#9A7205]"},{n:stats.completed,t:"Completed",s:"Successfully delivered",Icon:CheckCircle,tone:"bg-[#ECFFF5] text-[#087449]"}].map((item) => (
-            <div key={item.t} className={`rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-5 shadow-[0_8px_24px_rgba(45,35,30,.04)] ${item.t === "Completed" ? "col-span-2 sm:col-span-1" : ""}`}>
-              <div className="flex items-center justify-between gap-2"><div><p className="text-xs font-bold uppercase tracking-wider text-stone-500">{item.t}</p><p className="mt-1 text-2xl sm:text-3xl font-black tracking-tight text-[#4D002C]">{item.n}</p><p className="mt-0.5 text-xs text-stone-500">{item.s}</p></div><div className={`flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl ${item.tone}`}><item.Icon className="h-5 w-5" /></div></div>
-            </div>
-          ))}
-        </section>
-
-        <div className="mt-4 grid gap-4 sm:mt-6 xl:grid-cols-[1fr_340px]">
-          <section className="overflow-hidden rounded-2xl border border-stone-200/80 bg-white shadow-[0_12px_34px_rgba(45,35,30,.045)]">
-            {/* Header with Title and Sleek Tabs */}
-            <div className="border-b border-stone-200/70 bg-stone-50/60 px-5 py-4 sm:px-6 sm:py-4.5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-base sm:text-lg font-bold text-[#4D002C]">Purchase Requests</h2>
-                  <p className="mt-0.5 text-xs text-stone-500">Track approved PRs and active requests under review.</p>
-                </div>
-
-                <div className="inline-flex items-center p-1 bg-stone-100 border border-stone-200/70 rounded-xl w-fit">
-                  <button
-                    type="button"
-                    onClick={() => setPrViewTab("all")}
-                    className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
-                      prViewTab === "all"
-                        ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
-                        : "text-stone-600 hover:text-stone-900 font-semibold"
-                    }`}
-                  >
-                    All <span className="ml-1 text-[11px] font-medium text-stone-500">({prs.length})</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPrViewTab("approved")}
-                    className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
-                      prViewTab === "approved"
-                        ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
-                        : "text-stone-600 hover:text-stone-900 font-semibold"
-                    }`}
-                  >
-                    Approved <span className="ml-1 text-[11px] font-medium text-stone-500">({approvedPRs.length})</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPrViewTab("drafts")}
-                    className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
-                      prViewTab === "drafts"
-                        ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
-                        : "text-stone-600 hover:text-stone-900 font-semibold"
-                    }`}
-                  >
-                    Under Review <span className="ml-1 text-[11px] font-medium text-stone-500">({draftPRs.length})</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {prs.length === 0 ? (
-              <div className="p-10 text-center">
-                <ClipboardList className="mx-auto h-10 w-10 text-stone-300" />
-                <h3 className="mt-3 text-sm font-bold text-stone-800">No purchase requests yet</h3>
-                <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-stone-500">
-                  Create your first request to begin tracking it through the university procurement process.
+        <section className="mt-5 sm:mt-6" aria-label="Main Feature Shortcuts">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            {/* 1. Create Purchase Request */}
+            <Link
+              href="/dashboard/new-pr"
+              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[160px] sm:min-h-[170px]"
+            >
+              <div className="flex flex-col gap-2">
+                <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C] transition-colors">
+                  Create PR
+                </h2>
+                <p className="text-xs sm:text-[13px] text-stone-500 font-normal leading-relaxed">
+                  Draft and submit a new request with automated compliance checking
                 </p>
               </div>
-            ) : (
-              <div>
-                {/* TAB: APPROVED ONLY */}
-                {prViewTab === "approved" && (
-                  approvedPRs.length === 0 ? (
-                    <div className="py-12 px-6 text-center">
-                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-100 text-stone-400 mb-3">
-                        <FileText className="h-6 w-6" />
-                      </div>
-                      <h3 className="text-sm font-bold text-stone-800">No Approved Requests Yet</h3>
-                      <p className="mt-1 text-xs text-stone-500 max-w-md mx-auto leading-relaxed">
-                        Requests currently under initial review will automatically move to this section once approved by the PMO Director.
-                      </p>
-                      {draftPRs.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setPrViewTab("drafts")}
-                          className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold text-[#4D002C] hover:bg-stone-50 transition-colors"
-                        >
-                          View Requests Under Review ({draftPRs.length})
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="divide-y divide-stone-100">
-                      {approvedPRs.map((pr) => (
-                        <Link
-                          key={pr.pr_no}
-                          href={`/dashboard/pr/${pr.pr_no}`}
-                          className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 transition hover:bg-stone-50/70"
-                        >
-                          <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#7B0046]/15 bg-[#7B0046]/5 text-[#7B0046] shadow-xs group-hover:bg-[#7B0046]/10 transition-colors">
-                              <CheckCircle className="h-5 w-5" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="font-mono text-sm font-bold text-[#4D002C]">{pr.pr_no}</span>
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-200">
-                                  Approved
-                                </span>
-                                <span className="text-xs text-stone-400 font-medium">
-                                  · {new Date(pr.created_at).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}
-                                </span>
-                              </div>
-                              <p className="mt-1 truncate text-sm font-semibold text-stone-800">{pr.purpose || "Official procurement request"}</p>
-                              <p className="mt-0.5 text-xs text-stone-500 font-medium">{pr.department || "University Office"}</p>
-                            </div>
-                          </div>
 
-                          <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 pt-2 sm:pt-0 border-t border-stone-100 sm:border-0">
-                            <div className="text-left sm:text-right">
-                              <p className="text-sm font-bold text-stone-900">
-                                ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                              </p>
-                              <span className={`mt-1 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${statusColor(pr.current_stage)}`}>
-                                {stageNumber(pr.current_stage) ? `Stage ${stageNumber(pr.current_stage)} · ` : ""}{statusLabel(pr.current_stage)}
-                              </span>
-                            </div>
-                            <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs font-bold text-[#4D002C] shadow-xs group-hover:bg-[#4D002C] group-hover:text-white group-hover:border-[#4D002C] transition-all shrink-0">
-                              <Eye className="h-3.5 w-3.5" />
-                              <span>Track PR</span>
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )
-                )}
-
-                {/* TAB: DRAFTS / UNDER REVIEW ONLY */}
-                {prViewTab === "drafts" && (
-                  draftPRs.length === 0 ? (
-                    <div className="py-12 px-6 text-center">
-                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-100 text-stone-400 mb-3">
-                        <CheckCircle className="h-6 w-6" />
-                      </div>
-                      <h3 className="text-sm font-bold text-stone-800">No Requests Under Review</h3>
-                      <p className="mt-1 text-xs text-stone-500 max-w-md mx-auto leading-relaxed">
-                        All your purchase requests have passed preliminary review and moved to approved procurement stages.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="divide-y divide-stone-100">
-                      {draftPRs.map((pr) => (
-                        <Link
-                          key={pr.pr_no}
-                          href={`/dashboard/pr/${pr.pr_no}`}
-                          className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 transition hover:bg-stone-50/70"
-                        >
-                          <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-stone-100 text-stone-600 shadow-xs group-hover:bg-stone-200/70 transition-colors">
-                              <Clock className="h-5 w-5" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="font-mono text-sm font-bold text-[#4D002C]">{pr.pr_no}</span>
-                                {pr.pr_no?.includes("TEMP") && (
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200/80">
-                                    Temporary No.
-                                  </span>
-                                )}
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-200">
-                                  Under Review
-                                </span>
-                                <span className="text-xs text-stone-400 font-medium">
-                                  · {new Date(pr.created_at).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}
-                                </span>
-                              </div>
-                              <p className="mt-1 truncate text-sm font-semibold text-stone-800">{pr.purpose || "Official procurement request"}</p>
-                              <p className="mt-0.5 text-xs text-stone-500 font-medium">{pr.department || "University Office"}</p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 pt-2 sm:pt-0 border-t border-stone-100 sm:border-0">
-                            <div className="text-left sm:text-right">
-                              <p className="text-sm font-bold text-stone-900">
-                                ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                              </p>
-                              <span className={`mt-1 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${statusColor(pr.current_stage)}`}>
-                                {stageNumber(pr.current_stage) ? `Stage ${stageNumber(pr.current_stage)} · ` : ""}{statusLabel(pr.current_stage)}
-                              </span>
-                            </div>
-                            <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs font-bold text-[#4D002C] shadow-xs group-hover:bg-[#4D002C] group-hover:text-white group-hover:border-[#4D002C] transition-all shrink-0">
-                              <Eye className="h-3.5 w-3.5" />
-                              <span>Track PR</span>
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )
-                )}
-
-                {/* TAB: ALL REQUESTS */}
-                {prViewTab === "all" && (
-                  <div>
-                    {/* Approved Section - Only rendered when approved PRs exist */}
-                    {approvedPRs.length > 0 && (
-                      <div>
-                        <div className="flex items-center justify-between px-5 py-2.5 bg-stone-50/80 border-b border-stone-200/80">
-                          <span className="text-xs font-bold uppercase tracking-wider text-[#4D002C]">
-                            Approved Purchase Requests
-                          </span>
-                          <span className="text-[11px] font-bold text-stone-600 bg-white px-2 py-0.5 rounded-md border border-stone-200">
-                            {approvedPRs.length} {approvedPRs.length === 1 ? "PR" : "PRs"}
-                          </span>
-                        </div>
-                        <div className="divide-y divide-stone-100">
-                          {approvedPRs.map((pr) => (
-                            <Link
-                              key={pr.pr_no}
-                              href={`/dashboard/pr/${pr.pr_no}`}
-                              className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 transition hover:bg-stone-50/70"
-                            >
-                              <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#7B0046]/15 bg-[#7B0046]/5 text-[#7B0046] shadow-xs group-hover:bg-[#7B0046]/10 transition-colors">
-                                  <CheckCircle className="h-5 w-5" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <span className="font-mono text-sm font-bold text-[#4D002C]">{pr.pr_no}</span>
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-200">
-                                      Approved
-                                    </span>
-                                    <span className="text-xs text-stone-400 font-medium">
-                                      · {new Date(pr.created_at).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}
-                                    </span>
-                                  </div>
-                                  <p className="mt-1 truncate text-sm font-semibold text-stone-800">{pr.purpose || "Official procurement request"}</p>
-                                  <p className="mt-0.5 text-xs text-stone-500 font-medium">{pr.department || "University Office"}</p>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 pt-2 sm:pt-0 border-t border-stone-100 sm:border-0">
-                                <div className="text-left sm:text-right">
-                                  <p className="text-sm font-bold text-stone-900">
-                                    ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                  </p>
-                                  <span className={`mt-1 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${statusColor(pr.current_stage)}`}>
-                                    {stageNumber(pr.current_stage) ? `Stage ${stageNumber(pr.current_stage)} · ` : ""}{statusLabel(pr.current_stage)}
-                                  </span>
-                                </div>
-                                <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs font-bold text-[#4D002C] shadow-xs group-hover:bg-[#4D002C] group-hover:text-white group-hover:border-[#4D002C] transition-all shrink-0">
-                                  <Eye className="h-3.5 w-3.5" />
-                                  <span>Track PR</span>
-                                </div>
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Under Review Section */}
-                    {draftPRs.length > 0 && (
-                      <div>
-                        <div className={`flex items-center justify-between px-5 py-2.5 bg-stone-50/80 border-b border-stone-200/80 ${approvedPRs.length > 0 ? "border-t" : ""}`}>
-                          <span className="text-xs font-bold uppercase tracking-wider text-[#4D002C]">
-                            Purchase Requests Under Review
-                          </span>
-                          <span className="text-[11px] font-bold text-stone-600 bg-white px-2 py-0.5 rounded-md border border-stone-200">
-                            {draftPRs.length} {draftPRs.length === 1 ? "PR" : "PRs"}
-                          </span>
-                        </div>
-                        <div className="divide-y divide-stone-100">
-                          {draftPRs.map((pr) => (
-                            <Link
-                              key={pr.pr_no}
-                              href={`/dashboard/pr/${pr.pr_no}`}
-                              className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 transition hover:bg-stone-50/70"
-                            >
-                              <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-stone-100 text-stone-600 shadow-xs group-hover:bg-stone-200/70 transition-colors">
-                                  <Clock className="h-5 w-5" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <span className="font-mono text-sm font-bold text-[#4D002C]">{pr.pr_no}</span>
-                                    {pr.pr_no?.includes("TEMP") && (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200/80">
-                                        Temporary No.
-                                      </span>
-                                    )}
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-200">
-                                      Under Review
-                                    </span>
-                                    <span className="text-xs text-stone-400 font-medium">
-                                      · {new Date(pr.created_at).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}
-                                    </span>
-                                  </div>
-                                  <p className="mt-1 truncate text-sm font-semibold text-stone-800">{pr.purpose || "Official procurement request"}</p>
-                                  <p className="mt-0.5 text-xs text-stone-500 font-medium">{pr.department || "University Office"}</p>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 pt-2 sm:pt-0 border-t border-stone-100 sm:border-0">
-                                <div className="text-left sm:text-right">
-                                  <p className="text-sm font-bold text-stone-900">
-                                    ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                  </p>
-                                  <span className={`mt-1 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${statusColor(pr.current_stage)}`}>
-                                    {stageNumber(pr.current_stage) ? `Stage ${stageNumber(pr.current_stage)} · ` : ""}{statusLabel(pr.current_stage)}
-                                  </span>
-                                </div>
-                                <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs font-bold text-[#4D002C] shadow-xs group-hover:bg-[#4D002C] group-hover:text-white group-hover:border-[#4D002C] transition-all shrink-0">
-                                  <Eye className="h-3.5 w-3.5" />
-                                  <span>Track PR</span>
-                                </div>
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Subtle info footer when only drafts exist */}
-                    {approvedPRs.length === 0 && draftPRs.length > 0 && (
-                      <div className="px-5 py-3 bg-stone-50/40 border-t border-stone-100">
-                        <p className="text-[11px] text-stone-500 font-medium">
-                          Note: Once a request passes Stage 3 (PMO Director Validation), it will automatically move to Approved Purchase Requests.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
+              <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-[#7B0046]">
+                <span>Action</span>
+                <ArrowRight className="h-4 w-4 transition-transform shrink-0" />
               </div>
-            )}
-          </section>
+            </Link>
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-            <section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#4D002C] to-[#7B0046] p-5 text-white shadow-[0_16px_38px_rgba(77,0,44,.09)]">
-              <div className="relative flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#F0C83F]/30 bg-[#F0C83F]/10 text-[#F0C83F]">
-                  <Bot className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[.15em] text-[#F0D56A]">Procurement Advisor</p>
-                  <h3 className="mt-0.5 text-base font-extrabold">Gab AI</h3>
-                </div>
+            {/* 2. View Purchase Requests */}
+            <Link
+              href="/dashboard/purchase-requests"
+              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[160px] sm:min-h-[170px]"
+            >
+              <div className="flex flex-col gap-2">
+                <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C] transition-colors">
+                  Purchase Requests
+                </h2>
+                <p className="text-xs sm:text-[13px] text-stone-500 font-normal leading-relaxed">
+                  Monitor approval stages, view full records, and print official PR documents
+                </p>
               </div>
-              <p className="mt-3 text-xs leading-relaxed text-white/80">Need help with RA 12009, PR preparation, procurement stages, or SVP? Gab can guide you through the process.</p>
-              <Link href="/dashboard/chatbot" className="mt-4 flex items-center justify-between rounded-xl border border-white/20 bg-white/[0.1] px-4 py-2.5 text-xs font-bold text-[#F5D766] hover:bg-white/[0.16] transition-colors">
-                <span>Open Gab AI</span>
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            </section>
 
-            <section className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-[0_10px_28px_rgba(45,35,30,.04)]">
-              <div className="flex items-center gap-2.5">
-                <LayoutDashboard className="h-4 w-4 text-[#F5AB26]" />
-                <h3 className="text-sm font-extrabold text-[#4D002C]">Current activity</h3>
+              <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-600 group-hover:text-[#7B0046]">
+                <span>{prs.length} {prs.length === 1 ? "Record" : "Records"}</span>
+                <ArrowRight className="h-4 w-4 transition-transform shrink-0" />
               </div>
-              {activeRequest ? (
-                <div className="mt-3 rounded-xl border border-[#E9D9AE] bg-[#FFFDF6] p-3.5">
-                  <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#A07A13]">Active request</p>
-                  <p className="mt-1 font-mono text-sm font-extrabold text-[#7B0046]">{activeRequest.pr_no}</p>
-                  <p className="mt-1 truncate text-xs text-stone-600 font-medium">{statusLabel(activeRequest.current_stage)}</p>
-                  <Link href={`/dashboard/pr/${activeRequest.pr_no}`} className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold text-[#7B0046] hover:text-[#4D002C]">
-                    <span>Continue tracking</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              ) : (
-                <p className="mt-3 text-xs leading-relaxed text-stone-500">You have no active procurement requests. Start a new request whenever you are ready.</p>
-              )}
-            </section>
+            </Link>
 
-            <section className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-[0_10px_28px_rgba(45,35,30,.04)]">
-              <div className="flex items-center gap-2.5">
-                <BarChart3 className="h-4 w-4 text-[#F5AB26]" />
-                <h3 className="text-sm font-extrabold text-[#4D002C]">Transparency Board</h3>
+            {/* 3. Gab AI Chatbot */}
+            <Link
+              href="/dashboard/chatbot"
+              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[160px] sm:min-h-[170px]"
+            >
+              <div className="flex flex-col gap-2">
+                <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C] transition-colors">
+                  AI Chatbot
+                </h2>
+                <p className="text-xs sm:text-[13px] text-stone-500 font-normal leading-relaxed">
+                  Get instant guidance on RA 12009, PR preparation, and procurement steps
+                </p>
               </div>
-              <p className="mt-2 text-xs leading-relaxed text-stone-500">Browse official MSU-GenSan public procurement postings and bidding records.</p>
-              <Link
-                href="/dashboard/transparency"
-                className="group mt-3.5 flex items-center justify-between rounded-xl border border-[#7B0046]/20 bg-[#FAF7F2] px-4 py-2.5 text-xs font-bold text-[#7B0046] hover:!bg-[#7B0046] hover:!text-white hover:!border-[#7B0046] shadow-2xs hover:shadow-md transition-all duration-200"
-              >
-                <span className="font-bold text-[#7B0046] group-hover:!text-white transition-colors duration-200">
-                  View Transparency Board
-                </span>
-                <ArrowUpRight className="h-4 w-4 text-[#7B0046] group-hover:!text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
-              </Link>
-            </section>
+
+              <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-600 group-hover:text-[#7B0046]">
+                <span>Gab AI</span>
+                <ArrowRight className="h-4 w-4 transition-transform shrink-0" />
+              </div>
+            </Link>
+
+            {/* 4. Transparency Board */}
+            <Link
+              href="/dashboard/transparency"
+              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[160px] sm:min-h-[170px]"
+            >
+              <div className="flex flex-col gap-2">
+                <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C] transition-colors">
+                  Transparency Board
+                </h2>
+                <p className="text-xs sm:text-[13px] text-stone-500 font-normal leading-relaxed">
+                  Access official university bidding notices, published awards, and contracts
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-600 group-hover:text-[#7B0046]">
+                <span>Browse</span>
+                <ArrowRight className="h-4 w-4 transition-transform shrink-0" />
+              </div>
+            </Link>
           </div>
-        </div>
+        </section>
 
-        <footer className="mt-6 flex flex-col items-center justify-between gap-1.5 border-t border-stone-200/80 py-4 text-center sm:mt-8 sm:flex-row sm:text-left"><p className="text-xs text-stone-500">MSU GenSan Procurement Management System · Institutional access</p><p className="text-xs text-stone-500">RA 12009 Compliant</p></footer>
+        {/* 3 Procurement Overviews (Compact & Subtle) */}
+
+
+
+        <footer className="mt-auto py-8 text-center text-xs text-stone-500">
+          © {new Date().getFullYear()} Mindanao State University - General Santos · Procurement Management System
+        </footer>
       </main>
       <Chatbot />
       <style jsx global>{`

@@ -57,10 +57,7 @@ const STANDARD_UNITS = [
   { value: "g", label: "g (Grams)" },
   { value: "liter", label: "liter (Liters)" },
   { value: "meter", label: "meter (Meters)" },
-  { value: "job", label: "job (Job Order)" },
   { value: "service", label: "service (Services)" },
-  { value: "license", label: "license (Licenses)" },
-  { value: "month", label: "month (Months)" },
 ];
 
 export default function ProcurementRequestForm() {
@@ -201,6 +198,7 @@ export default function ProcurementRequestForm() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] pb-16">
+
       {/* Top Navigation */}
       <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 px-4 py-3 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto flex justify-between items-center">
@@ -228,28 +226,6 @@ export default function ProcurementRequestForm() {
           <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
           
           <div className="p-6 md:p-8">
-            {/* Official University Header & Dedicated Logo Space */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pb-6 mb-8 border-b border-stone-200 text-center sm:text-left">
-              <div className="shrink-0">
-                <MsuLogo size={68} className="rounded-full shadow-xs" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold uppercase tracking-wider text-stone-500">
-                  Republic of the Philippines
-                </p>
-                <h1 className="text-lg sm:text-xl md:text-2xl font-black text-[#4D002C] tracking-tight">
-                  MINDANAO STATE UNIVERSITY - GENERAL SANTOS
-                </h1>
-                <p className="text-xs sm:text-sm font-semibold text-[#8C6B13]">
-                  Procurement Management Office &middot; Fatima, General Santos City
-                </p>
-                <div className="mt-2.5 inline-flex items-center gap-2 rounded-lg bg-red-50 border border-red-200/80 px-3 py-1">
-                  <span className="text-xs font-extrabold uppercase tracking-wide text-[#7B0046]">
-                    PURCHASE REQUEST FORM (PR)
-                  </span>
-                </div>
-              </div>
-            </div>
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
               {/* Physical Submission Notice */}
