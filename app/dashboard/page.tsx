@@ -273,7 +273,7 @@ export default function DashboardPage() {
 
 
 
-        <footer className="mt-auto py-8 text-center text-xs text-stone-500">
+        <footer className="mt-12 py-8 text-center text-xs text-stone-500 border-t border-stone-200">
           © {new Date().getFullYear()} Mindanao State University - General Santos · Procurement Management System
         </footer>
       </main>
