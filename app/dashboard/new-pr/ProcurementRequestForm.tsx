@@ -207,11 +207,11 @@ export default function ProcurementRequestForm() {
           {/* Header Banner */}
           <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
           
-          <div className="p-6 md:p-8">
+          <div className="p-4 sm:p-6 md:p-8">
 
-            <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
               {/* Physical Submission Notice */}
-              <div className="rounded-xl border-2 border-amber-300/80 bg-[#FFFDF7] p-5 shadow-sm">
+              <div className="rounded-xl border-2 border-amber-300/80 bg-[#FFFDF7] p-4 sm:p-5 shadow-sm">
                 <div className="flex items-start gap-3.5">
                   <div className="mt-0.5 h-10 w-10 rounded-xl bg-[#7B0046] text-amber-200 flex items-center justify-center shrink-0 shadow-sm">
                     <Printer className="h-5 w-5" />

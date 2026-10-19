@@ -58,3 +58,48 @@
   border-color: #7B0046 !important;
   box-shadow: 0 0 0 3px rgba(123, 0, 70, 0.12), 0 2px 6px rgba(56, 0, 32, 0.04) !important;
 }
+
+
+/* Mobile-only workspace fit and navigation refinements. Desktop styles are unchanged. */
+.mobile-primary-nav {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (max-width: 1023px) {
+  .portal-shell .app-theme-content:not(.mobile-chat-shell),
+  .admin-shell .app-theme-content {
+    min-width: 0;
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
+
+  .portal-shell .app-theme-content main,
+  .admin-shell .app-theme-content main {
+    min-width: 0;
+  }
+
+  .portal-shell .app-theme-content .overflow-x-auto,
+  .admin-shell .app-theme-content .overflow-x-auto {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+}
+
+@media (max-width: 640px) {
+  .portal-shell .app-theme-content table th,
+  .admin-shell .app-theme-content table th {
+    font-size: 0.72rem;
+    line-height: 1.35;
+  }
+
+  .portal-shell .app-theme-content table td,
+  .admin-shell .app-theme-content table td {
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .portal-shell .app-theme-content .ui-card,
+  .admin-shell .app-theme-content .ui-card {
+    border-radius: 0.95rem;
+  }
+}

@@ -87,7 +87,7 @@ export function SystemPageHeader({
       <div className={`mx-auto flex h-full items-center justify-between gap-3 ${containerClassName}`}>
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           {backHref !== null && (
-            <Link href={backHref} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-stone-500 transition-colors hover:bg-stone-100 hover:text-[#7B0046] focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20" title="Back" aria-label="Back">
+            <Link href={backHref} className="flex h-10 w-10 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl text-stone-500 transition-colors hover:bg-stone-100 hover:text-[#7B0046] focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20" title="Back" aria-label="Back">
               <ArrowLeft className="h-5 w-5" />
             </Link>
           )}
@@ -108,7 +108,7 @@ export function SystemPageHeader({
         <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
           {children && <div className="flex shrink-0 items-center gap-2 sm:gap-3">{children}</div>}
           <div ref={accountMenuRef} className="relative shrink-0">
-            <button type="button" onClick={() => setAccountMenuOpen((previous) => !previous)} className="flex h-10 max-w-[48vw] cursor-pointer items-center gap-2 rounded-xl border border-stone-200 bg-white px-2.5 text-xs text-stone-700 transition hover:border-stone-300 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 sm:max-w-[250px] sm:px-3" aria-expanded={accountMenuOpen} aria-label="User account menu">
+            <button type="button" onClick={() => setAccountMenuOpen((previous) => !previous)} className="flex h-11 sm:h-10 max-w-[48vw] cursor-pointer items-center gap-2 rounded-xl border border-stone-200 bg-white px-2.5 text-xs text-stone-700 transition hover:border-stone-300 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 sm:max-w-[250px] sm:px-3" aria-expanded={accountMenuOpen} aria-label="User account menu">
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#7B0046]/10 text-[#7B0046]">
                 <User className="h-3.5 w-3.5" />
               </div>

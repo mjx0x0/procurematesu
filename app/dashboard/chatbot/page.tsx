@@ -861,7 +861,7 @@ export default function ChatbotDashboard() {
               <button
                 onClick={() => loading ? stopResponse() : sendMessage()}
                 disabled={!loading && !input.trim()}
-                className="shrink-0 h-9 sm:h-9.5 px-3.5 sm:px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#8E0052] hover:from-[#610037] hover:to-[#7B0046] text-white disabled:opacity-40 transition-colors shadow-xs flex items-center justify-center border border-amber-400/20"
+                className="shrink-0 h-11 sm:h-9.5 px-3.5 sm:px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#8E0052] hover:from-[#610037] hover:to-[#7B0046] text-white disabled:opacity-40 transition-colors shadow-xs flex items-center justify-center border border-amber-400/20"
                 aria-label={loading ? "Stop response" : "Send message"}
               >
                 {loading ? <Square className="h-3.5 w-3.5 text-amber-200 fill-current" /> : <Send className="h-3.5 w-3.5 text-amber-200" />}

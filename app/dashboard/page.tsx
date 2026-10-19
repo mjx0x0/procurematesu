@@ -106,7 +106,7 @@ const displayName = user?.user_metadata?.full_name || "Requisitioner";
       </SystemPageHeader>
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
-        <section className="relative overflow-hidden rounded-[24px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-8 sm:p-12 md:p-14 shadow-[0_18px_45px_rgba(77,0,44,.12)]">
+        <section className="relative overflow-hidden rounded-[24px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-5 sm:p-12 md:p-14 shadow-[0_18px_45px_rgba(77,0,44,.12)]">
           <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
           <div className="relative">
             <div>

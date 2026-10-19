@@ -19,7 +19,7 @@ export default function AppThemeShell({children}:{children:React.ReactNode}){
         .app-sidebar button::after { content: none !important; display: none !important; }
       `}</style>
       <AppSidebar mode={isAdmin ? "admin" : "user"} />
-      <div className="app-theme-content">{children}</div>
+      <div className={`app-theme-content ${pathname === "/dashboard/chatbot" ? "mobile-chat-shell" : ""}`}>{children}</div>
       <SystemBranding />
     </div>
   );
