@@ -150,7 +150,7 @@ export default function PurchaseRequestsPage() {
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#302725]">
       {/* Top Navbar */}
-      <EndUserPageHeader titlePrimary="Purchase" titleAccent="Requests" icon={FileText} />
+      <EndUserPageHeader titlePrimary="Purchase" titleAccent="Requests" icon={FileText} containerClassName="max-w-7xl px-3.5 sm:px-6 lg:px-8" />
 
       <main className="mx-auto max-w-7xl px-3.5 py-6 sm:px-6 sm:py-8 lg:px-8">
         {/* Hero Section */}
