@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
+import { EndUserPageHeader } from "@/components/dashboard/EndUserPageHeader";
 import { ArrowLeft, FileText, Loader2, Plus, Save, Trash2, X, CheckCircle2, AlertCircle, Printer } from "lucide-react";
 import { MsuLogo } from "@/components/msu-logo";
 import { firstValidationError, validatePurchaseRequest } from "@/lib/pr-validation";
@@ -197,24 +198,7 @@ export default function ProcurementRequestForm() {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" /></div>;
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] pb-16">
-
-      {/* Top Navigation */}
-      <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 px-4 py-3 sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto flex justify-between items-center">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-3 text-[#4D002C] group"
-          >
-            <div className="p-1.5 rounded-lg border border-stone-200 text-stone-600 group-hover:text-[#7B0046] group-hover:border-[#7B0046]/30 group-hover:bg-[#FAF7F2] transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-            </div>
-            <div className="flex items-center gap-3">
-              <MsuLogo size={38} className="shrink-0" />
-              <div>
-                <span className="font-extrabold text-lg text-[#4D002C] leading-tight block">New Purchase Request</span>
-                <span className="text-[11px] text-stone-500 font-medium leading-none">Mindanao State University - General Santos</span>
-              </div>
+    <div cla<EndUserPageHeader titlePrimary="Create PR" titleAccent="Draft" icon={FileText} />       </div>
             </div>
           </Link>
         </div>
