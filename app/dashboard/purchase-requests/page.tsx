@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft,
   CheckCircle,
   Clock,
   ExternalLink,
@@ -18,9 +17,9 @@ import {
   Sparkles,
   XCircle,
 } from "lucide-react";
-import { MsuLogo } from "@/components/msu-logo";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
+import { EndUserPageHeader } from "@/components/dashboard/EndUserPageHeader";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -150,21 +149,7 @@ export default function PurchaseRequestsPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#302725]">
-      {/* Top Navbar */}
-      <nav className="sticky top-0 z-40 border-b border-[#7B0046]/10 bg-white/95 px-4 py-3 backdrop-blur-md shadow-xs">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#7B0046] hover:text-[#4D002C] transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to Dashboard</span>
-          </Link>
-          <div className="flex items-center gap-2.5">
-            <MsuLogo size={34} className="shrink-0" />
-            <span className="font-extrabold text-sm sm:text-base text-[#4D002C]">Purchase Requests</span>
-          </div>
-        </div>
+      {/* Top N<EndUserPageHeader titlePrimary="Purchase" titleAccent="Requests" icon={FileText} />iv>
       </nav>
 
       <main className="mx-auto max-w-7xl px-3.5 py-6 sm:px-6 sm:py-8 lg:px-8">
