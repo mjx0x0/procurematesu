@@ -33,7 +33,9 @@ export default function TransparencyPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <nav classNa<EndUserPageHeader titlePrimary="Transparency" titleAccent="Board" icon={ShieldCheck} />n className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <EndUserPageHeader titlePrimary="Transparency" titleAccent="Board" icon={ShieldCheck} />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <section className="bg-gradient-to-br from-[#4D002C] via-[#7B0046] to-[#610037] rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-sm mb-6">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-amber-200 bg-white/10 border border-white/10 rounded-full px-3 py-1.5 mb-4">
