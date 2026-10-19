@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowLeft, ExternalLink, FileText, Search, ShieldCheck, TrendingUp } from "lucide-react";
-import { MsuLogo } from "@/components/msu-logo";
+import { ExternalLink, FileText, Search, ShieldCheck, TrendingUp } from "lucide-react";
 import { TRANSPARENCY_PROJECTS, TRANSPARENCY_SOURCE_URL } from "@/lib/transparency-projects";
+import { EndUserPageHeader } from "@/components/dashboard/EndUserPageHeader";
 
 const YEARS = [2026, 2025, 2024];
 const CATEGORIES = ["All", "Infrastructure", "Goods & Equipment", "Services", "ICT", "Research & Laboratory", "Agriculture & Development", "Other"] as const;
@@ -34,18 +33,7 @@ export default function TransparencyPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <nav className="bg-white border-b border-[#7B0046]/10 px-4 py-3 sticky top-0 z-50 shadow-xs">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold text-[#7B0046] hover:text-[#4D002C]">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
-          </Link>
-          <div className="flex items-center gap-2.5">
-            <MsuLogo size={36} className="shrink-0" />
-            <span className="font-bold text-base sm:text-lg text-[#4D002C]">Procurement Transparency</span>
-          </div>
-        </div>
-      </nav>
+      <EndUserPageHeader titlePrimary="Transparency" titleAccent="Board" icon={ShieldCheck} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <section className="bg-gradient-to-br from-[#4D002C] via-[#7B0046] to-[#610037] rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-sm mb-6">
