@@ -11,6 +11,7 @@ interface EndUserPageHeaderProps {
   titleAccent: string;
   icon: LucideIcon;
   backHref?: string;
+  containerClassName?: string;
   children?: ReactNode;
 }
 
@@ -19,6 +20,7 @@ export function EndUserPageHeader({
   titleAccent,
   icon: PageIcon,
   backHref = "/dashboard",
+  containerClassName = "max-w-7xl px-4 sm:px-6",
   children,
 }: EndUserPageHeaderProps) {
   const router = useRouter();
@@ -77,7 +79,7 @@ export function EndUserPageHeader({
 
   return (
     <nav className="sticky top-0 z-40 shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5">
+      <div className={`mx-auto flex items-center justify-between gap-3 py-3.5 ${containerClassName}`}>
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Link
             href={backHref}

@@ -543,7 +543,7 @@ export default function ChatbotDashboard() {
   return (
     <div className="h-screen h-[100dvh] max-h-screen bg-[#FAF8F5] flex flex-col overflow-hidden">
       {/* Top Navbar */}
-      <EndUserPageHeader titlePrimary="AI" titleAccent="Chatbot" icon={Bot}>
+      <EndUserPageHeader titlePrimary="AI" titleAccent="Chatbot" icon={Bot} containerClassName="max-w-7xl w-full px-2 sm:px-4 md:px-6">
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop Sidebar Toggle Button */}
             <button

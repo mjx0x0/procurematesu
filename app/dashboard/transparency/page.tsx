@@ -33,7 +33,7 @@ export default function TransparencyPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <EndUserPageHeader titlePrimary="Transparency" titleAccent="Board" icon={ShieldCheck} />
+      <EndUserPageHeader titlePrimary="Transparency" titleAccent="Board" icon={ShieldCheck} containerClassName="max-w-7xl px-4 sm:px-6" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <section className="bg-gradient-to-br from-[#4D002C] via-[#7B0046] to-[#610037] rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-sm mb-6">
