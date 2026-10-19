@@ -524,10 +524,10 @@ export default function ChatbotDashboard() {
     );
 
   return (
-    <div className="h-screen h-[100dvh] max-h-screen bg-[#FAF8F5] flex flex-col overflow-hidden">
+    <div className="chatbot-viewport h-screen h-[100dvh] max-h-screen bg-[#FAF8F5] flex flex-col overflow-hidden">
       {/* Top Navbar */}
-      <SystemPageHeader titlePrimary="AI" titleAccent="Chatbot" icon={Bot} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl w-full px-2 sm:px-4 md:px-6">
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <SystemPageHeader titlePrimary="AI" titleAccent="Chatbot" mobileTitlePrimary="Gab" mobileTitleAccent="AI" compactOnMobile icon={Bot} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl w-full px-2 sm:px-4 md:px-6">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* Desktop Sidebar Toggle Button */}
             <button
               onClick={() => setSidebarOpen((prev) => !prev)}
@@ -551,7 +551,7 @@ export default function ChatbotDashboard() {
             {/* Mobile History Toggle Button */}
             <button
               onClick={() => setMobileHistoryOpen(true)}
-              className="md:hidden p-2 rounded-lg text-stone-600 hover:bg-stone-100 hover:text-[#7B0046] text-xs font-medium flex items-center gap-1"
+              className="md:hidden h-9 w-9 shrink-0 rounded-lg text-stone-600 hover:bg-stone-100 hover:text-[#7B0046] text-xs font-medium flex items-center justify-center gap-1"
               title="Chat History"
             >
               <History className="h-4 w-4" />
@@ -560,7 +560,7 @@ export default function ChatbotDashboard() {
             <button
               onClick={startNewChat}
               disabled={loading}
-              className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-[#7B0046] hover:bg-[#610037] text-white text-xs font-bold flex items-center gap-1 sm:gap-1.5 shadow-xs transition-colors border border-amber-400/30 disabled:opacity-50"
+              className="min-h-9 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-[#7B0046] hover:bg-[#610037] text-white text-xs font-bold flex items-center gap-1 sm:gap-1.5 shadow-xs transition-colors border border-amber-400/30 disabled:opacity-50"
             >
               <MessageSquarePlus className="h-3.5 w-3.5 text-amber-300" />
               <span className="hidden sm:inline">New Chat</span>
@@ -570,7 +570,7 @@ export default function ChatbotDashboard() {
             <button
               onClick={() => setShowClearModal(true)}
               disabled={loading || !sessionId}
-              className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-white border border-stone-200 hover:border-red-200 text-stone-600 hover:text-red-700 text-xs font-semibold flex items-center gap-1 sm:gap-1.5 transition-colors disabled:opacity-40"
+              className="min-h-9 min-w-9 justify-center px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-white border border-stone-200 hover:border-red-200 text-stone-600 hover:text-red-700 text-xs font-semibold flex items-center gap-1 sm:gap-1.5 transition-colors disabled:opacity-40"
               title="Clear current chat"
             >
               <Trash2 className="h-3.5 w-3.5 text-stone-400" />
@@ -847,7 +847,7 @@ export default function ChatbotDashboard() {
           </div>
 
           {/* Input Box */}
-          <div className="shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 border-t border-stone-200 bg-white mt-auto">
+          <div className="chatbot-composer shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 border-t border-stone-200 bg-white mt-auto">
             <div className="flex gap-2 items-center">
               <input
                 ref={inputRef}

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckCircle, Clock, Eye, FileText, Filter, Loader2, PlusCircle, Printer, Search } from "lucide-react";
-import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
+import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, PROCUREMENT_STAGE_SHORT_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 
@@ -141,7 +141,7 @@ export default function PurchaseRequestsPage() {
 
       <main className="mx-auto max-w-7xl px-3.5 py-6 sm:px-6 sm:py-8 lg:px-8">
         {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-5 sm:p-8 text-white shadow-sm mb-6">
+        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-4 sm:p-8 text-white shadow-sm mb-5 sm:mb-6">
           <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
           <div className="relative flex flex-col md:flex-row md:items-end justify-between gap-5">
             <div className="max-w-2xl">
@@ -171,14 +171,14 @@ export default function PurchaseRequestsPage() {
           <button
             type="button"
             onClick={() => setStageFilter("all")}
-            className={`rounded-xl border p-4 text-left transition-all ${
+            className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${
               stageFilter === "all"
                 ? "border-[#7B0046] bg-white shadow-sm ring-2 ring-[#7B0046]/10"
                 : "border-stone-200 bg-white hover:border-stone-300"
             }`}
           >
             <p className="text-xs font-bold uppercase tracking-wider text-stone-500">All Requests</p>
-            <p className="mt-1 text-2xl sm:text-3xl font-black text-[#4D002C]">{counts.total}</p>
+            <p className="mt-1 text-xl sm:text-3xl font-black text-[#4D002C]">{counts.total}</p>
             <p className="text-[11px] text-stone-500 mt-0.5">Total submissions</p>
           </button>
 
@@ -228,14 +228,14 @@ export default function PurchaseRequestsPage() {
         {/* Directory Container */}
         <section className="overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-sm">
           {/* Filter & Search Bar */}
-          <div className="border-b border-stone-200/80 bg-stone-50/60 p-4 sm:p-5">
+          <div className="border-b border-stone-200/80 bg-stone-50/60 p-3 sm:p-5">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               {/* Tab Selector */}
-              <div className="inline-flex items-center p-1 bg-stone-100 border border-stone-200/70 rounded-xl w-fit">
+              <div className="flex w-full items-center gap-1 overflow-x-auto no-scrollbar rounded-xl border border-stone-200/70 bg-stone-100 p-1 md:w-fit">
                 <button
                   type="button"
                   onClick={() => setStageFilter("all")}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  className={`flex-none whitespace-nowrap px-2.5 py-2 sm:px-3 sm:py-1.5 rounded-lg text-xs transition-all ${
                     stageFilter === "all"
                       ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
                       : "text-stone-600 hover:text-stone-900 font-semibold"
@@ -286,7 +286,7 @@ export default function PurchaseRequestsPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search PR No., purpose, office..."
-                  className="w-full rounded-xl border border-stone-200 bg-white pl-9 pr-3 py-2 text-xs sm:text-sm outline-none focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/10"
+                  className="w-full rounded-xl border border-stone-200 bg-white pl-9 pr-3 py-2.5 sm:py-2 text-xs sm:text-sm outline-none focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/10"
                 />
               </div>
             </div>
@@ -332,11 +332,11 @@ export default function PurchaseRequestsPage() {
                 return (
                   <div
                     key={pr.pr_no}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 hover:bg-stone-50/70 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-5 hover:bg-stone-50/70 transition-colors"
                   >
-                    <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                    <div className="flex items-start gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                       <div
-                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border shadow-xs ${
+                        className={`flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg sm:rounded-xl border shadow-xs ${
                           isDone
                             ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                             : isApproved
@@ -345,17 +345,17 @@ export default function PurchaseRequestsPage() {
                         }`}
                       >
                         {isDone ? (
-                          <CheckCircle className="h-5 w-5" />
+                          <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                         ) : isApproved ? (
                           <CheckCircle className="h-5 w-5" />
                         ) : (
-                          <Clock className="h-5 w-5" />
+                          <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
                         )}
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono text-sm sm:text-base font-bold text-[#4D002C]">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                          <span className="font-mono text-[13px] sm:text-base font-bold text-[#4D002C]">
                             {pr.pr_no}
                           </span>
                           {pr.pr_no?.includes("TEMP") && (
@@ -364,7 +364,7 @@ export default function PurchaseRequestsPage() {
                             </span>
                           )}
                           <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border ${
+                            className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] font-bold border ${
                               isDone
                                 ? "bg-emerald-50 text-emerald-800 border-emerald-200"
                                 : isApproved
@@ -374,7 +374,7 @@ export default function PurchaseRequestsPage() {
                           >
                             {isDone ? "Completed" : isApproved ? "Approved" : "Under Review"}
                           </span>
-                          <span className="text-xs text-stone-400 font-medium">
+                          <span className="text-[11px] sm:text-xs text-stone-400 font-medium">
                             · {new Date(pr.created_at).toLocaleDateString("en-PH", {
                               year: "numeric",
                               month: "short",
@@ -383,16 +383,24 @@ export default function PurchaseRequestsPage() {
                           </span>
                         </div>
 
-                        <p className="mt-1 truncate text-xs sm:text-sm font-semibold text-stone-800">
+                        <p className="mt-1 line-clamp-2 sm:truncate text-xs sm:text-sm font-semibold leading-snug text-stone-800">
                           {pr.purpose || "Official procurement request"}
                         </p>
-                        <p className="mt-0.5 text-xs text-stone-500 font-medium">
+                        <p className="mt-0.5 text-[11px] sm:text-xs text-stone-500 font-medium">
                           {pr.department || "University Office"}
                         </p>
+                        <div className="mt-2 sm:hidden">
+                          <span
+                            className={`inline-flex max-w-full items-center rounded-lg border px-2 py-1 text-[11px] font-semibold leading-snug ${statusColor(pr.current_stage)}`}
+                          >
+                            {stageNum ? `Stage ${stageNum} · ` : ""}
+                            {PROCUREMENT_STAGE_SHORT_LABELS[pr.current_stage] || statusLabel(pr.current_stage)}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t border-stone-100 sm:border-0">
+                    <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t border-stone-100 sm:border-0">
                       <div className="text-left sm:text-right">
                         <p className="text-sm sm:text-base font-bold text-stone-900">
                           ₱{Number(pr.total || 0).toLocaleString(undefined, {
@@ -401,7 +409,7 @@ export default function PurchaseRequestsPage() {
                           })}
                         </p>
                         <span
-                          className={`mt-1 inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${statusColor(
+                          className={`hidden sm:inline-flex mt-1 items-center rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${statusColor(
                             pr.current_stage
                           )}`}
                         >
@@ -413,15 +421,16 @@ export default function PurchaseRequestsPage() {
                       <div className="flex items-center gap-1.5 shrink-0">
                         <Link
                           href={`/dashboard/pr/${pr.pr_no}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#4D002C] text-white text-xs font-bold shadow-xs hover:bg-[#7B0046] transition-colors"
+                          className="inline-flex min-h-10 items-center gap-1 px-2.5 sm:px-3 py-2 rounded-xl bg-[#4D002C] text-white text-[11px] sm:text-xs font-bold shadow-xs hover:bg-[#7B0046] transition-colors"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           <span>Track PR</span>
                         </Link>
                         <Link
                           href={`/dashboard/pr-print?id=${pr.pr_no}`}
-                          className="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl border border-stone-200 bg-white text-stone-700 text-xs font-bold hover:bg-stone-50 transition-colors"
+                          className="inline-flex min-h-10 min-w-10 items-center justify-center gap-1 px-2.5 py-2 rounded-xl border border-stone-200 bg-white text-stone-700 text-xs font-bold hover:bg-stone-50 transition-colors"
                           title="Print PR Form"
+                          aria-label={`Print purchase request ${pr.pr_no}`}
                         >
                           <Printer className="h-3.5 w-3.5" />
                         </Link>
