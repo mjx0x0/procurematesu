@@ -198,11 +198,10 @@ export default function ProcurementRequestForm() {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" /></div>;
 
   return (
-    <div cla<EndUserPageHeader titlePrimary="Create PR" titleAccent="Draft" icon={FileText} />       </div>
-            </div>
-          </Link>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[#FAF8F5] pb-16">
+
+      {/* Top Navigation */}
+      <EndUserPageHeader titlePrimary="Create PR" titleAccent="Draft" icon={FileText} />
 
       <main className="max-w-5xl mx-auto px-4 pt-6">
         <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
