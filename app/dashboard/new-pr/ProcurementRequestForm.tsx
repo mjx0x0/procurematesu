@@ -6,7 +6,6 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import { EndUserPageHeader } from "@/components/dashboard/EndUserPageHeader";
 import { ArrowLeft, FileText, Loader2, Plus, Save, Trash2, X, CheckCircle2, AlertCircle, Printer } from "lucide-react";
-import { MsuLogo } from "@/components/msu-logo";
 import { firstValidationError, validatePurchaseRequest } from "@/lib/pr-validation";
 
 interface Item {
@@ -201,7 +200,7 @@ export default function ProcurementRequestForm() {
     <div className="min-h-screen bg-[#FAF8F5] pb-16">
 
       {/* Top Navigation */}
-      <EndUserPageHeader titlePrimary="Create PR" titleAccent="Draft" icon={FileText} />
+      <EndUserPageHeader titlePrimary="Create PR" titleAccent="Draft" icon={FileText} containerClassName="max-w-5xl px-4" />
 
       <main className="max-w-5xl mx-auto px-4 pt-6">
         <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
