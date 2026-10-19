@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, ArrowUpRight, BarChart3, Bot, CheckCircle, ChevronDown, ClipboardList, Clock, Eye, FileText, LayoutDashboard, Loader2, LogOut, PlusCircle, ShieldCheck, Sparkles } from "lucide-react";
-import { MsuLogo } from "@/components/msu-logo";
+import { ArrowRight, Loader2 } from "lucide-react";
+
 import { Chatbot } from "@/components/chatbot/Chatbot";
 import { NotificationPopover } from "@/components/NotificationPopover";
-import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
+
 import { supabase } from "@/lib/supabase/client";
+import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -28,18 +29,6 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0 });
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setUserMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -86,12 +75,7 @@ export default function DashboardPage() {
     return () => { cancelled = true; };
   }, [router]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.replace("/");
-  };
-
-  const displayName = user?.user_metadata?.full_name || "Requisitioner";
+const displayName = user?.user_metadata?.full_name || "Requisitioner";
   const initials = displayName.slice(0, 2).toUpperCase();
 
   if (loading) {
@@ -107,71 +91,19 @@ export default function DashboardPage() {
 
   return (
     <div className="app-theme min-h-[100svh] overflow-x-hidden bg-[#F7F5F2] text-[#302725] dashboard-page">
-      <header className="sticky top-0 z-40 border-b border-[#7B0046]/10 bg-[#FCFBF9]/95 backdrop-blur-xl">
-        <div className="mx-auto flex min-h-[60px] max-w-[1220px] items-center justify-between gap-3 px-4 py-2.5 sm:min-h-[68px] sm:px-7 lg:px-8">
-          <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
-            <MsuLogo size={36} className="shrink-0" />
-            <div className="min-w-0 leading-tight">
-              <div className="max-w-[210px] truncate text-xs sm:text-sm font-extrabold tracking-tight text-[#4D002C] sm:max-w-none">MSU GenSan Procurement Management</div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#F5AB26]">End User Workspace</div>
-            </div>
-          </Link>
-
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <NotificationPopover />
-            <div className="hidden h-7 w-px bg-stone-200 sm:block" />
-            <div ref={userMenuRef} className="relative">
-              <button
-                type="button"
-                onClick={() => setUserMenuOpen((prev) => !prev)}
-                className="flex items-center gap-2 rounded-xl border border-stone-200/80 bg-white px-2.5 py-1.5 transition hover:border-[#F5AB26]/60 hover:bg-[#FFFDF7] focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 cursor-pointer"
-                aria-expanded={userMenuOpen}
-                aria-label="User account menu"
-              >
-                <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full border border-[#F5AB26]/45 bg-[#FFF6D9] text-[9px] sm:text-[10px] font-black text-[#6B4F05]">
-                  {initials}
-                </div>
-                <div className="hidden max-w-[150px] text-left leading-tight sm:block">
-                  <p className="truncate text-[10px] font-bold text-stone-800">{displayName}</p>
-                  <p className="truncate text-[8px] text-stone-400">{user?.email}</p>
-                </div>
-                <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${userMenuOpen ? "rotate-180 text-[#7B0046]" : ""}`} />
-              </button>
-
-              {userMenuOpen && (
-                <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">
-                  <div className="border-b border-stone-100 px-3 py-2.5">
-                    <p className="truncate text-xs font-bold text-stone-900">{displayName}</p>
-                    <p className="truncate text-[10px] text-stone-500">{user?.email}</p>
-                    <div className="mt-1.5 flex items-center gap-1.5">
-                      <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[9px] font-semibold text-amber-800 border border-amber-200/60">
-                        {isAdmin ? "Administrator" : "Requisitioner"}
-                      </span>
-                    </div>
-                  </div>
-                  {isAdmin && (
-                    <Link
-                      href="/admin"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 hover:text-[#7B0046] transition"
-                    >
-                      <ShieldCheck className="h-4 w-4 text-[#F5AB26]" />
-                      <span>Admin Portal</span>
-                    </Link>
-                  )}
-                  <button
-                    onClick={handleLogout}
-                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>Logout</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <SystemPageHeader
+        titlePrimary="MSU GenSan Procurement Management"
+        titleAccent="System"
+        workspaceLabel="End User Workspace"
+        brandLogo
+        backHref={null}
+        roleLabel={isAdmin ? "Administrator" : "Requisitioner"}
+        showAdminPortal={isAdmin}
+        containerClassName="max-w-[1220px] px-3.5 sm:px-7 lg:px-8"
+      >
+        <NotificationPopover />
+        <div className="hidden h-7 w-px bg-stone-200 sm:block" />
+      </SystemPageHeader>
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
         <section className="relative overflow-hidden rounded-[24px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-8 sm:p-12 md:p-14 shadow-[0_18px_45px_rgba(77,0,44,.12)]">
@@ -270,8 +202,6 @@ export default function DashboardPage() {
         </section>
 
         {/* 3 Procurement Overviews (Compact & Subtle) */}
-
-
 
         <footer className="mt-12 py-8 text-center text-xs text-stone-500 border-t border-stone-200">
           © {new Date().getFullYear()} Mindanao State University - General Santos · Procurement Management System

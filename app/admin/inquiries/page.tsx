@@ -1,24 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+
 import { supabase } from "@/lib/supabase/client";
-import {
-  FileText,
-  LogOut,
-  User,
-  Loader2,
-  Search,
-  ChevronDown,
-  Eye,
-  MessageSquare,
-  Calendar,
-  Filter,
-  X,
-  Download,
-  ArrowLeft,
-} from "lucide-react";
+import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import { User, Loader2, Search, Eye, MessageSquare, Filter, X, Download } from "lucide-react";
 
 interface Inquiry {
   id: string;
@@ -35,7 +22,6 @@ interface Inquiry {
 
 export default function InquiriesPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [filteredInquiries, setFilteredInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,18 +30,6 @@ export default function InquiriesPage() {
   const [dateFilter, setDateFilter] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
-  const adminMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target as Node)) {
-        setAdminMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   // Check admin and load data
   useEffect(() => {
@@ -82,7 +56,6 @@ export default function InquiriesPage() {
           return;
         }
 
-        setUser(user);
         await loadInquiries();
       } catch (err) {
         console.error("Admin check error:", err);
@@ -142,12 +115,7 @@ export default function InquiriesPage() {
     setFilteredInquiries(filtered);
   }, [searchTerm, typeFilter, dateFilter, inquiries]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
-
-  const formatDate = (date: string) => {
+const formatDate = (date: string) => {
     return new Date(date).toLocaleString("en-PH", {
       month: "short",
       day: "numeric",
@@ -214,64 +182,7 @@ export default function InquiriesPage() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">
       {/* Navigation */}
-      <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-40 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/admin"
-              className="p-2 rounded-xl text-stone-500 hover:text-[#7B0046] hover:bg-stone-100 transition-colors"
-              title="Back to Admin Dashboard"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-            <div className="bg-[#4D002C] p-2 rounded-xl text-amber-300 shadow-sm">
-              <MessageSquare className="h-5 w-5" />
-            </div>
-            <div>
-              <b className="text-xl font-black text-[#4D002C]">
-                Inquiry <span className="text-[#F5AB26]">Monitoring</span>
-              </b>
-            </div>
-          </div>
-          <div ref={adminMenuRef} className="relative shrink-0">
-            <button
-              type="button"
-              onClick={() => setAdminMenuOpen((prev) => !prev)}
-              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 cursor-pointer"
-              aria-expanded={adminMenuOpen}
-              aria-label="Admin account menu"
-            >
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7B0046]/10 text-[10px] font-bold text-[#7B0046]">
-                <User className="h-3.5 w-3.5" />
-              </div>
-              <span className="hidden sm:inline font-medium text-xs max-w-[170px] truncate text-stone-800">
-                {user?.email}
-              </span>
-              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7B0046]" : ""}`} />
-            </button>
-
-            {adminMenuOpen && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">
-                <div className="border-b border-stone-100 px-3 py-2.5">
-                  <p className="truncate text-xs font-bold text-stone-900">{user?.email}</p>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-[#7B0046] border border-red-200/60">
-                      Administrator
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
+      <SystemPageHeader titlePrimary="Inquiry" titleAccent="Monitoring" icon={MessageSquare} backHref="/admin" roleLabel="Administrator" containerClassName="max-w-7xl px-4 sm:px-6" />
 
       <div className="max-w-7xl mx-auto px-4 py-7">
         {/* Header */}

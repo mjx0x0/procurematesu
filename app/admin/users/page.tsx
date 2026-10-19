@@ -1,10 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
-import { ArrowLeft, CheckCircle, ChevronDown, Loader2, LogOut, User, UserCheck, UserX, Users, RefreshCw, AlertCircle } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import { CheckCircle, Loader2, User, UserCheck, UserX, Users, RefreshCw, AlertCircle } from "lucide-react";
 
 interface UserAccount {
   id: string;
@@ -19,48 +18,14 @@ interface UserAccount {
 }
 
 export default function AdminUsersPage() {
-  const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
-  const adminMenuRef = useRef<HTMLDivElement>(null);
+
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target as Node)) {
-        setAdminMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        let { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          const { data: { session } } = await supabase.auth.getSession();
-          user = session?.user || null;
-        }
-        setCurrentUser(user);
-      } catch (err) {
-        console.error("Error fetching current user:", err);
-      }
-    };
-    fetchUser();
-  }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
-
-  const loadUsers = useCallback(async () => {
+const loadUsers = useCallback(async () => {
     setError(null);
     try {
       const response = await fetch("/api/admin/users", { cache: "no-store" });
@@ -117,64 +82,7 @@ export default function AdminUsersPage() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">
-      <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-40 shadow-xs">
-        <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/admin"
-              className="p-2 rounded-xl text-stone-500 hover:text-[#7B0046] hover:bg-stone-100 transition-colors"
-              title="Back to Admin Dashboard"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-            <div className="bg-[#4D002C] p-2 rounded-xl text-amber-300 shadow-sm">
-              <Users className="h-5 w-5" />
-            </div>
-            <div>
-              <b className="text-xl font-black text-[#4D002C]">
-                User <span className="text-[#F5AB26]">Management</span>
-              </b>
-            </div>
-          </div>
-          <div ref={adminMenuRef} className="relative shrink-0">
-            <button
-              type="button"
-              onClick={() => setAdminMenuOpen((prev) => !prev)}
-              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 cursor-pointer"
-              aria-expanded={adminMenuOpen}
-              aria-label="Admin account menu"
-            >
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7B0046]/10 text-[10px] font-bold text-[#7B0046]">
-                <User className="h-3.5 w-3.5" />
-              </div>
-              <span className="hidden sm:inline font-medium text-xs max-w-[170px] truncate text-stone-800">
-                {currentUser?.email || "procurement@msugensan.edu.ph"}
-              </span>
-              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7B0046]" : ""}`} />
-            </button>
-
-            {adminMenuOpen && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">
-                <div className="border-b border-stone-100 px-3 py-2.5">
-                  <p className="truncate text-xs font-bold text-stone-900">{currentUser?.email || "Procurement Admin"}</p>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-[#7B0046] border border-red-200/60">
-                      Administrator
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
+      <SystemPageHeader titlePrimary="User" titleAccent="Management" icon={Users} backHref="/admin" roleLabel="Administrator" containerClassName="max-w-6xl px-4" />
 
       <main className="max-w-6xl mx-auto px-4 py-7">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">

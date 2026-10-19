@@ -5,9 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import PRDownloadButton from "@/components/PRDownloadButton";
-import { MsuLogo } from "@/components/msu-logo";
+import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
-import { ArrowLeft, CheckCircle, Clock, FileCheck, FileText, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, Clock, FileCheck, FileText, Loader2, XCircle } from "lucide-react";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -159,25 +159,7 @@ export default function PRDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 px-4 py-3 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <MsuLogo size={38} className="shrink-0" />
-            <div>
-              <span className="font-extrabold text-sm sm:text-base text-[#4D002C] tracking-tight">
-                Purchase Requests <span className="text-[#F5AB26]">Tracking</span>
-              </span>
-            </div>
-          </div>
-          <Link
-            href="/dashboard"
-            className="ui-button ui-button-secondary ui-button-sm text-xs font-semibold"
-          >
-            <ArrowLeft className="h-4 w-4 text-[#7B0046]" />
-            <span>Back to Dashboard</span>
-          </Link>
-        </div>
-      </nav>
+      <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" icon={FileText} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-5xl px-4" />
 
       <main className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-stone-200">

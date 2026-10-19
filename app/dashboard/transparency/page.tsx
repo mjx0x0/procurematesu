@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { ExternalLink, FileText, Search, ShieldCheck, TrendingUp } from "lucide-react";
 import { TRANSPARENCY_PROJECTS, TRANSPARENCY_SOURCE_URL } from "@/lib/transparency-projects";
-import { EndUserPageHeader } from "@/components/dashboard/EndUserPageHeader";
+import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 
 const YEARS = [2026, 2025, 2024];
 const CATEGORIES = ["All", "Infrastructure", "Goods & Equipment", "Services", "ICT", "Research & Laboratory", "Agriculture & Development", "Other"] as const;
@@ -33,7 +33,7 @@ export default function TransparencyPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <EndUserPageHeader titlePrimary="Transparency" titleAccent="Board" icon={ShieldCheck} containerClassName="max-w-7xl px-4 sm:px-6" />
+      <SystemPageHeader titlePrimary="Transparency" titleAccent="Board" icon={ShieldCheck} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl px-4 sm:px-6" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <section className="bg-gradient-to-br from-[#4D002C] via-[#7B0046] to-[#610037] rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-sm mb-6">

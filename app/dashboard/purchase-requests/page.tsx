@@ -3,23 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  CheckCircle,
-  Clock,
-  ExternalLink,
-  Eye,
-  FileText,
-  Filter,
-  Loader2,
-  PlusCircle,
-  Printer,
-  Search,
-  Sparkles,
-  XCircle,
-} from "lucide-react";
+import { CheckCircle, Clock, Eye, FileText, Filter, Loader2, PlusCircle, Printer, Search } from "lucide-react";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
-import { EndUserPageHeader } from "@/components/dashboard/EndUserPageHeader";
+import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -150,7 +137,7 @@ export default function PurchaseRequestsPage() {
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#302725]">
       {/* Top Navbar */}
-      <EndUserPageHeader titlePrimary="Purchase" titleAccent="Requests" icon={FileText} containerClassName="max-w-7xl px-3.5 sm:px-6 lg:px-8" />
+      <SystemPageHeader titlePrimary="Purchase" titleAccent="Requests" icon={FileText} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl px-3.5 sm:px-6 lg:px-8" />
 
       <main className="mx-auto max-w-7xl px-3.5 py-6 sm:px-6 sm:py-8 lg:px-8">
         {/* Hero Section */}

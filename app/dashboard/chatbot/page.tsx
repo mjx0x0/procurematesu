@@ -3,26 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { EndUserPageHeader } from "@/components/dashboard/EndUserPageHeader";
+import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { ChatMessageContent } from "@/components/chatbot/ChatMessageContent";
-import {
-  Bot,
-  Check,
-  ChevronLeft,
-  Copy,
-  History,
-  Loader2,
-  MessageSquarePlus,
-  Send,
-  Sparkles,
-  Trash2,
-  X,
-  Square,
-  Clock,
-  ArrowRight,
-  PanelLeftClose,
-  PanelLeftOpen,
-} from "lucide-react";
+import { Bot, Check, Copy, History, Loader2, MessageSquarePlus, Send, Sparkles, Trash2, X, Square, ArrowRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 
 interface PRChoice {
@@ -543,7 +526,7 @@ export default function ChatbotDashboard() {
   return (
     <div className="h-screen h-[100dvh] max-h-screen bg-[#FAF8F5] flex flex-col overflow-hidden">
       {/* Top Navbar */}
-      <EndUserPageHeader titlePrimary="AI" titleAccent="Chatbot" icon={Bot} containerClassName="max-w-7xl w-full px-2 sm:px-4 md:px-6">
+      <SystemPageHeader titlePrimary="AI" titleAccent="Chatbot" icon={Bot} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl w-full px-2 sm:px-4 md:px-6">
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop Sidebar Toggle Button */}
             <button
@@ -594,7 +577,7 @@ export default function ChatbotDashboard() {
               <span className="hidden sm:inline">Clear</span>
             </button>
           </div>
-      </EndUserPageHeader>
+      </SystemPageHeader>
 
       {/* Main Layout */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 md:p-6 flex gap-4 min-h-0 overflow-hidden">

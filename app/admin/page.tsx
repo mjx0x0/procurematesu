@@ -7,12 +7,8 @@ import { supabase } from "@/lib/supabase/client";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { ActionFeedbackModal, type FeedbackTone } from "@/components/ui/ActionFeedbackModal";
 import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
-import { MsuLogo } from "@/components/msu-logo";
-import {
-  Check, CheckCircle, Clock, Eye, FileCheck, FileText, Loader2, LogOut,
-  MessageSquare, RefreshCw, Search, Trash2, User, Users, X, XCircle,
-  AlertCircle, ArrowRight, Sparkles, ChevronRight, ChevronDown,
-} from "lucide-react";
+import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import { Check, CheckCircle, Clock, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Trash2, User, Users, X, XCircle, AlertCircle, ChevronRight } from "lucide-react";
 
 interface PR {
   pr_no: string;
@@ -52,7 +48,6 @@ const COLORS: Record<string, string> = {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
   const [prs, setPrs] = useState<PR[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -71,18 +66,7 @@ export default function AdminDashboard() {
   const [officialPrInput, setOfficialPrInput] = useState("");
   const [showOfficialPrModal, setShowOfficialPrModal] = useState(false);
   const [approvalGroupFilter, setApprovalGroupFilter] = useState<"all" | "approved" | "drafts">("all");
-  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
-  const adminMenuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target as Node)) {
-        setAdminMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
   const selectedPRRef = useRef<PR | null>(null);
   selectedPRRef.current = selectedPR;
 
@@ -109,7 +93,6 @@ export default function AdminDashboard() {
         if (!authUser) { router.replace("/"); return; }
         const { data: profile } = await supabase.from("users").select("role,is_active,status").eq("id", authUser.id).single();
         if (profile?.role !== "admin" || profile?.is_active === false || (profile?.status && profile.status !== "approved")) { router.replace("/dashboard"); return; }
-        setUser(authUser);
         await loadData();
       } catch (e) { console.error(e); } finally { setLoading(false); }
     })();
@@ -269,9 +252,7 @@ export default function AdminDashboard() {
       showFeedback("success", "Purchase Request Deleted", `${deleted} and its recorded stage history have been permanently removed.`);
     } catch (e) { console.error(e); showFeedback("error", "Delete Failed", "The purchase request could not be deleted. Please try again."); }
   };
-  const logout = async () => { await supabase.auth.signOut(); router.push("/"); };
-
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]"><Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" /></div>;
+if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]"><Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" /></div>;
 
   const detailStage = currentStage(selectedPR);
   const detailIndex = currentIndex(selectedPR);
@@ -279,48 +260,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
-      <nav className="bg-white/95 border-b border-stone-200 sticky top-0 z-40 shadow-[0_1px_12px_rgba(45,20,10,0.04)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0"><MsuLogo size={40} className="shrink-0" /><div className="min-w-0"><b className="block text-base sm:text-lg text-[#4D002C] truncate">MSU GenSan Procurement Management System</b></div></div>
-          <div ref={adminMenuRef} className="relative shrink-0">
-            <button
-              type="button"
-              onClick={() => setAdminMenuOpen((prev) => !prev)}
-              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 cursor-pointer"
-              aria-expanded={adminMenuOpen}
-              aria-label="Admin account menu"
-            >
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7B0046]/10 text-[10px] font-bold text-[#7B0046]">
-                <User className="h-3.5 w-3.5" />
-              </div>
-              <span className="hidden sm:inline font-medium text-xs max-w-[170px] truncate text-stone-800">
-                {user?.email}
-              </span>
-              <ChevronDown className={`h-3.5 w-3.5 text-stone-400 transition-transform ${adminMenuOpen ? "rotate-180 text-[#7B0046]" : ""}`} />
-            </button>
-
-            {adminMenuOpen && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,20,10,0.12)]">
-                <div className="border-b border-stone-100 px-3 py-2.5">
-                  <p className="truncate text-xs font-bold text-stone-900">{user?.email}</p>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <span className="inline-flex items-center rounded-full bg-[#FDF2F7] px-2 py-0.5 text-[9px] font-bold text-[#7B0046] border border-[#F5D6E5]">
-                      Administrator
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={logout}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
+      <SystemPageHeader titlePrimary="MSU GenSan Procurement Management" titleAccent="System" workspaceLabel="Administrator Workspace" brandLogo backHref={null} roleLabel="Administrator" containerClassName="max-w-7xl px-4 sm:px-6" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-7">
         <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><h1 className="text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1><p className="text-stone-600 mt-1 text-sm">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="flex flex-wrap gap-2 items-start"><Link href="/admin/users" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><Users className="h-4 w-4" /> User Approvals</Link><Link href="/admin/inquiries" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#7B0046] border border-[#7B0046] rounded-xl text-sm font-bold text-white hover:bg-[#4D002C] disabled:opacity-60 disabled:cursor-wait shadow-sm transition-all"><RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
