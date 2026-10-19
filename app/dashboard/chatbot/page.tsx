@@ -542,7 +542,8 @@ export default function ChatbotDashboard() {
 
   return (
     <div className="h-screen h-[100dvh] max-h-screen bg-[#FAF8F5] flex flex-col overflow-hidden">
-      {/* Top N<EndUserPageHeader titlePrimary="AI" titleAccent="Chatbot" icon={Bot}>
+      {/* Top Navbar */}
+      <EndUserPageHeader titlePrimary="AI" titleAccent="Chatbot" icon={Bot}>
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop Sidebar Toggle Button */}
             <button
@@ -593,8 +594,7 @@ export default function ChatbotDashboard() {
               <span className="hidden sm:inline">Clear</span>
             </button>
           </div>
-      </EndUserPageHeader>iv>
-      </nav>
+      </EndUserPageHeader>
 
       {/* Main Layout */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 md:p-6 flex gap-4 min-h-0 overflow-hidden">
