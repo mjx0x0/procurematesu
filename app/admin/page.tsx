@@ -260,16 +260,16 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
-      <SystemPageHeader titlePrimary="MSU GenSan Procurement Management" titleAccent="System" workspaceLabel="Administrator Workspace" brandLogo backHref={null} roleLabel="Administrator" containerClassName="max-w-7xl px-4 sm:px-6" />
+      <SystemPageHeader titlePrimary="MSU GenSan Procurement Management" titleAccent="System" mobileTitlePrimary="MSU GenSan" mobileTitleAccent="Admin" compactOnMobile workspaceLabel="Administrator Workspace" brandLogo backHref={null} roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-7">
-        <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><h1 className="text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1><p className="text-stone-600 mt-1 text-sm">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="flex flex-wrap gap-2 items-start"><Link href="/admin/users" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><Users className="h-4 w-4" /> User Approvals</Link><Link href="/admin/inquiries" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#7B0046] border border-[#7B0046] rounded-xl text-sm font-bold text-white hover:bg-[#4D002C] disabled:opacity-60 disabled:cursor-wait shadow-sm transition-all"><RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
+      <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-4 sm:py-7">
+        <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1><p className="text-[13px] sm:text-sm text-stone-600 mt-1">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="flex flex-wrap gap-2 items-start"><Link href="/admin/users" className="px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><Users className="h-4 w-4" /> User Approvals</Link><Link href="/admin/inquiries" className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-[#7B0046] hover:bg-[#FDF2F7] flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#7B0046] border border-[#7B0046] rounded-xl text-xs sm:text-sm font-bold text-white hover:bg-[#4D002C] disabled:opacity-60 disabled:cursor-wait shadow-sm transition-all"><RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">{[[stats.total, "Total PRs", FileCheck, "text-[#7B0046]"], [stats.pending, "In Progress", Clock, "text-amber-600"], [stats.completed, "Completed", CheckCircle, "text-emerald-700"], [stats.rejected, "Rejected", XCircle, "text-red-600"]].map(([n, l, I, c]: any) => <div key={l} className="bg-white rounded-2xl p-4 border border-stone-200 shadow-[0_5px_20px_rgba(45,20,10,0.035)]"><div className="flex justify-between items-center"><div><div className={`text-2xl font-bold ${c}`}>{n}</div><div className="text-xs font-semibold text-stone-600 mt-0.5">{l}</div></div><I className={`h-5 w-5 ${c}`} /></div></div>)}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-7">{[[stats.total, "Total PRs", FileCheck, "text-[#7B0046]"], [stats.pending, "In Progress", Clock, "text-amber-600"], [stats.completed, "Completed", CheckCircle, "text-emerald-700"], [stats.rejected, "Rejected", XCircle, "text-red-600"]].map(([n, l, I, c]: any) => <div key={l} className="bg-white rounded-2xl p-3 sm:p-4 border border-stone-200 shadow-[0_5px_20px_rgba(45,20,10,0.035)]"><div className="flex justify-between items-center"><div><div className={`text-xl sm:text-2xl font-bold ${c}`}>{n}</div><div className="text-[11px] sm:text-xs font-semibold text-stone-600 mt-0.5">{l}</div></div><I className={`h-4 w-4 sm:h-5 sm:w-5 ${c}`} /></div></div>)}</div>
 
         {/* Filter and Search Bar */}
-        <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-5 shadow-[0_5px_20px_rgba(45,20,10,0.03)] flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
-          <div className="relative flex-1">
+        <div className="bg-white rounded-2xl border border-stone-200 p-3 sm:p-4 mb-4 sm:mb-5 shadow-[0_5px_20px_rgba(45,20,10,0.03)] flex flex-col lg:flex-row gap-2 sm:gap-3 items-stretch lg:items-center justify-between">
+          <div className="relative min-w-0 w-full lg:flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
             <input
               value={searchTerm}
@@ -278,11 +278,11 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046] text-sm"
             />
           </div>
-          <div className="flex flex-wrap sm:flex-nowrap gap-3 items-center">
+          <div className="admin-filter-controls flex w-full min-w-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-nowrap sm:gap-3 sm:items-center">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-gray-900 text-sm font-medium focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
+              className="admin-filter-select min-w-0 w-full max-w-full sm:w-auto px-3 py-2.5 sm:px-3.5 rounded-xl border border-stone-200 bg-white text-gray-900 text-sm font-medium focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
             >
               <option value="all">All Statuses ({prs.length})</option>
               {STAGES.map((s) => (
@@ -305,7 +305,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
             {(searchTerm || statusFilter !== "all" || departmentFilter !== "all") && (
               <button
                 onClick={() => { setSearchTerm(""); setStatusFilter("all"); setDepartmentFilter("all"); }}
-                className="px-3 py-2 rounded-xl text-xs font-bold text-stone-500 hover:text-stone-800 hover:bg-stone-100 whitespace-nowrap transition-colors"
+                className="self-start sm:self-auto px-3 py-2 rounded-xl text-xs font-bold text-stone-500 hover:text-stone-800 hover:bg-stone-100 whitespace-nowrap transition-colors"
               >
                 Clear
               </button>
@@ -315,17 +315,17 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
         {/* Purchase Requests Table Card */}
         <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-[0_8px_30px_rgba(45,20,10,0.04)]">
-          <div className="px-6 py-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-stone-50/50">
+          <div className="px-3.5 sm:px-6 py-3 sm:py-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-stone-50/50">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-[#4D002C]">Purchase Requests</h2>
+              <h2 className="text-base sm:text-xl font-bold text-[#4D002C]">Purchase Requests</h2>
               <p className="text-xs sm:text-sm text-stone-500 mt-0.5">Workflow stages are enforced sequentially in accordance with PMO procurement rules.</p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1 p-1 bg-stone-100 border border-stone-200/80 rounded-xl">
+            <div className="admin-pr-list-controls flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+              <div className="admin-pr-group-tabs flex w-full max-w-full items-center gap-1 overflow-x-auto no-scrollbar p-1 bg-stone-100 border border-stone-200/80 rounded-xl sm:w-fit sm:overflow-visible">
                 <button
                   type="button"
                   onClick={() => setApprovalGroupFilter("all")}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  className={`flex-none whitespace-nowrap px-2.5 sm:px-3 py-2 sm:py-1.5 rounded-lg text-xs transition-all ${
                     approvalGroupFilter === "all"
                       ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
                       : "text-stone-600 hover:text-stone-900 font-semibold"
@@ -356,7 +356,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                   Under Review <span className="ml-1 text-[11px] font-medium text-stone-500">({prs.filter((p) => !isApprovedPR(p)).length})</span>
                 </button>
               </div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-xs font-bold text-stone-700 w-fit">
+              <span className="inline-flex items-center gap-1.5 self-start sm:self-auto shrink-0 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-xs font-bold text-stone-700 w-fit">
                 <span className="h-2 w-2 rounded-full bg-[#7B0046]" />
                 {filtered.length} {filtered.length === 1 ? "Record" : "Records"}
               </span>
@@ -455,10 +455,10 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                     <div
                       key={pr.pr_no}
                       onClick={() => void openDetails(pr)}
-                      className="p-4 hover:bg-[#FFFDF7] transition-colors cursor-pointer flex flex-col gap-2.5"
+                      className="p-3 sm:p-4 hover:bg-[#FFFDF7] transition-colors cursor-pointer flex flex-col gap-2 sm:gap-2.5"
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <div className="flex flex-col items-start gap-1 min-w-0 max-w-[210px]">
+                        <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
                           <span className="font-mono text-xs sm:text-sm font-extrabold text-[#7B0046] tracking-tight truncate max-w-full block" title={pr.pr_no}>{pr.pr_no}</span>
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {pr.pr_no.includes("TEMP") && (
@@ -468,25 +468,26 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                             )}
                           </div>
                         </div>
-                        <span className="font-mono text-sm font-bold text-stone-900 shrink-0">
+                        <span className="font-mono text-[13px] sm:text-sm font-bold text-stone-900 shrink-0">
                           ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
 
-                      <p className="text-sm font-medium text-stone-800 line-clamp-1">{pr.purpose || "Official procurement request"}</p>
+                      <p className="text-[13px] sm:text-sm font-medium leading-snug text-stone-800 line-clamp-2 sm:line-clamp-1">{pr.purpose || "Official procurement request"}</p>
 
                       <div className="flex items-center justify-between gap-2 text-xs text-stone-500 font-medium">
                         <span className="truncate">{pr.department || "University Office"}</span>
                         <span className="shrink-0">{pr.created_at ? new Date(pr.created_at).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "—"}</span>
                       </div>
 
-                      <div className="flex items-center justify-between gap-2 pt-1 border-t border-stone-100">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border truncate max-w-[220px] ${COLORS[pr.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
-                          <span className="truncate">{stageNumber ? `Stage ${stageNumber}: ` : ""}{LABELS[pr.current_stage] || pr.current_stage}</span>
+                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-stone-100 min-w-0">
+                        <span className={`inline-flex min-w-0 flex-1 items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-[11px] sm:text-xs font-bold border truncate max-w-[calc(100%-4.25rem)] sm:max-w-[220px] ${COLORS[pr.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
+                          <span className="truncate sm:hidden">{stageNumber ? `Stage ${stageNumber}: ` : ""}{stepInfo?.shortLabel || LABELS[pr.current_stage] || pr.current_stage}</span>
+                          <span className="hidden truncate sm:inline">{stageNumber ? `Stage ${stageNumber}: ` : ""}{LABELS[pr.current_stage] || pr.current_stage}</span>
                         </span>
                         <button
                           onClick={(e) => { e.stopPropagation(); void openDetails(pr); }}
-                          className="inline-flex items-center gap-1 h-7 px-2.5 rounded-lg bg-white text-[#7B0046] text-xs font-bold border border-stone-200 shadow-2xs hover:bg-stone-50"
+                          className="inline-flex min-h-10 sm:h-8 items-center justify-center gap-1 px-3 sm:px-2.5 rounded-lg bg-white text-[#7B0046] text-xs font-bold border border-stone-200 shadow-2xs hover:bg-stone-50"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           <span>View</span>
@@ -502,23 +503,23 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
       </main>
 
       {showDetails && selectedPR && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[94vh] overflow-hidden flex flex-col border border-stone-200">
+        <div className="admin-pr-detail-overlay fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center overflow-y-auto p-2 sm:p-5">
+          <div className="admin-pr-detail-modal bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-5xl max-h-[calc(100dvh-1rem)] sm:max-h-[94vh] overflow-hidden flex flex-col border border-stone-200">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b border-stone-200 px-6 py-4 flex justify-between items-start z-10 shrink-0 shadow-2xs">
-              <div>
-                <div className="flex items-center gap-3 flex-wrap">
-                  <h3 className="text-xl font-extrabold text-[#4D002C] tracking-tight">PR {selectedPR.pr_no}</h3>
+            <div className="admin-pr-detail-header sticky top-0 bg-white border-b border-stone-200 px-3.5 sm:px-6 py-3 sm:py-4 flex justify-between items-start gap-2 z-10 shrink-0 shadow-2xs">
+              <div className="min-w-0 flex-1">
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3 flex-wrap">
+                  <h3 className="max-w-full break-words text-base sm:text-xl font-extrabold text-[#4D002C] tracking-tight">PR {selectedPR.pr_no}</h3>
                   {selectedPR.pr_no.includes("TEMP") && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">
                       Temporary Control #
                     </span>
                   )}
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${COLORS[selectedPR.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold border ${COLORS[selectedPR.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
                     {detailStage ? `Stage ${detailStage.number}: ${detailStage.shortLabel}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-stone-500 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                <p className="text-[11px] sm:text-sm text-stone-500 mt-1 flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-1 leading-relaxed">
                   <span><b>Department:</b> {selectedPR.department || "—"}</span>
                   <span>•</span>
                   <span><b>Total:</b> ₱{Number(selectedPR.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
@@ -539,21 +540,21 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
               <button
                 onClick={() => setShowDetails(false)}
                 aria-label="Close PR details"
-                className="p-2 text-stone-400 hover:text-stone-700 rounded-xl hover:bg-stone-100 transition-colors"
+                className="shrink-0 p-2 text-stone-400 hover:text-stone-700 rounded-xl hover:bg-stone-100 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="overflow-y-auto p-5 sm:p-6 space-y-5">
+            <div className="admin-pr-detail-body min-h-0 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-5">
               {/* Procurement Actions & Workflow Controls Card */}
-              <div className="bg-white rounded-2xl border border-stone-200/90 p-4 sm:p-5 shadow-xs space-y-3.5">
+              <div className="bg-white rounded-2xl border border-stone-200/90 p-3 sm:p-5 shadow-xs space-y-3">
                 {/* Primary Stage Action Card */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-stone-50/90 p-4 sm:p-5 rounded-xl border border-stone-200/90 shadow-xs">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-stone-50/90 p-3 sm:p-5 rounded-xl border border-stone-200/90 shadow-xs">
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#7B0046] text-white shadow-xs border border-[#630038]">
-                      <span className="font-mono font-bold text-lg leading-none tracking-tight">
+                    <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-[#7B0046] text-white shadow-xs border border-[#630038]">
+                      <span className="font-mono font-bold text-base sm:text-lg leading-none tracking-tight">
                         {detailStage?.number ? detailStage.number : "PR"}
                       </span>
                     </div>
@@ -569,7 +570,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
                     {/* Step 4 Official PR Assignment button - Only at Stage 4 */}
                     {selectedPR.current_stage === "pr_pre_numbering" && (
                       <button
@@ -631,12 +632,12 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                 )}
 
                 {/* Secondary Tools & Operations Bar */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-1 border-t border-stone-100">
+                <div className="admin-pr-secondary-actions flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-1 border-t border-stone-100">
                   {/* Documentary & Communication Tools */}
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setFullPrNo(selectedPR.pr_no)}
-                      className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-semibold border border-stone-200 shadow-2xs transition-all active:scale-98"
+                      className="admin-pr-action-button inline-flex items-center justify-center gap-2 h-9 px-3 sm:px-3.5 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-semibold border border-stone-200 shadow-2xs transition-all active:scale-98"
                     >
                       <FileText className="h-4 w-4 text-stone-600" />
                       <span>View Full PR Form</span>
@@ -658,7 +659,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                     {!["completed", "rejected", "cancelled"].includes(selectedPR.current_stage) && (
                       <button
                         onClick={() => openAction("reject")}
-                        className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg bg-white hover:bg-red-50 text-stone-600 hover:text-red-700 text-xs font-semibold border border-stone-200 hover:border-red-200 shadow-2xs transition-all active:scale-98"
+                        className="admin-pr-action-button inline-flex items-center justify-center gap-2 h-9 px-3 sm:px-3.5 rounded-lg bg-white hover:bg-red-50 text-stone-600 hover:text-red-700 text-xs font-semibold border border-stone-200 hover:border-red-200 shadow-2xs transition-all active:scale-98"
                       >
                         <XCircle className="h-4 w-4 text-red-500" />
                         <span>Reject PR</span>
@@ -803,7 +804,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
       )}
 
       {action && selectedPR && (
-        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div className="admin-pr-action-overlay fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-5 border border-stone-200">
             <div className="flex items-center justify-between gap-3 pb-3 mb-3.5 border-b border-stone-100">
               <div className="flex items-center gap-2.5 min-w-0">
@@ -923,7 +924,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
       {/* Standalone Step 4: Official PR Number Assignment Modal */}
       {showOfficialPrModal && selectedPR && (
-        <div className="fixed inset-0 z-[75] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div className="admin-pr-official-overlay fixed inset-0 z-[75] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200">
             <div className="flex items-start justify-between gap-3 mb-4 pb-3 border-b border-stone-100">
               <div className="flex items-center gap-2.5">
@@ -1002,7 +1003,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
         </div>
       )}
 
-      {deletePR && <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className="p-3 rounded-xl bg-red-50 text-red-600"><Trash2 className="h-6 w-6" /></div><div><h3 className="text-lg font-bold text-gray-900">Delete Purchase Request?</h3><p className="text-sm text-stone-600 mt-1"><b>{deletePR}</b> and its recorded stage history will be permanently removed.</p></div></div><div className="flex justify-end gap-2"><button onClick={() => setDeletePR(null)} className="px-4 py-2 rounded-lg bg-stone-100 text-stone-700 text-sm font-semibold">Cancel</button><button onClick={() => void deleteRequest()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold flex items-center gap-2"><Trash2 className="h-4 w-4" /> Delete Permanently</button></div></div></div>}
+      {deletePR && <div className="admin-pr-delete-overlay fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-4 sm:p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className="p-3 rounded-xl bg-red-50 text-red-600"><Trash2 className="h-6 w-6" /></div><div><h3 className="text-lg font-bold text-gray-900">Delete Purchase Request?</h3><p className="text-sm text-stone-600 mt-1"><b>{deletePR}</b> and its recorded stage history will be permanently removed.</p></div></div><div className="flex justify-end gap-2"><button onClick={() => setDeletePR(null)} className="px-4 py-2 rounded-lg bg-stone-100 text-stone-700 text-sm font-semibold">Cancel</button><button onClick={() => void deleteRequest()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold flex items-center gap-2"><Trash2 className="h-4 w-4" /> Delete Permanently</button></div></div></div>}
 
       {fullPrNo && <AdminPRFullFormModal prNo={fullPrNo} onClose={() => setFullPrNo(null)} />}
       <ActionFeedbackModal open={feedback.open} tone={feedback.tone} title={feedback.title} message={feedback.message} onClose={() => setFeedback((f) => ({ ...f, open: false }))} actionLabel="Done" />
