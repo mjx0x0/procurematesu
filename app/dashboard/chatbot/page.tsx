@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { EndUserPageHeader } from "@/components/dashboard/EndUserPageHeader";
 import { ChatMessageContent } from "@/components/chatbot/ChatMessageContent";
 import {
-  ArrowLeft,
   Bot,
   Check,
   ChevronLeft,
@@ -24,7 +24,6 @@ import {
   PanelLeftOpen,
 } from "lucide-react";
 import { PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
-import { MsuLogo } from "@/components/msu-logo";
 
 interface PRChoice {
   pr_no: string;
@@ -543,33 +542,7 @@ export default function ChatbotDashboard() {
 
   return (
     <div className="h-screen h-[100dvh] max-h-screen bg-[#FAF8F5] flex flex-col overflow-hidden">
-      {/* Top Navbar */}
-      <nav className="bg-white border-b border-stone-200 shrink-0 z-40 shadow-xs">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
-          {/* Left: Back & Title */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="p-1.5 sm:p-2 rounded-lg text-stone-600 hover:bg-stone-50 hover:text-[#7B0046] transition-colors shrink-0"
-              aria-label="Back to dashboard"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <MsuLogo size={36} className="shrink-0" />
-            <div className="bg-[#7B0046] p-2 rounded-xl text-amber-300 border border-amber-400/30 shadow-xs shrink-0 hidden sm:flex">
-              <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="font-bold text-[#4D002C] text-sm sm:text-base truncate leading-tight">
-                AI Procurement Assistant
-              </h1>
-              <p className="text-[10px] sm:text-xs text-stone-500 truncate hidden xs:block">
-                Mindanao State University - General Santos
-              </p>
-            </div>
-          </div>
-
-          {/* Right: Actions */}
+      {/* Top N<EndUserPageHeader titlePrimary="AI" titleAccent="Chatbot" icon={Bot}>
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop Sidebar Toggle Button */}
             <button
@@ -620,7 +593,7 @@ export default function ChatbotDashboard() {
               <span className="hidden sm:inline">Clear</span>
             </button>
           </div>
-        </div>
+      </EndUserPageHeader>iv>
       </nav>
 
       {/* Main Layout */}
