@@ -245,7 +245,7 @@ export default function ProcurementRequestForm() {
               {/* Section 1: Form & Department Details */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 pb-2 border-b border-stone-200">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-[#9A7410] bg-amber-50 px-2.5 py-0.5 rounded border border-amber-200">Section 1</span>
+                  
                   <h3 className="text-base font-extrabold text-[#4D002C]">Document &amp; Department Information</h3>
                 </div>
 
@@ -382,7 +382,7 @@ export default function ProcurementRequestForm() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between pb-2 border-b border-stone-200 flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-[#9A7410] bg-amber-50 px-2.5 py-0.5 rounded border border-amber-200">Section 2</span>
+                    
                     <h3 className="text-base font-extrabold text-[#4D002C]">Requested Items &amp; Cost Breakdown</h3>
                   </div>
                   <button
@@ -548,7 +548,7 @@ export default function ProcurementRequestForm() {
               {/* Section 3: Signatories */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 pb-2 border-b border-stone-200">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-[#9A7410] bg-amber-50 px-2.5 py-0.5 rounded border border-amber-200">Section 3</span>
+                  
                   <h3 className="text-base font-extrabold text-[#4D002C]">Signatories &amp; Responsibility</h3>
                 </div>
 
