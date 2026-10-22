@@ -11,10 +11,10 @@ const DRAFT_CONTINUATION_PATTERN = /\b(purpose|department|office|section|item|it
 // Treat both standalone cancellation commands ("cancel", "stop") and natural phrases
 // ("cancel drafting", "stop the PR", "never mind") as explicit draft cancellation.
 const STOP_DRAFTING_PATTERN = /^(?:stop|cancel|quit|exit|abort|end|never\s*mind|nevermind)\s*[.!?]*$|^(?:stop|cancel|quit|exit|abort|end)\s+(?:the\s+)?(?:draft|drafting|pr|purchase\s+request|form)\s*[.!?]*$|\b(?:stop|cancel|quit|exit|abort|end|cancel\s+that|don't\s+continue|do\s+not\s+continue)\b.{0,50}\b(?:draft|drafting|pr|purchase\s+request|form)\b|\b(?:never\s*mind|nevermind|forget\s+it|i(?:'|’)\s*(?:don't|do not)\s+(?:want|need)\s+to\s+continue)\b/i;
-const PR_PATTERN = /\bPR[- ]?(\d{4}[- ]?\d{4}|\d{4})\b/i;
-// Newer requests use an internal PR-TEMP-YYYY-NNNN reference before an official number is assigned.
-const TEMP_PR_PATTERN = /\bPR[- ]?TEMP[- ]?(\d{4})[- ]?(\d{4,})\b/i;
-const PR_ACCESS_PATTERN = /\b(track|show|view|see|open|display|details?|status|progress|update|history|timeline|next)\b/i;
+// Match canonical and legacy PR identifiers, including temporary and finalized IDs.
+// Normalize Unicode dash variants before matching so copied IDs (for example PR‑FINAL‑123) work too.
+const PR_IDENTIFIER_PATTERN = /\bPR\s*-\s*[A-Z0-9]+(?:\s*-\s*[A-Z0-9]+)*\b|\bPR\s+\d{4}(?:[\s-]+\d{1,})?\b|\bPR(?=\d)\d{4,12}\b/i;
+const PR_ACCESS_PATTERN = /\b(track(?:ing)?|show|view|see|open|display|details?|status|progress|update|history|timeline|next|check|find|locate|lookup|look\s+up)\b/i;
 const OTHER_USER_PR_PATTERN = /\b(another|other|someone\s+else|somebody\s+else|different)\s+(user|person|account|requester)|\b(?:someone\s+else'?s|another\s+user'?s|other\s+user'?s)\b/i;
 const PROCUREMENT_FLOW_PATTERN = /\b(?:MSU(?:[- ]?GenSan)?|Mindanao\s+State\s+University(?:\s*[-–—]\s*General\s+Santos)?|General\s+Santos)\b.{0,80}\b(?:procurement|purchas(?:e|ing)|PR|process|flow|procedure|steps?|stages?)\b|\b(?:procurement|purchasing|PR)\s+(?:flow|process|procedure|steps?|stages?)\b/i;
 const OFFICE_INFO_PATTERN = /\b(?:where(?:'s| is| can I find)|location|address|contact|contacts|phone|telephone|email|e-mail|how can I contact|how do I reach)\b.{0,50}\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO|BAC|procurement)\b|\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO)\b.{0,50}\b(?:where|location|address|contact|phone|telephone|email|reach)\b/i;
@@ -75,6 +75,24 @@ async function validateSlotAnswer(step: string, message: string, collected: any)
   } catch {
     return { valid: true, reason: '' };
   }
+}
+
+function normalizePRIdentifier(identifier: string): string {
+  let value = identifier
+    .replace(/[\u2010-\u2015\u2212]/g, '-')
+    .toUpperCase()
+    .replace(/^PR\s*/, '')
+    .trim()
+    .replace(/\s*-\s*/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+  // Older numeric IDs are sometimes written without the separator between year and sequence.
+  if (/^(?:19|20)\d{4,}$/.test(value)) {
+    value = `${value.slice(0, 4)}-${value.slice(4)}`;
+  }
+  return `PR-${value}`;
 }
 
 function buildProcurementFlowResponse() { const lines = PROCUREMENT_STAGES.map(stage => `${stage.number}. **${stage.label}** — ${stage.description}`).join('\n'); return `🏛️ **MSU-General Santos Procurement Workflow**\n\nHere is the official **procurement workflow used in ProcuremateSU**, from receipt of the Purchase Request through monitoring and documentation.\n\n${lines}\n\n### Key posting thresholds\n• **₱50,000 and above:** applicable RFQ posting to PhilGEPS\n• **₱200,000 and above:** applicable SVP posting threshold noted in the MSU workflow\n\nThe exact stage descriptions above are taken from ProcuremateSU's centralized procurement-process definition, providing clear milestone tracking for all purchase requests.`; }
@@ -162,19 +180,18 @@ export async function POST(request: NextRequest) {
       !/\b(and|also|additionally|plus|as well as)\b/i.test(message) &&
       message.trim().split(/\s+/).length <= 14;
     if (asksOnlyForWorkflow) return NextResponse.json({ response: buildProcurementFlowResponse(), sources: ['ProcuremateSU procurement process'] });
-    const tempPrMatch = message.match(TEMP_PR_PATTERN);
-    const prMatch = tempPrMatch ? null : message.match(PR_PATTERN);
-    const isPRAccessRequest = Boolean(tempPrMatch || prMatch) && PR_ACCESS_PATTERN.test(message);
+    // Normalize common Unicode dashes used when users copy PR numbers from forms or chat.
+    const searchableMessage = message.replace(/[\u2010-\u2015\u2212]/g, '-');
+    const prIdentifier = searchableMessage.match(PR_IDENTIFIER_PATTERN)?.[0] || '';
+    const normalized = prIdentifier ? normalizePRIdentifier(prIdentifier) : '';
+    const isPRAccessRequest = Boolean(prIdentifier) && PR_ACCESS_PATTERN.test(message);
     if (isPRAccessRequest) {
-      const raw = prMatch?.[1].replace(/\s+/g, '') || '';
-      const normalized = tempPrMatch
-        ? `PR-TEMP-${tempPrMatch[1]}-${tempPrMatch[2]}`
-        : raw.startsWith('2026') ? `PR-${raw}` : `PR-${raw.replace(/^PR/i, '')}`;
+      // Keep the existing ownership boundary, but apply it to every PR numbering scheme.
       if (profile.role !== 'admin') {
         const { data: ownedPR, error: ownershipError } = await clientToUse
           .from('purchase_requests')
           .select('pr_no')
-          .eq('pr_no', normalized)
+          .ilike('pr_no', normalized)
           .eq('user_id', user.id)
           .maybeSingle();
         if (ownershipError || !ownedPR) {
@@ -182,73 +199,68 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      if (NEXT_PATTERN.test(message)) {
-        const { data: pr, error: prError } = await clientToUse
-          .from('purchase_requests')
-          .select('pr_no,purpose,total,current_stage,created_at,department')
-          .eq('pr_no', normalized)
-          .maybeSingle();
-        if (prError || !pr) return NextResponse.json({ error: 'Purchase Request not found.' }, { status: 404 });
-        const { data: history } = await clientToUse
-          .from('pr_stages_completed')
-          .select('stage_key,stage_name,completed_at,remarks,notes')
-          .eq('pr_no', normalized)
-          .neq('status', 'remark')
-          .order('completed_at', { ascending: false })
-          .limit(1);
-        return NextResponse.json({ response: buildNextStepResponse(pr, history?.[0] || null), sources: ['ProcuremateSU procurement process', 'Purchase Request stage history'] });
+      // Tracking is sourced from the live database for all PR formats, never document excerpts.
+      const { data: pr, error: prError } = await clientToUse
+        .from('purchase_requests')
+        .select('pr_no,purpose,total,current_stage,created_at,department')
+        .ilike('pr_no', normalized)
+        .maybeSingle();
+      if (prError) {
+        console.error('[chat/send] Failed to retrieve Purchase Request for tracking:', prError);
+        return NextResponse.json({ error: 'Unable to retrieve this Purchase Request from live tracking records. Please retry.' }, { status: 500 });
+      }
+      if (!pr) {
+        return NextResponse.json({ error: 'Purchase Request not found in the live tracking records.' }, { status: 404 });
       }
 
-      // Temporary PR numbers are not in the official-document excerpts. Read the live
-      // Purchase Request record directly so tracking never falls through to a RAG answer.
-      if (tempPrMatch) {
-        const { data: pr, error: prError } = await clientToUse
-          .from('purchase_requests')
-          .select('pr_no,purpose,total,current_stage,created_at,department')
-          .eq('pr_no', normalized)
-          .maybeSingle();
-        if (prError || !pr) {
-          return NextResponse.json({ error: 'Purchase Request not found in the live tracking records.' }, { status: 404 });
-        }
+      const { data: stageHistory, error: historyError } = await clientToUse
+        .from('pr_stages_completed')
+        .select('stage_key,stage_name,completed_at,remarks,notes,status')
+        .ilike('pr_no', pr.pr_no)
+        .order('completed_at', { ascending: true })
+        .limit(100);
+      if (historyError) {
+        console.error('[chat/send] Failed to retrieve Purchase Request stage history:', historyError);
+      }
 
-        const { data: stageHistory } = await clientToUse
-          .from('pr_stages_completed')
-          .select('stage_key,stage_name,completed_at,remarks,notes,status')
-          .eq('pr_no', normalized)
-          .order('completed_at', { ascending: true })
-          .limit(30);
-
-        const currentStage = PROCUREMENT_STAGES.find((stage) => stage.key === pr.current_stage);
-        const currentStatus = pr.current_stage === 'draft'
-          ? 'Draft — awaiting printed-form receipt'
-          : currentStage?.label || String(pr.current_stage || 'Status unavailable').replace(/_/g, ' ');
-
-        let response = `📋 **Purchase Request Tracking: ${pr.pr_no}**\n\n`;
-        response += `• **Current Status:** ${currentStatus}\n`;
-        response += `• **Department:** ${pr.department || 'N/A'}\n`;
-        response += `• **Purpose:** ${pr.purpose || 'N/A'}\n`;
-        response += `• **Total Amount:** ₱${(Number(pr.total) || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
-
-        if (stageHistory && stageHistory.length > 0) {
-          response += '\n**Recorded Timeline:**\n';
-          for (const entry of stageHistory) {
-            const date = entry.completed_at
-              ? new Date(entry.completed_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' })
-              : '';
-            const marker = entry.status === 'pending_receipt' ? '⏳' : entry.status === 'rejected' ? '❌' : entry.status === 'remark' ? '📝' : '✅';
-            response += `${marker} ${entry.stage_name || entry.stage_key || 'PR activity'}${date ? ` — ${date}` : ''}${entry.remarks ? `\n   ${entry.remarks}` : ''}\n`;
-          }
-        } else {
-          response += '\nNo stage-history entries have been recorded yet.';
-        }
-
+      if (NEXT_PATTERN.test(message)) {
+        const latestHistory = [...(stageHistory || [])].reverse().find((entry: any) => entry.status !== 'remark') || null;
         return NextResponse.json({
-          response,
-          sources: ['Live Purchase Request record', 'Purchase Request stage history'],
+          response: buildNextStepResponse(pr, latestHistory),
+          sources: ['Live Purchase Request record', 'ProcuremateSU procurement process', 'Purchase Request stage history'],
         });
       }
+
+      const currentStage = PROCUREMENT_STAGES.find((stage) => stage.key === pr.current_stage);
+      const currentStatus = pr.current_stage === 'draft'
+        ? 'Draft — awaiting printed-form receipt'
+        : currentStage?.label || String(pr.current_stage || 'Status unavailable').replace(/_/g, ' ');
+
+      let response = `📋 **Purchase Request Tracking: ${pr.pr_no}**\n\n`;
+      response += `• **Current Status:** ${currentStatus}\n`;
+      response += `• **Department:** ${pr.department || 'N/A'}\n`;
+      response += `• **Purpose:** ${pr.purpose || 'N/A'}\n`;
+      response += `• **Total Amount:** ₱${(Number(pr.total) || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
+
+      if (stageHistory && stageHistory.length > 0) {
+        response += '\n**Recorded Timeline:**\n';
+        for (const entry of stageHistory) {
+          const date = entry.completed_at
+            ? new Date(entry.completed_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' })
+            : '';
+          const marker = entry.status === 'pending_receipt' ? '⏳' : entry.status === 'rejected' ? '❌' : entry.status === 'remark' ? '📝' : '✅';
+          response += `${marker} ${entry.stage_name || entry.stage_key || 'PR activity'}${date ? ` — ${date}` : ''}${entry.remarks ? `\n   ${entry.remarks}` : ''}\n`;
+        }
+      } else {
+        response += '\nNo stage-history entries have been recorded yet.';
+      }
+
+      return NextResponse.json({
+        response,
+        sources: ['Live Purchase Request record', 'Purchase Request stage history'],
+      });
     }
-    if (NEXT_PATTERN.test(message) && !prMatch && !tempPrMatch) {
+    if (NEXT_PATTERN.test(message) && !prIdentifier) {
       const { data: latestPR, error: latestError } = await clientToUse.from('purchase_requests').select('pr_no,purpose,total,current_stage,created_at,department').eq('user_id', user.id).not('current_stage', 'eq', 'draft').order('created_at', { ascending: false }).limit(1).maybeSingle();
       if (latestError || !latestPR) return NextResponse.json({ response: `📋 **I couldn't find a submitted Purchase Request under your account yet.**\n\nSubmit a PR first, then ask **"What happens next?"** and I will explain its current and next procurement stage.`, sources: ['Purchase Request records'] });
       const { data: history } = await clientToUse.from('pr_stages_completed').select('stage_key,stage_name,completed_at,remarks,notes').eq('pr_no', latestPR.pr_no).neq('status', 'remark').order('completed_at', { ascending: false }).limit(1);
