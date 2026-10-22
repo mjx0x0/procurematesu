@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "types": ["node", "react", "react-dom"],
+    "types": [
+      "node",
+      "react",
+      "react-dom"
+    ],
     "target": "ES2017",
     "lib": [
       "dom",
@@ -29,17 +33,16 @@
         "./*"
       ]
     }
-
   },
   "include": [
     "next-env.d.ts",
-    "globals.d.ts",  // ✅ Add this line
+    "globals.d.ts", // ✅ Add this line
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".next-dev/types/**/*.ts"
   ],
-  
   "exclude": [
     "node_modules"
   ]

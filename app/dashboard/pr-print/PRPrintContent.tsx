@@ -4,6 +4,8 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Printer } from "lucide-react";
+import { getFormDisplayPrNumber, isTemporaryPR } from "@/lib/procurement-process";
+import { createClient } from "@/lib/supabase/client";
 
 interface PRItem {
   item_description: string;
@@ -20,6 +22,7 @@ interface PRData {
   purpose?: string;
   pr_no?: string;
   pr_date?: string;
+  current_stage?: string;
   sai_no?: string;
   sai_date?: string;
   alobs_no?: string;
@@ -43,15 +46,80 @@ export default function PRPrintContent() {
       return;
     }
     const encoded = searchParams.get("data");
+    const idParam = searchParams.get("id");
+
     if (encoded) {
       try {
         const json = atob(decodeURIComponent(encoded));
         const parsed = JSON.parse(json);
         setData(parsed);
+        setLoading(false);
+        return;
       } catch (e) {
         console.error("Failed to decode PR data", e);
       }
     }
+
+    if (idParam) {
+      const fetchPr = async () => {
+        try {
+          const supabase = createClient();
+          const { data: prRecord } = await supabase
+            .from("purchase_requests")
+            .select("*")
+            .eq("pr_no", idParam)
+            .maybeSingle();
+
+          if (prRecord) {
+            const { data: itemRecords } = await supabase
+              .from("pr_items")
+              .select("*")
+              .eq("pr_no", idParam)
+              .order("created_at", { ascending: true });
+
+            const formattedDate = prRecord.created_at
+              ? new Date(prRecord.created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : undefined;
+
+            setData({
+              department: prRecord.department,
+              section: prRecord.section || "",
+              purpose: prRecord.purpose,
+              pr_no: prRecord.pr_no,
+              pr_date: formattedDate,
+              current_stage: prRecord.current_stage,
+              printed_name: prRecord.printed_name || prRecord.created_by,
+              designation: prRecord.designation || "",
+              items: (itemRecords || []).map((it) => ({
+                item_description: it.item_description,
+                quantity: it.quantity,
+                unit: it.unit || "pcs",
+                stock_no: it.stock_no || "",
+                unit_cost: Number(it.unit_cost) || 0,
+                total_cost: Number(it.total_cost) || 0,
+              })),
+              total_amount:
+                Number(prRecord.total_cost) ||
+                (itemRecords || []).reduce(
+                  (sum, it) => sum + (Number(it.total_cost) || 0),
+                  0
+                ),
+            });
+          }
+        } catch (e) {
+          console.error("Failed to load PR by ID for printing", e);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchPr();
+      return;
+    }
+
     setLoading(false);
   }, [searchParams]);
 
@@ -85,18 +153,33 @@ export default function PRPrintContent() {
   return (
     <div className="min-h-screen bg-stone-100 py-6 px-4 print:p-0 print:bg-white text-black">
       {/* Top Action Bar (Hidden on Print) */}
-      <div className="max-w-4xl mx-auto mb-6 flex items-center justify-between print:hidden">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-2 text-stone-700 hover:text-[#7B0046] text-sm font-semibold transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Link>
+      <div className="max-w-4xl mx-auto mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 print:hidden">
+        <div>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-stone-700 hover:text-[#7B0046] text-sm font-semibold transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Link>
+          {data.pr_no && (
+            <div className="mt-1 flex items-center gap-2 text-xs text-stone-600">
+              <span>System Tracking ID:</span>
+              <span className="font-mono font-bold text-stone-900 bg-stone-200/80 px-2 py-0.5 rounded">
+                {data.pr_no}
+              </span>
+              {isTemporaryPR(data.pr_no) && (
+                <span className="text-amber-800 bg-amber-100 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-amber-300">
+                  Temporary • PR No. blank on form for PMO handwritten entry
+                </span>
+              )}
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 bg-[#7B0046] hover:bg-[#610037] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-all"
+            className="inline-flex items-center gap-2 bg-[#7B0046] hover:bg-[#610037] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-all cursor-pointer"
           >
             <Printer className="h-4 w-4 text-amber-300" />
             Print Official PR
@@ -142,8 +225,8 @@ export default function PRPrintContent() {
               <div className="grid grid-cols-12 gap-2 items-end">
                 <div className="col-span-7 flex items-end">
                   <span className="font-semibold text-stone-800 w-16 shrink-0">PR No.</span>
-                  <span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold">
-                    {data.pr_no || "DRAFT"}{data.pr_no?.includes("TEMP") ? " (TEMPORARY)" : ""}
+                  <span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold min-h-[20px]">
+                    {getFormDisplayPrNumber(data.pr_no, data.current_stage) || "\u00A0"}
                   </span>
                 </div>
                 <div className="col-span-5 flex items-end">
@@ -310,6 +393,18 @@ export default function PRPrintContent() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Subtle Footnote for audit / office tracking */}
+        <div className="mt-2 text-[10px] text-stone-500 font-mono flex items-center justify-between px-1 print:text-[8px] print:text-stone-400">
+          <span>Mindanao State University - General Santos City Procurement Office</span>
+          {data.pr_no && (
+            <span>
+              {isTemporaryPR(data.pr_no)
+                ? `System Tracking Control: ${data.pr_no} • Official PR No. to be assigned & handwritten by PMO upon Step 4`
+                : `Official PR Control: ${data.pr_no}`}
+            </span>
+          )}
         </div>
       </div>
     </div>

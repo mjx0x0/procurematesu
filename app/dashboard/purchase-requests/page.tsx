@@ -26,6 +26,7 @@ const isApprovedStage = (status: string) => {
 };
 
 const statusColor = (status: string) => {
+  if (status === "draft") return "border-stone-200 bg-stone-100 text-stone-700";
   if (status === "completed") return "border-emerald-200 bg-emerald-50 text-emerald-700";
   if (status === "rejected" || status === "cancelled") return "border-red-200 bg-red-50 text-red-700";
   if (isApprovedStage(status)) return "border-blue-200 bg-blue-50 text-blue-700";
@@ -369,10 +370,12 @@ export default function PurchaseRequestsPage() {
                                 ? "bg-emerald-50 text-emerald-800 border-emerald-200"
                                 : isApproved
                                 ? "bg-stone-100 text-stone-700 border-stone-200"
+                                : pr.current_stage === "draft"
+                                ? "bg-stone-100 text-stone-700 border-stone-200"
                                 : "bg-amber-50 text-amber-800 border-amber-200/70"
                             }`}
                           >
-                            {isDone ? "Completed" : isApproved ? "Approved" : "Under Review"}
+                            {isDone ? "Completed" : isApproved ? "Approved" : pr.current_stage === "draft" ? "Draft" : "Under Review"}
                           </span>
                           <span className="text-[11px] sm:text-xs text-stone-400 font-medium">
                             · {new Date(pr.created_at).toLocaleDateString("en-PH", {
@@ -393,7 +396,7 @@ export default function PurchaseRequestsPage() {
                           <span
                             className={`inline-flex max-w-full items-center rounded-lg border px-2 py-1 text-[11px] font-semibold leading-snug ${statusColor(pr.current_stage)}`}
                           >
-                            {stageNum ? `Stage ${stageNum} · ` : ""}
+                            {stageNum && stageNum > 0 ? `Stage ${stageNum} · ` : ""}
                             {PROCUREMENT_STAGE_SHORT_LABELS[pr.current_stage] || statusLabel(pr.current_stage)}
                           </span>
                         </div>

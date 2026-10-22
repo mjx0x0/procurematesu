@@ -111,12 +111,12 @@ export async function POST(req: NextRequest) {
     if (!existingStage || existingStage.length === 0) {
       await admin.from("pr_stages_completed").insert({
         pr_no: createdPR.pr_no,
-        stage_key: "receipt_of_pr",
-        stage_name: "Receipt of Purchase Request (PR)",
+        stage_key: "draft",
+        stage_name: "Draft",
         status: "completed",
         completed_at: new Date().toISOString(),
-        remarks: "Purchase Request submitted by end-user unit with Temporary PR Number. Official PR control number will be assigned at Step 4 (Pre-Numbering and Control of PRs).",
-        notes: "Temporary PR Number assigned pending PMO Pre-Numbering.",
+        remarks: "Purchase Request drafted by end-user unit. Pending physical submission of printed form to the Procurement Office.",
+        notes: "Temporary PR Number assigned pending physical submission.",
       });
     }
 

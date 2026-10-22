@@ -1,5 +1,6 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { getFormDisplayPrNumber, isTemporaryPR } from "@/lib/procurement-process";
 
 // Styles matching the official MSU General Santos City Purchase Request template
 const styles = StyleSheet.create({
@@ -450,7 +451,9 @@ export default function PRPDF({ pr = {}, items = [] }: PRPDFProps) {
               <View style={styles.metaSplitRow}>
                 <View style={styles.metaSubColLeft}>
                   <Text style={styles.metaLabel}>PR No.</Text>
-                  <Text style={styles.metaUnderlineVal}>{safePr.pr_no ? `${safePr.pr_no}${safePr.pr_no.includes("TEMP") ? " (TEMPORARY)" : ""}` : ""}</Text>
+                  <Text style={styles.metaUnderlineVal}>
+                    {getFormDisplayPrNumber(safePr.pr_no, safePr.current_stage) || " "}
+                  </Text>
                 </View>
                 <View style={styles.metaSubColRight}>
                   <Text style={styles.metaLabel}>Date</Text>
@@ -603,6 +606,11 @@ export default function PRPDF({ pr = {}, items = [] }: PRPDFProps) {
             </View>
           </View>
         </View>
+        {safePr.pr_no && isTemporaryPR(safePr.pr_no) && (
+          <Text style={{ fontSize: 6.5, color: "#777777", textAlign: "right", marginTop: 4 }}>
+            System Tracking Control: {safePr.pr_no} (Official PR number to be written by Procurement Office upon assignment)
+          </Text>
+        )}
       </Page>
     </Document>
   );

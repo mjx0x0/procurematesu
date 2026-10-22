@@ -94,7 +94,11 @@ export async function POST(req: NextRequest) {
 
     const currentIndex = PROCUREMENT_STAGE_KEYS.indexOf(pr.current_stage as any);
     const nextIndex = PROCUREMENT_STAGE_KEYS.indexOf(newStatus as any);
-    if (currentIndex < 0 || nextIndex !== currentIndex + 1) return NextResponse.json({ error: 'Invalid stage transition. The PR must follow the official procurement workflow sequence.' }, { status: 409, headers: JSON_HEADERS });
+    
+    // Allow transition from draft to receipt_of_pr
+    const isDraftToReceipt = pr.current_stage === 'draft' && newStatus === 'receipt_of_pr';
+    
+    if (currentIndex < 0 || (!isDraftToReceipt && nextIndex !== currentIndex + 1)) return NextResponse.json({ error: 'Invalid stage transition. The PR must follow the official procurement workflow sequence.' }, { status: 409, headers: JSON_HEADERS });
 
     let effectivePrNo = prNo;
     if (rawOfficialPrNo) {

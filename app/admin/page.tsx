@@ -85,9 +85,25 @@ export default function AdminDashboard() {
   useEffect(() => {
     (async () => {
       try {
-        let { data: { user: authUser } } = await supabase.auth.getUser();
+        let { data: { user: authUser }, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+          if (userError.name === 'AuthApiError') {
+            await supabase.auth.signOut();
+            router.replace("/");
+            return;
+          }
+          throw userError;
+        }
         if (!authUser) {
-          const { data: { session } } = await supabase.auth.getSession();
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          if (sessionError) {
+             if (sessionError.name === 'AuthApiError') {
+               await supabase.auth.signOut();
+               router.replace("/");
+               return;
+             }
+             throw sessionError;
+          }
           authUser = session?.user || null;
         }
         if (!authUser) { router.replace("/"); return; }
@@ -590,11 +606,11 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                     {nextStage(selectedPR) ? (
                       <button
                         onClick={() => openAction("complete")}
-                        title={`Advance to Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}`}
+                        title={selectedPR.current_stage === "draft" ? "Confirm physical receipt of printed PR form and advance to Stage 1" : `Advance to Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}`}
                         className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#7B0046] hover:bg-[#630038] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-[#7B0046] active:scale-98"
                       >
                         <Check className="h-4 w-4 text-white" />
-                        <span>Complete Stage {detailStage?.number || ""}</span>
+                        <span>{selectedPR.current_stage === "draft" ? "Confirm Receipt of Printed PR" : `Complete Stage ${detailStage?.number || ""}`}</span>
                       </button>
                     ) : selectedPR.current_stage === "completed" ? (
                       <div className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-stone-100 text-stone-800 text-xs sm:text-sm font-semibold border border-stone-200">
@@ -813,7 +829,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                 </div>
                 <div className="min-w-0">
                   <h3 className="text-sm font-bold text-stone-900 truncate">
-                    {action === "complete" ? "Advance Stage" : action === "remark" ? "Send Remark" : "Reject Purchase Request"}
+                    {action === "complete" ? (selectedPR.current_stage === "draft" ? "Confirm Physical Receipt of PR" : "Advance Stage") : action === "remark" ? "Send Remark" : "Reject Purchase Request"}
                   </h3>
                   <p className="text-[11px] text-stone-500 truncate font-mono">
                     {selectedPR.pr_no}
@@ -915,7 +931,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                 }`}
               >
                 {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                <span>{action === "complete" ? "Complete Stage" : action === "remark" ? "Send Remark" : "Reject PR"}</span>
+                <span>{action === "complete" ? (selectedPR.current_stage === "draft" ? "Confirm Receipt & Advance to Stage 1" : "Complete Stage") : action === "remark" ? "Send Remark" : "Reject PR"}</span>
               </button>
             </div>
           </div>

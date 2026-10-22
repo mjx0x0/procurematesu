@@ -6,7 +6,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import PRDownloadButton from "@/components/PRDownloadButton";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
-import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
+import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, getFormDisplayPrNumber } from "@/lib/procurement-process";
 import { CheckCircle, Clock, FileCheck, FileText, Loader2, XCircle } from "lucide-react";
 
 interface PurchaseRequest {
@@ -155,11 +155,11 @@ export default function PRDetailPage() {
   })();
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><Loader2 className="h-9 w-9 animate-spin text-[#7B0046]" /></div>;
-  if (error || !pr) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><div className="text-center"><XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" /><h2 className="text-xl font-bold text-stone-900">{error || "PR Not Found"}</h2><Link href="/dashboard" className="text-[#7B0046] font-semibold mt-3 inline-block">Back to Dashboard</Link></div></div>;
+  if (error || !pr) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><div className="text-center"><XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" /><h2 className="text-xl font-bold text-stone-900">{error || "PR Not Found"}</h2><Link href="/dashboard/purchase-requests" className="text-[#7B0046] font-semibold mt-3 inline-block">Back to Purchase Requests</Link></div></div>;
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" icon={FileText} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-5xl px-4" />
+      <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" icon={FileText} backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="max-w-5xl px-4" />
 
       <main className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-stone-200">
@@ -207,7 +207,42 @@ export default function PRDetailPage() {
             </div>
             <div className="grid grid-cols-12 border-b-2 border-black text-xs">
               <div className="col-span-6 border-r-2 border-black p-3 space-y-2"><div className="flex items-end"><span className="font-semibold w-24 shrink-0">Department</span><span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold uppercase">{pr.department || ""}</span></div><div className="flex items-end"><span className="font-semibold w-24 shrink-0">Section</span><span className="flex-1 border-b border-black pl-2 pb-0.5">{pr.section || ""}</span></div></div>
-              <div className="col-span-6 p-3 space-y-2"><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">PR No.</span><span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold">{pr.pr_no}{pr.pr_no?.includes("TEMP") ? " (TEMPORARY)" : ""}</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black pl-1 pb-0.5 text-center">{new Date(pr.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span></div></div><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">SAI No.</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div></div><div className="grid grid-cols-12 gap-2 items-end"><div className="col-span-7 flex items-end"><span className="font-semibold w-16 shrink-0">ALOBS No.</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div><div className="col-span-5 flex items-end"><span className="font-semibold w-10 shrink-0">Date</span><span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span></div></div></div>
+              <div className="col-span-6 p-3 space-y-2">
+                <div className="grid grid-cols-12 gap-2 items-end">
+                  <div className="col-span-7 flex items-end">
+                    <span className="font-semibold w-16 shrink-0">PR No.</span>
+                    <span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold min-h-[20px]">
+                      {getFormDisplayPrNumber(pr.pr_no, pr.current_stage) || "\u00A0"}
+                    </span>
+                  </div>
+                  <div className="col-span-5 flex items-end">
+                    <span className="font-semibold w-10 shrink-0">Date</span>
+                    <span className="flex-1 border-b border-black pl-1 pb-0.5 text-center">
+                      {new Date(pr.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                    </span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-12 gap-2 items-end">
+                  <div className="col-span-7 flex items-end">
+                    <span className="font-semibold w-16 shrink-0">SAI No.</span>
+                    <span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span>
+                  </div>
+                  <div className="col-span-5 flex items-end">
+                    <span className="font-semibold w-10 shrink-0">Date</span>
+                    <span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-12 gap-2 items-end">
+                  <div className="col-span-7 flex items-end">
+                    <span className="font-semibold w-16 shrink-0">ALOBS No.</span>
+                    <span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span>
+                  </div>
+                  <div className="col-span-5 flex items-end">
+                    <span className="font-semibold w-10 shrink-0">Date</span>
+                    <span className="flex-1 border-b border-black min-h-[20px]">&nbsp;</span>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="grid grid-cols-12 border-b-2 border-black text-center font-bold text-xs"><div className="col-span-1 border-r-2 border-black py-2">Quantity</div><div className="col-span-1 border-r-2 border-black py-2">Unit</div><div className="col-span-5 border-r-2 border-black py-2 italic">ITEM DESCRIPTION</div><div className="col-span-1 border-r-2 border-black py-2">Stock No.</div><div className="col-span-2 border-r-2 border-black py-2 italic">Estimated Unit Cost</div><div className="col-span-2 py-2 italic">Estimated Cost</div></div>
             <div className="divide-y divide-black text-xs">{items.map(item => <div key={item.id} className="grid grid-cols-12 min-h-[26px] items-center"><div className="col-span-1 border-r-2 border-black py-1.5 text-center">{item.quantity}</div><div className="col-span-1 border-r-2 border-black py-1.5 text-center">{item.unit}</div><div className="col-span-5 border-r-2 border-black py-1.5 px-2.5">{item.item_description}</div><div className="col-span-1 border-r-2 border-black py-1.5 text-center">{item.stock_no || ""}</div><div className="col-span-2 border-r-2 border-black py-1.5 px-2 text-right">{Number(item.unit_cost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div><div className="col-span-2 py-1.5 px-2 text-right font-semibold">{Number(item.total_cost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>)}<div className="grid grid-cols-12 min-h-[24px]"><div className="col-span-1 border-r-2 border-black"/><div className="col-span-1 border-r-2 border-black"/><div className="col-span-5 border-r-2 border-black py-1 text-center font-bold">****Nothing Follows****</div><div className="col-span-1 border-r-2 border-black"/><div className="col-span-2 border-r-2 border-black"/><div className="col-span-2"/></div>{Array.from({ length: Math.max(0, 5 - items.length) }).map((_, i) => <div key={i} className="grid grid-cols-12 min-h-[24px]"><div className="col-span-1 border-r-2 border-black"/><div className="col-span-1 border-r-2 border-black"/><div className="col-span-5 border-r-2 border-black"/><div className="col-span-1 border-r-2 border-black"/><div className="col-span-2 border-r-2 border-black"/><div className="col-span-2"/></div>)}</div>
@@ -231,6 +266,11 @@ export default function PRDetailPage() {
               </div>
             </div>
           </div>
+          {pr.pr_no && !getFormDisplayPrNumber(pr.pr_no, pr.current_stage) && (
+            <div className="mt-2 text-right text-[11px] text-stone-500 font-mono print:text-[9px]">
+              System Tracking Ref: {pr.pr_no} (Official PR No. to be assigned &amp; written by PMO upon Step 4)
+            </div>
+          )}
         </section>
 
         <div className="pr-timeline bg-white rounded-xl p-6 shadow-sm border border-stone-200 mt-8 mb-8 print:hidden">

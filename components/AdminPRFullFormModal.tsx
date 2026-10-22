@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { FileText, Loader2, Printer, X } from "lucide-react";
 import { motion } from "motion/react";
+import { getFormDisplayPrNumber } from "@/lib/procurement-process";
 
 interface PRItem { item_description?: string; quantity?: number; unit?: string; stock_no?: string; unit_cost?: number; total_cost?: number; [key: string]: unknown; }
-interface PRRecord { [key: string]: unknown; pr_no?: string; department?: string; section?: string; purpose?: string; pr_date?: string; sai_no?: string; sai_date?: string; alobs_no?: string; alobs_date?: string; printed_name?: string; designation?: string; approved_by?: string; approved_by_designation?: string; total?: number; }
+interface PRRecord { [key: string]: unknown; pr_no?: string; current_stage?: string; department?: string; section?: string; purpose?: string; pr_date?: string; sai_no?: string; sai_date?: string; alobs_no?: string; alobs_date?: string; printed_name?: string; designation?: string; approved_by?: string; approved_by_designation?: string; total?: number; }
 interface Props { prNo: string; onClose: () => void; }
 
 const money = (v: unknown) => Number(v || 0).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -129,7 +130,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
                   <div className="grid min-h-[27px] grid-cols-12 items-end gap-2">
                     <div className="col-span-7 flex items-end">
                       <span className="w-16 shrink-0 font-semibold">PR No.</span>
-                      <span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold">{String(pr.pr_no || "DRAFT")}{String(pr.pr_no || "").includes("TEMP") ? " (TEMPORARY)" : ""}</span>
+                      <span className="flex-1 border-b border-black pl-2 pb-0.5 font-bold min-h-[20px]">{getFormDisplayPrNumber(String(pr.pr_no || ""), String(pr.current_stage || "")) || "\u00A0"}</span>
                     </div>
                     <div className="col-span-5 flex items-end">
                       <span className="w-10 shrink-0 font-semibold">Date</span>

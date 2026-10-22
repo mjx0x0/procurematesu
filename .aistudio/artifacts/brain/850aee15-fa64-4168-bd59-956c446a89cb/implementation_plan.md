@@ -1,49 +1,39 @@
-# Implementation Plan: End User Dashboard Quick-Access Feature Bar
+# Implementation Summary: Blank PR Number on Forms During Stages 1-3 with Temporary Tracking
 
 ## Overview
-Add a prominent, responsive **Quick-Access Feature Bar** positioned directly below the hero section on the End User Dashboard (`/dashboard`). This bar will provide requisitioners with high-visibility, 1-click access to the system's core capabilities:
-1. **Create Purchase Request** (primary highlight action)
-2. **Purchase Requests** (scrolls/focuses into the PR tracking table with status counts)
-3. **Gab AI Chatbot** (opens the dedicated full-screen procurement assistant `/dashboard/chatbot`)
-4. **Transparency Board** (navigates to public procurement and bidding records `/dashboard/transparency`)
+As requested, the PR Number on the official/printable Purchase Request (PR) form is now kept blank during stages 1 to 3 (and Draft) so the Procurement Office can physically handwrite or stamp the official number on the underline space. A temporary PR tracking number (e.g., `PR-TEMP-YYYY-XXXX`) is assigned and displayed in the digital UI for tracking across the system until the Procurement Office inputs the official PR number at Step 4 (Pre-Numbering and Control of PRs), at which point the official PR number updates and displays on the official form.
 
 ---
 
-## User Review Required
+## Changes Implemented
 
-> [!NOTE]
-> The quick-access shortcuts will be rendered in a dedicated modern card row directly below the hero banner, before the stats counters and PR table. This ensures the shortcuts are immediately visible on desktop, tablet, and mobile screens.
+### 1. `lib/procurement-process.ts`
+- **`isTemporaryPR(prNo)`**: Checks whether a PR number is temporary or draft (`TEMP`, `AUTO-GENERATED`, `DRAFT`).
+- **`getFormDisplayPrNumber(prNo, stageKey)`**:
+  - During early stages (`draft`, `receipt_of_pr`, `ppmp_app_verification`, `pmo_director_validation`) or whenever `isTemporaryPR(prNo)` is true, returns `""` (empty string) so the official form underline remains blank.
+  - At Step 4 (`pr_pre_numbering`) and onward once an official number is assigned, returns the official PR number.
+
+### 2. Official PR Views & Print Templates
+- **`app/dashboard/pr-print/PRPrintContent.tsx`**:
+  - PR No. table cell now renders `{getFormDisplayPrNumber(data.pr_no, data.current_stage) || "\u00A0"}` with standard underline and min-height, providing a clear blank line for handwriting/stamping.
+  - Screen action bar (`print:hidden`) displays `System Tracking ID: {data.pr_no}` with temporary control badge.
+  - Added direct loading by `?id=PR-...` alongside encoded data.
+  - Added subtle audit footnote displaying `System Tracking Control: {data.pr_no}`.
+- **`components/PRPDF.tsx`**:
+  - Uses `getFormDisplayPrNumber(safePr.pr_no, safePr.current_stage) || " "` in the official header box.
+  - Added subtle footnote at the bottom of the PDF page displaying `System Tracking Control: {safePr.pr_no}` when temporary.
+- **`app/dashboard/pr/[pr_no]/page.tsx`**:
+  - The boxed form template renders `{getFormDisplayPrNumber(pr.pr_no, pr.current_stage) || "\u00A0"}`.
+  - Top header and tracking timeline clearly display `{pr.pr_no}` with an informational banner explaining the temporary control number and that the official number will be assigned at Step 4.
+- **`components/AdminPRFullFormModal.tsx`**:
+  - Form PR No. cell renders `{getFormDisplayPrNumber(String(pr.pr_no || ""), String(pr.current_stage || "")) || "\u00A0"}`.
+
+### 3. PR Creation & Clarifications
+- **`app/dashboard/new-pr/ProcurementRequestForm.tsx`**:
+  - Form input labeled as `Blank on form (Auto-tracked)` with hint: `Blank on printed PR form; official No. assigned at Step 4`.
+  - Submission dialog informs users that the printed PR form leaves the PR No. blank for the Procurement Office to write the official control number, while the system temporary number tracks the request digitally.
 
 ---
 
-## Proposed Changes
-
-### `app/dashboard/page.tsx`
-- **Add Quick Actions Feature Bar**:
-  - Insert a 4-card / 4-button quick access row beneath the institutional hero section.
-  - **Button 1 — Create Purchase Request**: Distinctive university gold/maroon action card with `PlusCircle` icon, clear title and subtitle ("Start new procurement request"), linking to `/dashboard/new-pr`.
-  - **Button 2 — View Purchase Requests**: Card with `ClipboardList` / `FileText` icon showing the count of active PRs and a shortcut anchor to smoothly scroll to the request tracking table.
-  - **Button 3 — Gab AI Chatbot**: Card with `Bot` & `Sparkles` badge, subtitle ("RA 12009 & PR assistant"), linking to `/dashboard/chatbot`.
-  - **Button 4 — Transparency Board**: Card with `BarChart3` icon and university branding, subtitle ("Public bids & procurement records"), linking to `/dashboard/transparency`.
-- **Responsive Layout**:
-  - Grid: `grid-cols-2 md:grid-cols-4` for a clean 2x2 grid on mobile phones and a 4-column horizontal command center on tablets and desktops.
-  - Interactive hover/active states with subtle scaling and MSU-GenSan color accents (`#7B0046` maroon, `#F5AB26` gold).
-- **Smooth Anchor / Tab Integration**:
-  - Clicking "Purchase Requests" smoothly scrolls down to the PR table section (`#purchase-requests-section`).
-
----
-
-## Verification Plan
-
-### Automated Verification
-- Run `lint_applet` to verify syntax and TypeScript typings.
-- Run `compile_applet` to verify production build passes cleanly.
-- Verify HTTP 200 response on `http://localhost:3000/dashboard` using `curl`.
-
-### Manual / Browser Verification
-- Verify the 4 shortcut buttons appear directly below the hero banner.
-- Test clicking **Create Purchase Request** -> navigates to `/dashboard/new-pr`.
-- Test clicking **Gab AI Chatbot** -> navigates to `/dashboard/chatbot`.
-- Test clicking **Transparency Board** -> navigates to `/dashboard/transparency`.
-- Test clicking **Purchase Requests** -> scrolls down to the purchase request tracking list.
-- Check responsive appearance on both mobile and desktop viewports.
+## Verification
+- Both `compile_applet` and `lint_applet` passed with zero errors.

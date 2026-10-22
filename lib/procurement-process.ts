@@ -1,4 +1,5 @@
 export const PROCUREMENT_STAGES = [
+  { key: 'draft', number: 0, label: 'Draft', shortLabel: 'Draft', description: 'PR drafted by end-user, pending physical submission.' },
   { key: 'receipt_of_pr', number: 1, label: 'Receipt of Purchase Request (PR)', shortLabel: 'Receipt of PR', description: 'Receive duly accomplished Purchase Requests (PRs) from end-user units.' },
   { key: 'ppmp_app_verification', number: 2, label: 'Verification Against PPMP/APP', shortLabel: 'PPMP/APP Verification', description: 'Review and verify the PR against the approved PPMP and APP.' },
   { key: 'pmo_director_validation', number: 3, label: 'Validation by the PMO Director', shortLabel: 'PMO Director Validation', description: 'Forward the PR for review, validation, and signature of the PMO Director to certify completeness and compliance.' },
@@ -37,4 +38,32 @@ export const TERMINAL_STAGES = ['completed', 'rejected', 'cancelled'] as const;
 
 export function getProcurementStage(key: string) {
   return PROCUREMENT_STAGES.find((stage) => stage.key === key);
+}
+
+/**
+ * Determines whether the given PR still uses a temporary or draft tracking number.
+ */
+export function isTemporaryPR(prNo?: string | null): boolean {
+  if (!prNo) return true;
+  const upper = prNo.toUpperCase();
+  return upper.includes("TEMP") || upper.includes("AUTO-GENERATED") || upper === "DRAFT";
+}
+
+/**
+ * Returns the PR number to display on the printed/official PR form.
+ * During draft and stages 1 to 3 (or whenever the PR number is still temporary /
+ * until the Procurement Office inputs the official PR number at Step 4),
+ * this returns empty string ("") so the office can write the official number on the blank space.
+ */
+export function getFormDisplayPrNumber(prNo?: string | null, stageKey?: string | null): string {
+  if (!prNo) return "";
+  if (isTemporaryPR(prNo)) return "";
+
+  // Stages before Step 4: draft (0), receipt_of_pr (1), ppmp_app_verification (2), pmo_director_validation (3)
+  const earlyStages = ["draft", "receipt_of_pr", "ppmp_app_verification", "pmo_director_validation"];
+  if (stageKey && earlyStages.includes(stageKey)) {
+    return "";
+  }
+
+  return prNo;
 }

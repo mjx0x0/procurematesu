@@ -34,9 +34,26 @@ export default function DashboardPage() {
     let cancelled = false;
     const loadDashboard = async () => {
       try {
-        let { data: { user: authUser } } = await supabase.auth.getUser();
+        let { data: { user: authUser }, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+          // If the error is an invalid refresh token, sign out and redirect
+          if (userError.name === 'AuthApiError') {
+            await supabase.auth.signOut();
+            router.replace("/");
+            return;
+          }
+          throw userError;
+        }
         if (!authUser) {
-          const { data: { session } } = await supabase.auth.getSession();
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          if (sessionError) {
+             if (sessionError.name === 'AuthApiError') {
+               await supabase.auth.signOut();
+               router.replace("/");
+               return;
+             }
+             throw sessionError;
+          }
           authUser = session?.user || null;
         }
         if (!authUser) {

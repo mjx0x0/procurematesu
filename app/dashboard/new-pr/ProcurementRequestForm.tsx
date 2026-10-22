@@ -253,11 +253,11 @@ export default function ProcurementRequestForm() {
                   <div className="space-y-1">
                     <label className="block text-xs font-bold text-stone-700">PR Number</label>
                     <input
-                      value="Auto-generated"
+                      value="Blank on form (Auto-tracked)"
                       disabled
                       className="w-full h-11 px-3.5 font-mono text-sm font-semibold text-stone-500 bg-stone-100 rounded-xl border border-stone-200"
                     />
-                    <p className="text-[11px] text-stone-500">Assigned upon submission</p>
+                    <p className="text-[11px] text-stone-500">Blank on printed PR form; official No. assigned at Step 4</p>
                   </div>
                   <div className="space-y-1">
                     <label className="block text-xs font-bold text-stone-700">Date</label>
@@ -744,7 +744,7 @@ export default function ProcurementRequestForm() {
                 </div>
                 <div className="text-2xl font-black text-[#7B0046] mt-1 font-mono tracking-tight">{createdPRNo}</div>
                 <p className="text-[11px] text-amber-900 mt-2 leading-relaxed text-left border-t border-amber-200/80 pt-2">
-                  ℹ️ The official PR number will be assigned by the PMO during <strong>Step 4 (Pre-Numbering and Control of PRs)</strong>. Once entered by the admin, this temporary number will automatically update in your data.
+                  ℹ️ The PR number is <strong>empty on the printed form</strong> so the Procurement Office can write the official number in the blank space. Your temporary tracking number (<code>{createdPRNo}</code>) tracks your request in the system until the office inputs the official number at <strong>Step 4 (Pre-Numbering and Control of PRs)</strong>.
                 </p>
               </div>
 
@@ -780,17 +780,21 @@ export default function ProcurementRequestForm() {
       {error && (
         <div
           role="alert"
-          className="fixed bottom-6 right-6 z-[90] max-w-md w-[calc(100vw-2rem)] sm:w-[440px] bg-white rounded-2xl border-2 border-red-500 shadow-[0_16px_48px_rgba(180,20,20,0.32)] overflow-hidden transition-all animate-in slide-in-from-bottom-5 duration-200"
+          className="fixed bottom-6 right-6 z-[90] max-w-md w-[calc(100vw-2rem)] sm:w-[440px] bg-white rounded-2xl border border-red-200/90 shadow-[0_16px_40px_rgba(45,20,10,0.14)] overflow-hidden transition-all animate-in slide-in-from-bottom-5 duration-200"
         >
-          <div className="h-1.5 bg-gradient-to-r from-red-600 via-amber-500 to-[#7B0046]" />
+          <div className="h-1 bg-gradient-to-r from-red-600 via-amber-500 to-[#7B0046]" />
           <div className="p-4 sm:p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-red-100 text-red-700 shrink-0 mt-0.5 shadow-2xs">
+                <div className="p-2 rounded-xl bg-red-50 text-red-700 shrink-0 mt-0.5 border border-red-200/60 shadow-2xs">
                   <AlertCircle className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h4 className="text-sm font-black text-red-900 tracking-tight">Attention: Form Incomplete</h4>
+                  <h4 className="text-sm font-black text-red-900 tracking-tight">
+                    {error.toLowerCase().includes("database") || error.toLowerCase().includes("constraint") || error.toLowerCase().includes("relation") || error.toLowerCase().includes("server")
+                      ? "Submission Notice"
+                      : "Attention: Form Incomplete"}
+                  </h4>
                   <p className="mt-1.5 text-xs sm:text-sm text-stone-700 leading-relaxed font-medium">
                     {error}
                   </p>
