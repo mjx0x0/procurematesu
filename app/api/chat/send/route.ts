@@ -12,6 +12,8 @@ const DRAFT_CONTINUATION_PATTERN = /\b(purpose|department|office|section|item|it
 // ("cancel drafting", "stop the PR", "never mind") as explicit draft cancellation.
 const STOP_DRAFTING_PATTERN = /^(?:stop|cancel|quit|exit|abort|end|never\s*mind|nevermind)\s*[.!?]*$|^(?:stop|cancel|quit|exit|abort|end)\s+(?:the\s+)?(?:draft|drafting|pr|purchase\s+request|form)\s*[.!?]*$|\b(?:stop|cancel|quit|exit|abort|end|cancel\s+that|don't\s+continue|do\s+not\s+continue)\b.{0,50}\b(?:draft|drafting|pr|purchase\s+request|form)\b|\b(?:never\s*mind|nevermind|forget\s+it|i(?:'|’)\s*(?:don't|do not)\s+(?:want|need)\s+to\s+continue)\b/i;
 const PR_PATTERN = /\bPR[- ]?(\d{4}[- ]?\d{4}|\d{4})\b/i;
+// Newer requests use an internal PR-TEMP-YYYY-NNNN reference before an official number is assigned.
+const TEMP_PR_PATTERN = /\bPR[- ]?TEMP[- ]?(\d{4})[- ]?(\d{4,})\b/i;
 const PR_ACCESS_PATTERN = /\b(track|show|view|see|open|display|details?|status|progress|update|history|timeline|next)\b/i;
 const OTHER_USER_PR_PATTERN = /\b(another|other|someone\s+else|somebody\s+else|different)\s+(user|person|account|requester)|\b(?:someone\s+else'?s|another\s+user'?s|other\s+user'?s)\b/i;
 const PROCUREMENT_FLOW_PATTERN = /\b(?:MSU(?:[- ]?GenSan)?|Mindanao\s+State\s+University(?:\s*[-–—]\s*General\s+Santos)?|General\s+Santos)\b.{0,80}\b(?:procurement|purchas(?:e|ing)|PR|process|flow|procedure|steps?|stages?)\b|\b(?:procurement|purchasing|PR)\s+(?:flow|process|procedure|steps?|stages?)\b/i;
@@ -160,18 +162,93 @@ export async function POST(request: NextRequest) {
       !/\b(and|also|additionally|plus|as well as)\b/i.test(message) &&
       message.trim().split(/\s+/).length <= 14;
     if (asksOnlyForWorkflow) return NextResponse.json({ response: buildProcurementFlowResponse(), sources: ['ProcuremateSU procurement process'] });
-    const prMatch = message.match(PR_PATTERN); const isPRAccessRequest = Boolean(prMatch) && PR_ACCESS_PATTERN.test(message);
+    const tempPrMatch = message.match(TEMP_PR_PATTERN);
+    const prMatch = tempPrMatch ? null : message.match(PR_PATTERN);
+    const isPRAccessRequest = Boolean(tempPrMatch || prMatch) && PR_ACCESS_PATTERN.test(message);
     if (isPRAccessRequest) {
-      const raw = prMatch![1].replace(/\s+/g, ''); const normalized = raw.startsWith('2026') ? `PR-${raw}` : `PR-${raw.replace(/^PR/i, '')}`;
-      if (profile.role !== 'admin') { const { data: ownedPR, error: ownershipError } = await clientToUse.from('purchase_requests').select('pr_no').eq('pr_no', normalized).eq('user_id', user.id).maybeSingle(); if (ownershipError || !ownedPR) return NextResponse.json({ error: 'Access denied. That Purchase Request is not associated with your account.' }, { status: 403 }); }
+      const raw = prMatch?.[1].replace(/\s+/g, '') || '';
+      const normalized = tempPrMatch
+        ? `PR-TEMP-${tempPrMatch[1]}-${tempPrMatch[2]}`
+        : raw.startsWith('2026') ? `PR-${raw}` : `PR-${raw.replace(/^PR/i, '')}`;
+      if (profile.role !== 'admin') {
+        const { data: ownedPR, error: ownershipError } = await clientToUse
+          .from('purchase_requests')
+          .select('pr_no')
+          .eq('pr_no', normalized)
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (ownershipError || !ownedPR) {
+          return NextResponse.json({ error: 'Access denied. That Purchase Request is not associated with your account.' }, { status: 403 });
+        }
+      }
+
       if (NEXT_PATTERN.test(message)) {
-        const { data: pr, error: prError } = await clientToUse.from('purchase_requests').select('pr_no,purpose,total,current_stage,created_at,department').eq('pr_no', normalized).maybeSingle();
+        const { data: pr, error: prError } = await clientToUse
+          .from('purchase_requests')
+          .select('pr_no,purpose,total,current_stage,created_at,department')
+          .eq('pr_no', normalized)
+          .maybeSingle();
         if (prError || !pr) return NextResponse.json({ error: 'Purchase Request not found.' }, { status: 404 });
-        const { data: history } = await clientToUse.from('pr_stages_completed').select('stage_key,stage_name,completed_at,remarks,notes').eq('pr_no', normalized).neq('status', 'remark').order('completed_at', { ascending: false }).limit(1);
+        const { data: history } = await clientToUse
+          .from('pr_stages_completed')
+          .select('stage_key,stage_name,completed_at,remarks,notes')
+          .eq('pr_no', normalized)
+          .neq('status', 'remark')
+          .order('completed_at', { ascending: false })
+          .limit(1);
         return NextResponse.json({ response: buildNextStepResponse(pr, history?.[0] || null), sources: ['ProcuremateSU procurement process', 'Purchase Request stage history'] });
       }
+
+      // Temporary PR numbers are not in the official-document excerpts. Read the live
+      // Purchase Request record directly so tracking never falls through to a RAG answer.
+      if (tempPrMatch) {
+        const { data: pr, error: prError } = await clientToUse
+          .from('purchase_requests')
+          .select('pr_no,purpose,total,current_stage,created_at,department')
+          .eq('pr_no', normalized)
+          .maybeSingle();
+        if (prError || !pr) {
+          return NextResponse.json({ error: 'Purchase Request not found in the live tracking records.' }, { status: 404 });
+        }
+
+        const { data: stageHistory } = await clientToUse
+          .from('pr_stages_completed')
+          .select('stage_key,stage_name,completed_at,remarks,notes,status')
+          .eq('pr_no', normalized)
+          .order('completed_at', { ascending: true })
+          .limit(30);
+
+        const currentStage = PROCUREMENT_STAGES.find((stage) => stage.key === pr.current_stage);
+        const currentStatus = pr.current_stage === 'draft'
+          ? 'Draft — awaiting printed-form receipt'
+          : currentStage?.label || String(pr.current_stage || 'Status unavailable').replace(/_/g, ' ');
+
+        let response = `📋 **Purchase Request Tracking: ${pr.pr_no}**\n\n`;
+        response += `• **Current Status:** ${currentStatus}\n`;
+        response += `• **Department:** ${pr.department || 'N/A'}\n`;
+        response += `• **Purpose:** ${pr.purpose || 'N/A'}\n`;
+        response += `• **Total Amount:** ₱${(Number(pr.total) || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
+
+        if (stageHistory && stageHistory.length > 0) {
+          response += '\n**Recorded Timeline:**\n';
+          for (const entry of stageHistory) {
+            const date = entry.completed_at
+              ? new Date(entry.completed_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' })
+              : '';
+            const marker = entry.status === 'pending_receipt' ? '⏳' : entry.status === 'rejected' ? '❌' : entry.status === 'remark' ? '📝' : '✅';
+            response += `${marker} ${entry.stage_name || entry.stage_key || 'PR activity'}${date ? ` — ${date}` : ''}${entry.remarks ? `\n   ${entry.remarks}` : ''}\n`;
+          }
+        } else {
+          response += '\nNo stage-history entries have been recorded yet.';
+        }
+
+        return NextResponse.json({
+          response,
+          sources: ['Live Purchase Request record', 'Purchase Request stage history'],
+        });
+      }
     }
-    if (NEXT_PATTERN.test(message) && !prMatch) {
+    if (NEXT_PATTERN.test(message) && !prMatch && !tempPrMatch) {
       const { data: latestPR, error: latestError } = await clientToUse.from('purchase_requests').select('pr_no,purpose,total,current_stage,created_at,department').eq('user_id', user.id).not('current_stage', 'eq', 'draft').order('created_at', { ascending: false }).limit(1).maybeSingle();
       if (latestError || !latestPR) return NextResponse.json({ response: `📋 **I couldn't find a submitted Purchase Request under your account yet.**\n\nSubmit a PR first, then ask **"What happens next?"** and I will explain its current and next procurement stage.`, sources: ['Purchase Request records'] });
       const { data: history } = await clientToUse.from('pr_stages_completed').select('stage_key,stage_name,completed_at,remarks,notes').eq('pr_no', latestPR.pr_no).neq('status', 'remark').order('completed_at', { ascending: false }).limit(1);
