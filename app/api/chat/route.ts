@@ -60,7 +60,10 @@ function isLikelyIncompleteResponse(value: string): boolean {
   // Catch obvious cut-offs without requiring every valid bullet to end in punctuation.
   if (/[,:;—–-]$/.test(text) || /\.{3,}$/.test(text)) return true;
   if (/\b(?:and|or|but|because|which|that|including|such as|for example|to|of|with|from|in|on|at|by|under|the|a|an|is|are|was|were|be|can|will|should|must|if|when|while|although|however|therefore|respectively)\s*$/i.test(text)) return true;
-  if (/\*\*[^*\n]*$|(?<!\*)\*[^*\n]*$|`[^`\n]*$|\[[^\]\n]*$|\]\([^\)\n]*$/.test(text)) return true;
+  const boldMarkers = text.match(/\*\*/g)?.length || 0;
+  const codeMarkers = text.match(/`/g)?.length || 0;
+  if (boldMarkers % 2 !== 0 || codeMarkers % 2 !== 0) return true;
+  if (/\[[^\]\n]*$|\]\([^\)\n]*$/.test(text)) return true;
 
   const lastLine = text.split(/\n/).at(-1)?.trim() || '';
   return /^(?:[-*•]\s*|\d+[.)]\s*)$/.test(lastLine);
