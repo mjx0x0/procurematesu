@@ -18,7 +18,7 @@ function loadLocalChunks(): DocChunk[] {
   const filesToLoad = [
     { file: 'procurement_manual.txt', label: 'MSU-GenSan PMO Operations Manual' },
     { file: 'new_ra12009.txt', label: 'Republic Act No. 12009 (New Government Procurement Act)' },
-    { file: 'ra12009.txt', label: 'Government Procurement Guidelines (RA 12009 / RA 9184)' },
+    { file: 'ra12009.txt', label: 'Local Government Units Procurement Manual (2014; legacy RA 9184 reference, not RA 12009 law)' },
   ];
 
   for (const { file, label } of filesToLoad) {
@@ -117,7 +117,14 @@ export function searchProcurementKnowledge(query: string, limit: number = 3): st
 
   scored.sort((a, b) => b.score - a.score);
 
-  const top = scored.filter(s => s.score > 0).slice(0, limit);
+  const asksCurrentLegalRule = /\b(?:ra\s*12009|new government procurement act|current law|svp|small value procurement|threshold|philgeps posting)\b/i.test(query);
+  const asksHistoricalRule = /\b(?:ra\s*9184|2016|2014|historical|legacy|old law|compare|comparison|lgu manual)\b/i.test(query);
+  const eligibleScores = scored.filter(s => {
+    if (asksCurrentLegalRule && !asksHistoricalRule &&
+        /local government units procurement manual|legacy ra 9184 reference/i.test(s.chunk.source)) return false;
+    return true;
+  });
+  const top = eligibleScores.filter(s => s.score > 0).slice(0, limit);
   if (!top.length) {
     return '';
   }
