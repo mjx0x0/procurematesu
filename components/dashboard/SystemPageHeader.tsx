@@ -54,7 +54,7 @@ export function SystemPageHeader({
         }
         if (!cancelled) setCurrentUser(user);
       } catch (error) {
-        console.error("Unable to load account for system header:", error);
+        console.warn("Unable to load account for system header:", error);
       }
     };
     void loadUser();

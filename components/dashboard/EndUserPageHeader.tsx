@@ -40,7 +40,7 @@ export function EndUserPageHeader({
         }
         if (!cancelled) setCurrentUser(user);
       } catch (error) {
-        console.error("Unable to load end-user account for page header:", error);
+        console.warn("Unable to load end-user account for page header:", error);
       }
     };
 

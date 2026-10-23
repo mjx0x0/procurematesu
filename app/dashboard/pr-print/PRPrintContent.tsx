@@ -401,7 +401,7 @@ export default function PRPrintContent() {
           {data.pr_no && (
             <span>
               {isTemporaryPR(data.pr_no)
-                ? `System Tracking Control: ${data.pr_no} • Official PR No. to be assigned & handwritten by PMO upon Step 4`
+                ? `System Tracking Control: ${data.pr_no}`
                 : `Official PR Control: ${data.pr_no}`}
             </span>
           )}

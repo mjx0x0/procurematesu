@@ -268,7 +268,7 @@ export default function PRDetailPage() {
           </div>
           {pr.pr_no && !getFormDisplayPrNumber(pr.pr_no, pr.current_stage) && (
             <div className="mt-2 text-right text-[11px] text-stone-500 font-mono print:text-[9px]">
-              System Tracking Ref: {pr.pr_no} (Official PR No. to be assigned &amp; written by PMO upon Step 4)
+              System Tracking Ref: {pr.pr_no}
             </div>
           )}
         </section>

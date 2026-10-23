@@ -374,19 +374,8 @@ export default function NewPRForm() {
               </div>
             )}
 
-            {/* PR Number & Date */}
+            {/* Date */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  PR Number
-                </label>
-                <input
-                  type="text"
-                  value="Auto-generated"
-                  disabled
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-                />
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Date
@@ -441,28 +430,6 @@ export default function NewPRForm() {
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7B0046] focus:border-transparent outline-none transition-all bg-white"
                 />
               </div>
-            </div>
-
-            {/* SAI & ALOBS */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">SAI No.</label>
-              <input
-                type="text"
-                value=""
-                readOnly
-                disabled
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Alobs No.</label>
-              <input
-                type="text"
-                value=""
-                readOnly
-                disabled
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-              />
             </div>
 
             {/* Purpose */}

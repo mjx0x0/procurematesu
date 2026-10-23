@@ -15,7 +15,7 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     "placeholder-key";
 
-  return createServerClient(
+  const client = createServerClient(
     supabaseUrl,
     supabaseKey,
     {
@@ -37,4 +37,64 @@ export async function createClient() {
       },
     },
   );
+
+  // Wrap getUser to catch invalid refresh token errors gracefully
+  const originalGetUser = client.auth.getUser.bind(client.auth);
+  (client.auth.getUser as any) = async (jwt?: string) => {
+    try {
+      const res = await originalGetUser(jwt);
+      if (res.error) {
+        const msg = res.error.message || "";
+        if (
+          msg.includes("Refresh Token") ||
+          msg.includes("refresh_token") ||
+          (res.error as any).code === "refresh_token_not_found"
+        ) {
+          return { data: { user: null }, error: null };
+        }
+      }
+      return res;
+    } catch (err: any) {
+      const msg = err?.message || "";
+      if (
+        msg.includes("Refresh Token") ||
+        msg.includes("refresh_token") ||
+        err?.code === "refresh_token_not_found"
+      ) {
+        return { data: { user: null }, error: null };
+      }
+      throw err;
+    }
+  };
+
+  // Wrap getSession to catch invalid refresh token errors gracefully
+  const originalGetSession = client.auth.getSession.bind(client.auth);
+  (client.auth.getSession as any) = async () => {
+    try {
+      const res = await originalGetSession();
+      if (res.error) {
+        const msg = res.error.message || "";
+        if (
+          msg.includes("Refresh Token") ||
+          msg.includes("refresh_token") ||
+          (res.error as any).code === "refresh_token_not_found"
+        ) {
+          return { data: { session: null }, error: null };
+        }
+      }
+      return res;
+    } catch (err: any) {
+      const msg = err?.message || "";
+      if (
+        msg.includes("Refresh Token") ||
+        msg.includes("refresh_token") ||
+        err?.code === "refresh_token_not_found"
+      ) {
+        return { data: { session: null }, error: null };
+      }
+      throw err;
+    }
+  };
+
+  return client;
 }

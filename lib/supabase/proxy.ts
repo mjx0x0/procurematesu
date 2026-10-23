@@ -33,10 +33,31 @@ export async function updateSession(request: NextRequest) {
     // Client-side pages (e.g. /dashboard, /admin) independently authenticate
     // using the browser client SDK, ensuring smooth operation both in first-party
     // tabs (e.g. Vercel) and iframe previews (AI Studio).
-    await supabase.auth.getUser();
-  } catch (error) {
-    // Silently continue so client-side authentication can handle the session
-    console.warn("[proxy] session refresh notice:", error);
+    const { error } = await supabase.auth.getUser();
+    if (error) {
+      const msg = error.message || "";
+      if (
+        msg.includes("Refresh Token") ||
+        msg.includes("refresh_token") ||
+        (error as any).code === "refresh_token_not_found" ||
+        (error as any).status === 400
+      ) {
+        request.cookies.getAll().forEach((c) => {
+          if (c.name.startsWith("sb-") && c.name.includes("-auth-token")) {
+            response.cookies.delete(c.name);
+          }
+        });
+      }
+    }
+  } catch (error: any) {
+    const msg = error?.message || "";
+    if (
+      !msg.includes("Refresh Token") &&
+      !msg.includes("refresh_token") &&
+      error?.code !== "refresh_token_not_found"
+    ) {
+      console.warn("[proxy] session refresh notice:", error);
+    }
   }
 
   return response;

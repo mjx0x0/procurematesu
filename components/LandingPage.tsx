@@ -68,7 +68,7 @@ export default function LandingPage() {
                 <div className="text-sm font-extrabold tracking-tight sm:text-base text-white group-hover:text-amber-200 transition-colors">
                   Procure<span className="text-amber-200/90 font-black">M</span>ate<span className="text-amber-200/90 font-black">SU</span>
                 </div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-200/70">
+                <div className="text-[9px] font-normal font-[system-ui] not-italic uppercase tracking-[0.16em] text-amber-200/70">
                   MSU – General Santos Procurement
                 </div>
               </div>

@@ -249,46 +249,15 @@ export default function ProcurementRequestForm() {
                   <h3 className="text-base font-extrabold text-[#4D002C]">Document &amp; Department Information</h3>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-stone-700">PR Number</label>
-                    <input
-                      value="Blank on form (Auto-tracked)"
-                      disabled
-                      className="w-full h-11 px-3.5 font-mono text-sm font-semibold text-stone-500 bg-stone-100 rounded-xl border border-stone-200"
-                    />
-                    <p className="text-[11px] text-stone-500">Blank on printed PR form; official No. assigned at Step 4</p>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-stone-700">Date</label>
-                    <input
-                      type="date"
-                      value={new Date().toISOString().split("T")[0]}
-                      disabled
-                      className="w-full h-11 px-3.5 text-sm font-semibold text-stone-600 bg-stone-100 rounded-xl border border-stone-200"
-                    />
-                    <p className="text-[11px] text-stone-500">Current date</p>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-stone-700">SAI No.</label>
-                    <input
-                      value=""
-                      readOnly
-                      disabled
-                      className="w-full h-11 px-3.5 font-mono text-sm font-semibold text-stone-500 bg-stone-100 rounded-xl border border-stone-200"
-                    />
-                    <p className="text-[11px] text-stone-500">Accounting reference</p>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-stone-700">Alobs No.</label>
-                    <input
-                      value=""
-                      readOnly
-                      disabled
-                      className="w-full h-11 px-3.5 font-mono text-sm font-semibold text-stone-500 bg-stone-100 rounded-xl border border-stone-200"
-                    />
-                    <p className="text-[11px] text-stone-500">Budget reference</p>
-                  </div>
+                <div className="max-w-xs space-y-1">
+                  <label className="block text-xs font-bold text-stone-700">Date</label>
+                  <input
+                    type="date"
+                    value={new Date().toISOString().split("T")[0]}
+                    disabled
+                    className="w-full h-11 px-3.5 text-sm font-semibold text-stone-600 bg-stone-100 rounded-xl border border-stone-200"
+                  />
+                  <p className="text-[11px] text-stone-500">Current date</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">

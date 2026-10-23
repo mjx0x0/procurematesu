@@ -36,23 +36,16 @@ export default function DashboardPage() {
       try {
         let { data: { user: authUser }, error: userError } = await supabase.auth.getUser();
         if (userError) {
-          // If the error is an invalid refresh token, sign out and redirect
-          if (userError.name === 'AuthApiError') {
-            await supabase.auth.signOut();
-            router.replace("/");
-            return;
-          }
-          throw userError;
+          await supabase.auth.signOut().catch(() => {});
+          router.replace("/");
+          return;
         }
         if (!authUser) {
           const { data: { session }, error: sessionError } = await supabase.auth.getSession();
           if (sessionError) {
-             if (sessionError.name === 'AuthApiError') {
-               await supabase.auth.signOut();
-               router.replace("/");
-               return;
-             }
-             throw sessionError;
+            await supabase.auth.signOut().catch(() => {});
+            router.replace("/");
+            return;
           }
           authUser = session?.user || null;
         }
