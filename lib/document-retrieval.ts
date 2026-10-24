@@ -118,6 +118,45 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   if (supabase && terms.length) {
     try {
       const searches: any[] = [];
+      const selectedColumns = 'id, document_name, document_type, chunk_text, metadata';
+      const scopedPhraseSearch = (documentName: string, contentPhrase: string) =>
+        supabase
+          .from('document_chunks')
+          .select(selectedColumns)
+          .eq('document_name', documentName)
+          .ilike('chunk_text', `%${contentPhrase}%`)
+          .limit(4);
+
+      // Broad per-word searches can miss the relevant chunk because each term
+      // query returns only its first few matches. Add source-scoped searches for
+      // known high-risk question types so the authoritative section enters the
+      // candidate set before ranking.
+      const asksSvpDetails = /\b(small value procurement|svp)\b/i.test(query);
+      const asksPurchaseRequestWorkflow =
+        /\b(purchase requests?|\bpr\b)\b/i.test(query) &&
+        /\b(sequence|workflow|process|steps|review|reviewing|approval|approving|offices|procedure)\b/i.test(query) &&
+        /\b(msu|gensan|university|pmo|procurement)\b/i.test(query);
+
+      if (asksSvpDetails) {
+        const currentIrr = 'Implementing Rules and Regulations of RA 12009';
+        searches.push(
+          scopedPhraseSearch(currentIrr, 'Section 34. Small Value Procurement'),
+          scopedPhraseSearch(currentIrr, 'shall not require posting'),
+          scopedPhraseSearch(currentIrr, 'The BAC shall prepare and send the RFQs or RFPs'),
+          scopedPhraseSearch(currentIrr, 'Abstract of Quotations or Ratings'),
+          scopedPhraseSearch(currentIrr, 'in case no price quotation is received')
+        );
+      }
+
+      if (asksPurchaseRequestWorkflow) {
+        const pmoManual = 'PMO Administrative Manual';
+        searches.push(
+          scopedPhraseSearch(pmoManual, '1. Receipt of Purchase Request'),
+          scopedPhraseSearch(pmoManual, '3. Validation by the PMO Director'),
+          scopedPhraseSearch(pmoManual, 'Endorsement to Budget Management Office'),
+          scopedPhraseSearch(pmoManual, 'Receipt of Approved PRs signed by the Chancellor')
+        );
+      }
 
       const phrase = normalizedQuery.replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim();
       const phrases = Array.from(new Set(
@@ -195,6 +234,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const asksInstitutional = /\b(msu|gensan|university|pmo|pro|procurement office|department|chancellor|budget office|purchase request|pr|workflow|process|approval|logbook|director|contact|office)\b/i.test(query);
           if (asksLegal && isCurrentProcurementLawSource(identity)) score += 24;
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
+          if (asksSvpDetails && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 35;
+          if (asksPurchaseRequestWorkflow && /receipt of purchase request|validation by the pmo director|budget management office|approved prs signed by the chancellor/i.test(text)) score += 40;
           if (/generic government procurement manual|government procurement manual volume|good procurement manual/i.test(identity)) score -= 8;
           if (isLegacy && asksAboutLegacyRules(query)) score += 2;
 
@@ -240,7 +281,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   const formattedContext = chunks
     .map((chunk, index) => {
       const section = metadataField(chunk.metadata, ['section', 'section_number', 'section_title', 'article', 'article_title', 'heading']);
-      const page = metadataField(chunk.metadata, ['pdf_page', 'page_number', 'page', 'page_no', 'page_num', 'source_page']);
+      const page = metadataField(chunk.metadata, ['pdf_page', 'page_number', 'page', 'page_no', 'page_num', 'source_page', 'page_start']);
       const location = [
         section ? `section/article: ${section}` : '',
         page ? `PDF page: ${page}` : '',
