@@ -34,6 +34,38 @@ const historicalChunks = [
   { document_name: 'IRR 2016', chunk_text: 'The 2016 Revised Implementing Rules and Regulations of RA 9184.' },
 ];
 
+const circularSourceUrl = 'https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf';
+const circularChunks = [{
+  document_name: 'GPPB Circular No. 06-2026',
+  document_type: 'gppb_circular',
+  chunk_text: [
+    'Section 3.1: These guidelines apply to State Universities and Colleges (SUCs).',
+    'Section 3.2: Compliance with the documentary requirements is without prejudice to substantive conditions applicable to each procurement mode under RA No. 12009 and its IRR.',
+    'Section 3.5: The eligibility documents enumerated in these Guidelines are exclusive and procuring entities shall not require additional eligibility documents.',
+    'Section 4.2: The BAC shall indicate in the Request for Quotation (RFQ) or Request for Proposal (RFP) the stage when documents must be submitted: with offers, during evaluation, or before issuance of the Notice of Award.',
+    'Section 4.3.1: PhilGEPS Organization ID or PhilGEPS Certificate of Registration (Platinum Membership); the membership must not be suspended.',
+    'Section 4.3.2: Mayor’s Permit or Business Registration Permit. An expired Mayor’s Permit with the official receipt for renewal is accepted subject to submission of a valid permit after award and before payment. A PhilGEPS Platinum Certificate may be submitted in lieu of the specified permit or Organization ID where applicable.',
+    'Section 4.3.5: PCAB License for infrastructure projects, or Special PCAB License in case of a joint venture.',
+    'Section 4.3.6: Income or Business Tax Return when the ABC exceeds PHP 500,000.',
+    'Section 4.3.7: Omnibus Sworn Statement (OSS).',
+    'Section 4.4: The Procuring Entities already maintaining an updated file of these requirements through PhilGEPS or their own records may no longer require its re-submission.',
+    'Section 4.7 matrix — Small Value Procurement: PhilGEPS Organization ID; Mayor’s Permit; Professional License/CV for consulting; PCAB License and registration for infrastructure; Income/Business Tax Return for ABCs above PHP 500,000; Omnibus Sworn Statement (OSS) for ABCs above PHP 50,000.',
+  ].join('\n'),
+  metadata: { source_url: circularSourceUrl, source_authority: 'gppb_current_issuance', document_status: 'current_supplementary_issuance_ra_12009' },
+}];
+
+const completeSvpProcedureChunks = [{
+  document_name: 'Implementing Rules and Regulations of RA 12009',
+  chunk_text: [
+    'Section 34. Small Value Procurement. 34.1: For eligible Goods not available from PS-DBM, Infrastructure Projects, and Consulting Services, the threshold is Two Million Pesos (₱2,000,000.00).',
+    '34.3(a): The End-User or Implementing Unit submits a request containing the technical specifications or Scope of Work, Terms of Reference when applicable, ABC, and other terms and conditions.',
+    '34.3(c): The BAC shall prepare and send RFQs/RFPs to at least three (3) suppliers, contractors, or consultants of known qualifications. Receipt of at least one (1) quotation is sufficient to proceed with evaluation.',
+    '34.3(b): Except for ABCs of ₱200,000.00 and below, which shall not require posting, the RFQ or RFP shall be posted for a period of three (3) calendar days on the PhilGEPS website.',
+    '34.3(d): In case no price quotation is received from the suppliers, the Procuring Entity may extend the deadline for submission of price quotation until receipt of at least a single price quotation, but the extension shall not go beyond the validity of the corresponding appropriations.',
+    '34.3(f)–(g): After the deadline, an Abstract of Quotations or Ratings is prepared and the BAC recommends award to the HoPE under the applicable rule.',
+  ].join('\n'),
+}];
+
 test('SVP answer cites correct subsection, threshold, posting exception, and quotation safeguards', () => {
   const query = 'According to the RA 12009 IRR, explain SVP threshold, quotation requirements, posting and exceptions.';
   const answer = buildVerifiedProcurementAnswer(query, svpChunks);
@@ -151,4 +183,76 @@ test('contact answer abstains when directory provenance is not verified', () => 
       metadata: { source_url: 'https://example.com/guessed-directory' },
     },
   ]), null);
+});
+
+
+test('SVP documentary answer uses the exclusive Circular 06-2026 checklist and separates Section 34 procedure', () => {
+  const query = 'For an SUC using Small Value Procurement under RA 12009, what documentary requirements should be checked? Distinguish the requirements in GPPB Circular No. 06-2026 from the actual SVP procedure under Section 34 of the IRR.';
+  const answer = buildVerifiedProcurementAnswer(query, [...circularChunks, ...completeSvpProcedureChunks]);
+  assert.ok(answer);
+  assert.match(answer, /Circular No\\. 06-2026/);
+  assert.match(answer, /Section 3\\.5/);
+  assert.match(answer, /exclusive/i);
+  assert.match(answer, /PhilGEPS Organization ID/);
+  assert.match(answer, /Mayor’s Permit or Business Registration Permit/);
+  assert.match(answer, /Professional License or CV/);
+  assert.match(answer, /PCAB License/);
+  assert.match(answer, /exceeds ₱500,000/);
+  assert.match(answer, /exceeds ₱50,000/);
+  assert.match(answer, /Section 34\\.3\\(d\\)/);
+  assert.match(answer, /at least three qualified suppliers/i);
+  assert.match(answer, /₱200,000 or below/);
+  assert.doesNotMatch(answer, /SEC registration|BIR certificate|market survey|price-comparison sheet|posting-exception justification/i);
+  assert.ok(answer.includes(circularSourceUrl));
+});
+
+test('document-resubmission question cites current Circular Section 4.4, not historical RA 9184', () => {
+  const query = 'Can a supplier avoid resubmitting documents already submitted to the procuring entity if those documents are still valid and up to date? Cite the official provision.';
+  const answer = buildVerifiedProcurementAnswer(query, [...circularChunks, ...historicalChunks]);
+  assert.ok(answer);
+  assert.match(answer, /GPPB Circular No\\. 06-2026, Section 4\\.4/);
+  assert.match(answer, /updated file/i);
+  assert.match(answer, /may no longer require those documents to be resubmitted|may no longer require its re-submission/i);
+  assert.ok(answer.includes(circularSourceUrl));
+  assert.doesNotMatch(answer, /Revised Implementing Rules and Regulations of RA No\\. 9184|Section 8\\.5\\.2/);
+});
+
+test('no-quotation question answers directly from current IRR Section 34.3(d)', () => {
+  const query = 'Under the current RA 12009 IRR, what happens if the procuring entity receives no quotations for an SVP procurement? Explain the applicable rule and cite the correct subsection.';
+  const answer = buildVerifiedProcurementAnswer(query, completeSvpProcedureChunks);
+  assert.ok(answer);
+  assert.match(answer, /Section 34\\.3\\(d\\)/);
+  assert.match(answer, /may extend the deadline/i);
+  assert.match(answer, /until it receives at least one quotation/i);
+  assert.match(answer, /must not go beyond the validity of the corresponding appropriations/i);
+  assert.match(answer, /Section 34\\.3\\(c\\)/);
+  assert.match(answer, /IRR-of-RA-No\\.-12009\\.pdf/);
+});
+
+test('specific documentary and no-quotation intents fail closed when their official excerpts are absent', () => {
+  const documentaryQuery = 'For an SUC using Small Value Procurement under RA 12009, what documentary requirements should be checked?';
+  const documentaryAnswer = buildVerifiedProcurementAnswer(documentaryQuery, completeSvpProcedureChunks);
+  assert.ok(documentaryAnswer);
+  assert.match(documentaryAnswer, /cannot safely provide an SVP document checklist/i);
+  assert.match(documentaryAnswer, /Circular No\\. 06-2026/);
+
+  const noQuotationQuery = 'What happens if the procuring entity receives no quotations for an SVP procurement?';
+  const noQuotationAnswer = buildVerifiedProcurementAnswer(noQuotationQuery, [
+    { document_name: 'IRR 2016', chunk_text: 'Historical rule only.' },
+  ]);
+  assert.ok(noQuotationAnswer);
+  assert.match(noQuotationAnswer, /can’t verify this procurement rule/i);
+  assert.match(noQuotationAnswer, /Section 34\\.3\\(d\\)/);
+});
+
+test('Circular Section 4.4 answer abstains without exact official source provenance', () => {
+  const query = 'Can a supplier avoid resubmitting documents already submitted if they remain valid and up to date?';
+  const answer = buildVerifiedProcurementAnswer(query, [{
+    document_name: 'GPPB Circular No. 06-2026',
+    chunk_text: 'Section 4.4: The Procuring Entity may no longer require resubmission of updated documents.',
+    metadata: { source_url: 'https://example.com/unverified-circular' },
+  }]);
+  assert.ok(answer);
+  assert.match(answer, /can’t verify this procurement rule/i);
+  assert.match(answer, /GPPB Circular No\\. 06-2026, Section 4\\.4/);
 });
