@@ -6,6 +6,7 @@ export interface RetrievedChunk {
   document_name: string;
   document_type: string;
   chunk_text: string;
+  metadata?: Record<string, unknown>;
   similarity?: number;
   source_type: 'supabase_vector' | 'supabase_keyword' | 'local_fallback';
 }
@@ -25,6 +26,47 @@ function getSupabase(): SupabaseClient | null {
     supabaseClient = createClient(url, key);
   }
   return supabaseClient;
+}
+
+
+function metadataField(metadata: Record<string, unknown> | undefined, keys: string[]): string {
+  if (!metadata) return '';
+  for (const key of keys) {
+    const value = metadata[key];
+    if (typeof value === 'string' || typeof value === 'number') {
+      const normalized = String(value).trim();
+      if (normalized) return normalized;
+    }
+  }
+  return '';
+}
+
+function sourceIdentity(documentName: string, documentType: string, metadata?: Record<string, unknown>): string {
+  return [
+    documentName,
+    documentType,
+    metadataField(metadata, ['source_file', 'original_file', 'source_title', 'document_title', 'source_authority', 'authority', 'document_status']),
+  ].join(' ').toLowerCase();
+}
+
+function asksAboutLegacyRules(query: string): boolean {
+  return /\bra\s*\.?\s*9184\b|\b9184\b|2016\s*(revised\s*)?irr|transition|transitory|transitional|legacy|previous law|old procurement/i.test(query);
+}
+
+function isLegacyProcurementSource(identity: string): boolean {
+  // Current RA 12009 material can mention RA 9184 as the law it revises.
+  if (/\bra\s*\.?\s*12009\b|new government procurement act|implementing rules and regulations.{0,40}12009/i.test(identity)) {
+    return false;
+  }
+  return /\bra\s*\.?\s*9184\b|local government units procurement manual|2016.{0,20}irr|legacy_ra_9184_reference|historical_reference_not_current/i.test(identity);
+}
+
+function isCurrentProcurementLawSource(identity: string): boolean {
+  return /\bra\s*\.?\s*12009\b|new government procurement act|implementing rules and regulations.{0,40}12009|\bgppb\b.{0,45}20(25|26)|\b(?:resolution|circular)\b.{0,45}20(25|26)/i.test(identity);
+}
+
+function isPMOProcedureSource(identity: string): boolean {
+  return /pmo administrative manual|msu.{0,40}(?:procurement|pmo)|procurement management office|pmo operations manual/i.test(identity);
 }
 
 /**
@@ -109,6 +151,20 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const text = String(doc.chunk_text || '').trim();
           if (!text) continue;
 
+          const metadata =
+            doc.metadata && typeof doc.metadata === 'object' && !Array.isArray(doc.metadata)
+              ? (doc.metadata as Record<string, unknown>)
+              : undefined;
+          const identity = sourceIdentity(
+            String(doc.document_name || ''),
+            String(doc.document_type || ''),
+            metadata
+          );
+          const isLegacy = isLegacyProcurementSource(identity);
+          // Historical RA 9184 material should not outrank current rules unless
+          // the user explicitly asks about RA 9184, older guidance, or transition.
+          if (isLegacy && !asksAboutLegacyRules(query)) continue;
+
           const haystack = `${doc.document_name || ''} ${text}`.toLowerCase();
           let score = 0;
 
@@ -135,6 +191,13 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
             score += 15;
           }
 
+          const asksLegal = /\b(ra\s*\.?\s*12009|ra\s*\.?\s*9184|law|legal|regulation|irr|threshold|svp|small value|competitive bidding|bidding|procurement mode|section|article|deadline|posting|quotation|eligibility|award|supplier)\b/i.test(query);
+          const asksInstitutional = /\b(msu|gensan|university|pmo|pro|procurement office|department|chancellor|budget office|purchase request|pr|workflow|process|approval|logbook|director|contact|office)\b/i.test(query);
+          if (asksLegal && isCurrentProcurementLawSource(identity)) score += 24;
+          if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
+          if (/generic government procurement manual|government procurement manual volume|good procurement manual/i.test(identity)) score -= 5;
+          if (isLegacy && asksAboutLegacyRules(query)) score += 2;
+
           const key = String(doc.id || text.slice(0, 120));
           const existing = candidates.get(key);
           const item = {
@@ -142,6 +205,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
             document_name: doc.document_name || 'Procurement Records',
             document_type: doc.document_type || 'document_chunks',
             chunk_text: text,
+            metadata,
             source_type: 'supabase_keyword' as const,
             score
           };
@@ -175,7 +239,13 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   const sources = Array.from(new Set(chunks.map(c => c.document_name).filter(Boolean)));
   const formattedContext = chunks
     .map((chunk, index) => {
-      const docHeader = `[DOCUMENT EXCERPT ${index + 1}: ${chunk.document_name.toUpperCase()} (${chunk.document_type})]`;
+      const section = metadataField(chunk.metadata, ['section', 'section_number', 'section_title', 'article', 'article_title', 'heading']);
+      const page = metadataField(chunk.metadata, ['pdf_page', 'page_number', 'page', 'page_no', 'page_num', 'source_page']);
+      const location = [
+        section ? `section/article: ${section}` : '',
+        page ? `PDF page: ${page}` : '',
+      ].filter(Boolean).join(' | ');
+      const docHeader = `[DOCUMENT EXCERPT ${index + 1}: ${chunk.document_name.toUpperCase()} (${chunk.document_type})${location ? ` | ${location}` : ''}]`;
       return `${docHeader}\n${chunk.chunk_text}`;
     })
     .join('\n\n========================================\n\n');
