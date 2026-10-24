@@ -948,39 +948,9 @@ function buildDraftCompletionResponse(
 // VERIFIED INSTITUTIONAL FACTS
 // ============================================================
 
-function getVerifiedInstitutionalAnswer(query: string): string | null {
-  const q = query.toLowerCase().replace(/\s+/g, ' ').trim();
-  const procurementOffice = /\b(procurement(?: management)? office|procurement office|pmo|pro)\b/i.test(q);
-  const asksDirector =
-    /\b(who(?: is|['’]s)?|what is the name of|name of|identify|tell me)\b.*\b(director|head|officer|in charge)\b/i.test(q) ||
-    /\b(director|head|officer|in charge)\b.*\b(who|name|person)\b/i.test(q);
-  const asksContact = /\b(contact|phone|telephone|number|hotline|reach|email)\b/i.test(q);
-  const asksLocation = /\b(where|location|address|located|office location)\b/i.test(q);
-
-  if (!procurementOffice) return null;
-
-  if (asksDirector) {
-    return "👤 **Procurement Management Office Director**\n\n" +
-      "The official MSU-General Santos University Directory lists **Assoc. Prof. Nelson P. Benares, Jr.** as the **Director of the Procurement Management Office**.\n\n" +
-      "The office is under the **Office of the Vice Chancellor for Administration and Finance**.\n\n" +
-      "📚 **Source:** MSU-GenSan University Directory";
-  }
-
-  if (asksContact) {
-    return "📞 **Procurement Management Office Contact**\n\n" +
-      "**Director:** Assoc. Prof. Nelson P. Benares, Jr.\n" +
-      "**Contact Number:** +63 908 810 5634\n\n" +
-      "The office is listed under the Office of the Vice Chancellor for Administration and Finance.\n\n" +
-      "📚 **Source:** MSU-GenSan University Directory";
-  }
-
-  if (asksLocation) {
-    return "📍 **Procurement Management Office**\n\n" +
-      "The university directory lists the MSU-General Santos campus at **Fatima, General Santos City, South Cotabato, Philippines, 9500**, and identifies the Procurement Management Office under the Office of the Vice Chancellor for Administration and Finance.\n\n" +
-      "A June 12, 2026 university advisory states that offices affected by Y-Building/Admin Building damage were to temporarily relocate to designated locations. Because the advisory does not establish a permanent current PMO location in the source used here, Gab AI should not invent a temporary office address.\n\n" +
-      "📚 **Sources:** MSU-GenSan University Directory; MSU-GenSan Temporary Office Relocation Advisory";
-  }
-
+// Institutional facts are intentionally not hard-coded here. The normal retrieval
+// path must find current source excerpts or abstain when the knowledge base cannot verify them.
+function getVerifiedInstitutionalAnswer(_query: string): string | null {
   return null;
 }
 
@@ -1154,7 +1124,7 @@ export async function POST(req: NextRequest) {
 You are the official AI Procurement Assistant for Mindanao State University - General Santos (MSU-GenSan).
 
 CRITICAL DIRECTIVES:
-1. You have been provided with verified excerpts retrieved directly from the university's "document_chunks" database table.
+1. If the user prompt includes excerpts from the university's "document_chunks" database table, treat them as retrieved evidence. If it says no sufficiently relevant excerpt was retrieved, do not assume a source is available.
 2. Ground answers firmly in the retrieved evidence. Do not invent facts that are absent from the evidence.
 3. For factual procurement-law and MSU-specific answers, cite the retrieved source title and any section/article/page available in the excerpt. Never invent section numbers, page numbers, or links. For a common definition where no legal claim is made, a citation may be omitted.
 4. Treat specific institutional questions as high-precision questions. Use the retrieved institutional source that directly names the office, person, role, or contact information.
@@ -1187,7 +1157,7 @@ ${retrievedDocs || 'No sufficiently relevant verified excerpt was retrieved. Do 
 Please provide a clear, accurate, grounded response adhering strictly to the verified excerpts above. Keep the answer focused on the user's question and finish the thought completely. Do not add unrelated background or a long list of additional topics.
 `;
 
-        const requiresVerifiedEvidence = /\b(?:ra\s*\.?\s*12009|ra\s*\.?\s*9184|law|legal|regulation|irr|section|article|threshold|svp|small value procurement|posting period|quotation count|procurement mode|eligibility requirement|legal basis|deadline|chancellor|budget office|pmo|procurement management office|university|msu|gensan|office location|contact number|director|purchase request)\b/i.test(trimmedMsg);
+        const requiresVerifiedEvidence = /\b(?:ra\s*\.?\s*12009|ra\s*\.?\s*9184|law|legal|regulation|irr|section|article|threshold|svp|small value procurement|posting period|quotation count|procurement mode|eligibility requirement|legal basis|deadline|chancellor|budget office|pmo|procurement office|procurement management office|university|msu|gensan|office location|address|location|relocation|phone|telephone|email|contact|head|officer|director|purchase request)\b/i.test(trimmedMsg);
         const aiResponse = (!retrievedDocs.trim() && requiresVerifiedEvidence)
           ? ''
           : await callGeminiWithFallback(userPrompt, systemPrompt, 0.2);
