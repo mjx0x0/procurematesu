@@ -38,6 +38,10 @@ The repair script is deliberately separate from `scripts/ingest-docs.js`. The or
 
    An empty result means no chunks have NULL embeddings. Also inspect the source metadata for `Local Government Units Procurement Manual (2014)` and confirm `source_file` points to `LocalGovUnitsProcManual.pdf` while `ingestion_file` is `data/ra12009.txt`.
 
+## Verify the stored IRR edition before production use
+
+The current Supabase chunk metadata records the source file as `Implementing-Rules-and-Regulations-of-RA-12009(1).pdf`, but the metadata inspected so far does not establish the edition/approval date. Before treating the source record as fully verified, compare the original file used for ingestion against the GPPB-approved IRR approved through Resolution No. 02-2025. GPPB Public Advisory No. 09-2026 (31 July 2026) says the separate “1st Edition, as of 31 March 2026” IRR issued by GPPB-TSO was withdrawn and must no longer be used. Use only the approved IRR linked from GPPB's advisory. Do not infer the source edition from the chunk title or from the fact that one section's text matches.
+
 ## Source-use policy in the chatbot
 
 - Current legal questions should use RA 12009 and its IRR first.
