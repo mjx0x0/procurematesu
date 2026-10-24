@@ -38,9 +38,11 @@ The repair script is deliberately separate from `scripts/ingest-docs.js`. The or
 
    An empty result means no chunks have NULL embeddings. Also inspect the source metadata for `Local Government Units Procurement Manual (2014)` and confirm `source_file` points to `LocalGovUnitsProcManual.pdf` while `ingestion_file` is `data/ra12009.txt`.
 
-## Verify the stored IRR edition before production use
+## Verified IRR edition (checked 24 October 2026)
 
-The current Supabase chunk metadata records the source file as `Implementing-Rules-and-Regulations-of-RA-12009(1).pdf`, but the metadata inspected so far does not establish the edition/approval date. Before treating the source record as fully verified, compare the original file used for ingestion against the GPPB-approved IRR approved through Resolution No. 02-2025. GPPB Public Advisory No. 09-2026 (31 July 2026) says the separate “1st Edition, as of 31 March 2026” IRR issued by GPPB-TSO was withdrawn and must no longer be used. Use only the approved IRR linked from GPPB's advisory. Do not infer the source edition from the chunk title or from the fact that one section's text matches.
+The actual PDF used for the current Supabase IRR chunks was inspected: `Implementing-Rules-and-Regulations-of-RA-12009(1).pdf`. Its PDF metadata reports the title `Draft_IRR of R.A. 12009_as of 10 February 2025`, creation date 10 February 2025, and 193 pages. Its opening text (Section 1) and final page (Section 117, Effectivity) match the corresponding opening and ending text/pages of the 193-page IRR PDF hosted by GPPB. The Supabase chunks also identify this filename as their `source_file`. This confirms the **edition-level identity** of the file in the current knowledge base as the GPPB-approved IRR, approved through Resolution No. 02-2025, rather than the withdrawn March 2026 edition. This was a content/metadata comparison, not a cryptographic byte-for-byte hash comparison.
+
+**Do not confuse it with the separate Library file `IRR-of-RA-12009-1st-Edition.pdf`.** Its cover and text explicitly say “As of March 30, 2026 | 1st Edition.” GPPB Public Advisory No. 09-2026, posted 31 July 2026, says that edition was withdrawn and must no longer be used. Keep that withdrawn file out of the current-law knowledge base. Official references: [GPPB Public Advisory No. 09-2026](https://www.gppb.gov.ph/public-advisory-no-09-2026/), [GPPB-approved IRR PDF](https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf), and [GPPB notice of the approved IRR](https://www.gppb.gov.ph/exciting-announcement-issuance-and-publication-of-the-irr-for-the-new-government-procurement-act/).
 
 ## Source-use policy in the chatbot
 
