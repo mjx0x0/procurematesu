@@ -137,38 +137,38 @@ async function main() {
     // Local Government Units Procurement Manual under the RA 9184 framework.
     // Preserve the ingestion path separately from the original source document.
     for (const batch of inBatches(rowsToRepair, BATCH_SIZE)) {
-    const results = await Promise.all(batch.map(async (row) => {
-      try {
-        const { data: latestRow, error: latestError } = await supabase
-          .from('document_chunks')
-          .select('metadata')
-          .eq('id', row.id)
-          .single();
-        if (latestError) throw latestError;
+      const results = await Promise.all(batch.map(async (row) => {
+        try {
+          const { data: latestRow, error: latestError } = await supabase
+            .from('document_chunks')
+            .select('metadata')
+            .eq('id', row.id)
+            .single();
+          if (latestError) throw latestError;
 
-        const metadata = {
-          ...(latestRow?.metadata || row.metadata || {}),
-          source_file: 'LocalGovUnitsProcManual.pdf',
-          ingestion_file: 'data/ra12009.txt',
-          source_title: 'Local Government Units Procurement Manual (2014)',
-          publication_year: 2014,
-          source_authority: 'legacy_ra_9184_reference',
-          document_status: 'historical_reference_not_current_ra_12009_law',
-          authority_note: '2014 LGU-specific procurement manual developed under the RA 9184 framework; not the text of RA 12009 or its current IRR.',
-        };
+          const metadata = {
+            ...(latestRow?.metadata || row.metadata || {}),
+            source_file: 'LocalGovUnitsProcManual.pdf',
+            ingestion_file: 'data/ra12009.txt',
+            source_title: 'Local Government Units Procurement Manual (2014)',
+            publication_year: 2014,
+            source_authority: 'legacy_ra_9184_reference',
+            document_status: 'historical_reference_not_current_ra_12009_law',
+            authority_note: '2014 LGU-specific procurement manual developed under the RA 9184 framework; not the text of RA 12009 or its current IRR.',
+          };
 
-        const { error } = await supabase
-          .from('document_chunks')
-          .update({ metadata })
-          .eq('id', row.id);
+          const { error } = await supabase
+            .from('document_chunks')
+            .update({ metadata })
+            .eq('id', row.id);
 
-        if (error) throw error;
-        return true;
-      } catch (error) {
-        console.error(`Provenance repair failed for row ${row.id}:`, error.message || error);
-        return false;
-      }
-    }));
+          if (error) throw error;
+          return true;
+        } catch (error) {
+          console.error(`Provenance repair failed for row ${row.id}:`, error.message || error);
+          return false;
+        }
+      }));
 
       provenanceUpdated += results.filter(Boolean).length;
       provenanceFailures += results.filter((success) => !success).length;
