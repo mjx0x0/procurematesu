@@ -2,7 +2,9 @@
 
 ## Why this repair exists
 
-The knowledge base previously contained current RA 12009 IRR and PMO Administrative Manual chunks without embeddings. Those chunks can be skipped by semantic search. There were also legacy RA 9184 chunks whose metadata described the 2014 Local Government Units Procurement Manual as coming from `data/ra12009.txt`, which is an ingestion filename rather than the original source document.
+The Supabase knowledge base contains chunks from the current RA 12009 IRR and the PMO Administrative Manual whose `embedding` field is NULL. **Important architecture note:** the active application's `lib/document-retrieval.ts` currently retrieves chunks with keyword-based `ilike` searches on `chunk_text`; it does not call a vector-search RPC or use the stored embeddings in its current chat retrieval path. Therefore, filling NULL embeddings is a data-quality/future-vector-search repair, not by itself a fix to current chat retrieval. In this branch, the changes most directly affecting current retrieval are source provenance, legacy-source filtering, and keyword ranking. Using embeddings in runtime retrieval would require a separate, tested vector-retrieval change.
+
+There were also legacy RA 9184 chunks whose metadata described the 2014 Local Government Units Procurement Manual as coming from `data/ra12009.txt`, which is an ingestion filename rather than the original source document.
 
 The repair script is deliberately separate from `scripts/ingest-docs.js`. The original ingestion script inserts new rows and should not be used to repair existing rows because repeated runs can create duplicates.
 
@@ -53,4 +55,4 @@ Test at least:
 - An explicit RA 9184 / transitory-period question.
 - A question that has no matching source; the assistant should admit the retrieval gap instead of guessing.
 
-Do not call the test complete merely because embeddings exist. Check whether each answer cites the right source, whether legacy sources are labelled, and whether the answer avoids unsupported requirements.
+Do not call the test complete merely because embeddings exist. In the current keyword-based implementation, verify source ranking/filtering and answer grounding directly. Separately test vector retrieval if/when that feature is implemented.
