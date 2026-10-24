@@ -11,4 +11,6 @@ export function buildVerifiedProcurementAnswer(
 ): string | null;
 
 export function isSmallValueProcurementQuestion(query: string): boolean;
+export function isBriefSvpMethodQuestion(query: string): boolean;
+export function isPmoDirectorContactQuestion(query: string): boolean;
 export function isHistoricalRa9184Question(query: string): boolean;
