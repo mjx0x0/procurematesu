@@ -321,10 +321,10 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
           else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\. 06-2026/i.test(identity)) score += 12;
           if ((asksSvpDocumentaryRequirements || asksCircularResubmission)
-            && documentName === 'GPPB Circular No. 06-2026') score += 100;
+            && documentName === 'GPPB Circular No. 06-2026') score += 1000;
           if (asksNoSvpQuotation
             && documentName === 'Implementing Rules and Regulations of RA 12009'
-            && /in case no price quotation is received from the suppliers/i.test(text)) score += 100;
+            && /in case no price quotation is received from the suppliers/i.test(text)) score += 1000;
           if (asksPurchaseRequestWorkflow && /receipt of purchase request|validation by the pmo director|budget management office|approved prs signed by the chancellor/i.test(text)) score += 40;
           if (/generic government procurement manual|government procurement manual volume|good procurement manual/i.test(identity)) score -= 8;
           if (isLegacy && asksAboutLegacyRules(query)) score += 2;
