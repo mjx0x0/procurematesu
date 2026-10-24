@@ -35,24 +35,68 @@ const historicalChunks = [
 ];
 
 const circularSourceUrl = 'https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf';
-const circularChunks = [{
-  document_name: 'GPPB Circular No. 06-2026',
-  document_type: 'gppb_circular',
-  chunk_text: [
-    'Section 3.1: These guidelines apply to State Universities and Colleges (SUCs).',
-    'Section 3.2: Compliance with the documentary requirements is without prejudice to substantive conditions applicable to each procurement mode under RA No. 12009 and its IRR.',
-    'Section 3.5: The eligibility documents enumerated in these Guidelines are exclusive and procuring entities shall not require additional eligibility documents.',
-    'Section 4.2: The BAC shall indicate in the Request for Quotation (RFQ) or Request for Proposal (RFP) the stage when documents must be submitted: with offers, during evaluation, or before issuance of the Notice of Award.',
-    'Section 4.3.1: PhilGEPS Organization ID or PhilGEPS Certificate of Registration (Platinum Membership); the membership must not be suspended.',
-    'Section 4.3.2: Mayor’s Permit or Business Registration Permit. An expired Mayor’s Permit with the official receipt for renewal is accepted subject to submission of a valid permit after award and before payment. A PhilGEPS Platinum Certificate may be submitted in lieu of the specified permit or Organization ID where applicable.',
-    'Section 4.3.5: PCAB License for infrastructure projects, or Special PCAB License in case of a joint venture.',
-    'Section 4.3.6: Income or Business Tax Return when the ABC exceeds PHP 500,000.',
-    'Section 4.3.7: Omnibus Sworn Statement (OSS).',
-    'Section 4.4: The Procuring Entities already maintaining an updated file of these requirements through PhilGEPS or their own records may no longer require its re-submission.',
-    'Section 4.7 matrix — Small Value Procurement: PhilGEPS Organization ID; Mayor’s Permit; Professional License/CV for consulting; PCAB License and registration for infrastructure; Income/Business Tax Return for ABCs above PHP 500,000; Omnibus Sworn Statement (OSS) for ABCs above PHP 50,000.',
-  ].join('\n'),
-  metadata: { source_url: circularSourceUrl, source_authority: 'gppb_current_issuance', document_status: 'current_supplementary_issuance_ra_12009' },
-}];
+const circularChunks = [
+  {
+    "document_name": "GPPB Circular No. 06-2026",
+    "document_type": "gppb_circular",
+    "chunk_text": "GPPB CIRCULAR NO. 06-2026\nDOCUMENTARY REQUIREMENTS AND RELEVANT GUIDELINES FOR SPECIFIC MODES OF PROCUREMENT UNDER RA NO. 12009\n\nSOURCE AND STATUS\nOfficial source: Annex A to GPPB Resolution No. 10-2026, GPPB Circular No. 06-2026.\nResolution approved: 3 February 2026. The official GPPB PDF is published at:\nhttps://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf\nGPPB Resolution No. 10-2026 declares that these guidelines form part of and are an Appendix to the Implementing Rules and Regulations of RA No. 12009. This is a supplementary issuance, not the text of the Act or IRR.\nOfficial source location: Annex A, pp. 1-8; source authority: Government Procurement Policy Board (GPPB); status: current supplementary issuance under RA No. 12009; published 19 June 2026.",
+    "metadata": {
+      "source_url": "https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf",
+      "source_authority": "gppb_current_issuance",
+      "document_status": "current_supplementary_issuance_ra_12009"
+    }
+  },
+  {
+    "document_name": "GPPB Circular No. 06-2026",
+    "document_type": "gppb_circular",
+    "chunk_text": "3.0 SCOPE AND APPLICATION\nSection 3.1: The guidelines apply to government branches and instrumentalities including State Universities and Colleges (SUCs), government-owned or -controlled corporations, government financial institutions, and local government units.\nSection 3.2: Compliance with these documentary requirements is without prejudice to the substantive conditions applicable to each procurement mode under RA No. 12009 and its IRR.\nSection 3.5: The eligibility documents enumerated in the guidelines are exclusive. Procuring entities shall not require additional eligibility documents under these guidelines.",
+    "metadata": {
+      "source_url": "https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf",
+      "source_authority": "gppb_current_issuance",
+      "document_status": "current_supplementary_issuance_ra_12009"
+    }
+  },
+  {
+    "document_name": "GPPB Circular No. 06-2026",
+    "document_type": "gppb_circular",
+    "chunk_text": "4.0 DOCUMENTARY REQUIREMENTS\nSection 4.1 identifies Small Value Procurement as one of the covered modes.\nSection 4.2: The Bids and Awards Committee (BAC) must state in the Request for Quotation (RFQ) or Request for Proposal (RFP) the stage at which documentary requirements must be submitted: submission of offers, evaluation of offers, or before issuance of the Notice of Award.\nSection 4.3.1: Philippine Government Electronic Procurement System (PhilGEPS) Organization ID or PhilGEPS Certificate of Registration (Platinum Membership). The procuring entity must ensure that the supplier's, contractor's, or consultant's membership is not suspended.\nSection 4.3.2: Mayor's Permit or Business Registration Permit. An expired Mayor's Permit with the official receipt for its renewal application is accepted, subject to submission of the valid permit after contract award but before payment. A PhilGEPS Platinum Certificate may be submitted in lieu of specified permits or PhilGEPS Organization ID in procurement modes requiring those documents.\nSection 4.3.5: PCAB License for infrastructure projects, or Special PCAB License for a joint venture.\nSection 4.3.6: Income or Business Tax Return when the A",
+    "metadata": {
+      "source_url": "https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf",
+      "source_authority": "gppb_current_issuance",
+      "document_status": "current_supplementary_issuance_ra_12009"
+    }
+  },
+  {
+    "document_name": "GPPB Circular No. 06-2026",
+    "document_type": "gppb_circular",
+    "chunk_text": "pproved Budget for the Contract (ABC) exceeds PHP 500,000.\nSection 4.3.7: Omnibus Sworn Statement (OSS).\nSection 4.4: If the procuring entity already maintains an updated file of the supplier's, contractor's, or consultant's relevant documents through PhilGEPS or its own records, it may no longer require those documents to be resubmitted.",
+    "metadata": {
+      "source_url": "https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf",
+      "source_authority": "gppb_current_issuance",
+      "document_status": "current_supplementary_issuance_ra_12009"
+    }
+  },
+  {
+    "document_name": "GPPB Circular No. 06-2026",
+    "document_type": "gppb_circular",
+    "chunk_text": "4.7 SMALL VALUE PROCUREMENT DOCUMENT MATRIX\nThe Section 4.7 matrix lists, for Small Value Procurement, the following requirements as applicable to the procurement type:\n- PhilGEPS Organization ID.\n- Mayor's Permit.\n- Professional License/CV for consulting services.\n- PCAB License and registration for infrastructure projects.\n- Income/Business Tax Return for ABCs above PHP 500,000.\n- Omnibus Sworn Statement for ABCs above PHP 50,000.\nThe Section 4.7 matrix does not mark the NFCC computation or committed line of credit (LoC) column as an SVP requirement. Do not import that requirement into SVP from another procurement mode.",
+    "metadata": {
+      "source_url": "https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf",
+      "source_authority": "gppb_current_issuance",
+      "document_status": "current_supplementary_issuance_ra_12009"
+    }
+  },
+  {
+    "document_name": "GPPB Circular No. 06-2026",
+    "document_type": "gppb_circular",
+    "chunk_text": "HOW TO APPLY THIS CIRCULAR\nUse this circular for supplier eligibility-document questions for covered procurement modes. For choosing SVP, its threshold, quotation requests, posting, posting exception, and steps when no quotation is received, consult RA No. 12009 IRR Section 34. The circular supplements the IRR; it does not replace the substantive requirements of Section 34. For an SVP question, cite the exact relevant source separately: IRR Section 34 for the procurement procedure, and Circular No. 06-2026 Sections 3.2, 3.5, 4.2-4.4 and 4.7 for supplementary documentary requirements as applicable.\n\nSOURCE URL: https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf",
+    "metadata": {
+      "source_url": "https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf",
+      "source_authority": "gppb_current_issuance",
+      "document_status": "current_supplementary_issuance_ra_12009"
+    }
+  }
+];
 
 const completeSvpProcedureChunks = [{
   document_name: 'Implementing Rules and Regulations of RA 12009',
