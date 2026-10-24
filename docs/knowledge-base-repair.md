@@ -53,7 +53,7 @@ The actual PDF used for the current Supabase IRR chunks was inspected: `Implemen
 - The PMO Administrative Manual is an institutional procedure source, not legislation. The knowledge-base metadata does not verify its approval/version status, so its procedures should be presented as internal guidance and confirmed with the PMO.
 - Do not answer specific thresholds, quotation counts, posting periods, or forms from memory when the retrieved current source does not establish them.
 - **Known source conflict to flag:** the PMO Administrative Manual contains wording that says to post SVPs with an ABC of “₱200,000 and above,” while Section 34.3(b) of the GPPB-approved RA 12009 IRR says ABCs of ₱200,000 and below do not require posting. For exactly ₱200,000, this is a conflict in the local manual's wording; the official IRR controls, and the institutional manual should be confirmed/corrected by the PMO. Do not silently repeat the internal wording as law.
-- Later GPPB circulars/resolutions must be added as independently versioned sources as they become applicable. In particular, GPPB Resolution No. 05-2025 states that the new standard procurement forms became mandatory on 21 September 2025 and that the three-year transition is reckoned from approval of the forms on 14 May 2025, with full compliance due by 15 May 2028. GPPB Resolution No. 10-2026 / Circular No. 06-2026, published on 19 June 2026, consolidates documentary requirements and relevant guidance for specific RA 12009 procurement modes, including Small Value Procurement. These should be ingested as separately versioned sources rather than folded into the Act or IRR text. See the [GPPB Resolutions list](https://www.gppb.gov.ph/resolutions/) and [Circular No. 06-2026](https://www.gppb.gov.ph/wp-content/uploads/2026/06/Annex-A-Circular-No.-06-2026.pdf).
+- Later GPPB circulars/resolutions must be added as independently versioned sources as they become applicable. In particular, GPPB Resolution No. 05-2025 states that the new standard procurement forms became mandatory on 21 September 2025 and that the three-year transition is reckoned from approval of the forms on 14 May 2025, with full compliance due by 15 May 2028. GPPB Resolution No. 10-2026 / Circular No. 06-2026, published on 19 June 2026, consolidates documentary requirements and relevant guidance for specific RA 12009 procurement modes, including Small Value Procurement. These should be ingested as separately versioned sources rather than folded into the Act or IRR text. See the [GPPB Resolutions list](https://www.gppb.gov.ph/resolutions/) and [Circular No. 06-2026](https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf).
 
 ## After running the repair
 
@@ -82,3 +82,29 @@ npm run test:procurement
 ```
 
 The tests cover subsection mapping, threshold/posting exceptions, the split posting paragraph, historical source selection, internal-versus-legal workflow wording, and the requirement not to hard-code institutional contact answers. Also run `npm run lint` and a full `npx next build` before merging. This working branch has not been merged to `master`.
+
+
+## GPPB Circular No. 06-2026 (current supplementary issuance)
+
+The official source is **GPPB Circular No. 06-2026, Annex A to GPPB Resolution No. 10-2026**, approved 3 February 2026 and published with the annex on 19 June 2026. It applies to State Universities and Colleges under Section 3.1 and forms an appendix to the RA No. 12009 IRR under Resolution No. 10-2026. Use the complete official PDF URL below; the shorter `Annex-A-Circular-No.-06-2026.pdf` filename is not the verified URL for this copy.
+
+Official PDF: https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf
+
+Relevant SVP guidance in Circular No. 06-2026:
+- Section 3.2 says documentary compliance does not replace substantive requirements of the procurement mode under RA No. 12009 and its IRR.
+- Section 3.5 makes the enumerated eligibility documents exclusive; procuring entities must not demand additional eligibility documents under these guidelines.
+- Section 4.2 requires the BAC to state in the RFQ/RFP when the documents are due.
+- Sections 4.3.1–4.3.7 list applicable documents, including PhilGEPS Organization ID/Platinum Membership, Mayor’s/Business Registration Permit, PCAB license for infrastructure, income/business tax return when the ABC exceeds ₱500,000, and the Omnibus Sworn Statement. The professional license/CV requirement is specific to covered consulting services; the matrix in Section 4.7 must be applied by procurement type.
+- Section 4.4 says updated documents already maintained in the procuring entity’s files or PhilGEPS need not be resubmitted.
+- Section 4.7’s SVP matrix also shows the Omnibus Sworn Statement requirement for ABCs above ₱50,000. Do not treat the table as a rule that every document applies identically to every supplier or procurement type.
+
+Do not fold Circular No. 06-2026 into the text or citation of the IRR. Cite its title/sections separately as a current supplementary issuance. The deterministic SVP answers now link both the approved IRR (for Section 34 rules) and Circular No. 06-2026 (for the supplementary supplier-document rules).
+
+## Latest answer-quality regression coverage
+
+The source-gated answer guard now has separate handling for:
+- Detailed Section 34 questions (full threshold, quotations, posting, exception, and no-quotation procedure).
+- A short "which procurement method / what official rule" question (a concise SVP recommendation with an official IRR link and the supplementary circular link).
+- Current PMO Director contact questions (only the verified official MSU-GenSan University Directory chunk and its source URL can support the deterministic answer; unrelated manual/legal chunks are excluded from retrieval for this intent).
+
+The regression tests now check concise-vs-detailed SVP routing, official circular citation/link, historical RA 9184/2016 IRR citation, and suppression of unrelated content in the contact response. After pulling the branch, run `npm run test:procurement`, `npm run lint`, and `npx next build`; full local build checks must still be run on the current branch before merge.
