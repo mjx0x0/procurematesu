@@ -15,16 +15,18 @@ The repair script is deliberately separate from `scripts/ingest-docs.js`. The or
 3. Run a dry run first:
 
    ```bash
-   node scripts/repair-knowledge-base.js
+   node scripts/repair-knowledge-base.js --embeddings-only
    ```
 
-4. Check the reported source counts. If they match the expected missing-embedding/provenance rows, explicitly apply the repair:
+4. Confirm the dry run reports only the expected missing-embedding counts. The read-only count at the time of this update is 408 total missing vectors: 376 IRR chunks, 30 PMO Administrative Manual chunks, one university-directory chunk, and one temporary-relocation-advisory chunk. Recheck the counts at run time.
+
+5. If the counts are as expected and the local `.env.local` points to the intended Supabase project, apply **only the missing embeddings**:
 
    ```bash
-   node scripts/repair-knowledge-base.js --apply
+   node scripts/repair-knowledge-base.js --apply --embeddings-only
    ```
 
-   The script only updates rows whose `embedding` is currently NULL and separately corrects the provenance metadata on the named 2014 LGU manual rows. It does not insert new chunks or delete rows. It uses `Xenova/all-MiniLM-L6-v2`, which matches the existing 384-dimensional embedding model.
+   This option skips the separate metadata/provenance repair. The script updates only rows whose `embedding` is currently NULL; it does not insert new chunks or delete rows. It uses `Xenova/all-MiniLM-L6-v2` and checks for 384 dimensions, matching the existing embedding space.
 
 5. Confirm in Supabase SQL Editor:
 
