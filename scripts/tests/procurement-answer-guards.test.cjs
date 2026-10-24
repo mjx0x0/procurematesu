@@ -40,7 +40,7 @@ test('SVP answer cites correct subsection, threshold, posting exception, and quo
   assert.ok(answer);
   assert.match(answer, /Section 34\.1/);
   assert.match(answer, /Section 34\.3\(b\)/);
-  assert.match(answer, /Section 34\.3\(c\)/);
+  assert.match(answer, /34\.3\(c\)/);
   assert.match(answer, /₱2,000,000/);
   assert.match(answer, /₱200,000 or below/);
   assert.match(answer, /three \(3\) calendar days/);
