@@ -65,3 +65,20 @@ Test at least:
 - A question that has no matching source; the assistant should admit the retrieval gap instead of guessing.
 
 Do not call the test complete merely because embeddings exist. In the current keyword-based implementation, verify source ranking/filtering and answer grounding directly. Separately test vector retrieval if/when that feature is implemented.
+## Retrieval and answer-grounding regression fixes
+
+The chat route now has source-gated deterministic answers for three high-risk, repeatedly tested question types:
+
+- **Small Value Procurement:** only uses the handler when the retrieved context contains the RA 12009 IRR Section 34 threshold/quotation text and posting-rule text. It cites Section 34.1 and 34.3(a)–(g), including the ₱200,000-or-below posting exception, the three-calendar-day posting rule, the at-least-three quotation requests, the one-quotation evaluation rule within the threshold, and the no-quotation deadline-extension limit. The posting rule is Section **34.3(b)**, not Section 50.3.2.
+- **Historical RA 9184 questions:** retrieval is restricted to the RA 9184 and IRR 2016 sources; the response cites the Official Gazette's RA 9184 page and GPPB's 2016 Revised IRR page. IRR 2016 is explicitly recognized as a legacy source and is filtered from ordinary current-law answers.
+- **MSU-Gensan PR workflow:** when the PMO Administrative Manual source supports the key workflow steps, the response identifies these as internal procedures and separates them from national procurement-law requirements.
+
+The retrieval layer also avoids ranking unrelated Negotiated Procurement passages as SVP evidence and avoids labeling the continuation of Section 34.3(b)–(g) with the next Section 35 heading when the source chunker has split the text across records.
+
+Run the source-level regression tests from the repository root:
+
+```bash
+npm run test:procurement
+```
+
+The tests cover subsection mapping, threshold/posting exceptions, the split posting paragraph, historical source selection, internal-versus-legal workflow wording, and the requirement not to hard-code institutional contact answers. Also run `npm run lint` and a full `npx next build` before merging. This working branch has not been merged to `master`.
