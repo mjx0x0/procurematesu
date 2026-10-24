@@ -197,7 +197,8 @@ function generateOfflineProcurementResponse(query: string, retrievedContext: str
 
     if (rankedExcerpts.length) {
       const answer = rankedExcerpts.slice(0, 2).map((item) => takeCompleteSentences(item.part, 900)).join('\n\n');
-      const sourceNote = explicitlyRequestsSources && sources.length
+      const shouldCiteSources = explicitlyRequestsSources || /\b(ra\s*\.?\s*12009|ra\s*\.?\s*9184|law|legal|regulation|irr|threshold|svp|small value|procurement mode|posting|quotation|eligibility|msu|gensan|pmo|purchase request|workflow|approval)\b/i.test(query);
+      const sourceNote = shouldCiteSources && sources.length
         ? '\n\n**Sources:** ' + sources.map(normalizeSourceLabel).join('; ')
         : '';
       return answer + sourceNote;
