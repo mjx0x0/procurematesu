@@ -142,6 +142,10 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         /\b(?:purchase requests?|pr)\b/i.test(query) &&
         /\b(sequence|workflow|process|steps|review|reviewing|approval|approving|offices|procedure)\b/i.test(query) &&
         /\b(msu|gensan|university|pmo|procurement)\b/i.test(query);
+      const asksPmoDirectorContact =
+        /\b(?:mobile|phone|telephone|contact number|number to call)\b/i.test(query) &&
+        /\b(?:director|head|person in charge)\b/i.test(query) &&
+        /\b(?:procurement|pmo|pro)\b/i.test(query);
 
       if (asksSvpDetails) {
         const currentIrr = 'Implementing Rules and Regulations of RA 12009';
@@ -179,6 +183,18 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch(pmoManual, '3. Validation by the PMO Director'),
           scopedPhraseSearch(pmoManual, 'Endorsement to Budget Management Office'),
           scopedPhraseSearch(pmoManual, 'approved Purchase Requests signed by the Chancellor or authorized approving authority')
+        );
+      }
+
+      // A current PMO director phone-number question must be sourced from the
+      // official university directory only, not the operational manual or law.
+      if (asksPmoDirectorContact) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'MSU-GenSan University Directory')
+            .ilike('chunk_text', '%Director:%')
+            .ilike('chunk_text', '%Contact Number:%')
+            .limit(4)
         );
       }
 
@@ -225,6 +241,9 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           );
           const isLegacy = isLegacyProcurementSource(identity);
           const documentName = String(doc.document_name || '');
+
+          // Prevent unrelated laws/manuals from entering contact-question context.
+          if (asksPmoDirectorContact && documentName !== 'MSU-GenSan University Directory') continue;
 
           // Explicit historical questions are source-scoped: only RA 9184 and its
           // 2016 IRR can support the answer. Current RA 12009 excerpts are excluded
