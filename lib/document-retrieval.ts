@@ -78,6 +78,10 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   const supabase = getSupabase();
   type RankedChunk = RetrievedChunk & { score: number };
   const candidates = new Map<string, RankedChunk>();
+  const asksPmoDirectorContact =
+    /\b(?:mobile|phone|telephone|contact number|number to call)\b/i.test(query) &&
+    /\b(?:director|head|person in charge)\b/i.test(query) &&
+    /\b(?:procurement|pmo|pro)\b/i.test(query);
 
   // Expand common procurement/institutional aliases before searching. This makes
   // short questions such as "PRO director" searchable without requiring the user
@@ -142,10 +146,6 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         /\b(?:purchase requests?|pr)\b/i.test(query) &&
         /\b(sequence|workflow|process|steps|review|reviewing|approval|approving|offices|procedure)\b/i.test(query) &&
         /\b(msu|gensan|university|pmo|procurement)\b/i.test(query);
-      const asksPmoDirectorContact =
-        /\b(?:mobile|phone|telephone|contact number|number to call)\b/i.test(query) &&
-        /\b(?:director|head|person in charge)\b/i.test(query) &&
-        /\b(?:procurement|pmo|pro)\b/i.test(query);
 
       if (asksSvpDetails) {
         const currentIrr = 'Implementing Rules and Regulations of RA 12009';
@@ -292,7 +292,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const asksInstitutional = /\b(msu|gensan|university|pmo|pro|procurement office|department|chancellor|budget office|purchase request|pr|workflow|process|approval|logbook|director|contact|office)\b/i.test(query);
           if (asksLegal && isCurrentProcurementLawSource(identity)) score += 24;
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
-          if (asksSvpDetails && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 35;
+          if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \\(3\\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
+          else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\\. 06-2026/i.test(identity)) score += 12;
           if (asksPurchaseRequestWorkflow && /receipt of purchase request|validation by the pmo director|budget management office|approved prs signed by the chancellor/i.test(text)) score += 40;
           if (/generic government procurement manual|government procurement manual volume|good procurement manual/i.test(identity)) score -= 8;
           if (isLegacy && asksAboutLegacyRules(query)) score += 2;
