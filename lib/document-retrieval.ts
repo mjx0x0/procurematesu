@@ -321,7 +321,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     .slice(0, limit);
 
   // Local fallback only when the database does not provide a relevant chunk.
-  if (ranked.length === 0) {
+  if (ranked.length === 0 && !asksPmoDirectorContact) {
     const localText = searchLocalDocs(query, limit);
     if (localText) {
       ranked.push({
