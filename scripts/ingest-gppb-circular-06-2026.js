@@ -8,7 +8,8 @@ const SOURCE_URL = 'https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_
 const SOURCE_TITLE = 'GPPB Circular No. 06-2026 (Annex A to Resolution No. 10-2026)';
 const DOCUMENT_NAME = 'GPPB Circular No. 06-2026';
 const DOCUMENT_TYPE = 'gppb_circular';
-const SOURCE_FILE = path.join(process.cwd(), 'data', 'gppb_circular_06_2026.txt');
+const SOURCE_FILE_LABEL = 'data/gppb_circular_06_2026.txt';
+const SOURCE_FILE = path.join(process.cwd(), SOURCE_FILE_LABEL);
 const EMBEDDING_MODEL = 'Xenova/all-MiniLM-L6-v2';
 const EXPECTED_DIMENSIONS = 384;
 const MAX_CHUNK_CHARS = 1200;
@@ -89,7 +90,7 @@ async function main() {
     metadata: {
       source_url: SOURCE_URL,
       source_title: SOURCE_TITLE,
-      source_file: 'data/gppb_circular_06_2026.txt',
+      source_file: SOURCE_FILE_LABEL,
       source_authority: 'gppb_current_issuance',
       document_status: 'current_supplementary_issuance_ra_12009',
       publication_date: '2026-06-19',
@@ -121,18 +122,26 @@ async function main() {
   }
 
   const expectedIds = new Set(prepared.map((row) => row.id));
-  const unexpectedExistingIds = matchingRows.filter((row) => !expectedIds.has(row.id));
-  if (unexpectedExistingIds.length) {
+  const unknownSourceRows = matchingRows.filter((row) =>
+    !row.metadata || row.metadata.source_file !== SOURCE_FILE_LABEL
+  );
+  if (unknownSourceRows.length) {
     throw new Error(
-      'Found ' + unexpectedExistingIds.length + ' row(s) for this official source with unexpected IDs. No changes made; inspect them before ingesting to avoid duplicate chunks.'
+      'Found ' + unknownSourceRows.length + ' row(s) for this official source that do not identify ' +
+      SOURCE_FILE_LABEL + ' as their source_file. No changes made; inspect them before ingesting.'
     );
   }
+  // If curated source text changes, only the affected deterministic chunk IDs
+  // become stale. Keep replacement scoped to this exact official URL and file,
+  // upsert the revised rows first, then remove the superseded rows.
+  const staleRows = matchingRows.filter((row) => !expectedIds.has(row.id));
 
   console.log('ProcureMateSU — official GPPB Circular 06-2026 ingestion');
   console.log('Source: ' + SOURCE_URL);
   console.log('Mode: ' + (APPLY ? 'APPLY (upsert deterministic IDs)' : 'DRY RUN (no database writes)'));
   console.log('Prepared text chunks: ' + prepared.length);
   console.log('Existing matching chunks: ' + matchingRows.length);
+  console.log('Superseded chunks from prior versions of this source: ' + staleRows.length);
   console.log('Chunks to create or refresh: ' + prepared.length);
 
   if (!APPLY) {
@@ -164,6 +173,17 @@ async function main() {
     .upsert(rows, { onConflict: 'id' });
 
   if (upsertError) throw upsertError;
+
+  for (const staleRow of staleRows) {
+    const { error: deleteError } = await supabase
+      .from('document_chunks')
+      .delete()
+      .eq('id', staleRow.id)
+      .eq('document_name', DOCUMENT_NAME)
+      .contains('metadata', { source_url: SOURCE_URL });
+    if (deleteError) throw deleteError;
+    console.log('Removed superseded chunk from this exact source: ' + staleRow.id);
+  }
 
   const { count: totalCount, error: countError } = await supabase
     .from('document_chunks')
