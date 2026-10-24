@@ -4,6 +4,7 @@ require('dotenv').config({ path: '.env.local' });
 const EMBEDDING_MODEL = 'Xenova/all-MiniLM-L6-v2';
 const EXPECTED_DIMENSIONS = 384;
 const APPLY = process.argv.includes('--apply');
+const EMBEDDINGS_ONLY = process.argv.includes('--embeddings-only');
 const BATCH_SIZE = 6;
 
 function requireEnv(name) {
@@ -62,13 +63,14 @@ async function main() {
 
   console.log('ProcureMateSU knowledge-base repair');
   console.log(`Mode: ${APPLY ? 'APPLY CHANGES' : 'DRY RUN (no database changes)'}`);
+  console.log(`Repair scope: ${EMBEDDINGS_ONLY ? 'EMBEDDINGS ONLY' : 'EMBEDDINGS + LEGACY SOURCE PROVENANCE'}`);
   console.log(`Rows missing embeddings: ${missingCount || 0}`);
-  console.log(`Legacy-manual provenance records to correct: ${rowsToRepair.length}`);
+  console.log(`Legacy-manual provenance records to correct: ${EMBEDDINGS_ONLY ? 'SKIPPED' : rowsToRepair.length}`);
   console.log('Missing embeddings by source:');
   console.log(JSON.stringify(missingBySource, null, 2));
 
   if (!APPLY) {
-    console.log('\nDry run complete. Review these counts, then run with --apply to make changes.');
+    console.log(`\nDry run complete. Review these counts, then run with --apply${EMBEDDINGS_ONLY ? ' --embeddings-only' : ''} to make changes.`);
     return;
   }
 
@@ -128,10 +130,13 @@ async function main() {
   let provenanceUpdated = 0;
   let provenanceFailures = 0;
 
-  // The ingestion file is named ra12009.txt, but its contents are the 2014
-  // Local Government Units Procurement Manual under the RA 9184 framework.
-  // Preserve the ingestion path separately from the original source document.
-  for (const batch of inBatches(rowsToRepair, BATCH_SIZE)) {
+  // This is a separate provenance fix; skip it when the operator explicitly
+  // requests embeddings only.
+  if (!EMBEDDINGS_ONLY) {
+    // The ingestion file is named ra12009.txt, but its contents are the 2014
+    // Local Government Units Procurement Manual under the RA 9184 framework.
+    // Preserve the ingestion path separately from the original source document.
+    for (const batch of inBatches(rowsToRepair, BATCH_SIZE)) {
     const results = await Promise.all(batch.map(async (row) => {
       try {
         const { data: latestRow, error: latestError } = await supabase
@@ -165,8 +170,9 @@ async function main() {
       }
     }));
 
-    provenanceUpdated += results.filter(Boolean).length;
-    provenanceFailures += results.filter((success) => !success).length;
+      provenanceUpdated += results.filter(Boolean).length;
+      provenanceFailures += results.filter((success) => !success).length;
+    }
   }
 
   console.log('\nRepair summary');
