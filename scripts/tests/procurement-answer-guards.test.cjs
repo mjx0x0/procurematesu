@@ -293,6 +293,16 @@ test('exact Professional License/CV comparison prompt returns the ambiguity answ
   assert.doesNotMatch(answer, /Threshold — Section 34\.1/);
 });
 
+test('specific Professional License/CV intent abstains when official Circular excerpts are missing', () => {
+  const query = 'For an SUC using Small Value Procurement (SVP) under RA No. 12009, is a Professional License or CV required for every consulting-services procurement? Compare Sections 4.3.3 and 4.7 of GPPB Circular No. 06-2026, explain any inconsistency between them, and state what the procurement office should do before treating this document as a mandatory requirement. Cite the relevant sections and official source.';
+  const answer = buildVerifiedProcurementAnswer(query, completeSvpProcedureChunks);
+  assert.ok(answer);
+  assert.match(answer, /can’t verify this procurement rule/i);
+  assert.match(answer, /Sections 4\\.3\\.3 and 4\\.7/);
+  assert.ok(answer.includes(circularSourceUrl));
+  assert.doesNotMatch(answer, /Threshold — Section 34\\.1/);
+});
+
 test('document-resubmission question cites current Circular Section 4.4, not historical RA 9184', () => {
   const query = 'Can a supplier avoid resubmitting documents already submitted to the procuring entity if those documents are still valid and up to date? Cite the official provision.';
   const answer = buildVerifiedProcurementAnswer(query, [...circularChunks, ...historicalChunks]);
