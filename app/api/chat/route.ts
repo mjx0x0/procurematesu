@@ -945,7 +945,7 @@ function buildDraftCompletionResponse(
 }
 
 // ============================================================
-// VERIFIED INSTITUTIONAL FACTS
+// INSTITUTIONAL FACT ANSWERS MUST BE RETRIEVED FROM CURRENT SOURCES
 // ============================================================
 
 // Institutional facts are intentionally not hard-coded here. The normal retrieval
