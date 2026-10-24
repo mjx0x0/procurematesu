@@ -138,6 +138,13 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
       // candidate set before ranking.
       const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
         || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query));
+      const asksSvpDocumentaryRequirements = asksSvpDetails
+        && /\b(?:documentary requirements?|eligibility documents?|supplier documents?|documents? (?:to check|to submit|required|should be checked)|document checklist)\b/i.test(query);
+      const asksCircularResubmission =
+        /\b(?:resubmit(?:ting)?|re-submi(?:t|tting)|re-submission|submit again|resubmission)\b/i.test(query)
+        && /\b(?:documents?|requirements?|already submitted|updated file|valid|up to date|current)\b/i.test(query);
+      const asksNoSvpQuotation = asksSvpDetails
+        && /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b/i.test(query);
       const asksHistoricalRa9184 =
         /\b9184\b/i.test(query) &&
         /\b(?:before|prior to|previous(?:ly)?|historical(?:ly)?|history|old law|former|applied under)\b/i.test(query) &&
@@ -156,6 +163,24 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch(currentIrr, 'The BAC shall prepare and send the RFQs or RFPs'),
           scopedPhraseSearch(currentIrr, 'Abstract of Quotations or Ratings'),
           scopedPhraseSearch(currentIrr, 'in case no price quotation is received')
+        );
+      }
+
+      if (asksNoSvpQuotation) {
+        const currentIrr = 'Implementing Rules and Regulations of RA 12009';
+        searches.push(
+          scopedPhraseSearch(currentIrr, 'in case no price quotation is received from the suppliers'),
+          scopedPhraseSearch(currentIrr, 'extension shall not go beyond the validity of the corresponding appropriations')
+        );
+      }
+
+      // Retrieve all chunks for this short, specifically named official circular;
+      // broad term searches may otherwise select an obsolete historical eligibility rule.
+      if (asksSvpDocumentaryRequirements || asksCircularResubmission) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'GPPB Circular No. 06-2026')
+            .limit(20)
         );
       }
 
@@ -292,8 +317,13 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const asksInstitutional = /\b(msu|gensan|university|pmo|pro|procurement office|department|chancellor|budget office|purchase request|pr|workflow|process|approval|logbook|director|contact|office)\b/i.test(query);
           if (asksLegal && isCurrentProcurementLawSource(identity)) score += 24;
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
-          if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
-          else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\. 06-2026/i.test(identity)) score += 12;
+          if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \\(3\\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
+          else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\\. 06-2026/i.test(identity)) score += 12;
+          if ((asksSvpDocumentaryRequirements || asksCircularResubmission)
+            && documentName === 'GPPB Circular No. 06-2026') score += 100;
+          if (asksNoSvpQuotation
+            && documentName === 'Implementing Rules and Regulations of RA 12009'
+            && /in case no price quotation is received from the suppliers/i.test(text)) score += 100;
           if (asksPurchaseRequestWorkflow && /receipt of purchase request|validation by the pmo director|budget management office|approved prs signed by the chancellor/i.test(text)) score += 40;
           if (/generic government procurement manual|government procurement manual volume|good procurement manual/i.test(identity)) score -= 8;
           if (isLegacy && asksAboutLegacyRules(query)) score += 2;
@@ -317,9 +347,14 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     }
   }
 
+  const resultLimit = asksSvpDocumentaryRequirements
+    ? Math.max(limit, 10)
+    : (asksCircularResubmission || asksNoSvpQuotation)
+      ? Math.max(limit, 8)
+      : limit;
   const ranked = Array.from(candidates.values())
     .sort((a, b) => b.score - a.score)
-    .slice(0, limit);
+    .slice(0, resultLimit);
 
   // Local fallback only when the database does not provide a relevant chunk.
   if (ranked.length === 0 && !asksPmoDirectorContact) {
