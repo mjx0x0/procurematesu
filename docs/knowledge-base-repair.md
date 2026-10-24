@@ -28,7 +28,7 @@ The repair script is deliberately separate from `scripts/ingest-docs.js`. The or
 
    This option skips the separate metadata/provenance repair. The script updates only rows whose `embedding` is currently NULL; it does not insert new chunks or delete rows. It uses `Xenova/all-MiniLM-L6-v2` and checks for 384 dimensions, matching the existing embedding space.
 
-5. Confirm in Supabase SQL Editor:
+6. Confirm in Supabase SQL Editor:
 
    ```sql
    select document_name, count(*) as missing_embeddings
@@ -38,7 +38,7 @@ The repair script is deliberately separate from `scripts/ingest-docs.js`. The or
    order by document_name;
    ```
 
-   An empty result means no chunks have NULL embeddings. Also inspect the source metadata for `Local Government Units Procurement Manual (2014)` and confirm `source_file` points to `LocalGovUnitsProcManual.pdf` while `ingestion_file` is `data/ra12009.txt`.
+   An empty result means no chunks have NULL embeddings. Because this run uses `--embeddings-only`, it intentionally does not change the separate legacy-manual provenance metadata.
 
 ## Verified IRR edition (checked 24 October 2026)
 
