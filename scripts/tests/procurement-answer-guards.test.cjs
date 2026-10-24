@@ -263,7 +263,11 @@ test('SVP documentary answer uses the exclusive Circular 06-2026 checklist and s
   assert.match(answer, /exceeds ₱500,000/);
   assert.match(answer, /exceeds ₱50,000/);
   assert.match(answer, /Section 34\.3\(d\)/);
-  assert.match(answer, /at least three qualified suppliers/i);
+  assert.match(answer, /Section 34\.3\(a\)/);
+  assert.match(answer, /Technical Specifications, Scope of Work, Terms of Reference/i);
+  assert.match(answer, /Abstract of Quotations or Ratings/i);
+  assert.match(answer, /BAC recommends to the HoPE/i);
+  assert.match(answer, /at least three suppliers/i);
   assert.match(answer, /₱200,000 or below/);
   assert.doesNotMatch(answer, /SEC registration|BIR certificate|market survey|price-comparison sheet|posting-exception justification/i);
   assert.ok(answer.includes(circularSourceUrl));
