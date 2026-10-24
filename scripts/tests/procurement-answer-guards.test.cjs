@@ -130,7 +130,7 @@ test('current PMO director contact answer uses only verified official directory 
     },
     {
       document_name: 'MSU-GenSan University Directory',
-      chunk_text: 'OFFICIAL INSTITUTIONAL REFERENCE — PROCUREMENT MANAGEMENT OFFICE\\nDirector: Assoc. Prof. Nelson P. Benares, Jr.\\nContact Number: +63 908 810 5634\\nUse this institutional reference for questions such as: who is the director?',
+      chunk_text: 'OFFICIAL INSTITUTIONAL REFERENCE — PROCUREMENT MANAGEMENT OFFICE\nDirector: Assoc. Prof. Nelson P. Benares, Jr.\nContact Number: +63 908 810 5634\nUse this institutional reference for questions such as: who is the director?',
       metadata: { source_url: 'https://msugensan.edu.ph/about/university-directory/', verified_at: '2026-10-03' },
     },
   ]);
@@ -147,7 +147,7 @@ test('contact answer abstains when directory provenance is not verified', () => 
   assert.equal(buildVerifiedProcurementAnswer(query, [
     {
       document_name: 'MSU-GenSan University Directory',
-      chunk_text: 'Director: Assoc. Prof. Nelson P. Benares, Jr.\\nContact Number: +63 908 810 5634',
+      chunk_text: 'Director: Assoc. Prof. Nelson P. Benares, Jr.\nContact Number: +63 908 810 5634',
       metadata: { source_url: 'https://example.com/guessed-directory' },
     },
   ]), null);
