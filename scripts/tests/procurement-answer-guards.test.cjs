@@ -79,7 +79,7 @@ const circularChunks = [
   {
     "document_name": "GPPB Circular No. 06-2026",
     "document_type": "gppb_circular",
-    "chunk_text": "4.7 SMALL VALUE PROCUREMENT DOCUMENT MATRIX\nThe Section 4.7 matrix lists, for Small Value Procurement, the following requirements as applicable to the procurement type:\n- PhilGEPS Organization ID.\n- Mayor's Permit.\n- Professional License/CV for consulting services.\n- PCAB License and registration for infrastructure projects.\n- Income/Business Tax Return for ABCs above PHP 500,000.\n- Omnibus Sworn Statement for ABCs above PHP 50,000.\nThe Section 4.7 matrix does not mark the NFCC computation or committed line of credit (LoC) column as an SVP requirement. Do not import that requirement into SVP from another procurement mode.",
+    "chunk_text": "4.7 SMALL VALUE PROCUREMENT DOCUMENT MATRIX\nThe Section 4.7 matrix lists, for Small Value Procurement, the following requirements as applicable to the procurement type:\n- PhilGEPS Organization ID.\n- Mayor's Permit.\n- Professional License/CV for consulting services. Section 4.3.3 describes the Professional License or Curriculum Vitae requirement for consulting services procured through Take-over of Contracts or Highly Technical Consultants. These provisions appear inconsistent as applied to SVP; seek authoritative GPPB clarification before treating this as an unequivocal SVP requirement.\n- PCAB License and registration for infrastructure projects.\n- Income/Business Tax Return for ABCs above PHP 500,000.\n- Omnibus Sworn Statement for ABCs above PHP 50,000.\nThe Section 4.7 matrix does not mark the NFCC computation or committed line of credit (LoC) column as an SVP requirement. Do not import that requirement into SVP from another procurement mode.",
     "metadata": {
       "source_url": "https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf",
       "source_authority": "gppb_current_issuance",
@@ -258,7 +258,12 @@ test('SVP documentary answer uses the exclusive Circular 06-2026 checklist and s
   assert.match(answer, /exclusive/i);
   assert.match(answer, /PhilGEPS Organization ID/);
   assert.match(answer, /Mayor’s Permit or Business Registration Permit/);
-  assert.match(answer, /Professional License or CV/);
+  assert.ok(answer.includes('Professional License/CV for consulting services — clarification required'));
+  assert.ok(answer.includes('Section 4.3.3'));
+  assert.ok(answer.includes('Take-over of Contracts or Highly Technical Consultants'));
+  assert.match(answer, /appear inconsistent as applied to SVP/i);
+  assert.match(answer, /GPPB clarification/i);
+  assert.doesNotMatch(answer, /for consulting services, as shown in the SVP matrix/i);
   assert.match(answer, /PCAB License/);
   assert.match(answer, /exceeds ₱500,000/);
   assert.match(answer, /exceeds ₱50,000/);
@@ -271,6 +276,18 @@ test('SVP documentary answer uses the exclusive Circular 06-2026 checklist and s
   assert.match(answer, /₱200,000 or below/);
   assert.doesNotMatch(answer, /SEC registration|BIR certificate|market survey|price-comparison sheet|posting-exception justification/i);
   assert.ok(answer.includes(circularSourceUrl));
+});
+
+test('SVP Professional License/CV answer flags the Circular 4.3.3 versus 4.7 inconsistency', () => {
+  const query = 'For an SUC using SVP, what documentary requirement applies to consulting services, and how do Sections 4.3.3 and 4.7 interact?';
+  const answer = buildVerifiedProcurementAnswer(query, [...circularChunks, ...completeSvpProcedureChunks]);
+  assert.ok(answer);
+  assert.ok(answer.includes('Section 4.3.3'));
+  assert.ok(answer.includes('Section 4.7'));
+  assert.ok(answer.includes('Take-over of Contracts or Highly Technical Consultants'));
+  assert.match(answer, /appear inconsistent as applied to SVP/i);
+  assert.match(answer, /seek authoritative GPPB clarification/i);
+  assert.doesNotMatch(answer, /unequivocally required for every SVP consulting procurement/i);
 });
 
 test('document-resubmission question cites current Circular Section 4.4, not historical RA 9184', () => {
