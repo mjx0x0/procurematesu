@@ -44,6 +44,7 @@ test('SVP answer cites correct subsection, threshold, posting exception, and quo
   assert.match(answer, /three \(3\) calendar days/);
   assert.match(answer, /not beyond the validity of the corresponding appropriations/);
   assert.doesNotMatch(answer, /Section 50\.3\.2/);
+  assert.match(answer, /https:\/\/www\.gppb\.gov\.ph\/wp-content\/uploads\/2025\/02\/IRR-of-RA-No\.-12009\.pdf/);
 });
 
 test('paraphrased small-purchase question is recognized as SVP', () => {
