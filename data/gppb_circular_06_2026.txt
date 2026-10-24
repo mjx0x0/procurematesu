@@ -27,7 +27,7 @@ Section 4.4: If the procuring entity already maintains an updated file of the su
 The Section 4.7 matrix lists, for Small Value Procurement, the following requirements as applicable to the procurement type:
 - PhilGEPS Organization ID.
 - Mayor's Permit.
-- Professional License/CV for consulting services.
+- Professional License/CV (Consulting): Section 4.7's SVP matrix marks this item. However, Section 4.3.3 describes the Professional License or Curriculum Vitae requirement for consulting services procured through Take-over of Contracts or Highly Technical Consultants. These provisions appear inconsistent as applied to SVP. Do not assume this is an unequivocal requirement for every SVP consulting procurement; seek authoritative GPPB clarification before requiring it on that basis.
 - PCAB License and registration for infrastructure projects.
 - Income/Business Tax Return for ABCs above PHP 500,000.
 - Omnibus Sworn Statement for ABCs above PHP 50,000.
