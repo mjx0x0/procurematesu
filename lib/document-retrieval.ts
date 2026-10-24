@@ -133,7 +133,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
       // candidate set before ranking.
       const asksSvpDetails = /\b(small value procurement|svp)\b/i.test(query);
       const asksPurchaseRequestWorkflow =
-        /\b(purchase requests?|\bpr\b)\b/i.test(query) &&
+        /\b(?:purchase requests?|pr)\b/i.test(query) &&
         /\b(sequence|workflow|process|steps|review|reviewing|approval|approving|offices|procedure)\b/i.test(query) &&
         /\b(msu|gensan|university|pmo|procurement)\b/i.test(query);
 
@@ -154,7 +154,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch(pmoManual, '1. Receipt of Purchase Request'),
           scopedPhraseSearch(pmoManual, '3. Validation by the PMO Director'),
           scopedPhraseSearch(pmoManual, 'Endorsement to Budget Management Office'),
-          scopedPhraseSearch(pmoManual, 'Receipt of Approved PRs signed by the Chancellor')
+          scopedPhraseSearch(pmoManual, 'approved Purchase Requests signed by the Chancellor or authorized approving authority')
         );
       }
 
