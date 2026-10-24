@@ -348,8 +348,11 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     }
   }
 
+  // The documentary answer is intentionally cross-source: retain the six
+  // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
+  // quotations, posting, and the no-quotation exception independently.
   const resultLimit = asksSvpDocumentaryRequirements
-    ? Math.max(limit, 10)
+    ? Math.max(limit, 16)
     : (asksCircularResubmission || asksNoSvpQuotation)
       ? Math.max(limit, 8)
       : limit;
