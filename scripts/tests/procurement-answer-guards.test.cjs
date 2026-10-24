@@ -71,6 +71,17 @@ test('historical RA 9184 question cites RA 9184 and its own 2016 IRR', () => {
   assert.doesNotMatch(answer, /Section 5 of RA No\. 12009/);
 });
 
+test('explicit historical SVP question does not receive the current-law SVP template', () => {
+  const query = 'What was the Small Value Procurement threshold under RA 9184 before RA 12009? Explain as historical information.';
+  const answer = buildVerifiedProcurementAnswer(query, [
+    ...historicalChunks,
+    ...svpChunks,
+  ]);
+  assert.ok(answer);
+  assert.match(answer, /Historical procurement framework/);
+  assert.doesNotMatch(answer, /Small Value Procurement \(SVP\) under RA No\. 12009/);
+});
+
 test('historical RA 9184 answer abstains without both historical source types', () => {
   assert.equal(buildVerifiedProcurementAnswer(
     'What procurement law applied under RA 9184 before RA 12009? Historical information.',
