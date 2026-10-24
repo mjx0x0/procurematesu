@@ -98,17 +98,36 @@ const circularChunks = [
   }
 ];
 
-const completeSvpProcedureChunks = [{
-  document_name: 'Implementing Rules and Regulations of RA 12009',
-  chunk_text: [
-    'Section 34. Small Value Procurement. 34.1: For eligible Goods not available from PS-DBM, Infrastructure Projects, and Consulting Services, the threshold is Two Million Pesos (₱2,000,000.00); the Procuring Entity shall request submission of at least three (3) price quotations; receipt of one (1) quotation is sufficient to proceed with the evaluation of bidders.',
-    '34.3(a): The End-User or Implementing Unit submits a request containing the technical specifications or Scope of Work, Terms of Reference when applicable, ABC, and other terms and conditions.',
-    '34.3(c): The BAC shall prepare and send RFQs/RFPs to at least three (3) suppliers, contractors, or consultants of known qualifications. Receipt of one (1) quotation is sufficient to proceed with the evaluation of bidders.',
-    '34.3(b): Except for ABCs of ₱200,000.00 and below, which shall not require posting, the RFQ or RFP shall be posted for a period of three (3) calendar days on the PhilGEPS website.',
-    '34.3(d): In case no price quotation is received from the suppliers, the Procuring Entity may extend the deadline for submission of price quotation until receipt of at least a single price quotation, but the extension shall not go beyond the validity of the corresponding appropriations.',
-    '34.3(f)–(g): After the deadline, an Abstract of Quotations or Ratings is prepared and the BAC recommends award to the HoPE under the applicable rule.',
-  ].join('\n'),
-}];
+const completeSvpProcedureChunks = [
+  {
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    chunk_text: 'Section 34. Small Value Procurement. 34.1: For eligible Goods not available from PS-DBM, Infrastructure Projects, and Consulting Services, the threshold is Two Million Pesos (₱2,000,000.00); the Procuring Entity shall request submission of at least three (3) price quotations; receipt of one (1) quotation is sufficient to proceed with the evaluation of bidders.',
+  },
+  {
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    chunk_text: '34.3(a): The End-User or Implementing Unit submits a request containing the technical specifications or Scope of Work, Terms of Reference when applicable, ABC, and other terms and conditions.',
+  },
+  {
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    chunk_text: '34.3(c): The BAC shall prepare and send RFQs/RFPs to at least three (3) suppliers, contractors, or consultants of known qualifications. Receipt of one (1) quotation is sufficient to proceed with the evaluation of bidders.',
+  },
+  {
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    chunk_text: '34.3(b): Except for ABCs of ₱200,000.00 and below, which shall not require posting, the RFQ or RFP shall be posted for a period of three (3) calendar days on the PhilGEPS website.',
+  },
+  {
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    chunk_text: '34.3(d): In case no price quotation is received from the suppliers, the Procuring Entity may extend the deadline for submission of price quotation until receipt of at least a single price quotation,',
+  },
+  {
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    chunk_text: 'but the extension shall not go beyond the validity of the corresponding appropriations.',
+  },
+  {
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    chunk_text: '34.3(f)–(g): After the deadline, an Abstract of Quotations or Ratings is prepared and the BAC recommends award to the HoPE under the applicable rule.',
+  },
+];
 
 test('SVP answer cites correct subsection, threshold, posting exception, and quotation safeguards', () => {
   const query = 'According to the RA 12009 IRR, explain SVP threshold, quotation requirements, posting and exceptions.';
