@@ -59,7 +59,7 @@ const circularChunks = [
   {
     "document_name": "GPPB Circular No. 06-2026",
     "document_type": "gppb_circular",
-    "chunk_text": "4.0 DOCUMENTARY REQUIREMENTS\nSection 4.1 identifies Small Value Procurement as one of the covered modes.\nSection 4.2: The Bids and Awards Committee (BAC) must state in the Request for Quotation (RFQ) or Request for Proposal (RFP) the stage at which documentary requirements must be submitted: submission of offers, evaluation of offers, or before issuance of the Notice of Award.\nSection 4.3.1: Philippine Government Electronic Procurement System (PhilGEPS) Organization ID or PhilGEPS Certificate of Registration (Platinum Membership). The procuring entity must ensure that the supplier's, contractor's, or consultant's membership is not suspended.\nSection 4.3.2: Mayor's Permit or Business Registration Permit. An expired Mayor's Permit with the official receipt for its renewal application is accepted, subject to submission of the valid permit after contract award but before payment. A PhilGEPS Platinum Certificate may be submitted in lieu of specified permits or PhilGEPS Organization ID in procurement modes requiring those documents.\nSection 4.3.5: PCAB License for infrastructure projects, or Special PCAB License for a joint venture.\nSection 4.3.6: Income or Business Tax Return when the A",
+    "chunk_text": "4.0 DOCUMENTARY REQUIREMENTS\nSection 4.1 identifies Small Value Procurement as one of the covered modes.\nSection 4.2: The Bids and Awards Committee (BAC) must state in the Request for Quotation (RFQ) or Request for Proposal (RFP) the stage at which documentary requirements must be submitted: submission of offers, evaluation of offers, or before issuance of the Notice of Award.\nSection 4.3.1: Philippine Government Electronic Procurement System (PhilGEPS) Organization ID or PhilGEPS Certificate of Registration (Platinum Membership). Section 4.3.1(a): The procuring entity must ensure that the supplier's, contractor's, or consultant's PhilGEPS membership is not suspended. Section 4.3.1(b): Where the procuring entity accepts PhilGEPS Red Membership, the supplier may submit a printed copy of the Merchant Details from PhilGEPS corresponding to its PhilGEPS Organization Identification (ID).\nSection 4.3.2: Mayor's Permit or Business Registration Permit. An expired Mayor's Permit with the official receipt for its renewal application is accepted, subject to submission of the valid permit after contract award but before payment. A PhilGEPS Platinum Certificate may be submitted in lieu of specified permits or PhilGEPS Organization ID in procurement modes requiring those documents.\nSection 4.3.5: PCAB License for infrastructure projects, or Special PCAB License for a joint venture.\nSection 4.3.6: Income or Business Tax Return when the A",
     "metadata": {
       "source_url": "https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf",
       "source_authority": "gppb_current_issuance",
@@ -275,7 +275,11 @@ test('SVP documentary answer uses the exclusive Circular 06-2026 checklist and s
   assert.match(answer, /at least three suppliers/i);
   assert.match(answer, /₱200,000 or below/);
   assert.match(answer, /Red Membership/i);
+  assert.match(answer, /where the procuring entity accepts PhilGEPS Red Membership/i);
   assert.match(answer, /Merchant Details/i);
+  assert.match(answer, /Section 4\.4/);
+  assert.match(answer, /already maintains an updated file/i);
+  assert.match(answer, /may no longer require that requirement to be resubmitted/i);
   assert.doesNotMatch(answer, /SEC registration|BIR certificate|market survey|price-comparison sheet|posting-exception justification/i);
   assert.ok(answer.includes(circularSourceUrl));
 });
