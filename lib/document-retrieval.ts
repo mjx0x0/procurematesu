@@ -83,6 +83,16 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:director|head|person in charge)\b/i.test(query) &&
     /\b(?:procurement|pmo|pro)\b/i.test(query);
 
+  const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
+    || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query));
+  const asksSvpDocumentaryRequirements = asksSvpDetails
+    && /\b(?:documentary requirements?|eligibility documents?|supplier documents?|documents? (?:to check|to submit|required|should be checked)|document checklist)\b/i.test(query);
+  const asksCircularResubmission =
+    /\b(?:resubmit(?:ting)?|re-submi(?:t|tting)|re-submission|submit again|resubmission)\b/i.test(query)
+    && /\b(?:documents?|requirements?|already submitted|updated file|valid|up to date|current)\b/i.test(query);
+  const asksNoSvpQuotation = asksSvpDetails
+    && /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b/i.test(query);
+
   // Expand common procurement/institutional aliases before searching. This makes
   // short questions such as "PRO director" searchable without requiring the user
   // to know the exact office name used in the source documents.
@@ -136,15 +146,6 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
       // query returns only its first few matches. Add source-scoped searches for
       // known high-risk question types so the authoritative section enters the
       // candidate set before ranking.
-      const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
-        || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query));
-      const asksSvpDocumentaryRequirements = asksSvpDetails
-        && /\b(?:documentary requirements?|eligibility documents?|supplier documents?|documents? (?:to check|to submit|required|should be checked)|document checklist)\b/i.test(query);
-      const asksCircularResubmission =
-        /\b(?:resubmit(?:ting)?|re-submi(?:t|tting)|re-submission|submit again|resubmission)\b/i.test(query)
-        && /\b(?:documents?|requirements?|already submitted|updated file|valid|up to date|current)\b/i.test(query);
-      const asksNoSvpQuotation = asksSvpDetails
-        && /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b/i.test(query);
       const asksHistoricalRa9184 =
         /\b9184\b/i.test(query) &&
         /\b(?:before|prior to|previous(?:ly)?|historical(?:ly)?|history|old law|former|applied under)\b/i.test(query) &&
