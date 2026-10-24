@@ -90,6 +90,11 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   const asksCircularResubmission =
     /\b(?:resubmit(?:ting)?|re-submi(?:t|tting)|re-submission|submit again|resubmission)\b/i.test(query)
     && /\b(?:documents?|requirements?|already submitted|updated file|valid|up to date|current)\b/i.test(query);
+  const asksCircularLicenseCvAmbiguity =
+    /\b(?:small value procurement|svp)\b/i.test(query)
+    && /professional\s+license|curriculum vitae|\bcv\b/i.test(query)
+    && /consulting/i.test(query)
+    && /section\s*4\.3\.3|section\s*4\.7|inconsisten|for every|mandatory|compare/i.test(query);
   const asksNoSvpQuotation = asksSvpDetails
     && /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b/i.test(query);
 
@@ -177,7 +182,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
 
       // Retrieve all chunks for this short, specifically named official circular;
       // broad term searches may otherwise select an obsolete historical eligibility rule.
-      if (asksSvpDocumentaryRequirements || asksCircularResubmission) {
+      if (asksSvpDocumentaryRequirements || asksCircularResubmission || asksCircularLicenseCvAmbiguity) {
         searches.push(
           supabase.from('document_chunks').select(selectedColumns)
             .eq('document_name', 'GPPB Circular No. 06-2026')
@@ -320,7 +325,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
           else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\. 06-2026/i.test(identity)) score += 12;
-          if ((asksSvpDocumentaryRequirements || asksCircularResubmission)
+          if ((asksSvpDocumentaryRequirements || asksCircularResubmission || asksCircularLicenseCvAmbiguity)
             && documentName === 'GPPB Circular No. 06-2026') score += 1000;
           if (asksNoSvpQuotation
             && documentName === 'Implementing Rules and Regulations of RA 12009'
@@ -353,7 +358,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // quotations, posting, and the no-quotation exception independently.
   const resultLimit = asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
-    : (asksCircularResubmission || asksNoSvpQuotation)
+    : (asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation)
       ? Math.max(limit, 8)
       : limit;
   const ranked = Array.from(candidates.values())
