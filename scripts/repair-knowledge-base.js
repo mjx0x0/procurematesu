@@ -142,7 +142,7 @@ async function main() {
         if (latestError) throw latestError;
 
         const metadata = {
-          ...((latestRow?.metadata as Record<string, unknown> | null) || row.metadata || {}),
+          ...(latestRow?.metadata || row.metadata || {}),
           source_file: 'LocalGovUnitsProcManual.pdf',
           ingestion_file: 'data/ra12009.txt',
           source_title: 'Local Government Units Procurement Manual (2014)',
