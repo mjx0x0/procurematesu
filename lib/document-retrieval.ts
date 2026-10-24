@@ -226,7 +226,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     const localText = searchLocalDocs(query, limit);
     if (localText) {
       ranked.push({
-        document_name: 'RA 12009 / MSU Procurement Guidelines (System Verified)',
+        document_name: 'Local reference excerpts (source labels included below)',
         document_type: 'local_reference',
         chunk_text: localText,
         source_type: 'local_fallback',
