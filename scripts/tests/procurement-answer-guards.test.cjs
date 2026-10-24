@@ -190,8 +190,8 @@ test('SVP documentary answer uses the exclusive Circular 06-2026 checklist and s
   const query = 'For an SUC using Small Value Procurement under RA 12009, what documentary requirements should be checked? Distinguish the requirements in GPPB Circular No. 06-2026 from the actual SVP procedure under Section 34 of the IRR.';
   const answer = buildVerifiedProcurementAnswer(query, [...circularChunks, ...completeSvpProcedureChunks]);
   assert.ok(answer);
-  assert.match(answer, /Circular No\\. 06-2026/);
-  assert.match(answer, /Section 3\\.5/);
+  assert.match(answer, /Circular No\. 06-2026/);
+  assert.match(answer, /Section 3\.5/);
   assert.match(answer, /exclusive/i);
   assert.match(answer, /PhilGEPS Organization ID/);
   assert.match(answer, /Mayor’s Permit or Business Registration Permit/);
@@ -199,7 +199,7 @@ test('SVP documentary answer uses the exclusive Circular 06-2026 checklist and s
   assert.match(answer, /PCAB License/);
   assert.match(answer, /exceeds ₱500,000/);
   assert.match(answer, /exceeds ₱50,000/);
-  assert.match(answer, /Section 34\\.3\\(d\\)/);
+  assert.match(answer, /Section 34\.3\(d\)/);
   assert.match(answer, /at least three qualified suppliers/i);
   assert.match(answer, /₱200,000 or below/);
   assert.doesNotMatch(answer, /SEC registration|BIR certificate|market survey|price-comparison sheet|posting-exception justification/i);
@@ -210,23 +210,23 @@ test('document-resubmission question cites current Circular Section 4.4, not his
   const query = 'Can a supplier avoid resubmitting documents already submitted to the procuring entity if those documents are still valid and up to date? Cite the official provision.';
   const answer = buildVerifiedProcurementAnswer(query, [...circularChunks, ...historicalChunks]);
   assert.ok(answer);
-  assert.match(answer, /GPPB Circular No\\. 06-2026, Section 4\\.4/);
+  assert.match(answer, /GPPB Circular No\. 06-2026, Section 4\.4/);
   assert.match(answer, /updated file/i);
   assert.match(answer, /may no longer require those documents to be resubmitted|may no longer require its re-submission/i);
   assert.ok(answer.includes(circularSourceUrl));
-  assert.doesNotMatch(answer, /Revised Implementing Rules and Regulations of RA No\\. 9184|Section 8\\.5\\.2/);
+  assert.doesNotMatch(answer, /Revised Implementing Rules and Regulations of RA No\. 9184|Section 8\.5\.2/);
 });
 
 test('no-quotation question answers directly from current IRR Section 34.3(d)', () => {
   const query = 'Under the current RA 12009 IRR, what happens if the procuring entity receives no quotations for an SVP procurement? Explain the applicable rule and cite the correct subsection.';
   const answer = buildVerifiedProcurementAnswer(query, completeSvpProcedureChunks);
   assert.ok(answer);
-  assert.match(answer, /Section 34\\.3\\(d\\)/);
+  assert.match(answer, /Section 34\.3\(d\)/);
   assert.match(answer, /may extend the deadline/i);
   assert.match(answer, /until it receives at least one quotation/i);
   assert.match(answer, /must not go beyond the validity of the corresponding appropriations/i);
-  assert.match(answer, /Section 34\\.3\\(c\\)/);
-  assert.match(answer, /IRR-of-RA-No\\.-12009\\.pdf/);
+  assert.match(answer, /Section 34\.3\(c\)/);
+  assert.match(answer, /IRR-of-RA-No\.-12009\.pdf/);
 });
 
 test('specific documentary and no-quotation intents fail closed when their official excerpts are absent', () => {
@@ -234,7 +234,7 @@ test('specific documentary and no-quotation intents fail closed when their offic
   const documentaryAnswer = buildVerifiedProcurementAnswer(documentaryQuery, completeSvpProcedureChunks);
   assert.ok(documentaryAnswer);
   assert.match(documentaryAnswer, /cannot safely provide an SVP document checklist/i);
-  assert.match(documentaryAnswer, /Circular No\\. 06-2026/);
+  assert.match(documentaryAnswer, /Circular No\. 06-2026/);
 
   const noQuotationQuery = 'What happens if the procuring entity receives no quotations for an SVP procurement?';
   const noQuotationAnswer = buildVerifiedProcurementAnswer(noQuotationQuery, [
@@ -242,7 +242,7 @@ test('specific documentary and no-quotation intents fail closed when their offic
   ]);
   assert.ok(noQuotationAnswer);
   assert.match(noQuotationAnswer, /can’t verify this procurement rule/i);
-  assert.match(noQuotationAnswer, /Section 34\\.3\\(d\\)/);
+  assert.match(noQuotationAnswer, /Section 34\.3\(d\)/);
 });
 
 test('Circular Section 4.4 answer abstains without exact official source provenance', () => {
@@ -254,5 +254,5 @@ test('Circular Section 4.4 answer abstains without exact official source provena
   }]);
   assert.ok(answer);
   assert.match(answer, /can’t verify this procurement rule/i);
-  assert.match(answer, /GPPB Circular No\\. 06-2026, Section 4\\.4/);
+  assert.match(answer, /GPPB Circular No\. 06-2026, Section 4\.4/);
 });
