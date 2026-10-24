@@ -42,11 +42,11 @@ function metadataField(metadata: Record<string, unknown> | undefined, keys: stri
 }
 
 function sourceIdentity(documentName: string, documentType: string, metadata?: Record<string, unknown>): string {
-  return [
-    documentName,
-    documentType,
-    metadataField(metadata, ['source_file', 'original_file', 'source_title', 'document_title', 'source_authority', 'authority', 'document_status']),
-  ].join(' ').toLowerCase();
+  const metadataIdentity = [
+    'source_file', 'original_file', 'source_title', 'document_title',
+    'source_authority', 'authority', 'document_status',
+  ].map((key) => metadataField(metadata, [key])).filter(Boolean).join(' ');
+  return [documentName, documentType, metadataIdentity].join(' ').toLowerCase();
 }
 
 function asksAboutLegacyRules(query: string): boolean {
@@ -195,7 +195,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const asksInstitutional = /\b(msu|gensan|university|pmo|pro|procurement office|department|chancellor|budget office|purchase request|pr|workflow|process|approval|logbook|director|contact|office)\b/i.test(query);
           if (asksLegal && isCurrentProcurementLawSource(identity)) score += 24;
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
-          if (/generic government procurement manual|government procurement manual volume|good procurement manual/i.test(identity)) score -= 5;
+          if (/generic government procurement manual|government procurement manual volume|good procurement manual/i.test(identity)) score -= 8;
           if (isLegacy && asksAboutLegacyRules(query)) score += 2;
 
           const key = String(doc.id || text.slice(0, 120));
