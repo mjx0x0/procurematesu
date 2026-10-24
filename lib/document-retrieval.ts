@@ -58,7 +58,8 @@ function isLegacyProcurementSource(identity: string): boolean {
   if (/\bra\s*\.?\s*12009\b|new government procurement act|implementing rules and regulations.{0,40}12009/i.test(identity)) {
     return false;
   }
-  return /\bra\s*\.?\s*9184\b|local government units procurement manual|2016.{0,20}irr|legacy_ra_9184_reference|historical_reference_not_current/i.test(identity);
+  // The stored document label is "IRR 2016", so recognize both word orders.
+  return /\bra\s*\.?\s*9184\b|local government units procurement manual|\birr\s*2016\b|2016.{0,20}irr|legacy_ra_9184_reference|historical_reference_not_current/i.test(identity);
 }
 
 function isCurrentProcurementLawSource(identity: string): boolean {
@@ -131,7 +132,12 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
       // query returns only its first few matches. Add source-scoped searches for
       // known high-risk question types so the authoritative section enters the
       // candidate set before ranking.
-      const asksSvpDetails = /\b(small value procurement|svp)\b/i.test(query);
+      const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
+        || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query));
+      const asksHistoricalRa9184 =
+        /\b9184\b/i.test(query) &&
+        /\b(?:before|prior to|previous(?:ly)?|historical(?:ly)?|history|old law|former|applied under)\b/i.test(query) &&
+        /\b12009\b|\bhistorical(?:ly)?\b|\bprevious(?:ly)?\b|\bformer\b/i.test(query);
       const asksPurchaseRequestWorkflow =
         /\b(?:purchase requests?|pr)\b/i.test(query) &&
         /\b(sequence|workflow|process|steps|review|reviewing|approval|approving|offices|procedure)\b/i.test(query) &&
@@ -141,10 +147,28 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         const currentIrr = 'Implementing Rules and Regulations of RA 12009';
         searches.push(
           scopedPhraseSearch(currentIrr, 'Section 34. Small Value Procurement'),
+          scopedPhraseSearch(currentIrr, '34.3 Under this mode of procurement'),
           scopedPhraseSearch(currentIrr, 'shall not require posting'),
           scopedPhraseSearch(currentIrr, 'The BAC shall prepare and send the RFQs or RFPs'),
           scopedPhraseSearch(currentIrr, 'Abstract of Quotations or Ratings'),
           scopedPhraseSearch(currentIrr, 'in case no price quotation is received')
+        );
+      }
+
+      // An explicit "before RA 12009 / historical RA 9184" question must retrieve
+      // the old Act and its own IRR, rather than using a section of the new IRR
+      // that merely mentions the former law.
+      if (asksHistoricalRa9184) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'RA 9184')
+            .ilike('chunk_text', '%Government Procurement Reform Act%').limit(4),
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'IRR 2016')
+            .ilike('chunk_text', '%Revised Implementing Rules and Regulations%').limit(4),
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'IRR 2016')
+            .ilike('chunk_text', '%Section 1%').limit(4)
         );
       }
 
@@ -200,9 +224,24 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
             metadata
           );
           const isLegacy = isLegacyProcurementSource(identity);
-          // Historical RA 9184 material should not outrank current rules unless
-          // the user explicitly asks about RA 9184, older guidance, or transition.
+          const documentName = String(doc.document_name || '');
+
+          // Explicit historical questions are source-scoped: only RA 9184 and its
+          // 2016 IRR can support the answer. Current RA 12009 excerpts are excluded
+          // even when they mention the predecessor law.
+          if (asksHistoricalRa9184 && !['RA 9184', 'IRR 2016'].includes(documentName)) continue;
+
+          // On ordinary/current-law questions, exclude historical documents unless
+          // the user explicitly asks for history, comparison, or transition.
           if (isLegacy && !asksAboutLegacyRules(query)) continue;
+
+          // SVP questions should not be diluted with negotiated-procurement or
+          // unrelated chunks that happen to mention suppliers/quotations.
+          if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009') {
+            const isSvpSectionText =
+              /Section\s+34\.\s+Small Value Procurement|\b34\.1\b|\b34\.3\b|shall not require posting|Abstract of Quotations or Ratings|in case no price quotation is received|The BAC shall prepare and send the RFQs or RFPs/i.test(text);
+            if (!isSvpSectionText) continue;
+          }
 
           const haystack = `${doc.document_name || ''} ${text}`.toLowerCase();
           let score = 0;
@@ -280,7 +319,17 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   const sources = Array.from(new Set(chunks.map(c => c.document_name).filter(Boolean)));
   const formattedContext = chunks
     .map((chunk, index) => {
-      const section = metadataField(chunk.metadata, ['section', 'section_number', 'section_title', 'article', 'article_title', 'heading']);
+      let section = metadataField(chunk.metadata, ['section', 'section_number', 'section_title', 'article', 'article_title', 'heading']);
+      // PDF paragraph-aware chunking can attach a trailing Section 34.3(c)-(g)
+      // continuation to metadata for the next section (Section 35). Do not surface
+      // that following heading as the citation for the preceding SVP rules.
+      if (
+        /^Section\s*35\b/i.test(section) &&
+        /(?:shall not require posting|The BAC shall prepare and send the RFQs or RFPs|Abstract of Quotations or Ratings|in case no price quotation is received)/i.test(chunk.chunk_text) &&
+        /Section\s*35\.\s*Negotiated Procurement/i.test(chunk.chunk_text)
+      ) {
+        section = '34.3(b)-(g), Small Value Procurement (text preceding Section 35 heading)';
+      }
       const page = metadataField(chunk.metadata, ['pdf_page', 'page_number', 'page', 'page_no', 'page_num', 'source_page', 'page_start']);
       const location = [
         section ? `section/article: ${section}` : '',
