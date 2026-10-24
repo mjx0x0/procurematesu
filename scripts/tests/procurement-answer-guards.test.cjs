@@ -14,7 +14,11 @@ const svpChunks = [
   },
   {
     document_name: 'Implementing Rules and Regulations of RA 12009',
-    chunk_text: '34.3(b) Except for those with ABCs equal to Two Hundred Thousand Pesos (₱200,000.00) and below which shall not require posting, RFQ or RFP shall be posted for a period of three (3) calendar days.',
+    chunk_text: '34.3(b) Except for those with ABCs equal to Two Hundred Thousand Pesos (₱200,000.00) and below which shall not require posting, RFQ or RFP shall be posted for a period of three (3)',
+  },
+  {
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    chunk_text: 'calendar days on the PhilGEPS website, website of the Procuring Entity if available, and at a conspicuous place.',
   },
 ];
 
