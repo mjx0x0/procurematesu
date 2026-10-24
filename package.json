@@ -4,7 +4,9 @@
     "dev": "next dev -p 3000 -H 0.0.0.0",
     "build": "NODE_ENV=production next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test:procurement": "node --test scripts/tests/procurement-answer-guards.test.cjs",
+    "ingest:gppb-circular-06-2026": "node scripts/ingest-gppb-circular-06-2026.js"
   },
   "dependencies": {
     "@google/genai": "^2.21.0",

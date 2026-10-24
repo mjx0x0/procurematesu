@@ -18,7 +18,7 @@ function loadLocalChunks(): DocChunk[] {
   const filesToLoad = [
     { file: 'procurement_manual.txt', label: 'MSU-GenSan PMO Operations Manual' },
     { file: 'new_ra12009.txt', label: 'Republic Act No. 12009 (New Government Procurement Act)' },
-    { file: 'ra12009.txt', label: 'Government Procurement Guidelines (RA 12009 / RA 9184)' },
+    { file: 'ra12009.txt', label: 'Local Government Units Procurement Manual (2014) — historical RA 9184 reference' },
   ];
 
   for (const { file, label } of filesToLoad) {
@@ -77,18 +77,28 @@ function loadLocalChunks(): DocChunk[] {
   return chunks;
 }
 
+function isLegacySourceLabel(source: string): boolean {
+  return /local government units procurement manual|ra\s*\.?\s*9184|2016.{0,20}irr|legacy_ra_9184_reference/i.test(source);
+}
+
+function asksAboutLegacyRules(query: string): boolean {
+  return /\bra\s*\.?\s*9184\b|\b9184\b|2016\s*(revised\s*)?irr|transition|transitory|transitional|legacy|previous law|old procurement/i.test(query);
+}
+
 export function searchProcurementKnowledge(query: string, limit: number = 3): string {
-  const chunks = loadLocalChunks();
+  const allChunks = loadLocalChunks();
+  if (!allChunks.length) return '';
+
+  const asksLegacy = asksAboutLegacyRules(query);
+  const chunks = allChunks.filter(chunk => asksLegacy || !isLegacySourceLabel(chunk.source));
   if (!chunks.length) return '';
 
   const cleanQuery = query.toLowerCase().replace(/[^\w\s]/g, ' ');
   const keywords = cleanQuery.split(/\s+/).filter(w => w.length > 2 && !['what', 'when', 'where', 'which', 'about', 'how', 'the', 'and', 'for', 'are', 'with', 'from', 'this', 'that', 'can', 'you', 'please', 'tell'].includes(w));
 
-  if (!keywords.length) {
-    // Return key overview sections
-    const overview = chunks.slice(0, limit);
-    return overview.map(c => `[${c.source} - ${c.title}]\n${c.content}`).join('\n\n---\n\n');
-  }
+  // A retrieval request with no meaningful search terms is not evidence that
+  // an overview passage answers the user's question.
+  if (!keywords.length) return '';
 
   const scored = chunks.map(chunk => {
     let score = 0;
@@ -111,6 +121,12 @@ export function searchProcurementKnowledge(query: string, limit: number = 3): st
     if (query.match(/pr|purchase request/i) && textLower.includes('purchase request')) score += 10;
     if (query.match(/threshold/i) && textLower.includes('threshold')) score += 10;
     if (query.match(/msu|gensan/i) && (textLower.includes('mindanao state') || textLower.includes('msu'))) score += 10;
+
+    const asksLegal = /\b(ra\s*\.?\s*12009|ra\s*\.?\s*9184|law|legal|regulation|irr|threshold|svp|small value|bidding|procurement mode|section|article|deadline|posting|quotation|eligibility)\b/i.test(query);
+    const asksInstitutional = /\b(msu|gensan|university|pmo|pro|procurement office|chancellor|budget office|purchase request|pr|workflow|process|approval|logbook|director|office)\b/i.test(query);
+    if (asksLegal && /ra no\.? 12009|ra 12009|new government procurement act/i.test(chunk.source)) score += 18;
+    if (asksInstitutional && /msu.*pmo|pmo operations manual|administrative manual/i.test(chunk.source)) score += 14;
+    if (isLegacySourceLabel(chunk.source) && asksLegacy) score += 2;
 
     return { chunk, score };
   });
