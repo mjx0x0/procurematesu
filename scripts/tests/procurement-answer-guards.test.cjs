@@ -274,6 +274,8 @@ test('SVP documentary answer uses the exclusive Circular 06-2026 checklist and s
   assert.match(answer, /BAC recommends to the HoPE/i);
   assert.match(answer, /at least three suppliers/i);
   assert.match(answer, /₱200,000 or below/);
+  assert.match(answer, /Red Membership/i);
+  assert.match(answer, /Merchant Details/i);
   assert.doesNotMatch(answer, /SEC registration|BIR certificate|market survey|price-comparison sheet|posting-exception justification/i);
   assert.ok(answer.includes(circularSourceUrl));
 });
@@ -298,9 +300,9 @@ test('specific Professional License/CV intent abstains when official Circular ex
   const answer = buildVerifiedProcurementAnswer(query, completeSvpProcedureChunks);
   assert.ok(answer);
   assert.match(answer, /can’t verify this procurement rule/i);
-  assert.match(answer, /Sections 4\\.3\\.3 and 4\\.7/);
+  assert.match(answer, /Sections 4\.3\.3 and 4\.7/);
   assert.ok(answer.includes(circularSourceUrl));
-  assert.doesNotMatch(answer, /Threshold — Section 34\\.1/);
+  assert.doesNotMatch(answer, /Threshold — Section 34\.1/);
 });
 
 test('document-resubmission question cites current Circular Section 4.4, not historical RA 9184', () => {
