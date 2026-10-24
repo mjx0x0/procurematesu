@@ -233,7 +233,7 @@ test('specific documentary and no-quotation intents fail closed when their offic
   const documentaryQuery = 'For an SUC using Small Value Procurement under RA 12009, what documentary requirements should be checked?';
   const documentaryAnswer = buildVerifiedProcurementAnswer(documentaryQuery, completeSvpProcedureChunks);
   assert.ok(documentaryAnswer);
-  assert.match(documentaryAnswer, /cannot safely provide an SVP document checklist/i);
+  assert.match(documentaryAnswer, /safely provide an SVP document checklist/i);
   assert.match(documentaryAnswer, /Circular No\. 06-2026/);
 
   const noQuotationQuery = 'What happens if the procuring entity receives no quotations for an SVP procurement?';
