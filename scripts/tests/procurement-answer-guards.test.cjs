@@ -278,16 +278,19 @@ test('SVP documentary answer uses the exclusive Circular 06-2026 checklist and s
   assert.ok(answer.includes(circularSourceUrl));
 });
 
-test('SVP Professional License/CV answer flags the Circular 4.3.3 versus 4.7 inconsistency', () => {
-  const query = 'For an SUC using SVP, what documentary requirement applies to consulting services, and how do Sections 4.3.3 and 4.7 interact?';
+test('exact Professional License/CV comparison prompt returns the ambiguity answer, not generic Section 34 procedure', () => {
+  const query = 'For an SUC using Small Value Procurement (SVP) under RA No. 12009, is a Professional License or CV required for every consulting-services procurement? Compare Sections 4.3.3 and 4.7 of GPPB Circular No. 06-2026, explain any inconsistency between them, and state what the procurement office should do before treating this document as a mandatory requirement. Cite the relevant sections and official source.';
   const answer = buildVerifiedProcurementAnswer(query, [...circularChunks, ...completeSvpProcedureChunks]);
   assert.ok(answer);
-  assert.ok(answer.includes('Section 4.3.3'));
-  assert.ok(answer.includes('Section 4.7'));
-  assert.ok(answer.includes('Take-over of Contracts or Highly Technical Consultants'));
-  assert.match(answer, /appear inconsistent as applied to SVP/i);
+  assert.match(answer, /Professional License\/CV for SVP consulting services/i);
+  assert.match(answer, /Section 4\.7[’']s SVP documentary matrix marks/i);
+  assert.match(answer, /Section 4\.3\.3 describes/i);
+  assert.match(answer, /Take-over of Contracts or Highly Technical Consultants/);
+  assert.match(answer, /appear inconsistent/i);
   assert.match(answer, /seek authoritative GPPB clarification/i);
-  assert.doesNotMatch(answer, /unequivocally required for every SVP consulting procurement/i);
+  assert.match(answer, /Sections 4\.3\.3 and 4\.7/);
+  assert.match(answer, /https:\/\/www\.gppb\.gov\.ph\/wp-content\/uploads\/2026\/06\/Approved_GPPB-Resolution-No\.\-10-2026-Documentary-Requirements\.pdf/);
+  assert.doesNotMatch(answer, /Threshold — Section 34\.1/);
 });
 
 test('document-resubmission question cites current Circular Section 4.4, not historical RA 9184', () => {
