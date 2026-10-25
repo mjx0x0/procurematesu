@@ -94,7 +94,7 @@ const loadUsers = useCallback(async () => {
             onClick={loadUsers}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-stone-200 bg-white text-xs font-bold text-stone-700 hover:bg-stone-50 transition-colors shadow-xs"
           >
-            <RefreshCw className="h-3.5 w-3.5 text-[#F5AB26]" /> Refresh Accounts
+            <RefreshCw className="h-3.5 w-3.5 text-[#C27803]" /> Refresh Accounts
           </button>
         </div>
 

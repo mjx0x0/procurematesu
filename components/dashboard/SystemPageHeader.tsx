@@ -108,14 +108,14 @@ export function SystemPageHeader({
             <b className={`block truncate ${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} font-black leading-tight tracking-tight text-[#4D002C]`}>
               {compactOnMobile && (
                 <span className="sm:hidden">
-                  {mobileTitlePrimary ?? titlePrimary} <span className="text-[#F5AB26]">{mobileTitleAccent ?? titleAccent}</span>
+                  {mobileTitlePrimary ?? titlePrimary} <span className="text-[#C27803]">{mobileTitleAccent ?? titleAccent}</span>
                 </span>
               )}
               <span className={compactOnMobile ? "hidden sm:inline" : ""}>
-                {titlePrimary} <span className="text-[#F5AB26]">{titleAccent}</span>
+                {titlePrimary} <span className="text-[#C27803]">{titleAccent}</span>
               </span>
             </b>
-            {workspaceLabel && <p className="truncate text-[10px] font-bold uppercase tracking-wider text-[#F5AB26]">{workspaceLabel}</p>}
+            {workspaceLabel && <p className="truncate text-[10px] font-bold uppercase tracking-wider text-[#C27803]">{workspaceLabel}</p>}
           </div>
         </div>
         <div className={`flex shrink-0 items-center justify-end ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-2 sm:gap-3"}`}>
@@ -139,7 +139,7 @@ export function SystemPageHeader({
                 </div>
                 {showAdminPortal && (
                   <Link href="/admin" onClick={() => setAccountMenuOpen(false)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-stone-700 transition hover:bg-stone-50 hover:text-[#7B0046]">
-                    <ShieldCheck className="h-4 w-4 text-[#F5AB26]" />
+                    <ShieldCheck className="h-4 w-4 text-[#C27803]" />
                     <span>Admin Portal</span>
                   </Link>
                 )}

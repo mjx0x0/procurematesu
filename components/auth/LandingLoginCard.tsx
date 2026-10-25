@@ -213,12 +213,12 @@ export default function LandingLoginCard() {
 
           <div className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-stone-50/80 px-4 py-3">
             <div className="flex min-w-0 items-start gap-2">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#F5AB26]" />
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#C27803]" />
               <p className="text-xs leading-relaxed text-stone-600">
                 <span className="font-bold text-stone-700">New account?</span> Registration requires administrator approval.
               </p>
             </div>
-            <Link href="/auth/signup" className="shrink-0 text-xs font-extrabold text-[#7B0046] hover:text-[#4D002C] underline decoration-[#F5AB26] underline-offset-2">
+            <Link href="/auth/signup" className="shrink-0 text-xs font-extrabold text-[#7B0046] hover:text-[#4D002C] underline decoration-[#C27803] underline-offset-2">
               Register
             </Link>
           </div>
@@ -235,7 +235,7 @@ export default function LandingLoginCard() {
             className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#FAF8F5]/98 backdrop-blur-md px-4 selection:bg-[#7B0046] selection:text-amber-200"
           >
             {/* Decorative top accent */}
-            <div className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
+            <div className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#4D002C] via-[#C27803] to-[#7B0046]" />
 
             <motion.div
               initial={{ scale: 0.92, opacity: 0, y: 12 }}
@@ -245,15 +245,15 @@ export default function LandingLoginCard() {
             >
               {/* Pulsing University Seal with Gold Aura */}
               <div className="relative mb-6">
-                <div className="absolute -inset-2 rounded-full bg-[#F5AB26]/25 blur-xl animate-pulse" />
-                <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-white p-3 shadow-[0_20px_40px_rgba(77,0,44,0.18)] border border-[#F5AB26]/40">
+                <div className="absolute -inset-2 rounded-full bg-[#C27803]/25 blur-xl animate-pulse" />
+                <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-white p-3 shadow-[0_20px_40px_rgba(77,0,44,0.18)] border border-[#C27803]/40">
                   <MsuLogo size={56} />
                 </div>
               </div>
 
               {/* Text */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4D002C]/10 text-[#4D002C] text-[10px] font-black tracking-wider uppercase mb-2">
-                <Sparkles className="h-3 w-3 text-[#F5AB26]" />
+                <Sparkles className="h-3 w-3 text-[#C27803]" />
                 Institutional Authentication
               </div>
               <h3 className="text-xl font-black text-[#4D002C] tracking-tight">

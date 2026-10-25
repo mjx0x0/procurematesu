@@ -118,9 +118,10 @@ export default function PRDetailPage() {
       const processStage = stage.stage_key
         ? PROCUREMENT_STAGES.find((item) => item.key === stage.stage_key)
         : PROCUREMENT_STAGES.find((item) => item.label === cleanedName || item.shortLabel === cleanedName);
+      const isDraft = stage.stage_key === "draft" || cleanedName.toLowerCase() === "draft";
       return {
         key: processStage?.key || stage.stage_key || cleanedName.toLowerCase().replace(/[^a-z0-9]+/g, "_"),
-        number: processStage?.number || 999,
+        number: isDraft ? 0 : (processStage?.number ?? 999),
         label: processStage?.label || cleanedName,
       };
     };
@@ -276,7 +277,6 @@ export default function PRDetailPage() {
         <div className="pr-timeline bg-white rounded-xl p-6 shadow-sm border border-stone-200 mt-8 mb-8 print:hidden">
           <div className="flex items-end justify-between gap-4 pb-4 mb-5 border-b border-stone-200">
             <div>
-              <p className="text-[9px] font-bold tracking-[0.24em] uppercase text-[#F5AB26] mb-1">MSU • PROCUREMENT FLOW</p>
               <h3 className="font-bold text-[#4D002C] flex items-center gap-2"><Clock className="h-5 w-5 text-[#7B0046]" />Processing Timeline</h3>
             </div>
             <div className="hidden sm:flex items-center gap-2 rounded-full border border-[#D8C58E] bg-[#FBF7EA] px-3 py-1.5 text-[9px] font-extrabold tracking-[0.16em] text-[#8E6A08] uppercase">
@@ -325,7 +325,7 @@ export default function PRDetailPage() {
                             <div className="space-y-1.5">
                               {group.remarks.map((remark) => (
                                 <div key={remark.id} className="flex items-start gap-2 text-xs text-stone-600">
-                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F5AB26]" />
+                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#C27803]" />
                                   <div className="min-w-0 flex-1">
                                     <span className="leading-relaxed">{remark.remarks || remark.notes || "No remarks provided."}</span>
                                     <span className="ml-2 text-[10px] text-stone-400">{new Date(remark.completed_at).toLocaleString()}</span>

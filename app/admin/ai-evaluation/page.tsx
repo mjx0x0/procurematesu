@@ -137,7 +137,7 @@ useEffect(() => {
 
         <section className="ui-card overflow-hidden">
           <div className="px-5 py-4 border-b border-stone-200 bg-stone-50/50 flex items-center gap-2 font-bold text-[#4D002C]">
-            <ShieldCheck className="h-4 w-4 text-[#F5AB26]" />
+            <ShieldCheck className="h-4 w-4 text-[#C27803]" />
             <span>Evaluation History</span>
           </div>
           <div className="divide-y divide-stone-100">

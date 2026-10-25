@@ -59,7 +59,7 @@ export function MsuLogo({ className = "", size = 120, showText = false }: MsuLog
           <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C] leading-tight">
             Mindanao State University
           </h2>
-          <p className="text-xs font-semibold text-[#F5AB26] tracking-widest uppercase mt-0.5">
+          <p className="text-xs font-semibold text-[#C27803] tracking-widest uppercase mt-0.5">
             General Santos City
           </p>
         </div>

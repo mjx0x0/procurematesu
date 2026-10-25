@@ -116,13 +116,13 @@ const displayName = user?.user_metadata?.full_name || "Requisitioner";
       </SystemPageHeader>
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
-        <section className="relative overflow-hidden rounded-[24px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-5 sm:p-12 md:p-14 shadow-[0_18px_45px_rgba(77,0,44,.12)]">
+        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-6 sm:p-8 md:p-9 text-white shadow-[0_16px_40px_rgba(74,0,42,0.12)]">
           <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 -bottom-20 h-64 w-64 rounded-full bg-[#7B0046]/35 blur-3xl" />
           <div className="relative">
-            <div>
-
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-white">Good day, {displayName}.</h1>
-              <p className="mt-2.5 max-w-[850px] text-xs sm:text-sm leading-relaxed text-white/80">Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.</p>
+            <div className="max-w-2xl">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white">Good day, {displayName}.</h1>
+              <p className="mt-2 text-xs sm:text-sm leading-relaxed text-white/85">Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.</p>
             </div>
           </div>
         </section>

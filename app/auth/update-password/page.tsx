@@ -51,7 +51,7 @@ export default function UpdatePasswordPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="text-2xl font-bold text-[#4D002C]">Procuremate<span className="text-[#F5AB26]">SU</span></span>
+            <span className="text-2xl font-bold text-[#4D002C]">Procuremate<span className="text-[#C27803]">SU</span></span>
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Update Password</h2>
           <p className="text-gray-600 mt-2">Enter your new password</p>

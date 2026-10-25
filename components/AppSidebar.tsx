@@ -116,7 +116,7 @@ export default function AppSidebar({ mode }: AppSidebarProps) {
               title={label}
               className={`flex min-w-0 min-h-[60px] flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-center transition-colors ${active ? "text-[#7B0046]" : "text-stone-500 hover:text-[#7B0046]"}`}
             >
-              <span className={`flex h-7 w-9 items-center justify-center rounded-xl transition-colors ${active ? "bg-[#7B0046]/10 text-[#7B0046] ring-1 ring-[#F5AB26]/40" : "text-stone-500"}`}>
+              <span className={`flex h-7 w-9 items-center justify-center rounded-xl transition-colors ${active ? "bg-[#7B0046]/10 text-[#7B0046] ring-1 ring-[#C27803]/40" : "text-stone-500"}`}>
                 <Icon className="h-4 w-4" aria-hidden="true" />
               </span>
               <span className="max-w-full break-words text-[9px] font-bold leading-tight tracking-tight">{label}</span>

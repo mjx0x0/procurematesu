@@ -9,8 +9,8 @@
   --msu-maroon-deep: #4D002C;
   --msu-maroon-dark: #380020;
   --msu-maroon-soft: #8E0052;
-  --msu-gold: #F5AB26;
-  --msu-gold-bright: #F5AB26;
+  --msu-gold: #C27803;
+  --msu-gold-bright: #D98205;
   --msu-gold-soft: #E7CF78;
   --paper: #F8F6F4;
   --surface: #FFFFFF;
@@ -134,7 +134,7 @@ select:-webkit-autofill {
 
 button, a { -webkit-tap-highlight-color: transparent; }
 button { font-family: inherit; }
-button:focus-visible, a:focus-visible { outline: 2.5px solid #F5AB26; outline-offset: 2px; }
+button:focus-visible, a:focus-visible { outline: 2.5px solid #C27803; outline-offset: 2px; }
 button:not(:disabled) { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 

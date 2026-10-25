@@ -384,7 +384,7 @@ const formatDate = (date: string) => {
               </div>
 
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-[#F5AB26] font-bold mb-1.5">Isko BidDo AI Response</p>
+                <p className="text-[11px] uppercase tracking-wider text-[#C27803] font-bold mb-1.5">Isko BidDo AI Response</p>
                 <div className="p-3.5 bg-amber-50/40 rounded-xl border border-amber-200/80 text-sm text-stone-900 whitespace-pre-wrap leading-relaxed">
                   {selectedInquiry.bot_response || "No response recorded"}
                 </div>

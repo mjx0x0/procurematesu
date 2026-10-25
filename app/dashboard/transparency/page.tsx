@@ -36,18 +36,27 @@ export default function TransparencyPage() {
       <SystemPageHeader titlePrimary="Transparency" titleAccent="Board" icon={ShieldCheck} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl px-4 sm:px-6" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <section className="bg-gradient-to-br from-[#4D002C] via-[#7B0046] to-[#610037] rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-sm mb-6">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-amber-200 bg-white/10 border border-white/10 rounded-full px-3 py-1.5 mb-4">
-              <ShieldCheck className="h-3.5 w-3.5" /> Public Procurement Information
+        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-6 sm:p-8 md:p-9 text-white shadow-[0_16px_40px_rgba(74,0,42,0.12)] mb-6">
+          <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 -bottom-20 h-64 w-64 rounded-full bg-[#7B0046]/35 blur-3xl" />
+          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
+            <div className="max-w-2xl">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
+                MSU-Gensan Procurement Transparency
+              </h1>
+              <p className="mt-2 text-xs sm:text-sm text-white/85 leading-relaxed">
+                Explore publicly listed procurement projects of Mindanao State University - General Santos, organized by year and project category.
+              </p>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">MSU-Gensan Procurement Transparency</h1>
-            <p className="text-sm sm:text-base text-white/80 mt-2 leading-relaxed">
-              Explore publicly listed procurement projects of Mindanao State University - General Santos, organized by year and project category.
-            </p>
-            <div className="flex flex-wrap gap-3 mt-5">
-              <a href={TRANSPARENCY_SOURCE_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-white text-[#7B0046] px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-amber-50 transition-colors">
-                Official MSU-Gensan Bidding Documents <ExternalLink className="h-4 w-4" />
+            <div className="shrink-0">
+              <a
+                href={TRANSPARENCY_SOURCE_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white px-5 py-3 text-xs sm:text-sm font-extrabold text-[#7B0046] shadow-md transition hover:bg-amber-50 hover:-translate-y-0.5"
+              >
+                <span>Official Bidding Documents</span>
+                <ExternalLink className="h-4 w-4" />
               </a>
             </div>
           </div>

@@ -13,7 +13,7 @@ export default function ForgotPasswordPage() {
             <MsuLogo size={88} />
           </Link>
           <h1 className="text-2xl font-extrabold text-[#4D002C] tracking-tight">
-            Procuremate<span className="text-[#F5AB26]">SU</span>
+            Procuremate<span className="text-[#C27803]">SU</span>
           </h1>
           <p className="text-xs font-semibold text-[#7B0046] uppercase tracking-wide mt-0.5">
             Account Recovery • MSU-GenSan

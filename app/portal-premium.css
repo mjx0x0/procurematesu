@@ -2,7 +2,7 @@
 :root {
   --msu-maroon: #7B0046;
   --msu-deep: #4D002C;
-  --msu-gold: #F5AB26;
+  --msu-gold: #C27803;
   --paper: #F8F6F4;
 }
 
@@ -20,9 +20,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  border: 1px solid rgba(245, 171, 38, 0.35);
-  background: rgba(245, 171, 38, 0.12);
-  color: #F0C83F;
+  border: 1px solid rgba(194, 120, 3, 0.35);
+  background: rgba(194, 120, 3, 0.10);
+  color: #C27803;
   border-radius: 9999px;
   padding: 0.35rem 0.85rem;
   font-size: 0.75rem;

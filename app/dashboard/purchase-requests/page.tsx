@@ -142,18 +142,15 @@ export default function PurchaseRequestsPage() {
 
       <main className="mx-auto max-w-7xl px-3.5 py-6 sm:px-6 sm:py-8 lg:px-8">
         {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-4 sm:p-8 text-white shadow-sm mb-5 sm:mb-6">
+        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-6 sm:p-8 md:p-9 text-white shadow-[0_16px_40px_rgba(74,0,42,0.12)] mb-5 sm:mb-6">
           <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
-          <div className="relative flex flex-col md:flex-row md:items-end justify-between gap-5">
+          <div className="pointer-events-none absolute -left-16 -bottom-20 h-64 w-64 rounded-full bg-[#7B0046]/35 blur-3xl" />
+          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
             <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F0C83F]/35 bg-[#F0C83F]/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-[#F5D766]">
-                <FileText className="h-3.5 w-3.5" />
-                Procurement Records
-              </span>
-              <h1 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
                 Purchase Requests Directory
               </h1>
-              <p className="mt-2 text-xs sm:text-sm leading-relaxed text-white/80">
+              <p className="mt-2 text-xs sm:text-sm leading-relaxed text-white/85">
                 Track, filter, and monitor all your university purchase requests as they advance through verification, PMO approval, bidding, and delivery stages.
               </p>
             </div>
@@ -188,7 +185,7 @@ export default function PurchaseRequestsPage() {
             onClick={() => setStageFilter("under_review")}
             className={`rounded-xl border p-4 text-left transition-all ${
               stageFilter === "under_review"
-                ? "border-[#F5AB26] bg-white shadow-sm ring-2 ring-[#F5AB26]/20"
+                ? "border-[#C27803] bg-white shadow-sm ring-2 ring-[#C27803]/20"
                 : "border-stone-200 bg-white hover:border-stone-300"
             }`}
           >

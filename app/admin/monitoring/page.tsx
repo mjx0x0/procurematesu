@@ -114,7 +114,7 @@ const [riskFilter, setRiskFilter] = useState("all");
 
         <section className="ui-card p-5 mb-6">
           <div className="flex items-center gap-2 mb-4 font-bold text-[#4D002C]">
-            <SlidersHorizontal className="h-4 w-4 text-[#F5AB26]" />
+            <SlidersHorizontal className="h-4 w-4 text-[#C27803]" />
             <span>Advanced Filters & Query</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -201,7 +201,7 @@ const [riskFilter, setRiskFilter] = useState("all");
           </div>
           <div className="mt-3.5 pt-3 border-t border-stone-100 text-xs text-stone-500 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-1.5">
-              <Filter className="h-3.5 w-3.5 text-[#F5AB26]" />
+              <Filter className="h-3.5 w-3.5 text-[#C27803]" />
               <span>Showing <b>{filtered.length}</b> of <b>{prs.length}</b> Purchase Requests.</span>
             </div>
             <span className="text-[11px] text-stone-400 italic">

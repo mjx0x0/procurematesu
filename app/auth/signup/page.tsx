@@ -443,7 +443,7 @@ export default function SignupPage() {
                     Already have an account?{" "}
                     <Link
                       href="/"
-                      className="font-extrabold text-[#7B0046] hover:text-[#4D002C] underline decoration-[#F5AB26] underline-offset-2"
+                      className="font-extrabold text-[#7B0046] hover:text-[#4D002C] underline decoration-[#C27803] underline-offset-2"
                     >
                       Sign In
                     </Link>

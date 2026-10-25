@@ -96,7 +96,7 @@ export function EndUserPageHeader({
 
           <div className="min-w-0">
             <b className="block truncate text-lg font-black leading-tight text-[#4D002C] sm:text-xl">
-              {titlePrimary} <span className="text-[#F5AB26]">{titleAccent}</span>
+              {titlePrimary} <span className="text-[#C27803]">{titleAccent}</span>
             </b>
           </div>
         </div>

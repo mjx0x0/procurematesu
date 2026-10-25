@@ -101,8 +101,8 @@ export default function LandingPage() {
               </span>
             </h1>
 
-            <p className="mt-6 max-w-[560px] text-center lg:text-left text-sm sm:text-base leading-relaxed text-amber-50/90 lg:border-l-2 lg:border-[#F5AB26] lg:pl-5 font-normal mx-auto lg:mx-0 text-pretty">
-              A centralized institutional workspace for Purchase Request preparation, standardized university procurement workflow monitoring, public transparency records, and automated policy guidance powered by <strong className="font-bold text-[#F5AB26]">Gab AI</strong>.
+            <p className="mt-6 max-w-[560px] text-center lg:text-left text-sm sm:text-base leading-relaxed text-amber-50/90 lg:border-l-2 lg:border-[#C27803] lg:pl-5 font-normal mx-auto lg:mx-0 text-pretty">
+              A centralized institutional workspace for Purchase Request preparation, standardized university procurement workflow monitoring, public transparency records, and automated policy guidance powered by <strong className="font-bold text-[#C27803]">Gab AI</strong>.
             </p>
           </motion.div>
 
@@ -163,9 +163,9 @@ export default function LandingPage() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.35, delay: i * 0.08 }}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#F5AB26]/40 bg-[#FFFDF5] px-3.5 py-1.5 text-xs font-bold text-[#805F07] shadow-xs"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[#C27803]/40 bg-[#FFFDF5] px-3.5 py-1.5 text-xs font-bold text-[#805F07] shadow-xs"
                   >
-                    <CheckCircle2 className="h-3.5 w-3.5 text-[#F5AB26]" />
+                    <CheckCircle2 className="h-3.5 w-3.5 text-[#C27803]" />
                     {x}
                   </motion.span>
                 ))}
@@ -229,7 +229,7 @@ export default function LandingPage() {
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFF6E4] text-[#9A7205] border border-[#E9D9AE]">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <span className="text-xs font-mono font-extrabold tracking-wider text-[#F5AB26]">{n}</span>
+                  <span className="text-xs font-mono font-extrabold tracking-wider text-[#C27803]">{n}</span>
                 </div>
                 <h3 className="mt-5 text-base font-extrabold text-[#4D002C]">{title}</h3>
                 <p className="mt-2 text-xs sm:text-sm leading-relaxed text-stone-600">{text}</p>

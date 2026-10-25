@@ -93,7 +93,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
       >
         <header className="flex shrink-0 items-center justify-between border-b border-stone-200 bg-white px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-[#7B0046] p-2 text-[#F5AB26] shadow-sm">
+            <div className="rounded-xl bg-[#7B0046] p-2 text-[#C27803] shadow-sm">
               <FileText className="h-5 w-5" />
             </div>
             <div>

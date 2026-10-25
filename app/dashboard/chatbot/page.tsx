@@ -527,23 +527,27 @@ export default function ChatbotDashboard() {
     <div className="chatbot-viewport h-screen h-[100dvh] max-h-screen bg-[#FAF8F5] flex flex-col overflow-hidden">
       {/* Top Navbar */}
       <SystemPageHeader titlePrimary="AI" titleAccent="Chatbot" mobileTitlePrimary="Gab" mobileTitleAccent="AI" compactOnMobile icon={Bot} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl w-full px-2 sm:px-4 md:px-6">
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop Sidebar Toggle Button */}
             <button
               onClick={() => setSidebarOpen((prev) => !prev)}
-              className="hidden md:flex px-2.5 py-1.5 sm:py-2 rounded-xl text-stone-600 hover:bg-stone-100 hover:text-[#7B0046] text-xs font-semibold items-center gap-1.5 transition-all border border-stone-200"
+              className={`group hidden md:inline-flex h-9 items-center gap-1.5 rounded-xl border px-3 text-xs font-medium transition-all duration-150 select-none shadow-2xs ${
+                sidebarOpen
+                  ? "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50 hover:text-[#7B0046] active:scale-[0.98]"
+                  : "border-[#7B0046]/30 bg-[#FDF2F7] text-[#7B0046] font-semibold hover:border-[#7B0046]/50 hover:bg-[#FBE8F2] active:scale-[0.98]"
+              }`}
               title={sidebarOpen ? "Hide chat history" : "Show chat history"}
               aria-label={sidebarOpen ? "Hide chat history" : "Show chat history"}
             >
               {sidebarOpen ? (
                 <>
-                  <PanelLeftClose className="h-3.5 w-3.5 text-stone-500" />
-                  <span className="hidden lg:inline text-stone-600">Hide History</span>
+                  <PanelLeftClose className="h-4 w-4 text-stone-400 transition-colors group-hover:text-[#7B0046]" />
+                  <span>Hide History</span>
                 </>
               ) : (
                 <>
-                  <PanelLeftOpen className="h-3.5 w-3.5 text-[#7B0046]" />
-                  <span className="hidden lg:inline text-[#7B0046] font-bold">Show History</span>
+                  <PanelLeftOpen className="h-4 w-4 text-[#7B0046]" />
+                  <span>Show History</span>
                 </>
               )}
             </button>
@@ -551,30 +555,36 @@ export default function ChatbotDashboard() {
             {/* Mobile History Toggle Button */}
             <button
               onClick={() => setMobileHistoryOpen(true)}
-              className="md:hidden h-9 w-9 shrink-0 rounded-lg text-stone-600 hover:bg-stone-100 hover:text-[#7B0046] text-xs font-medium flex items-center justify-center gap-1"
-              title="Chat History"
+              className="group flex md:hidden h-9 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-2.5 text-xs font-medium text-stone-700 shadow-2xs transition-all duration-150 hover:border-stone-300 hover:bg-stone-50 hover:text-[#7B0046] active:scale-[0.98] select-none"
+              title="View chat history"
+              aria-label="View chat history"
             >
-              <History className="h-4 w-4" />
+              <History className="h-4 w-4 text-stone-500 transition-colors group-hover:text-[#7B0046]" />
+              <span className="hidden xs:inline">History</span>
             </button>
 
+            {/* New Chat Button */}
             <button
               onClick={startNewChat}
               disabled={loading}
-              className="min-h-9 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-[#7B0046] hover:bg-[#610037] text-white text-xs font-bold flex items-center gap-1 sm:gap-1.5 shadow-xs transition-colors border border-amber-400/30 disabled:opacity-50"
+              className="group inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#7B0046] bg-[#7B0046] px-3 text-xs font-semibold text-white shadow-2xs transition-all duration-150 hover:border-[#610037] hover:bg-[#610037] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 select-none"
+              title="Start a new chat conversation"
+              aria-label="New chat"
             >
-              <MessageSquarePlus className="h-3.5 w-3.5 text-amber-300" />
-              <span className="hidden sm:inline">New Chat</span>
-              <span className="sm:hidden">New</span>
+              <MessageSquarePlus className="h-4 w-4 text-amber-300 transition-transform group-hover:scale-105" />
+              <span>New Chat</span>
             </button>
 
+            {/* Clear Chat Button */}
             <button
               onClick={() => setShowClearModal(true)}
               disabled={loading || !sessionId}
-              className="min-h-9 min-w-9 justify-center px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-white border border-stone-200 hover:border-red-200 text-stone-600 hover:text-red-700 text-xs font-semibold flex items-center gap-1 sm:gap-1.5 transition-colors disabled:opacity-40"
+              className="group inline-flex h-9 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 text-xs font-medium text-stone-700 shadow-2xs transition-all duration-150 hover:border-red-200 hover:bg-red-50/70 hover:text-red-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-stone-200 disabled:hover:bg-white disabled:hover:text-stone-700 select-none"
               title="Clear current chat"
+              aria-label="Clear current chat"
             >
-              <Trash2 className="h-3.5 w-3.5 text-stone-400" />
-              <span className="hidden sm:inline">Clear</span>
+              <Trash2 className="h-4 w-4 text-stone-400 transition-colors group-hover:text-red-600" />
+              <span>Clear</span>
             </button>
           </div>
       </SystemPageHeader>
@@ -749,7 +759,7 @@ export default function ChatbotDashboard() {
                   {msg.isLoading ? (
                     <div className="flex items-center gap-1.5 py-1">
                       <span className="w-2 h-2 rounded-full bg-[#7B0046] animate-bounce" />
-                      <span className="w-2 h-2 rounded-full bg-[#F5AB26] animate-bounce [animation-delay:150ms]" />
+                      <span className="w-2 h-2 rounded-full bg-[#C27803] animate-bounce [animation-delay:150ms]" />
                       <span className="w-2 h-2 rounded-full bg-[#7B0046] animate-bounce [animation-delay:300ms]" />
                       <span className="text-xs text-stone-500 ml-2">Consulting procurement guidelines...</span>
                     </div>
@@ -832,7 +842,7 @@ export default function ChatbotDashboard() {
 
           {/* Quick Suggestions Chips */}
           <div className="shrink-0 px-3 py-1.5 bg-[#FAF8F5] border-t border-stone-200/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            <Sparkles className="h-3 w-3 text-[#F5AB26] shrink-0" />
+            <Sparkles className="h-3 w-3 text-[#C27803] shrink-0" />
             <span className="text-[10px] font-semibold text-stone-500 shrink-0 hidden xs:inline">Try:</span>
             {SUGGESTIONS.map((s) => (
               <button
