@@ -82,6 +82,9 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:mobile|phone|telephone|contact number|number to call)\b/i.test(query) &&
     /\b(?:director|head|person in charge)\b/i.test(query) &&
     /\b(?:procurement|pmo|pro)\b/i.test(query);
+  const asksUniversityChancellor =
+    /\bchancellor\b/i.test(query) &&
+    /\b(?:who|name|current|msu|gensan|university|pr|purchase request|approving authority|approver|approved by|form)\b/i.test(query);
 
   const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
     || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query));
@@ -229,6 +232,21 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         );
       }
 
+      // Questions about the Chancellor's identity or PR-form approving authority
+      // must prioritize the current official university directory, not historical/manual chunks.
+      if (asksUniversityChancellor) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'MSU-GenSan University Directory')
+            .ilike('chunk_text', '%Atty. Shidik T. Abantas%')
+            .limit(4),
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'MSU-GenSan University Directory')
+            .ilike('chunk_text', '%University Chancellor%')
+            .limit(4)
+        );
+      }
+
       const phrase = normalizedQuery.replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim();
       const phrases = Array.from(new Set(
         [phrase, ...queryParts.map(part => part.replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim())]
@@ -323,6 +341,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const asksInstitutional = /\b(msu|gensan|university|pmo|pro|procurement office|department|chancellor|budget office|purchase request|pr|workflow|process|approval|logbook|director|contact|office)\b/i.test(query);
           if (asksLegal && isCurrentProcurementLawSource(identity)) score += 24;
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
+          if (asksUniversityChancellor && documentName === 'MSU-GenSan University Directory') score += 1000;
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
           else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\. 06-2026/i.test(identity)) score += 12;
           if ((asksSvpDocumentaryRequirements || asksCircularResubmission || asksCircularLicenseCvAmbiguity)
@@ -358,7 +377,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // quotations, posting, and the no-quotation exception independently.
   const resultLimit = asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
-    : (asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation)
+    : (asksUniversityChancellor || asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation)
       ? Math.max(limit, 8)
       : limit;
   const ranked = Array.from(candidates.values())
