@@ -747,10 +747,10 @@ export default function ChatbotDashboard() {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex w-full min-w-0 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[92%] sm:max-w-[80%] rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm leading-relaxed ${
+                  className={`w-fit min-w-0 max-w-[92%] break-words [overflow-wrap:anywhere] sm:max-w-[80%] rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm leading-relaxed ${
                     msg.role === "user"
                       ? "bg-gradient-to-r from-[#7B0046] to-[#610037] text-white rounded-tr-sm shadow-xs"
                       : "bg-[#FAF8F5] border border-stone-200 text-stone-800 rounded-tl-sm shadow-2xs"
