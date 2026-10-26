@@ -284,6 +284,33 @@ test('current MSU-GenSan Chancellor answer uses the verified official directory 
   assert.doesNotMatch(answer, /example\.com\/internal-manual/);
 });
 
+test('short MSU-Gensan Chancellor question is answered directly from verified directory evidence', () => {
+  const query = 'Who is the MSU Gensan Chancellor?';
+  const answer = buildVerifiedProcurementAnswer(query, [
+    {
+      document_name: 'MSU-GenSan University Directory',
+      chunk_text: [
+        'OFFICIAL INSTITUTIONAL REFERENCE — UNIVERSITY CHANCELLOR',
+        'Mindanao State University - General Santos (MSU-GenSan)',
+        'Current University Chancellor: Atty. Shidik T. Abantas, MDM, LLM',
+        'Official role: University Chancellor.',
+        'The official MSU-GenSan University Directory and University Officials pages list Atty. Shidik T. Abantas, MDM, LLM as the University Chancellor.',
+        'For the ProcureMateSU Purchase Request form, the Approved By field displays Atty. Shidik T. Abantas, MDM, LLM with the designation Chancellor.',
+      ].join('\\n'),
+      metadata: {
+        source_url: 'https://msugensan.edu.ph/about/university-directory/',
+        source_title: 'MSU-GenSan University Directory',
+        verified_at: '2026-10-26',
+      },
+    },
+  ]);
+  assert.ok(answer);
+  assert.match(answer, /Atty\\. Shidik T\\. Abantas, MDM, LLM/);
+  assert.match(answer, /University Chancellor/);
+  assert.match(answer, /Approved By/);
+  assert.match(answer, /https:\\/\\/msugensan\\.edu\\.ph\\/about\\/university-directory\\//);
+});
+
 test('Chancellor answer refuses to identify a name from unverified directory provenance', () => {
   const query = 'Who is the current University Chancellor of MSU-Gensan?';
   const answer = buildVerifiedProcurementAnswer(query, [
