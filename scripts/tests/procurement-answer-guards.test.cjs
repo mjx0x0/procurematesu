@@ -296,7 +296,7 @@ test('short MSU-Gensan Chancellor question is answered directly from verified di
         'Official role: University Chancellor.',
         'The official MSU-GenSan University Directory and University Officials pages list Atty. Shidik T. Abantas, MDM, LLM as the University Chancellor.',
         'For the ProcureMateSU Purchase Request form, the Approved By field displays Atty. Shidik T. Abantas, MDM, LLM with the designation Chancellor.',
-      ].join('\\n'),
+      ].join('\n'),
       metadata: {
         source_url: 'https://msugensan.edu.ph/about/university-directory/',
         source_title: 'MSU-GenSan University Directory',
@@ -305,10 +305,10 @@ test('short MSU-Gensan Chancellor question is answered directly from verified di
     },
   ]);
   assert.ok(answer);
-  assert.match(answer, /Atty\\. Shidik T\\. Abantas, MDM, LLM/);
+  assert.match(answer, /Atty\. Shidik T\. Abantas, MDM, LLM/);
   assert.match(answer, /University Chancellor/);
   assert.match(answer, /Approved By/);
-  assert.match(answer, /https:\\/\\/msugensan\\.edu\\.ph\\/about\\/university-directory\\//);
+  assert.match(answer, /https:\/\/msugensan\.edu\.ph\/about\/university-directory\//);
 });
 
 test('Chancellor answer refuses to identify a name from unverified directory provenance', () => {
