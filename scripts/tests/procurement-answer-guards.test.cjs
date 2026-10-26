@@ -249,6 +249,57 @@ test('contact answer abstains when directory provenance is not verified', () => 
 });
 
 
+test('live web-search capability question clearly explains the limitation and offers official sources', () => {
+  const answer = buildVerifiedProcurementAnswer('Can you search the internet for it?', []);
+  assert.ok(answer);
+  assert.match(answer, /can search the procurement documents indexed in ProcureMateSU/i);
+  assert.match(answer, /does not have live internet-search capability/i);
+  assert.match(answer, /have not performed a live web search/i);
+  assert.match(answer, /https:\/\/www\.gppb\.gov\.ph\//);
+  assert.match(answer, /https:\/\/philgeps\.gov\.ph\//);
+  assert.match(answer, /https:\/\/msugensan\.edu\.ph\/about\/university-officials\//);
+  assert.doesNotMatch(answer, /I searched the internet and found/i);
+});
+
+test('current MSU-GenSan Chancellor answer uses the verified official directory and explains the PR form approver', () => {
+  const query = 'Who is the current University Chancellor of MSU-Gensan, and whose name should appear as the PR approving authority?';
+  const answer = buildVerifiedProcurementAnswer(query, [
+    {
+      document_name: 'PMO Administrative Manual',
+      chunk_text: 'PRs must be routed through the relevant offices before approval.',
+      metadata: { source_url: 'https://example.com/internal-manual' },
+    },
+    {
+      document_name: 'MSU-GenSan University Directory',
+      chunk_text: 'UNIVERSITY OFFICIALS\nUniversity Chancellor\nAtty. Shidik T. Abantas, MDM, LLM\nUniversity Chancellor',
+      metadata: { source_url: 'https://msugensan.edu.ph/about/university-directory/', verified_at: '2026-10-26' },
+    },
+  ]);
+  assert.ok(answer);
+  assert.match(answer, /Atty\. Shidik T\. Abantas, MDM, LLM/);
+  assert.match(answer, /University Chancellor/);
+  assert.match(answer, /Approved By/);
+  assert.match(answer, /does not itself mean that a PR has been approved/i);
+  assert.match(answer, /https:\/\/msugensan\.edu\.ph\/about\/university-directory\//);
+  assert.doesNotMatch(answer, /example\.com\/internal-manual/);
+});
+
+test('Chancellor answer refuses to identify a name from unverified directory provenance', () => {
+  const query = 'Who is the current University Chancellor of MSU-Gensan?';
+  const answer = buildVerifiedProcurementAnswer(query, [
+    {
+      document_name: 'MSU-GenSan University Directory',
+      chunk_text: 'University Chancellor: Atty. Shidik T. Abantas, MDM, LLM',
+      metadata: { source_url: 'https://example.com/guessed-directory' },
+    },
+  ]);
+  assert.ok(answer);
+  assert.match(answer, /could not verify the current Chancellor.s name/i);
+  assert.match(answer, /https:\/\/msugensan\.edu\.ph\/about\/university-officials\//);
+  assert.doesNotMatch(answer, /Atty\. Shidik T\. Abantas/);
+});
+
+
 test('SVP documentary answer uses the exclusive Circular 06-2026 checklist and separates Section 34 procedure', () => {
   const query = 'For an SUC using Small Value Procurement under RA 12009, what documentary requirements should be checked? Distinguish the requirements in GPPB Circular No. 06-2026 from the actual SVP procedure under Section 34 of the IRR.';
   const answer = buildVerifiedProcurementAnswer(query, [...circularChunks, ...completeSvpProcedureChunks]);
