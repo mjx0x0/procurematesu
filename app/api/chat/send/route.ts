@@ -95,7 +95,27 @@ function normalizePRIdentifier(identifier: string): string {
   return `PR-${value}`;
 }
 
-function buildProcurementFlowResponse() { const lines = PROCUREMENT_STAGES.map(stage => `${stage.number}. **${stage.label}** — ${stage.description}`).join('\n'); return `🏛️ **MSU-General Santos Procurement Workflow**\n\nHere is the official **procurement workflow used in ProcuremateSU**, from receipt of the Purchase Request through monitoring and documentation.\n\n${lines}\n\n### Key posting thresholds\n• **₱50,000 and above:** applicable RFQ posting to PhilGEPS\n• **₱200,000 and above:** applicable SVP posting threshold noted in the MSU workflow\n\nThe exact stage descriptions above are taken from ProcuremateSU's centralized procurement-process definition, providing clear milestone tracking for all purchase requests.`; }
+function buildProcurementFlowResponse() {
+  const lines = PROCUREMENT_STAGES
+    .map(stage => String(stage.number) + '. **' + stage.label + '** — ' + stage.description)
+    .join('\n');
+
+  return [
+    '🏛️ **MSU-General Santos Procurement Workflow**',
+    '',
+    'This is the workflow configured in ProcureMateSU, from receipt of the Purchase Request through monitoring and documentation.',
+    '',
+    lines,
+    '',
+    '### Posting and documentary thresholds',
+    '- **SVP RFQ/RFP posting — RA No. 12009 IRR, Section 34.3(b):** The request for quotation/proposal must be posted for three (3) calendar days on PhilGEPS, the procuring entity website if available, and a conspicuous place at its premises. The posting exception applies when the Approved Budget for the Contract (ABC) is **₱200,000 or below**.',
+    '- **Omnibus Sworn Statement — GPPB Circular No. 06-2026, Sections 4.3.7 and 4.7, as applicable:** the Circular identifies this document for procurements with an ABC **above ₱50,000**. This is a documentary requirement threshold, not an RFQ/RFP posting threshold.',
+    '',
+    'The stages above reflect ProcureMateSU’s configured workflow. Confirm office-specific instructions with the Procurement Management Office (PMO), and use PR tracking for the status of an individual request.',
+    '',
+    '**Official sources:** [GPPB-approved IRR of RA No. 12009, Section 34](https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf); [GPPB Circular No. 06-2026 / Resolution No. 10-2026](https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf).',
+  ].join('\n');
+}
 function buildNextStepResponse(pr: any, latestStage: any) { const currentIndex = PROCUREMENT_STAGES.findIndex(s => s.key === pr.current_stage); const current = currentIndex >= 0 ? PROCUREMENT_STAGES[currentIndex] : null; const next = currentIndex >= 0 && currentIndex < PROCUREMENT_STAGES.length - 1 ? PROCUREMENT_STAGES[currentIndex + 1] : null; if (pr.current_stage === 'completed' || !next) return `✅ **${pr.pr_no} has reached the final procurement stage.**\n\nThere is no next workflow stage recorded in ProcuremateSU. The PR has successfully completed the entire procurement workflow.\n\nFor the official transaction outcome or any remaining documentary requirement, coordinate with the Procurement Management Office.`; const age = latestStage?.completed_at ? Math.max(0, (Date.now() - new Date(latestStage.completed_at).getTime()) / 86400000) : null; return `📍 **What happens next for ${pr.pr_no}?**\n\n**Current stage:** Step ${current?.number || '?'} — ${current?.label || pr.current_stage}\n${latestStage?.completed_at ? `**Current stage recorded:** ${new Date(latestStage.completed_at).toLocaleString()}${age !== null ? ` (${age.toFixed(1)} days ago)` : ''}\n` : ''}\n**Next stage:** Step ${next.number} — ${next.label}\n\n**What this means:** ${next.description}\n\nThe next step is based on ProcuremateSU's centralized procurement workflow. Processing time can vary by transaction, office action, documentary requirements, and applicable procurement rules; the system does not treat the monitoring heuristic as an official SLA.`; }
 
 export async function POST(request: NextRequest) {
