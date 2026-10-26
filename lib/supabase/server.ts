@@ -38,29 +38,58 @@ export async function createClient() {
     },
   );
 
+function isStaleRefreshTokenError(error: unknown): boolean {
+  if (!error) return false;
+  if (typeof error === "string") {
+    return (
+      error.includes("Invalid Refresh Token") ||
+      error.includes("Refresh Token Not Found") ||
+      error.includes("refresh_token_not_found")
+    );
+  }
+  if (typeof error === "object") {
+    const obj = error as Record<string, unknown>;
+    const text = String(obj.message || obj.name || "");
+    if (
+      text.includes("Invalid Refresh Token") ||
+      text.includes("Refresh Token Not Found") ||
+      text.includes("refresh_token_not_found")
+    ) {
+      return true;
+    }
+    if (
+      Boolean(obj.__isAuthError) &&
+      (text.includes("refresh") || obj.status === 400 || obj.code === "refresh_token_not_found" || obj.name === "AuthApiError")
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+  const purgeStaleCookies = () => {
+    try {
+      cookieStore.getAll().forEach((c) => {
+        if (c.name.startsWith("sb-") || c.name.includes("auth-token")) {
+          try { cookieStore.delete(c.name); } catch {}
+        }
+      });
+    } catch {}
+  };
+
   // Wrap getUser to catch invalid refresh token errors gracefully
   const originalGetUser = client.auth.getUser.bind(client.auth);
   (client.auth.getUser as any) = async (jwt?: string) => {
     try {
       const res = await originalGetUser(jwt);
-      if (res.error) {
-        const msg = res.error.message || "";
-        if (
-          msg.includes("Refresh Token") ||
-          msg.includes("refresh_token") ||
-          (res.error as any).code === "refresh_token_not_found"
-        ) {
-          return { data: { user: null }, error: null };
-        }
+      if (res.error && isStaleRefreshTokenError(res.error)) {
+        purgeStaleCookies();
+        return { data: { user: null }, error: null };
       }
       return res;
     } catch (err: any) {
-      const msg = err?.message || "";
-      if (
-        msg.includes("Refresh Token") ||
-        msg.includes("refresh_token") ||
-        err?.code === "refresh_token_not_found"
-      ) {
+      if (isStaleRefreshTokenError(err)) {
+        purgeStaleCookies();
         return { data: { user: null }, error: null };
       }
       throw err;
@@ -72,24 +101,14 @@ export async function createClient() {
   (client.auth.getSession as any) = async () => {
     try {
       const res = await originalGetSession();
-      if (res.error) {
-        const msg = res.error.message || "";
-        if (
-          msg.includes("Refresh Token") ||
-          msg.includes("refresh_token") ||
-          (res.error as any).code === "refresh_token_not_found"
-        ) {
-          return { data: { session: null }, error: null };
-        }
+      if (res.error && isStaleRefreshTokenError(res.error)) {
+        purgeStaleCookies();
+        return { data: { session: null }, error: null };
       }
       return res;
     } catch (err: any) {
-      const msg = err?.message || "";
-      if (
-        msg.includes("Refresh Token") ||
-        msg.includes("refresh_token") ||
-        err?.code === "refresh_token_not_found"
-      ) {
+      if (isStaleRefreshTokenError(err)) {
+        purgeStaleCookies();
         return { data: { session: null }, error: null };
       }
       throw err;

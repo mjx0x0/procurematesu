@@ -212,33 +212,28 @@ export default function ProcurementRequestForm() {
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
               {/* Physical Submission Notice */}
               <div className="rounded-xl border-2 border-amber-300/80 bg-[#FFFDF7] p-4 sm:p-5 shadow-sm">
-                <div className="flex items-start gap-3.5">
-                  <div className="mt-0.5 h-10 w-10 rounded-xl bg-[#7B0046] text-amber-200 flex items-center justify-center shrink-0 shadow-sm">
-                    <Printer className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-sm font-black text-[#4D002C] tracking-tight uppercase">Important: Physical submission is required</h2>
-                    <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-stone-700">
-                      Submitting this Purchase Request through ProcuremateSU only records and prepares the PR digitally. It does <strong>not</strong> replace the required physical submission to the Procurement Office.
-                    </p>
-                    <p className="mt-1 text-xs sm:text-sm leading-relaxed text-stone-700">
-                      After creating your PR, you must <strong>print the PR form</strong> and physically submit the signed copy together with the required supporting documents to the Procurement Office for actual processing.
-                    </p>
-                    <label className="mt-3.5 flex items-start gap-3 cursor-pointer select-none bg-amber-100/50 hover:bg-amber-100/80 transition-colors p-3 rounded-lg border border-amber-200">
-                      <input
-                        type="checkbox"
-                        checked={physicalSubmissionAcknowledged}
-                        onChange={(e) => {
-                          setPhysicalSubmissionAcknowledged(e.target.checked);
-                          if (e.target.checked && error?.includes("physical submission requirement")) setError(null);
-                        }}
-                        className="mt-0.5 h-4 w-4 accent-[#7B0046] cursor-pointer shrink-0"
-                      />
-                      <span className="text-xs font-bold leading-5 text-[#4D002C]">
-                        I understand that online submission does not replace physical submission, and I will print and physically submit my PR and required supporting documents to the Procurement Office.
-                      </span>
-                    </label>
-                  </div>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-black text-[#4D002C] tracking-tight uppercase">Important: Physical submission is required</h2>
+                  <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-stone-700">
+                    Submitting this Purchase Request through ProcuremateSU only records and prepares the PR digitally. It does <strong>not</strong> replace the required physical submission to the Procurement Office.
+                  </p>
+                  <p className="mt-1 text-xs sm:text-sm leading-relaxed text-stone-700">
+                    After creating your PR, you must <strong>print the PR form</strong> and physically submit the signed copy together with the required supporting documents to the Procurement Office for actual processing.
+                  </p>
+                  <label className="mt-3.5 flex items-start gap-3 cursor-pointer select-none bg-amber-100/50 hover:bg-amber-100/80 transition-colors p-3 rounded-lg border border-amber-200">
+                    <input
+                      type="checkbox"
+                      checked={physicalSubmissionAcknowledged}
+                      onChange={(e) => {
+                        setPhysicalSubmissionAcknowledged(e.target.checked);
+                        if (e.target.checked && error?.includes("physical submission requirement")) setError(null);
+                      }}
+                      className="mt-0.5 h-4 w-4 accent-[#7B0046] cursor-pointer shrink-0"
+                    />
+                    <span className="text-xs font-bold leading-5 text-[#4D002C]">
+                      I understand that online submission does not replace physical submission, and I will print and physically submit my PR and required supporting documents to the Procurement Office.
+                    </span>
+                  </label>
                 </div>
               </div>
 

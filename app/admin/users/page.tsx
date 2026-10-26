@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { CheckCircle, Loader2, User, UserCheck, UserX, Users, RefreshCw, AlertCircle } from "lucide-react";
+import { isStaleRefreshTokenError } from "@/lib/supabase/client";
 
 interface UserAccount {
   id: string;
@@ -33,7 +34,9 @@ const loadUsers = useCallback(async () => {
       if (!response.ok) throw new Error(result.error || "Unable to load accounts.");
       setUsers(result.users || []);
     } catch (err: any) {
-      console.error(err);
+      if (!isStaleRefreshTokenError(err)) {
+        console.error("Load users notice:", err);
+      }
       setError(err.message || "Unable to load accounts.");
     } finally {
       setLoading(false);
@@ -58,7 +61,9 @@ const loadUsers = useCallback(async () => {
       if (!response.ok) throw new Error(result.error || "Unable to update account.");
       setUsers((current) => current.map((user) => user.id === userId ? result.user : user));
     } catch (err: any) {
-      console.error(err);
+      if (!isStaleRefreshTokenError(err)) {
+        console.error("Update account notice:", err);
+      }
       setError(err.message || "Unable to update account.");
     } finally {
       setBusyId(null);

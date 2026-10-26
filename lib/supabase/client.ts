@@ -27,27 +27,53 @@ export function clearAuthStorageAndCookies() {
   } catch {}
 }
 
-// Intercept and cleanly handle harmless Supabase invalid refresh token console errors in the browser
-if (typeof window !== "undefined") {
-  const originalConsoleError = console.error;
-  console.error = (...args: any[]) => {
-    const first = args[0];
-    const text = typeof first === "string"
-      ? first
-      : (first?.message || first?.name || String(first || ""));
-    const isRefreshTokenError =
+export function isStaleRefreshTokenError(error: unknown): boolean {
+  if (!error) return false;
+  if (typeof error === "string") {
+    return (
+      error.includes("Invalid Refresh Token") ||
+      error.includes("Refresh Token Not Found") ||
+      error.includes("refresh_token_not_found")
+    );
+  }
+  if (typeof error === "object") {
+    const obj = error as Record<string, unknown>;
+    const text = String(obj.message || obj.name || "");
+    if (
       text.includes("Invalid Refresh Token") ||
       text.includes("Refresh Token Not Found") ||
-      text.includes("refresh_token_not_found") ||
-      Boolean(first?.__isAuthError && (text.includes("refresh") || first?.status === 400));
+      text.includes("refresh_token_not_found")
+    ) {
+      return true;
+    }
+    if (
+      Boolean(obj.__isAuthError) &&
+      (text.includes("refresh") || obj.status === 400 || obj.code === "refresh_token_not_found" || obj.name === "AuthApiError")
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
 
-    if (isRefreshTokenError) {
+const globalScope = typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : null);
+if (globalScope?.console) {
+  const originalConsoleError = globalScope.console.error;
+  globalScope.console.error = (...args: any[]) => {
+    if (args.some(isStaleRefreshTokenError)) {
       clearAuthStorageAndCookies();
-      console.warn("[auth] Stale session cleared:", text);
       return;
     }
-    originalConsoleError.apply(console, args);
+    originalConsoleError.apply(globalScope.console, args);
   };
+}
+
+if (typeof process !== "undefined" && typeof process.on === "function") {
+  process.on("unhandledRejection", (reason: any) => {
+    if (isStaleRefreshTokenError(reason)) {
+      return;
+    }
+  });
 }
 
 function getStoredCookies(): { name: string; value: string }[] {
@@ -141,25 +167,13 @@ export function createClient() {
   (client.auth.getUser as any) = async (jwt?: string) => {
     try {
       const res = await originalGetUser(jwt);
-      if (res.error) {
-        const msg = res.error.message || "";
-        if (
-          msg.includes("Refresh Token") ||
-          msg.includes("refresh_token") ||
-          (res.error as any).code === "refresh_token_not_found"
-        ) {
-          clearAuthStorageAndCookies();
-          return { data: { user: null }, error: null };
-        }
+      if (res.error && isStaleRefreshTokenError(res.error)) {
+        clearAuthStorageAndCookies();
+        return { data: { user: null }, error: null };
       }
       return res;
     } catch (err: any) {
-      const msg = err?.message || "";
-      if (
-        msg.includes("Refresh Token") ||
-        msg.includes("refresh_token") ||
-        err?.code === "refresh_token_not_found"
-      ) {
+      if (isStaleRefreshTokenError(err)) {
         clearAuthStorageAndCookies();
         return { data: { user: null }, error: null };
       }
@@ -172,25 +186,13 @@ export function createClient() {
   (client.auth.getSession as any) = async () => {
     try {
       const res = await originalGetSession();
-      if (res.error) {
-        const msg = res.error.message || "";
-        if (
-          msg.includes("Refresh Token") ||
-          msg.includes("refresh_token") ||
-          (res.error as any).code === "refresh_token_not_found"
-        ) {
-          clearAuthStorageAndCookies();
-          return { data: { session: null }, error: null };
-        }
+      if (res.error && isStaleRefreshTokenError(res.error)) {
+        clearAuthStorageAndCookies();
+        return { data: { session: null }, error: null };
       }
       return res;
     } catch (err: any) {
-      const msg = err?.message || "";
-      if (
-        msg.includes("Refresh Token") ||
-        msg.includes("refresh_token") ||
-        err?.code === "refresh_token_not_found"
-      ) {
+      if (isStaleRefreshTokenError(err)) {
         clearAuthStorageAndCookies();
         return { data: { session: null }, error: null };
       }

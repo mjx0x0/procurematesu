@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase/client";
+import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { ActionFeedbackModal, type FeedbackTone } from "@/components/ui/ActionFeedbackModal";
 import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
@@ -104,7 +104,11 @@ export default function AdminDashboard() {
         const { data: profile } = await supabase.from("users").select("role,is_active,status").eq("id", authUser.id).single();
         if (profile?.role !== "admin" || profile?.is_active === false || (profile?.status && profile.status !== "approved")) { router.replace("/dashboard"); return; }
         await loadData();
-      } catch (e) { console.error(e); } finally { setLoading(false); }
+      } catch (e) {
+        if (!isStaleRefreshTokenError(e)) {
+          console.error("Admin verification notice:", e);
+        }
+      } finally { setLoading(false); }
     })();
   }, [router]);
 

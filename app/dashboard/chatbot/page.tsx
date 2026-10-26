@@ -531,60 +531,59 @@ export default function ChatbotDashboard() {
             {/* Desktop Sidebar Toggle Button */}
             <button
               onClick={() => setSidebarOpen((prev) => !prev)}
-              className={`group hidden md:inline-flex h-9 items-center gap-1.5 rounded-xl border px-3 text-xs font-medium transition-all duration-150 select-none shadow-2xs ${
+              className={`group relative hidden md:inline-flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-150 select-none shadow-2xs active:scale-95 ${
                 sidebarOpen
-                  ? "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50 hover:text-[#7B0046] active:scale-[0.98]"
-                  : "border-[#7B0046]/30 bg-[#FDF2F7] text-[#7B0046] font-semibold hover:border-[#7B0046]/50 hover:bg-[#FBE8F2] active:scale-[0.98]"
+                  ? "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50 hover:text-[#7B0046]"
+                  : "border-[#7B0046]/30 bg-[#FDF2F7] text-[#7B0046] hover:border-[#7B0046]/50 hover:bg-[#FBE8F2]"
               }`}
-              title={sidebarOpen ? "Hide chat history" : "Show chat history"}
-              aria-label={sidebarOpen ? "Hide chat history" : "Show chat history"}
+              aria-label={sidebarOpen ? "Hide History" : "Show History"}
             >
               {sidebarOpen ? (
-                <>
-                  <PanelLeftClose className="h-4 w-4 text-stone-400 transition-colors group-hover:text-[#7B0046]" />
-                  <span>Hide History</span>
-                </>
+                <PanelLeftClose className="h-4 w-4 text-stone-500 transition-colors group-hover:text-[#7B0046]" />
               ) : (
-                <>
-                  <PanelLeftOpen className="h-4 w-4 text-[#7B0046]" />
-                  <span>Show History</span>
-                </>
+                <PanelLeftOpen className="h-4 w-4 text-[#7B0046]" />
               )}
+              <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-stone-900/90 px-2 py-0.5 text-[11px] font-medium text-white shadow-md opacity-0 transition-opacity duration-150 group-hover:opacity-100 z-50">
+                {sidebarOpen ? "Hide History" : "Show History"}
+              </span>
             </button>
 
             {/* Mobile History Toggle Button */}
             <button
               onClick={() => setMobileHistoryOpen(true)}
-              className="group flex md:hidden h-9 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-2.5 text-xs font-medium text-stone-700 shadow-2xs transition-all duration-150 hover:border-stone-300 hover:bg-stone-50 hover:text-[#7B0046] active:scale-[0.98] select-none"
-              title="View chat history"
-              aria-label="View chat history"
+              className="group relative flex md:hidden h-9 w-9 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 shadow-2xs transition-all duration-150 hover:border-stone-300 hover:bg-stone-50 hover:text-[#7B0046] active:scale-95 select-none"
+              aria-label="Chat History"
             >
               <History className="h-4 w-4 text-stone-500 transition-colors group-hover:text-[#7B0046]" />
-              <span className="hidden xs:inline">History</span>
+              <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-stone-900/90 px-2 py-0.5 text-[11px] font-medium text-white shadow-md opacity-0 transition-opacity duration-150 group-hover:opacity-100 z-50">
+                Chat History
+              </span>
             </button>
 
             {/* New Chat Button */}
             <button
               onClick={startNewChat}
               disabled={loading}
-              className="group inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#7B0046] bg-[#7B0046] px-3 text-xs font-semibold text-white shadow-2xs transition-all duration-150 hover:border-[#610037] hover:bg-[#610037] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 select-none"
-              title="Start a new chat conversation"
-              aria-label="New chat"
+              className="group relative inline-flex h-9 w-9 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-700 shadow-2xs transition-all duration-150 hover:border-[#7B0046]/40 hover:bg-[#FDF2F7] hover:text-[#7B0046] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-stone-200 disabled:hover:bg-white disabled:hover:text-stone-700 select-none"
+              aria-label="New Chat"
             >
-              <MessageSquarePlus className="h-4 w-4 text-amber-300 transition-transform group-hover:scale-105" />
-              <span>New Chat</span>
+              <MessageSquarePlus className="h-4 w-4 text-[#7B0046] transition-transform group-hover:scale-110" />
+              <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-stone-900/90 px-2 py-0.5 text-[11px] font-medium text-white shadow-md opacity-0 transition-opacity duration-150 group-hover:opacity-100 z-50">
+                New Chat
+              </span>
             </button>
 
             {/* Clear Chat Button */}
             <button
               onClick={() => setShowClearModal(true)}
               disabled={loading || !sessionId}
-              className="group inline-flex h-9 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 text-xs font-medium text-stone-700 shadow-2xs transition-all duration-150 hover:border-red-200 hover:bg-red-50/70 hover:text-red-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-stone-200 disabled:hover:bg-white disabled:hover:text-stone-700 select-none"
-              title="Clear current chat"
-              aria-label="Clear current chat"
+              className="group relative inline-flex h-9 w-9 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 shadow-2xs transition-all duration-150 hover:border-red-200 hover:bg-red-50/80 hover:text-red-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-stone-200 disabled:hover:bg-white disabled:hover:text-stone-600 select-none"
+              aria-label="Clear Chat"
             >
-              <Trash2 className="h-4 w-4 text-stone-400 transition-colors group-hover:text-red-600" />
-              <span>Clear</span>
+              <Trash2 className="h-4 w-4 text-stone-500 transition-colors group-hover:text-red-600" />
+              <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-stone-900/90 px-2 py-0.5 text-[11px] font-medium text-white shadow-md opacity-0 transition-opacity duration-150 group-hover:opacity-100 z-50">
+                Clear Chat
+              </span>
             </button>
           </div>
       </SystemPageHeader>

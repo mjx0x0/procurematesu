@@ -45,11 +45,57 @@ function sanitizeForJson(value: unknown, seen = new WeakSet()): unknown {
   return result;
 }
 
+function isStaleRefreshTokenError(value: unknown): boolean {
+  if (!value) return false;
+  if (typeof value === "string") {
+    return (
+      value.includes("Invalid Refresh Token") ||
+      value.includes("Refresh Token Not Found") ||
+      value.includes("refresh_token_not_found")
+    );
+  }
+  if (typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    const text = String(obj.message || obj.name || "");
+    if (
+      text.includes("Invalid Refresh Token") ||
+      text.includes("Refresh Token Not Found") ||
+      text.includes("refresh_token_not_found")
+    ) {
+      return true;
+    }
+    if (
+      Boolean(obj.__isAuthError) &&
+      (text.includes("refresh") || obj.status === 400 || obj.code === "refresh_token_not_found" || obj.name === "AuthApiError")
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function installConsoleProtection() {
   if (typeof window === "undefined") return;
   const w = window as unknown as { __consoleSanitizerInstalled?: boolean };
   if (w.__consoleSanitizerInstalled) return;
   w.__consoleSanitizerInstalled = true;
+
+  // Intercept unhandled promise rejections for stale refresh token errors
+  window.addEventListener(
+    "unhandledrejection",
+    (event) => {
+      if (isStaleRefreshTokenError(event.reason)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        try {
+          import("@/lib/supabase/client").then(({ clearAuthStorageAndCookies }) => {
+            clearAuthStorageAndCookies();
+          }).catch(() => {});
+        } catch {}
+      }
+    },
+    true
+  );
 
   const methods: Array<"warn" | "error" | "log" | "info" | "debug"> = ["warn", "error", "log", "info", "debug"];
 
@@ -58,6 +104,18 @@ function installConsoleProtection() {
     if (!original) return;
 
     console[method] = function (...args: unknown[]) {
+      if (method === "error" || method === "warn") {
+        if (args.some(isStaleRefreshTokenError)) {
+          // Suppress harmless stale auth refresh token notices and purge storage
+          try {
+            import("@/lib/supabase/client").then(({ clearAuthStorageAndCookies }) => {
+              clearAuthStorageAndCookies();
+            }).catch(() => {});
+          } catch {}
+          return;
+        }
+      }
+
       try {
         const safeArgs = args.map(arg => {
           if (typeof arg === "object" && arg !== null) {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { supabase } from "@/lib/supabase/client";
+import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { User, Loader2, Search, Eye, MessageSquare, Filter, X, Download } from "lucide-react";
 
@@ -58,7 +58,9 @@ export default function InquiriesPage() {
 
         await loadInquiries();
       } catch (err) {
-        console.error("Admin check error:", err);
+        if (!isStaleRefreshTokenError(err)) {
+          console.error("Admin check error:", err);
+        }
       } finally {
         setLoading(false);
       }
