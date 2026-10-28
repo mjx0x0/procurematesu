@@ -3,6 +3,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
 import { GoogleGenAI } from '@google/genai';
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
+import { isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
 
@@ -156,7 +157,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ response: '🛑 **PR drafting stopped.**\n\nI did not create or submit a Purchase Request. Your draft has been cancelled.\n\nWhenever you are ready, you can say **"Help me draft a PR"** to start again.', sources: ['PR drafting session'] });
       }
 
-      if (shouldResetDrafting(message)) {
+      if (isDeterministicProcurementPolicyQuestion(message.trim())) {
+        // Official policy questions are new topics, not PR slot values. Clear
+        // the active draft so the delegated route can run the source-gated answer.
+        await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
+        draftState = {};
+      } else if (shouldResetDrafting(message)) {
         await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
         draftState = {};
       }
