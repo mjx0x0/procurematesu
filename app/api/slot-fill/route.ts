@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { validateDraftInput } from '@/lib/pr-validation';
 import { callGroq } from '@/lib/groq';
+import { createClient as createServerClient } from '@/lib/supabase/server';
+import { getProcurementScopeDecision } from '@/lib/procurement-scope-guard';
 
 let slotGenAI: GoogleGenAI | null = null;
 function getSlotGenAI(): GoogleGenAI | null { const apiKey = process.env.GEMINI_API_KEY; if (!apiKey) return null; if (!slotGenAI) slotGenAI = new GoogleGenAI({ apiKey }); return slotGenAI; }
@@ -25,9 +27,30 @@ export async function POST(req: NextRequest) {
     if (!contentType.toLowerCase().includes('application/json')) return NextResponse.json({ error: 'Content-Type must be application/json.' }, { status: 415, headers: JSON_HEADERS });
     const origin = req.headers.get('origin'); const host = req.headers.get('host');
     if (origin && host) { try { if (new URL(origin).host !== host) return NextResponse.json({ error: 'Invalid request origin.' }, { status: 403, headers: JSON_HEADERS }); } catch { return NextResponse.json({ error: 'Invalid request origin.' }, { status: 403, headers: JSON_HEADERS }); } }
+    const authClient = await createServerClient();
+    const { data: authData, error: authError } = await authClient.auth.getUser();
+    if (authError || !authData?.user) {
+      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401, headers: JSON_HEADERS });
+    }
+    const { data: profile, error: profileError } = await authClient
+      .from('users')
+      .select('is_active')
+      .eq('id', authData.user.id)
+      .maybeSingle();
+    if (profileError || !profile || profile.is_active === false) {
+      return NextResponse.json({ error: 'Account is not authorized.' }, { status: 403, headers: JSON_HEADERS });
+    }
+
     const body = await req.json(); const message = typeof body?.message === 'string' ? body.message.trim() : '';
     if (!message) return NextResponse.json({ error: 'Message is required.' }, { status: 400, headers: JSON_HEADERS });
     if (message.length > MAX_MESSAGE_LENGTH) return NextResponse.json({ error: `Message must not exceed ${MAX_MESSAGE_LENGTH} characters.` }, { status: 413, headers: JSON_HEADERS });
+    const scopeDecision = getProcurementScopeDecision(message, { activePRDraft: true });
+    if (!scopeDecision.allowed) {
+      return NextResponse.json({
+        error: 'This form accepts procurement-related Purchase Request details only. Please describe the item(s), quantity, intended use, or requesting unit.',
+      }, { status: 422, headers: JSON_HEADERS });
+    }
+
     const validationError = validateDraftInput(message);
     if (validationError) return NextResponse.json({ error: validationError }, { status: 422, headers: JSON_HEADERS });
 
