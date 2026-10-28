@@ -23,6 +23,7 @@ test('all six preview accuracy prompts route through the source-gated answer gua
 test('hyphenated bidding-document fee wording reaches the verified fee-table handler', () => {
   const prompt = 'Give all maximum bidding-document fees under GPPB Circular No. 02-2026 by Approved Budget for the Contract (ABC) range. Are these fees mandatory?';
   assert.equal(isBiddingDocumentsRateQuestion(prompt), true);
+  assert.equal(isDeterministicProcurementPolicyQuestion(prompt), true);
   const fallback = buildVerifiedProcurementAnswer(prompt, []);
   assert.match(fallback, /complete, verified rate table/i);
   assert.match(fallback, /will not estimate or invent/i);
