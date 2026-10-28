@@ -30,6 +30,18 @@ test('procurement mode selection and decision-tree questions scope to Resolution
   );
 });
 
+
+test('IRR edition/withdrawal questions retrieve the actual Public Advisory and approved IRR', () => {
+  assert.deepEqual(
+    names('Which version of the Implementing Rules and Regulations of RA No. 12009 should MSU-General Santos use? Explain the status of the March 2026 edition and cite the official GPPB advisory and approved IRR.'),
+    ['GPPB Public Advisory No. 09-2026', 'Implementing Rules and Regulations of RA 12009'],
+  );
+  assert.deepEqual(
+    names('Was the March 2026 IRR edition withdrawn?'),
+    ['GPPB Public Advisory No. 09-2026', 'Implementing Rules and Regulations of RA 12009'],
+  );
+});
+
 test('bidding-document fee questions scope to Circular No. 02-2026', () => {
   assert.deepEqual(
     names('What is the standard rate for bidding documents?'),
