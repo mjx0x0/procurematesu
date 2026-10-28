@@ -1,0 +1,16 @@
+export interface ExtractedPRItem {
+  item_description: string;
+  quantity: number;
+  unit: string;
+  unit_cost: number;
+  total_cost: number;
+}
+
+export interface ExtractedPRDetails {
+  department: string | null;
+  purpose: string | null;
+  items: ExtractedPRItem[];
+  total_amount: number;
+}
+
+export function extractPRDetailsRuleBased(text: string): ExtractedPRDetails;
