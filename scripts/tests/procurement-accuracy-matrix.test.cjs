@@ -4,6 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion, isBiddingDocumentsRateQuestion } = require('../../lib/procurement-answer-guards.js');
 const { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } = require('../../lib/procurement-scope-guard.js');
+const { extractPRDetailsRuleBased } = require('../../lib/pr-draft-extraction.js');
 
 test('all six preview accuracy prompts route through the source-gated answer guard', () => {
   const prompts = [
@@ -356,4 +357,40 @@ test('unrelated prompts fail closed instead of reaching the general-purpose mode
   ]) {
     assert.equal(getProcurementScopeDecision(prompt).allowed, false, prompt);
   }
+});
+
+
+test('PR drafting extracts purpose, full department, item quantity and unit cost from one complete message', () => {
+  const extracted = extractPRDetailsRuleBased(
+    'Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses, College of Education, 50 pcs, 190 pesos each'
+  );
+
+  assert.equal(extracted.department, 'College of Education');
+  assert.equal(
+    extracted.purpose,
+    'Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses'
+  );
+  assert.equal(extracted.items.length, 1);
+  assert.equal(extracted.items[0].item_description, 'laboratory glassware and supplies');
+  assert.equal(extracted.items[0].quantity, 50);
+  assert.equal(extracted.items[0].unit, 'pcs');
+  assert.equal(extracted.items[0].unit_cost, 190);
+  assert.equal(extracted.items[0].total_cost, 9500);
+  assert.equal(extracted.total_amount, 9500);
+});
+
+test('PR parser does not mistake ordinary laboratory or office supplies for a requesting department', () => {
+  const laboratory = extractPRDetailsRuleBased(
+    'Procurement of laboratory supplies for research, 20 pcs, 350 pesos each'
+  );
+  assert.equal(laboratory.department, null);
+  assert.equal(laboratory.items[0].quantity, 20);
+  assert.equal(laboratory.items[0].unit_cost, 350);
+
+  const office = extractPRDetailsRuleBased(
+    'Procurement of office supplies for university operations, 12 pcs, 75 pesos each'
+  );
+  assert.equal(office.department, null);
+  assert.equal(office.items[0].quantity, 12);
+  assert.equal(office.items[0].unit_cost, 75);
 });
