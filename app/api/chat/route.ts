@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
-import { buildVerifiedProcurementAnswer } from '@/lib/procurement-answer-guards';
+import { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
@@ -1048,8 +1048,23 @@ export async function POST(req: NextRequest) {
     let inquiryType = 'general';
     let citedSources: string[] = [];
 
-    // 2. Check if currently in multi-turn PR drafting
-    if (currentState.drafting) {
+    // Source-sensitive policy questions must bypass slot-filling first. This
+    // prevents long legal prompts containing words like "supplier", "price",
+    // "budget", or "section" from being mistaken for PR draft-field answers.
+    const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg);
+    if (deterministicPolicyQuestion) {
+      const policyRetrieval = await retrieveDocumentChunks(trimmedMsg, 6);
+      const verifiedPolicyAnswer = buildVerifiedProcurementAnswer(trimmedMsg, policyRetrieval.chunks);
+      // The guard returns a source-linked evidence-gap answer when current excerpts
+      // are missing. Keep that behavior rather than falling through to free-form guessing.
+      const policyEvidenceGapAnswer = buildVerifiedProcurementAnswer(trimmedMsg, []);
+      responseText = verifiedPolicyAnswer || policyEvidenceGapAnswer
+        || 'I could not verify this procurement rule from the official excerpts retrieved. Please consult the relevant GPPB issuance before acting.';
+      citedSources = policyRetrieval.sources.map(normalizeSourceLabel);
+      inquiryType = 'procurement_guidance';
+      // A policy question is a new topic, not input for the pending PR slot.
+      updatedState = {};
+    } else if (currentState.drafting) {
       inquiryType = 'draft_pr';
       const result = await handleDraftPRFlow(trimmedMsg, currentState);
       responseText = result.response;
