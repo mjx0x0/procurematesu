@@ -14,3 +14,5 @@ export interface ExtractedPRDetails {
 }
 
 export function extractPRDetailsRuleBased(text: string): ExtractedPRDetails;
+
+export function hasCompletePRDetails(extracted: ExtractedPRDetails | null | undefined): boolean;
