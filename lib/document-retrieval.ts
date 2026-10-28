@@ -381,7 +381,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           if (asksUniversityChancellor && documentName === 'MSU-GenSan University Directory') score += 1000;
           if (asksCurrentLawStatus && documentName === 'GPPB Circular No. 01-2025') score += 1000;
           if (asksDraftToStepOne && documentName === 'ProcureMateSU System Workflow') score += 1000;
-          if (asksPurchaseRequestWorkflow && documentName === 'PMO Administrative Manual' && /IV\\. PROCESS FLOW|Receipt of Purchase Request/i.test(text)) score += 1000;
+          if (asksPurchaseRequestWorkflow && documentName === 'PMO Administrative Manual' && /IV\. PROCESS FLOW|Receipt of Purchase Request/i.test(text)) score += 1000;
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
           else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\. 06-2026/i.test(identity)) score += 12;
           if ((asksSvpDocumentaryRequirements || asksCircularResubmission || asksCircularLicenseCvAmbiguity)
