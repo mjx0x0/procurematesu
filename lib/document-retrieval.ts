@@ -85,6 +85,20 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   const asksUniversityChancellor =
     /\bchancellor\b/i.test(query) &&
     /\b(?:who|name|current|msu|gensan|university|pr|purchase request|approving authority|approver|approved by|form)\b/i.test(query);
+  const asksCurrentLawStatus =
+    /\b9184\b/i.test(query) &&
+    /\b(?:current|currently|still|in force|governing|applicable|applies|apply|procurement law|which law|what law)\b/i.test(query) &&
+    !(/\b(?:before|prior to|previous(?:ly)?|historical(?:ly)?|history|old law|former|under the former|used to apply|applied under)\b/i.test(query) &&
+      (/\b12009\b/i.test(query) || /\bhistorical(?:ly)?\b|\bprevious(?:ly)?\b|\bformer\b/i.test(query)));
+  const asksDraftToStepOne =
+    /\bdraft\b/i.test(query) &&
+    /\bstep\s*1\b/i.test(query) &&
+    /\b(?:when|move|moves|moving|advance|advances|transition|transitions|change|changes|from|until|before|after|receipt|received)\b/i.test(query) &&
+    (/\bpurchase request\b|\bPR\b/i.test(query));
+  const asksPmoReceiptQuestion =
+    /\b(?:procurement management office|PMO)\b/i.test(query) &&
+    /\bpurchase requests?\b|\bPR\b/i.test(query) &&
+    /\b(?:after|receives?|received|receipt|what happens)/i.test(query);
 
   const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
     || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query));
@@ -159,9 +173,27 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         /\b(?:before|prior to|previous(?:ly)?|historical(?:ly)?|history|old law|former|applied under)\b/i.test(query) &&
         /\b12009\b|\bhistorical(?:ly)?\b|\bprevious(?:ly)?\b|\bformer\b/i.test(query);
       const asksPurchaseRequestWorkflow =
-        /\b(?:purchase requests?|pr)\b/i.test(query) &&
-        /\b(sequence|workflow|process|steps|review|reviewing|approval|approving|offices|procedure)\b/i.test(query) &&
-        /\b(msu|gensan|university|pmo|procurement)\b/i.test(query);
+        (/\b(?:purchase requests?|pr)\b/i.test(query) &&
+          /\b(sequence|workflow|process|steps|review|reviewing|approval|approving|offices|procedure|after|receives?|received|receipt|what happens)\b/i.test(query) &&
+          /\b(msu|gensan|university|pmo|procurement)\b/i.test(query))
+        || asksPmoReceiptQuestion;
+
+      if (asksCurrentLawStatus) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'GPPB Circular No. 01-2025')
+            .limit(10)
+        );
+      }
+
+      if (asksDraftToStepOne) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'ProcureMateSU System Workflow')
+            .ilike('chunk_text', '%Draft%')
+            .limit(4)
+        );
+      }
 
       if (asksSvpDetails) {
         const currentIrr = 'Implementing Rules and Regulations of RA 12009';
@@ -213,6 +245,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
       if (asksPurchaseRequestWorkflow) {
         const pmoManual = 'PMO Administrative Manual';
         searches.push(
+          scopedPhraseSearch(pmoManual, 'IV. PROCESS FLOW'),
           scopedPhraseSearch(pmoManual, '1. Receipt of Purchase Request'),
           scopedPhraseSearch(pmoManual, '3. Validation by the PMO Director'),
           scopedPhraseSearch(pmoManual, 'Endorsement to Budget Management Office'),
@@ -299,6 +332,10 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           // even when they mention the predecessor law.
           if (asksHistoricalRa9184 && !['RA 9184', 'IRR 2016'].includes(documentName)) continue;
 
+          // A current-law status question must be anchored in the official 2025
+          // transition circular, not diluted by the historical RA 9184/2016 IRR chunks.
+          if (asksCurrentLawStatus && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
+
           // On ordinary/current-law questions, exclude historical documents unless
           // the user explicitly asks for history, comparison, or transition.
           if (isLegacy && !asksAboutLegacyRules(query)) continue;
@@ -342,6 +379,9 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           if (asksLegal && isCurrentProcurementLawSource(identity)) score += 24;
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
           if (asksUniversityChancellor && documentName === 'MSU-GenSan University Directory') score += 1000;
+          if (asksCurrentLawStatus && documentName === 'GPPB Circular No. 01-2025') score += 1000;
+          if (asksDraftToStepOne && documentName === 'ProcureMateSU System Workflow') score += 1000;
+          if (asksPurchaseRequestWorkflow && documentName === 'PMO Administrative Manual' && /IV\\. PROCESS FLOW|Receipt of Purchase Request/i.test(text)) score += 1000;
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
           else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\. 06-2026/i.test(identity)) score += 12;
           if ((asksSvpDocumentaryRequirements || asksCircularResubmission || asksCircularLicenseCvAmbiguity)
@@ -377,9 +417,11 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // quotations, posting, and the no-quotation exception independently.
   const resultLimit = asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
-    : (asksUniversityChancellor || asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation)
+    : (asksUniversityChancellor || asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation || asksCurrentLawStatus || asksPmoReceiptQuestion)
       ? Math.max(limit, 8)
-      : limit;
+      : asksDraftToStepOne
+        ? Math.max(limit, 4)
+        : limit;
   const ranked = Array.from(candidates.values())
     .sort((a, b) => b.score - a.score)
     .slice(0, resultLimit);
