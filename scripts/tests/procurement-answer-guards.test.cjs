@@ -252,11 +252,13 @@ test('PMO receipt workflow answers with the manual sequence and does not present
   assert.doesNotMatch(answer, /RFQs, Small Value Procurement records, Abstracts of Quotations.*to confirm.*before any further action/i);
 });
 
-test('SVP handler abstains if current IRR section evidence is absent', () => {
+test('SVP handler abstains with a source link if current IRR section evidence is absent', () => {
   const answer = buildVerifiedProcurementAnswer('Explain SVP threshold and posting.', [
     { document_name: 'IRR 2016', chunk_text: 'Old procurement rule.' },
   ]);
-  assert.equal(answer, null);
+  assert.match(answer, /can(?:not|.?t) verify/i);
+  assert.match(answer, /Section 34/);
+  assert.ok(answer.includes('https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf'));
 });
 
 test('historical RA 9184 question cites RA 9184 and its own 2016 IRR', () => {
@@ -557,10 +559,12 @@ test('IRR edition question cites the actual withdrawal advisory and the approved
   assert.doesNotMatch(answer, /Circular No\. 01-2025.*withdrawal/i);
 });
 
-test('IRR edition question fails closed when the official withdrawal advisory was not retrieved', () => {
+test('IRR edition question fails closed with both official source links when evidence is incomplete', () => {
   const answer = buildVerifiedProcurementAnswer(currentIrrVersionQuestion, [currentIrrVersionChunks[1]]);
-  assert.match(answer, /can(?:not|.?t) verify/i);
+  assert.match(answer, /could not verify both/i);
   assert.match(answer, /Public Advisory No\. 09-2026/);
+  assert.ok(answer.includes('https://www.gppb.gov.ph/public-advisory-no-09-2026/'));
+  assert.ok(answer.includes('https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf'));
 });
 
 const biddingRateQuestion = 'What is the prescribed standard rate for bidding documents under GPPB Circular No. 02-2026? Cite the official circular.';
