@@ -4,7 +4,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
-import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper } from '@/lib/pr-draft-extraction';
+import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails } from '@/lib/pr-draft-extraction';
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
@@ -621,11 +621,7 @@ async function handleDraftPRFlow(
 
       // If every required field is already present in one message, finish
       // immediately. The user should never have to repeat information.
-      if (
-        extracted.department &&
-        itemDetails.length > 0 &&
-        completeItems.length === itemDetails.length
-      ) {
+      if (hasCompletePRDetails(extracted)) {
         return buildDraftCompletionResponse(
           { ...extracted, items: completeItems },
           { ...newState, drafting: false, step: null, collected }
