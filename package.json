@@ -5,7 +5,7 @@
     "build": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "eslint .",
-    "test:procurement": "node --test scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs",
+    "test:procurement": "node --test scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs",
     "ingest:gppb-circular-06-2026": "node scripts/ingest-gppb-circular-06-2026.js"
   },
   "dependencies": {
