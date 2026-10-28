@@ -309,6 +309,7 @@ test('valid procurement law, GPPB, PR drafting, and tracking prompts remain in s
     'Help me draft a PR for laboratory supplies.',
     'Track PR-2026-0001.',
     'Where can I contact the MSU-GenSan Procurement Office?',
+    'Can MSU-GenSan procure Python software licenses under RA No. 12009?',
   ]) {
     assert.equal(getProcurementScopeDecision(prompt).allowed, true, prompt);
   }
