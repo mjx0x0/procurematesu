@@ -93,6 +93,41 @@ test('A mode-selection question does not invent a specific mode when material fa
   assert.match(answer, /PS-DBM/i);
 });
 
+const modesListQuery = 'What procurement modes are available under RA No. 12009? Cite the official source.';
+const modesListChunk = {
+  document_name: 'GPPB Resolution No. 12-2025',
+  document_type: 'gppb_resolution',
+  chunk_text: 'Resolution No. 12-2025 approves the Procurement Mode Selection Decision Tree. Under Section 26.1 of the GPPB-approved IRR, the available modes are Competitive Bidding; Limited Source Bidding; Competitive Dialogue; Unsolicited Offer with Bid Matching; Direct Contracting; Direct Acquisition; Repeat Order; Small Value Procurement; Negotiated Procurement; Direct Sales; and Direct Procurement for Science, Technology and Innovation. The decision tree is guidance and its output is not a definitive determination.',
+  metadata: { source_url: TREE_URL, document_status: 'current_decision_tree_guidance_ra_12009' },
+};
+
+test('Procurement modes list includes all eleven modes and links the IRR and decision-tree resolution', () => {
+  const answer = buildVerifiedProcurementAnswer(modesListQuery, [modesListChunk]);
+  for (const mode of [
+    'Competitive Bidding',
+    'Limited Source Bidding',
+    'Competitive Dialogue',
+    'Unsolicited Offer with Bid Matching',
+    'Direct Contracting',
+    'Direct Acquisition',
+    'Repeat Order',
+    'Small Value Procurement',
+    'Negotiated Procurement',
+    'Direct Sales',
+    'Direct Procurement for Science, Technology and Innovation',
+  ]) assert.ok(answer.includes(mode), 'missing mode: ' + mode);
+  assert.ok(answer.includes(IRR_URL));
+  assert.ok(answer.includes(TREE_URL));
+  assert.match(answer, /not a recommendation for a specific purchase/i);
+});
+
+test('Procurement modes list fails closed if the excerpt does not enumerate all modes', () => {
+  const answer = buildVerifiedProcurementAnswer(modesListQuery, [{ ...modesListChunk, chunk_text: 'The Decision Tree is a guide; its output is not a definitive determination.' }]);
+  assert.match(answer, /cannot verify the complete list/i);
+  assert.ok(answer.includes(IRR_URL));
+  assert.ok(answer.includes(TREE_URL));
+});
+
 const svpIrrChunks = [
   {
     document_name: 'Implementing Rules and Regulations of RA 12009',
