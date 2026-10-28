@@ -229,7 +229,7 @@ test('Bidding-document rates answer all seven bands and marks them as maximum fe
   assert.match(answer, /maximum fees/i);
   assert.match(answer, /competitive-selection modes only/i);
   assert.match(answer, /not compulsory charges/i);
-  assert.match(answer, /does not apply automatically to every procurement mode/i);
+  assert.match(answer, /Do not apply this table automatically to other procurement modes/i);
   assert.ok(answer.includes(RATE_URL));
 });
 
