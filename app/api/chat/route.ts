@@ -1305,6 +1305,16 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
     }
 
     if (query && query.length <= 12000) {
+      const recoveryScopeDecision = getProcurementScopeDecision(query);
+      if (!recoveryScopeDecision.allowed) {
+        return NextResponse.json({
+          response: PROCUREMENT_SCOPE_RESPONSE,
+          sessionId: 'sess_recovery',
+          sources: ['ProcureMateSU scope and security guard'],
+          degradedMode: true,
+        }, { status: 200 });
+      }
+
       const isActionOrTrackingRequest =
         /\b(help me draft|create a pr|new purchase request|draft a purchase request|track|status of|show me my pr|my purchase requests)\b/i.test(query) ||
         /\bPR[- ]?(?:TEMP[- ]?)?(?:\d{4}[- ]?)?\d{1,6}\b/i.test(query);
