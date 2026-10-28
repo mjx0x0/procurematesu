@@ -117,6 +117,19 @@ The source-gated answer guard now has separate handling for:
 The regression tests now check concise-vs-detailed SVP routing, official circular citation/link, historical RA 9184/2016 IRR citation, and suppression of unrelated content in the contact response. After pulling the branch, run `npm run test:procurement`, `npm run lint`, and `npx next build`; full local build checks must still be run on the current branch before merge.
 
  
+
+## Citation and answer-accuracy hardening (28 October 2026)
+
+The chatbot's deterministic answer layer now covers these source-sensitive question families:
+- Current IRR edition questions cite both Public Advisory No. 09-2026 (withdrawal notice) and the IRR approved under Resolution No. 02-2025; an incomplete retrieval returns both official links without claiming the answer is fully verified.
+- Standard Procurement Forms questions cite Resolution No. 03-2025, Capacity Development Advisory No. 2025-003, and the GPPB downloadable-forms catalogue.
+- Decision Tree questions cite Resolution No. 12-2025 and the approved IRR. The tree is described as guidance, not authorization. Requests for a specific mode without material facts do not receive a mode recommendation; mode-list questions require the full list in the retrieved Resolution summary.
+- SVP answers fail closed when the approved IRR Section 34 evidence is absent. Documentary questions require evidence from both IRR Section 34 and Circular No. 06-2026, and the answer links both sources. One quotation is explicitly distinguished from an automatic award.
+- Circular No. 02-2026 rate answers require every one of the seven ABC bands in the official-source excerpt. If the table is incomplete, the chatbot says that the index does not contain a complete verified table and does not estimate amounts.
+- Circular No. 09-2026 answers require the overall election period, all separate restriction windows, project categories, exceptions, and cancellation/postponement condition. The answer avoids treating the overall period as a blanket procurement ban and distinguishes public-works exemptions from social-welfare and housing exceptions.
+
+A separate procurement-accuracy-matrix test suite tests correct responses and missing-evidence behavior for these families. The procurement test script and GitHub Actions workflow include this accuracy matrix alongside source-routing and existing guard tests. Passing source-level tests does not replace an end-to-end test of the current Vercel preview and chat endpoint.
+
 ## Core GPPB issuance coverage added on 28 October 2026
 
 The live Supabase knowledge base now includes curated source-labeled summaries (not full issuance text) for:
