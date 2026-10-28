@@ -252,11 +252,13 @@ test('PMO receipt workflow answers with the manual sequence and does not present
   assert.doesNotMatch(answer, /RFQs, Small Value Procurement records, Abstracts of Quotations.*to confirm.*before any further action/i);
 });
 
-test('SVP handler abstains if current IRR section evidence is absent', () => {
+test('SVP handler abstains with a source link if current IRR section evidence is absent', () => {
   const answer = buildVerifiedProcurementAnswer('Explain SVP threshold and posting.', [
     { document_name: 'IRR 2016', chunk_text: 'Old procurement rule.' },
   ]);
-  assert.equal(answer, null);
+  assert.match(answer, /can(?:not|.?t) verify/i);
+  assert.match(answer, /Section 34/);
+  assert.ok(answer.includes('https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf'));
 });
 
 test('historical RA 9184 question cites RA 9184 and its own 2016 IRR', () => {
@@ -526,4 +528,117 @@ test('Circular Section 4.4 answer abstains without exact official source provena
   assert.ok(answer);
   assert.match(answer, /can’t verify this procurement rule/i);
   assert.match(answer, /GPPB Circular No\. 06-2026, Section 4\.4/);
+});
+
+
+const currentIrrVersionQuestion = 'Which version of the Implementing Rules and Regulations of RA No. 12009 should MSU-General Santos use? Explain the status of the March 2026 edition and cite the official GPPB advisory and approved IRR.';
+const currentIrrVersionChunks = [
+  {
+    document_name: 'GPPB Public Advisory No. 09-2026',
+    document_type: 'gppb_public_advisory',
+    chunk_text: 'GPPB Public Advisory No. 09-2026 was posted on 31 July 2026. The Implementing Rules and Regulations of Republic Act No. 12009 (1st Edition, as of 31 March 2026) was withdrawn and should no longer be used as reference. Use and cite only the IRR approved by GPPB Resolution No. 02-2025 dated 04 February 2025, published in the Official Gazette on 10 February 2025, and effective 25 February 2025.',
+    metadata: { source_url: 'https://www.gppb.gov.ph/public-advisory-no-09-2026/' },
+  },
+  {
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    chunk_text: 'The Implementing Rules and Regulations of RA No. 12009 or the New Government Procurement Act.',
+    metadata: {
+      source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf',
+      document_status: 'current_gppb_approved_irr_ra_12009',
+    },
+  },
+];
+
+test('IRR edition question cites the actual withdrawal advisory and the approved IRR', () => {
+  const answer = buildVerifiedProcurementAnswer(currentIrrVersionQuestion, currentIrrVersionChunks);
+  assert.match(answer, /Resolution No\. 02-2025/);
+  assert.match(answer, /31 July 2026/);
+  assert.match(answer, /withdrawn and should no longer be used/i);
+  assert.match(answer, /public-advisory-no-09-2026/);
+  assert.match(answer, /IRR-of-RA-No.-12009\.pdf/);
+  assert.doesNotMatch(answer, /Circular No\. 01-2025.*withdrawal/i);
+});
+
+test('IRR edition question fails closed with both official source links when evidence is incomplete', () => {
+  const answer = buildVerifiedProcurementAnswer(currentIrrVersionQuestion, [currentIrrVersionChunks[1]]);
+  assert.match(answer, /could not verify both/i);
+  assert.match(answer, /Public Advisory No\. 09-2026/);
+  assert.ok(answer.includes('https://www.gppb.gov.ph/public-advisory-no-09-2026/'));
+  assert.ok(answer.includes('https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf'));
+});
+
+const biddingRateQuestion = 'What is the prescribed standard rate for bidding documents under GPPB Circular No. 02-2026? Cite the official circular.';
+const biddingRateChunks = [{
+  document_name: 'GPPB Circular No. 02-2026',
+  document_type: 'gppb_circular',
+  chunk_text: [
+    'GPPB Circular No. 02-2026, Sections 3.1–3.2: Applies to procuring entities including State Universities and Colleges, for Goods, Infrastructure Projects and Consulting Services through competitive-selection modes.',
+    'Section 5.2. The cost of Bidding Documents shall correspond to the ABC range indicated in the table. The amount that a procuring entity may set is the MAXIMUM cost of the bidding documents. It is a ceiling, not a mandatory fee that every entity must charge.',
+    'PHP 500,000 and below — 500.00',
+    'More than 500,000 up to 1 Million — 1,000.00',
+    'More than 1 Million up to 5 Million — 5,000.00',
+    'More than 5 Million up to 10 Million — 10,000.00',
+    'More than 10 Million up to 50 Million — 25,000.00',
+    'More than 50 Million up to 500 Million — 50,000.00',
+    'More than 500 Million — 75,000.00',
+  ].join('\n'),
+  metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2026/07/Annex-A_Circular-Bid-Docs-Fees_15052026.pdf' },
+}];
+
+test('Circular No. 02-2026 answer gives every maximum-rate band only after validating the complete rate table', () => {
+  const answer = buildVerifiedProcurementAnswer(biddingRateQuestion, biddingRateChunks);
+  for (const amount of ['₱500', '₱1,000', '₱5,000', '₱10,000', '₱25,000', '₱50,000', '₱75,000']) {
+    assert.match(answer, new RegExp(amount.replace(/[₱,]/g, '\\$&')));
+  }
+  assert.match(answer, /maximum fees/i);
+  assert.match(answer, /Circular No\. 02-2026/);
+  assert.match(answer, /Annex-A_Circular-Bid-Docs-Fees_15052026\.pdf/);
+});
+
+test('Circular No. 02-2026 answer fails closed if the exact rate table is missing', () => {
+  const answer = buildVerifiedProcurementAnswer(biddingRateQuestion, [{
+    ...biddingRateChunks[0],
+    chunk_text: 'Circular No. 02-2026 provides standard rates, but the rate table is not reproduced here.',
+  }]);
+  assert.match(answer, /does not contain a complete, verified rate table/i);
+  assert.match(answer, /will not estimate or invent/i);
+  assert.match(answer, /Annex-A_Circular-Bid-Docs-Fees_15052026\.pdf/);
+});
+
+const bskeQuestion = 'What restrictions applied during the 2026 Barangay and Sangguniang Kabataan election period under GPPB Circular No. 09-2026? State the applicable dates, explain that the rule is time-bound, and cite the official source.';
+const bskeText = [
+  'GPPB Circular No. 09-2026: The overall election period is 3 October 2026 to 9 November 2026.',
+  'The commencement and completion of procurement activities may proceed during the Election Period.',
+  'Release, disbursement, and expenditure of public funds, specifically issuance of a Notice of Award, are prohibited from 18 September 2026 until 1 November 2026 for all kinds of Public Works and Housing-Related Projects, subject to exceptions, and Social Welfare and Services projects, subject to exceptions.',
+  'Ayuda, TUPAD, AKAP, AICS, and 4Ps distribution is prohibited from 23 October through 2 November 2026, except burial and medical assistance normally given to qualified individuals.',
+  'Construction or maintenance of barangay-funded roads and bridges is prohibited from 23 October 2026 to 1 November 2026.',
+  'Exceptions include public-works maintenance without additional laborers; contracts awarded before 18 September; qualifying preparatory works/materials before that date; specified ongoing or foreign-assisted projects submitted to COMELEC; emergency restoration work; routine/normal social-welfare expenses; administrative housing expenses; and other expenses authorized by COMELEC after due notice and hearing.',
+  'Requests for exemption must be directly submitted to COMELEC. If the 2 November 2026 BSKE is cancelled, postponed, deferred, or otherwise not pursued, the guidelines no longer apply.',
+].join('\n');
+const bskeChunks = [{
+  document_name: 'GPPB Circular No. 09-2026',
+  document_type: 'gppb_circular',
+  chunk_text: bskeText,
+  metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2026/09/Annex-A_Guidelines-on-Conduct-of-Procurement-Activities-BSKE_25082026.pdf' },
+}];
+
+test('Circular No. 09-2026 answer distinguishes restriction windows, project categories, exceptions, and time limit', () => {
+  const answer = buildVerifiedProcurementAnswer(bskeQuestion, bskeChunks);
+  assert.match(answer, /3 October through 9 November 2026/);
+  assert.match(answer, /18 September–1 November 2026/);
+  assert.match(answer, /23 October–2 November 2026/);
+  assert.match(answer, /23 October through 1 November 2026/);
+  assert.match(answer, /not mean that every procurement is prohibited/i);
+  assert.match(answer, /COMELEC/);
+  assert.match(answer, /cancelled, postponed, deferred/i);
+  assert.match(answer, /Annex-A_Guidelines-on-Conduct-of-Procurement-Activities-BSKE_25082026\.pdf/);
+});
+
+test('Circular No. 09-2026 answer fails closed rather than asserting a blanket ban without date/category evidence', () => {
+  const answer = buildVerifiedProcurementAnswer(bskeQuestion, [{
+    ...bskeChunks[0],
+    chunk_text: 'The election period is from 3 October 2026 to 9 November 2026. Procurement restrictions apply.',
+  }]);
+  assert.match(answer, /can(?:not|.?t) verify/i);
+  assert.match(answer, /project category/i);
 });

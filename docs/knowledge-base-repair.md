@@ -18,7 +18,7 @@ The repair script is deliberately separate from `scripts/ingest-docs.js`. The or
    node scripts/repair-knowledge-base.js --embeddings-only
    ```
 
-4. Confirm the dry run reports only the expected missing-embedding counts. The read-only count at the time of this update is 408 total missing vectors: 376 IRR chunks, 30 PMO Administrative Manual chunks, one university-directory chunk, and one temporary-relocation-advisory chunk. Recheck the counts at run time.
+4. Confirm the dry run reports only the expected missing-embedding counts. Historical snapshot only: an earlier audit reported 408 missing vectors. That count is stale and must not be used for the current database; recheck the counts at run time. On 28 October 2026, after current-issuance additions, the live database had 15 rows with NULL embeddings; the 376 chunks for the verified GPPB-approved RA No. 12009 IRR all had embeddings and the correct official source URL/status metadata.
 
 5. If the counts are as expected and the local `.env.local` points to the intended Supabase project, apply **only the missing embeddings**:
 
@@ -65,6 +65,13 @@ Test at least:
 - A question that has no matching source; the assistant should admit the retrieval gap instead of guessing.
 
 Do not call the test complete merely because embeddings exist. In the current keyword-based implementation, verify source ranking/filtering and answer grounding directly. Separately test vector retrieval if/when that feature is implemented.
+
+## Corrections for IRR edition, bidding-document rates, and 2026 BSKE restrictions
+
+- **IRR edition:** GPPB Public Advisory No. 09-2026, posted 31 July 2026, is the official withdrawal notice for the "1st Edition, as of 31 March 2026" IRR. Route edition/version questions to the separate Public Advisory record and the IRR approved through GPPB Resolution No. 02-2025. Do not cite GPPB Circular No. 01-2025 as the withdrawal notice; that circular covers transitory provisions.
+- **Bidding-document rates:** Circular No. 02-2026, Annex A to GPPB Resolution No. 08-2026, Section 5.2 sets maximum—not mandatory—costs: ABC ≤ ₱500,000 = ₱500; > ₱500,000 to ₱1 million = ₱1,000; > ₱1 million to ₱5 million = ₱5,000; > ₱5 million to ₱10 million = ₱10,000; > ₱10 million to ₱50 million = ₱25,000; > ₱50 million to ₱500 million = ₱50,000; > ₱500 million = ₱75,000. These rates apply to the competitive-selection modes specified in Section 3.2, not automatically to every procurement mode.
+- **2026 BSKE:** Circular No. 09-2026's overall election period is 3 October–9 November 2026. The public-works/housing and social-welfare Notice of Award/public-fund prohibition is 18 September–1 November; specified Ayuda/TUPAD/AKAP/AICS/4Ps distribution is restricted 23 October–2 November with burial/medical exceptions; barangay-funded roads and bridges are restricted 23 October–1 November. Section 4.2 exemptions, the COMELEC exemption process, and Section 7 cancellation/postponement rule must be retrieved with these dates. Never summarize this as a blanket ban on all procurement during the full election period.
+
 ## Retrieval and answer-grounding regression fixes
 
 The chat route now has source-gated deterministic answers for three high-risk, repeatedly tested question types:
@@ -108,3 +115,40 @@ The source-gated answer guard now has separate handling for:
 - Current PMO Director contact questions (only the verified official MSU-GenSan University Directory chunk and its source URL can support the deterministic answer; unrelated manual/legal chunks are excluded from retrieval for this intent).
 
 The regression tests now check concise-vs-detailed SVP routing, official circular citation/link, historical RA 9184/2016 IRR citation, and suppression of unrelated content in the contact response. After pulling the branch, run `npm run test:procurement`, `npm run lint`, and `npx next build`; full local build checks must still be run on the current branch before merge.
+
+ 
+
+## Citation and answer-accuracy hardening (28 October 2026)
+
+The chatbot's deterministic answer layer now covers these source-sensitive question families:
+- Current IRR edition questions cite both Public Advisory No. 09-2026 (withdrawal notice) and the IRR approved under Resolution No. 02-2025; an incomplete retrieval returns both official links without claiming the answer is fully verified.
+- Standard Procurement Forms questions cite Resolution No. 03-2025, Capacity Development Advisory No. 2025-003, and the GPPB downloadable-forms catalogue.
+- Decision Tree questions cite Resolution No. 12-2025 and the approved IRR. The tree is described as guidance, not authorization. Requests for a specific mode without material facts do not receive a mode recommendation; mode-list questions require the full list in the retrieved Resolution summary.
+- SVP answers fail closed when the approved IRR Section 34 evidence is absent. Documentary questions require evidence from both IRR Section 34 and Circular No. 06-2026, and the answer links both sources. One quotation is explicitly distinguished from an automatic award.
+- Circular No. 02-2026 rate answers require every one of the seven ABC bands in the official-source excerpt. If the table is incomplete, the chatbot says that the index does not contain a complete verified table and does not estimate amounts.
+- Circular No. 09-2026 answers require the overall election period, all separate restriction windows, project categories, exceptions, and cancellation/postponement condition. The answer avoids treating the overall period as a blanket procurement ban and distinguishes public-works exemptions from social-welfare and housing exceptions.
+
+A separate procurement-accuracy-matrix test suite tests correct responses and missing-evidence behavior for these families. The procurement test script and GitHub Actions workflow include this accuracy matrix alongside source-routing and existing guard tests. Passing source-level tests does not replace an end-to-end test of the current Vercel preview and chat endpoint.
+
+## Core GPPB issuance coverage added on 28 October 2026
+
+The live Supabase knowledge base now includes curated source-labeled summaries (not full issuance text) for:
+
+- GPPB Resolution No. 03-2025 — Standard Procurement Forms and categories.
+- GPPB Resolution No. 12-2025 — Procurement Mode Selection Decision Tree and the caution that the tree is guidance, not definitive authorization.
+- GPPB Circular No. 01-2026 — Direct Procurement for Science, Technology, and Innovation.
+- GPPB Circular Nos. 02-2026 to 05-2026 — sale of bidding documents, printing services, tied-bid method, and legal assistance/indemnification.
+- GPPB Circular Nos. 07-2026 to 09-2026 — Framework Agreements, disaster-related procurement, and the time-bound November 2026 BSKE election period.
+
+The source URLs, dates, statuses, and conditions are recorded in chunk metadata and each summary. The full official text and associated annexes remain the controlling reference. The Circular No. 02-2026 summary now includes all seven maximum-cost bands transcribed from Section 5.2 of the official PDF; the deterministic answer guard only presents the table when all bands and the official source URL are retrieved. Circular No. 09-2026 now records the overall election period separately from the narrower restriction windows, project-category exceptions, COMELEC exemption process, and cancellation/postponement clause.
+
+The current retrieval module was updated on the review branch to add exact source-scoped retrieval for these specialized questions, rank the selected issuance above generic keyword matches, and put the official source URL in the prompt's excerpt header. The new regression tests check that representative prompts map to the correct named issuance and that unrelated PR-status prompts do not trigger these specialized sources.
+
+After these corrections, the live database has 2,994 chunks. The two revised circular summaries and the new Public Advisory No. 09-2026 chunk were marked with NULL embeddings so they can be re-embedded from the corrected source text; current keyword retrieval does not use vectors, but these embeddings should be repaired before enabling vector retrieval. Run the embedding repair locally against the intended Supabase project:
+
+```bash
+node scripts/repair-knowledge-base.js --embeddings-only
+node scripts/repair-knowledge-base.js --apply --embeddings-only
+```
+
+Recheck counts first and confirm that .env.local points to the intended Supabase project. Never commit .env.local or expose the service-role key.

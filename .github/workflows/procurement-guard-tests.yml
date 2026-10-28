@@ -5,13 +5,28 @@ on:
     branches: [master]
     paths:
       - "lib/procurement-answer-guards.js"
+      - "lib/procurement-answer-guards.d.ts"
+      - "app/api/chat/route.ts"
+      - "app/api/chat/send/route.ts"
+      - "lib/document-retrieval.ts"
+      - "lib/procurement-issuance-intents.js"
       - "scripts/tests/procurement-answer-guards.test.cjs"
+      - "scripts/tests/procurement-issuance-intents.test.cjs"
+      - "scripts/tests/procurement-accuracy-matrix.test.cjs"
+      - "package.json"
       - ".github/workflows/procurement-guard-tests.yml"
   pull_request:
     branches: [master]
     paths:
       - "lib/procurement-answer-guards.js"
+      - "lib/procurement-answer-guards.d.ts"
+      - "app/api/chat/route.ts"
+      - "app/api/chat/send/route.ts"
+      - "lib/document-retrieval.ts"
+      - "lib/procurement-issuance-intents.js"
       - "scripts/tests/procurement-answer-guards.test.cjs"
+      - "scripts/tests/procurement-issuance-intents.test.cjs"
+      - "package.json"
       - ".github/workflows/procurement-guard-tests.yml"
 
 jobs:
@@ -25,4 +40,4 @@ jobs:
         with:
           node-version: "20"
       - name: Run procurement answer guard regression tests
-        run: node --test scripts/tests/procurement-answer-guards.test.cjs
+        run: node --test scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs

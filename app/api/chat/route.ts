@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
-import { buildVerifiedProcurementAnswer } from '@/lib/procurement-answer-guards';
+import { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
@@ -1048,8 +1048,23 @@ export async function POST(req: NextRequest) {
     let inquiryType = 'general';
     let citedSources: string[] = [];
 
-    // 2. Check if currently in multi-turn PR drafting
-    if (currentState.drafting) {
+    // Source-sensitive policy questions must bypass slot-filling first. This
+    // prevents long legal prompts containing words like "supplier", "price",
+    // "budget", or "section" from being mistaken for PR draft-field answers.
+    const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg);
+    if (deterministicPolicyQuestion) {
+      const policyRetrieval = await retrieveDocumentChunks(trimmedMsg, 6);
+      const verifiedPolicyAnswer = buildVerifiedProcurementAnswer(trimmedMsg, policyRetrieval.chunks);
+      // The guard returns a source-linked evidence-gap answer when current excerpts
+      // are missing. Keep that behavior rather than falling through to free-form guessing.
+      const policyEvidenceGapAnswer = buildVerifiedProcurementAnswer(trimmedMsg, []);
+      responseText = verifiedPolicyAnswer || policyEvidenceGapAnswer
+        || 'I could not verify this procurement rule from the official excerpts retrieved. Please consult the relevant GPPB issuance before acting.';
+      citedSources = policyRetrieval.sources.map(normalizeSourceLabel);
+      inquiryType = 'procurement_guidance';
+      // A policy question is a new topic, not input for the pending PR slot.
+      updatedState = {};
+    } else if (currentState.drafting) {
       inquiryType = 'draft_pr';
       const result = await handleDraftPRFlow(trimmedMsg, currentState);
       responseText = result.response;
@@ -1151,7 +1166,12 @@ CRITICAL DIRECTIVES:
 24. If the user explicitly asks what applied historically before RA No. 12009, identify RA No. 9184 and its 2016 Revised IRR from those historical sources. Do not cite Section 5 of the RA No. 12009 IRR as the source for the prior law. If the correct historical sources were not retrieved, say so instead of improvising a citation.
 25. For an MSU-Gensan Purchase Request workflow answer, describe the PMO Administrative Manual as an internal institutional procedure. Do not append an unrelated claim that RA No. 9184 is the current law or cite that historical law as the legal basis for current procurement.
 26. If the user asks to search the internet, browse online, or find the latest information, do not claim that you performed a live web search unless a live-search tool was actually used. This deployment does not provide live web search in the chat flow. Explain briefly that you can search the indexed Supabase knowledge base, which may not contain the latest updates; then offer a useful next step and, when relevant, direct the user to the official GPPB website (https://www.gppb.gov.ph/) or the official MSU-GenSan website (https://msugensan.edu.ph/). Do not say you can only use excerpts the user personally provided: retrieve and use relevant excerpts from the system's own knowledge base when available.
-27. For questions about the current MSU-GenSan University Chancellor or the PR form's “Approved By” name, use the dedicated Chancellor identity handler and the current official MSU-GenSan University Directory excerpt. The official directory currently identifies Atty. Shidik T. Abantas, MDM, LLM as University Chancellor. State that the PR form displays the name in its “Approved By” field, but never imply that the name appearing on the form means a particular PR has already been approved. If the official directory excerpt was not retrieved, say the name could not be verified rather than guessing.`;
+27. For questions about the current MSU-GenSan University Chancellor or the PR form's “Approved By” name, use the dedicated Chancellor identity handler and the current official MSU-GenSan University Directory excerpt. The official directory currently identifies Atty. Shidik T. Abantas, MDM, LLM as University Chancellor. State that the PR form displays the name in its “Approved By” field, but never imply that the name appearing on the form means a particular PR has already been approved. If the official directory excerpt was not retrieved, say the name could not be verified rather than guessing.
+28. Citation delivery is mandatory when the user asks for a source: use a clickable Markdown link to the official URL in the retrieved source metadata. If multiple sources support different parts of an answer, link each source next to the relevant claim; merely naming a circular or adding an unlabeled source list is not enough.
+29. Keep related instruments distinct: cite IRR Section 34 for SVP procedure and Circular No. 06-2026 for supplementary eligibility documents; Resolution No. 03-2025 and Capacity Development Advisory No. 2025-003 for Standard Forms and effectivity; Resolution No. 12-2025 plus the approved IRR for Decision Tree guidance; Circular No. 02-2026 for bidding-document rate bands; Circular No. 09-2026 for date- and category-specific 2026 BSKE restrictions; and Public Advisory No. 09-2026 plus the approved IRR for the withdrawn March 2026 IRR edition.
+30. For bidding-document rates, provide the numeric table only when the retrieved official-source excerpt includes all seven ABC bands. The amounts are maximum fees, not mandatory fees, and apply only to the competitive-selection modes in Circular No. 02-2026 Section 3.2. Otherwise state that the exact table was not present and do not estimate.
+31. For election-period restrictions, do not generalize a specific Notice of Award or funding prohibition to every procurement or the entire election period. Check the project category, separate dates, applicable exemption, and possible COMELEC authorization from Circular No. 09-2026.
+32. For every law/regulation answer, ensure the source link and section actually support the claim. Do not create a section number by borrowing a following section heading or by relying only on a model-generated citation.`;
 
         const userPrompt = `
 === VERIFIED EXCERPTS FROM SUPABASE \`document_chunks\` ===
