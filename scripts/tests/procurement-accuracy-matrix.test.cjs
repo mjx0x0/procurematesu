@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion, isBiddingDocumentsRateQuestion } = require('../../lib/procurement-answer-guards.js');
 const { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } = require('../../lib/procurement-scope-guard.js');
-const { extractPRDetailsRuleBased } = require('../../lib/pr-draft-extraction.js');
+const { extractPRDetailsRuleBased, hasCompletePRDetails } = require('../../lib/pr-draft-extraction.js');
 
 test('all six preview accuracy prompts route through the source-gated answer guard', () => {
   const prompts = [
@@ -377,6 +377,7 @@ test('PR drafting extracts purpose, full department, item quantity and unit cost
   assert.equal(extracted.items[0].unit_cost, 190);
   assert.equal(extracted.items[0].total_cost, 9500);
   assert.equal(extracted.total_amount, 9500);
+  assert.equal(hasCompletePRDetails(extracted), true);
 });
 
 test('PR parser does not mistake ordinary laboratory or office supplies for a requesting department', () => {
