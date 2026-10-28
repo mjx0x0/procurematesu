@@ -4,6 +4,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
+import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails, mergePRDetailsFromDepartmentReply } from '@/lib/pr-draft-extraction';
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
@@ -398,99 +399,7 @@ Return ONLY valid JSON:
 }
 
 function extractPRDetailsRuleBased(text: string): ExtractedPR {
-  let department: string | null = null;
-  const deptMatch = text.match(/(?:department|dept|college|office)\s*[:\-]?\s*([^.;,]+?)(?=\s+(?:purpose|items?)\s*[:\-]?|[.;]|$)/i);
-  if (deptMatch) {
-    department = deptMatch[1].trim();
-  }
-
-  // Detect a natural-language "quantity + unit + price per unit" pattern even
-  // when the item name and purpose appear earlier in the same sentence.
-  const qtyPriceMatch = text.match(
-    /\b(\d+)\s*(pieces?|pcs?|units?|sets?|reams?|boxes?|packs?|rolls?)\b\s*(?:,|and)?\s*(?:for\s+)?(?:₱|PHP|Php)?\s*([\d,]+(?:\.\d+)?)\s*(?:pesos?|php|₱)?\s*(?:per\s+(?:unit|piece|pc|item)|each)\b/i
-  );
-
-  const items: Array<any> = [];
-
-  if (qtyPriceMatch) {
-    const qty = parseInt(qtyPriceMatch[1], 10);
-    const rawUnit = qtyPriceMatch[2].toLowerCase();
-    const unit = rawUnit.startsWith('piece') || rawUnit.startsWith('pc') ? 'pcs'
-      : rawUnit.startsWith('unit') ? 'units'
-      : rawUnit.startsWith('set') ? 'sets'
-      : rawUnit.startsWith('ream') ? 'reams'
-      : rawUnit.startsWith('box') ? 'boxes'
-      : rawUnit.startsWith('pack') ? 'packs'
-      : rawUnit.startsWith('roll') ? 'rolls' : 'pcs';
-    const unitCost = parseFloat(qtyPriceMatch[3].replace(/,/g, '')) || 0;
-
-    const beforeQuantity = text.slice(0, qtyPriceMatch.index || 0)
-      .replace(/^.*?\b(?:procurement of|purchase of|procure|buying|for the procurement of)\s+/i, '')
-      .replace(/\s+for\s+(?:the\s+)?(?:\d+(?:st|nd|rd|th)\s+semester\s+)?[^,;]+?\s+courses?\s*$/i, '')
-      .trim()
-      .replace(/[,;:]+\s*$/, '');
-
-    const description = beforeQuantity || 'Procurement Item';
-    const purposeMatch = text.match(/(?:purpose\s*[:\-]?\s*|procurement of\s+)([^,;]+(?:\s+for\s+[^,;]+)?)/i);
-    const purpose = purposeMatch
-      ? purposeMatch[0].replace(/^purpose\s*[:\-]?\s*/i, '').trim()
-      : text.trim();
-
-    items.push({
-      item_description: description,
-      quantity: qty,
-      unit,
-      unit_cost: unitCost,
-      total_cost: qty * unitCost,
-    });
-
-    return {
-      department,
-      purpose,
-      items,
-      total_amount: qty * unitCost,
-    };
-  }
-
-  // Conventional "10 units Laptop at 45000 each" / multi-item parsing.
-  const lines = text.split(/[.;\n]/).filter(l => l.trim().length > 3);
-  for (const line of lines) {
-    const match = line.match(/(\d+)\s*([a-zA-Z]+)?\s*([^@\d]+?)(?:(?:at|@|costing|cost)\s*(?:₱|PHP|Php)?\s*([\d,]+))?$/i);
-    if (match) {
-      const qty = parseInt(match[1], 10);
-      const rawUnit = (match[2] || '').toLowerCase();
-      const unit = ['pcs','pc','pieces','piece'].includes(rawUnit) ? 'pcs'
-        : ['units','unit'].includes(rawUnit) ? 'units'
-        : ['sets','set'].includes(rawUnit) ? 'sets'
-        : ['reams','ream'].includes(rawUnit) ? 'reams'
-        : ['boxes','box'].includes(rawUnit) ? 'boxes'
-        : ['packs','pack'].includes(rawUnit) ? 'packs'
-        : ['rolls','roll'].includes(rawUnit) ? 'rolls' : 'pcs';
-      const desc = (match[3] || line).trim();
-      const unitCost = match[4] ? parseFloat(match[4].replace(/,/g, '')) || 0 : 0;
-      if (desc.length > 2) {
-        items.push({ item_description: desc, quantity: qty, unit, unit_cost: unitCost, total_cost: qty * unitCost });
-      }
-    }
-  }
-
-  if (items.length === 0) {
-    const qtyMatch = text.match(/\b(\d+)\b/);
-    const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
-    const costMatch = text.match(/(?:₱|PHP|Php)?\s*([\d,]+)(?:\.00)?/);
-    const cost = costMatch ? parseFloat(costMatch[1].replace(/,/g, '')) || 0 : 0;
-    items.push({
-      item_description: text.trim().slice(0, 100),
-      quantity: qty,
-      unit: 'pcs',
-      unit_cost: cost,
-      total_cost: qty * cost,
-    });
-  }
-
-  const purpose = text.trim();
-  const total = items.reduce((sum, item) => sum + item.total_cost, 0);
-  return { department, purpose, items, total_amount: total };
+  return extractPRDetailsRuleBasedFromHelper(text);
 }
 
 // ============================================================
@@ -712,11 +621,7 @@ async function handleDraftPRFlow(
 
       // If every required field is already present in one message, finish
       // immediately. The user should never have to repeat information.
-      if (
-        extracted.department &&
-        itemDetails.length > 0 &&
-        completeItems.length === itemDetails.length
-      ) {
+      if (hasCompletePRDetails(extracted)) {
         return buildDraftCompletionResponse(
           { ...extracted, items: completeItems },
           { ...newState, drafting: false, step: null, collected }
@@ -760,61 +665,67 @@ async function handleDraftPRFlow(
     }
 
     case 'department': {
-      collected.department = message.trim();
+      // The user may answer the department question and include item details
+      // in the same reply. Merge that reply with the purpose already recorded
+      // instead of treating the entire message as a department name.
+      const existingExtracted = collected.extracted && typeof collected.extracted === 'object'
+        ? collected.extracted
+        : { department: null, purpose: collected.purpose || null, items: [], total_amount: 0 };
+      const extracted = mergePRDetailsFromDepartmentReply(
+        collected.purpose || existingExtracted.purpose,
+        message,
+        existingExtracted
+      );
 
-      // Only finalize if every previously extracted item has all required
-      // fields. If something is missing, ask only for that missing detail.
-      if (collected.extracted?.items?.length) {
-        const extracted = {
-          ...collected.extracted,
-          department: collected.department,
-          purpose: collected.purpose || collected.extracted.purpose,
-        };
-        const incompleteItems = extracted.items.filter(
-          (item: any) =>
-            String(item.item_description || '').trim().length <= 2 ||
-            Number(item.quantity) <= 0 ||
-            String(item.unit || '').trim().length === 0 ||
-            Number(item.unit_cost) <= 0
-        );
+      collected.department = extracted.department || message.trim();
+      collected.purpose = extracted.purpose || collected.purpose || existingExtracted.purpose || '';
+      collected.extracted = extracted;
+      newState.collected = collected;
 
-        if (incompleteItems.length === 0) {
-          newState.collected = { ...collected, extracted };
-          return buildDraftCompletionResponse(extracted, {
-            ...newState,
-            drafting: false,
-            step: null,
-            collected: { ...collected, extracted },
-          });
+      if (hasCompletePRDetails(extracted)) {
+        return buildDraftCompletionResponse(extracted, {
+          ...newState,
+          drafting: false,
+          step: null,
+          collected: { ...collected, extracted },
+        });
+      }
+
+      const incompleteItems = (extracted.items || []).filter(
+        (item: any) =>
+          String(item.item_description || '').trim().length <= 2 ||
+          Number(item.quantity) <= 0 ||
+          String(item.unit || '').trim().length === 0 ||
+          Number(item.unit_cost) <= 0
+      );
+
+      if (incompleteItems.length > 0) {
+        const missingFields = new Set<string>();
+        for (const item of incompleteItems) {
+          if (String(item.item_description || '').trim().length <= 2) missingFields.add('item description');
+          if (Number(item.quantity) <= 0) missingFields.add('quantity');
+          if (String(item.unit || '').trim().length === 0) missingFields.add('unit');
+          if (Number(item.unit_cost) <= 0) missingFields.add('estimated unit cost');
         }
 
-        const first = incompleteItems[0];
-        const missing: string[] = [];
-        if (String(first.item_description || '').trim().length <= 2) missing.push('item description');
-        if (Number(first.quantity) <= 0) missing.push('quantity');
-        if (String(first.unit || '').trim().length === 0) missing.push('unit');
-        if (Number(first.unit_cost) <= 0) missing.push('estimated unit cost');
-
-        newState.collected = { ...collected, extracted };
         newState.step = 'items';
         return {
           response:
-            `✅ Department set: **"${collected.department}"**\n\n` +
-            `📦 I already captured the item information you provided. I still need: **${missing.join(', ')}**.\n\n` +
-            `Please provide only the missing detail(s); you do not need to repeat the information already given.`,
+            '✅ Department set: **"' + collected.department + '"**\n\n' +
+            '📦 I kept the purpose and department you provided. I still need: **' + Array.from(missingFields).join(', ') + '**.\n\n' +
+            'Please provide only the missing detail(s); you do not need to repeat the information already given.',
           newState,
         };
       }
 
-      newState.collected = collected;
       newState.step = 'items';
       return {
         response:
-          `✅ Department set: **"${collected.department}"**\n\n` +
-          `Now, please list the **items** you need.\n\n` +
-          `For best results, include **description, quantity, unit, and estimated unit cost** in PHP:\n` +
-          `• Example: *'10 units Laptop Intel i7 at 45000 each, 2 units Laser Printer at 18000 each'*\n\n` +
-          `You can write multiple items in one message. Type **done** when you are finished!`,
+          '✅ Department set: **"' + collected.department + '"**\n\n' +
+          'Now, please list the **items** you need.\n\n' +
+          'For best results, include **description, quantity, unit, and estimated unit cost** in PHP:\n' +
+          '• Example: *\'10 units Laptop Intel i7 at 45000 each, 2 units Laser Printer at 18000 each\'*\n\n' +
+          'You can write multiple items in one message. Type **done** when you are finished!',
         newState,
       };
     }
