@@ -120,7 +120,7 @@ const svpCircularChunk = {
   chunk_text: [
     'Sections 3.1 and 3.2: These guidelines apply to State Universities and Colleges and do not replace substantive conditions of RA No. 12009 and its IRR. Section 3.5: The enumerated eligibility document list is exclusive.',
     'Section 4.2: The BAC must state in the RFQ/RFP when documents are to be submitted.',
-    'Section 4.3.1(b): If Red Membership is accepted, submit printed Merchant Details corresponding to the PhilGEPS Organization ID. Section 4.3.2: Mayor’s Permit or Business Registration Permit.',
+    'Section 4.3.1(b): If PhilGEPS Red Membership is accepted, submit printed Merchant Details corresponding to the PhilGEPS Organization ID. Section 4.3.2: Mayor’s Permit or Business Registration Permit.',
     'Section 4.3.3: Professional License or Curriculum Vitae for consulting services procured through Take-over of Contracts or Highly Technical Consultants. Section 4.3.5: PCAB License for infrastructure projects, or Special PCAB License for a joint venture.',
     'Section 4.3.6: Income/Business Tax Return if the ABC exceeds PHP 500,000. Section 4.3.7: Omnibus Sworn Statement. Section 4.4: If the PE already maintains an updated file, it may no longer require resubmission.',
     'Section 4.7 Small Value Procurement Document Matrix: PhilGEPS Organization ID; Mayor’s Permit; Professional License/CV (Consulting); PCAB License and registration for infrastructure; Income/Business Tax Return for ABCs above PHP 500,000; Omnibus Sworn Statement for ABCs above PHP 50,000. The Professional License/CV treatment appears inconsistent between Sections 4.3.3 and 4.7 as to every SVP consulting procurement; seek GPPB clarification.',
