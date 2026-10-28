@@ -2,7 +2,28 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { buildVerifiedProcurementAnswer } = require('../../lib/procurement-answer-guards.js');
+const { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } = require('../../lib/procurement-answer-guards.js');
+
+test('all six preview accuracy prompts route through the source-gated answer guard', () => {
+  const prompts = [
+    'Which version of the Implementing Rules and Regulations of RA No. 12009 should MSU-General Santos use? What happened to the March 2026 edition?',
+    'When did the Standard Procurement Forms under RA No. 12009 become mandatory, and which GPPB resolution approved them?',
+    'What procurement modes are available under RA No. 12009?',
+    'Explain the Small Value Procurement threshold and procedure, including quotation requirements, posting exceptions, and supplier documentary requirements for an SUC.',
+    'Give all maximum bidding-document fees under GPPB Circular No. 02-2026 by Approved Budget for the Contract (ABC) range. Are these fees mandatory?',
+    'What restrictions applied during the 2026 BSKE election period under GPPB Circular No. 09-2026? Give the applicable dates, project categories, exceptions, and COMELEC exemption process.',
+  ];
+
+  for (const prompt of prompts) {
+    assert.equal(isDeterministicProcurementPolicyQuestion(prompt), true, 'not routed through the answer guard: ' + prompt);
+    assert.notEqual(buildVerifiedProcurementAnswer(prompt, []), null, 'no source-aware fail-closed answer: ' + prompt);
+  }
+});
+
+test('ordinary PR drafting requests are not intercepted by the policy-question preflight', () => {
+  assert.equal(isDeterministicProcurementPolicyQuestion('Help me draft a PR for laboratory supplies.'), false);
+  assert.equal(isDeterministicProcurementPolicyQuestion('Create a new Purchase Request for 10 office chairs.'), false);
+});
 
 const IRR_URL = 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf';
 const IRR_ADVISORY_URL = 'https://www.gppb.gov.ph/public-advisory-no-09-2026/';
@@ -172,6 +193,7 @@ test('SVP answer separates IRR Section 34 from Circular 06-2026 and cites both',
   assert.match(answer, /₱200,000 or below/i);
   assert.match(answer, /Professional License\/CV/i);
   assert.match(answer, /not an automatic award/i);
+  assert.match(answer, /may, at its discretion, conduct a pre-bid conference/i);
   assert.ok(answer.includes(IRR_URL));
   assert.ok(answer.includes(SVP_CIRCULAR_URL));
 });
@@ -205,6 +227,9 @@ test('Bidding-document rates answer all seven bands and marks them as maximum fe
     assert.ok(answer.includes(amount), 'missing rate ' + amount);
   }
   assert.match(answer, /maximum fees/i);
+  assert.match(answer, /competitive-selection modes only/i);
+  assert.match(answer, /not compulsory charges/i);
+  assert.match(answer, /does not apply automatically to every procurement mode/i);
   assert.ok(answer.includes(RATE_URL));
 });
 
