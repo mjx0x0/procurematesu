@@ -600,7 +600,8 @@ test('Circular No. 02-2026 answer fails closed if the exact rate table is missin
     ...biddingRateChunks[0],
     chunk_text: 'Circular No. 02-2026 provides standard rates, but the rate table is not reproduced here.',
   }]);
-  assert.match(answer, /can(?:not|.?t) verify/i);
+  assert.match(answer, /does not contain a complete, verified rate table/i);
+  assert.match(answer, /will not estimate or invent/i);
   assert.match(answer, /Annex-A_Circular-Bid-Docs-Fees_15052026\.pdf/);
 });
 
