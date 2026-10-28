@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion, isBiddingDocumentsRateQuestion } = require('../../lib/procurement-answer-guards.js');
 const { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } = require('../../lib/procurement-scope-guard.js');
-const { extractPRDetailsRuleBased, hasCompletePRDetails } = require('../../lib/pr-draft-extraction.js');
+const { extractPRDetailsRuleBased, hasCompletePRDetails, mergePRDetailsFromDepartmentReply, hasExplicitPricedItemDetails } = require('../../lib/pr-draft-extraction.js');
 
 test('all six preview accuracy prompts route through the source-gated answer guard', () => {
   const prompts = [
@@ -394,4 +394,47 @@ test('PR parser does not mistake ordinary laboratory or office supplies for a re
   assert.equal(office.department, null);
   assert.equal(office.items[0].quantity, 12);
   assert.equal(office.items[0].unit_cost, 75);
+});
+
+
+test('PR drafting merges department-step reply with the previously recorded purpose', () => {
+  const purpose = 'Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses';
+  const priorExtraction = extractPRDetailsRuleBased(purpose);
+  const reply = 'College of Education, 50 pcs, 150 pesos each';
+
+  assert.equal(hasExplicitPricedItemDetails(reply), true);
+  const merged = mergePRDetailsFromDepartmentReply(purpose, reply, priorExtraction);
+
+  assert.equal(merged.department, 'College of Education');
+  assert.equal(merged.purpose, purpose);
+  assert.equal(merged.items.length, 1);
+  assert.equal(merged.items[0].item_description, 'laboratory glassware and supplies');
+  assert.equal(merged.items[0].quantity, 50);
+  assert.equal(merged.items[0].unit, 'pcs');
+  assert.equal(merged.items[0].unit_cost, 150);
+  assert.equal(merged.items[0].total_cost, 7500);
+  assert.equal(merged.total_amount, 7500);
+  assert.equal(hasCompletePRDetails(merged), true);
+});
+
+test('Department-only reply preserves the prior purpose and items without becoming a department string plus item details', () => {
+  const purpose = 'Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses';
+  const priorExtraction = {
+    department: null,
+    purpose,
+    items: [{
+      item_description: 'laboratory glassware and supplies',
+      quantity: 50,
+      unit: 'pcs',
+      unit_cost: 150,
+      total_cost: 7500,
+    }],
+    total_amount: 7500,
+  };
+
+  const merged = mergePRDetailsFromDepartmentReply(purpose, 'College of Education', priorExtraction);
+  assert.equal(merged.department, 'College of Education');
+  assert.equal(merged.purpose, purpose);
+  assert.deepEqual(merged.items, priorExtraction.items);
+  assert.equal(hasCompletePRDetails(merged), true);
 });
