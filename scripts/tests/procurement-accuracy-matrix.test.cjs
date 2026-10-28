@@ -210,7 +210,8 @@ test('Bidding-document rates answer all seven bands and marks them as maximum fe
 
 test('Bidding-document rates abstain if complete official rate table is not retrieved', () => {
   const answer = buildVerifiedProcurementAnswer(rateQuery, [{ ...rateChunk, chunk_text: 'Circular No. 02-2026 provides standard rates but this excerpt omits the exact rate table.' }]);
-  assert.match(answer, /cannot verify/i);
+  assert.match(answer, /does not contain a complete, verified rate table/i);
+  assert.match(answer, /will not estimate or invent/i);
   assert.ok(answer.includes(RATE_URL));
 });
 
