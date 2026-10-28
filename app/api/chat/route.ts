@@ -4,7 +4,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
-import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails } from '@/lib/pr-draft-extraction';
+import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails, mergePRDetailsFromDepartmentReply } from '@/lib/pr-draft-extraction';
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
@@ -665,61 +665,67 @@ async function handleDraftPRFlow(
     }
 
     case 'department': {
-      collected.department = message.trim();
+      // The user may answer the department question and include item details
+      // in the same reply. Merge that reply with the purpose already recorded
+      // instead of treating the entire message as a department name.
+      const existingExtracted = collected.extracted && typeof collected.extracted === 'object'
+        ? collected.extracted
+        : { department: null, purpose: collected.purpose || null, items: [], total_amount: 0 };
+      const extracted = mergePRDetailsFromDepartmentReply(
+        collected.purpose || existingExtracted.purpose,
+        message,
+        existingExtracted
+      );
 
-      // Only finalize if every previously extracted item has all required
-      // fields. If something is missing, ask only for that missing detail.
-      if (collected.extracted?.items?.length) {
-        const extracted = {
-          ...collected.extracted,
-          department: collected.department,
-          purpose: collected.purpose || collected.extracted.purpose,
-        };
-        const incompleteItems = extracted.items.filter(
-          (item: any) =>
-            String(item.item_description || '').trim().length <= 2 ||
-            Number(item.quantity) <= 0 ||
-            String(item.unit || '').trim().length === 0 ||
-            Number(item.unit_cost) <= 0
-        );
+      collected.department = extracted.department || message.trim();
+      collected.purpose = extracted.purpose || collected.purpose || existingExtracted.purpose || '';
+      collected.extracted = extracted;
+      newState.collected = collected;
 
-        if (incompleteItems.length === 0) {
-          newState.collected = { ...collected, extracted };
-          return buildDraftCompletionResponse(extracted, {
-            ...newState,
-            drafting: false,
-            step: null,
-            collected: { ...collected, extracted },
-          });
+      if (hasCompletePRDetails(extracted)) {
+        return buildDraftCompletionResponse(extracted, {
+          ...newState,
+          drafting: false,
+          step: null,
+          collected: { ...collected, extracted },
+        });
+      }
+
+      const incompleteItems = (extracted.items || []).filter(
+        (item: any) =>
+          String(item.item_description || '').trim().length <= 2 ||
+          Number(item.quantity) <= 0 ||
+          String(item.unit || '').trim().length === 0 ||
+          Number(item.unit_cost) <= 0
+      );
+
+      if (incompleteItems.length > 0) {
+        const missingFields = new Set<string>();
+        for (const item of incompleteItems) {
+          if (String(item.item_description || '').trim().length <= 2) missingFields.add('item description');
+          if (Number(item.quantity) <= 0) missingFields.add('quantity');
+          if (String(item.unit || '').trim().length === 0) missingFields.add('unit');
+          if (Number(item.unit_cost) <= 0) missingFields.add('estimated unit cost');
         }
 
-        const first = incompleteItems[0];
-        const missing: string[] = [];
-        if (String(first.item_description || '').trim().length <= 2) missing.push('item description');
-        if (Number(first.quantity) <= 0) missing.push('quantity');
-        if (String(first.unit || '').trim().length === 0) missing.push('unit');
-        if (Number(first.unit_cost) <= 0) missing.push('estimated unit cost');
-
-        newState.collected = { ...collected, extracted };
         newState.step = 'items';
         return {
           response:
-            `✅ Department set: **"${collected.department}"**\n\n` +
-            `📦 I already captured the item information you provided. I still need: **${missing.join(', ')}**.\n\n` +
-            `Please provide only the missing detail(s); you do not need to repeat the information already given.`,
+            '✅ Department set: **"' + collected.department + '"**\n\n' +
+            '📦 I kept the purpose and department you provided. I still need: **' + Array.from(missingFields).join(', ') + '**.\n\n' +
+            'Please provide only the missing detail(s); you do not need to repeat the information already given.',
           newState,
         };
       }
 
-      newState.collected = collected;
       newState.step = 'items';
       return {
         response:
-          `✅ Department set: **"${collected.department}"**\n\n` +
-          `Now, please list the **items** you need.\n\n` +
-          `For best results, include **description, quantity, unit, and estimated unit cost** in PHP:\n` +
-          `• Example: *'10 units Laptop Intel i7 at 45000 each, 2 units Laser Printer at 18000 each'*\n\n` +
-          `You can write multiple items in one message. Type **done** when you are finished!`,
+          '✅ Department set: **"' + collected.department + '"**\n\n' +
+          'Now, please list the **items** you need.\n\n' +
+          'For best results, include **description, quantity, unit, and estimated unit cost** in PHP:\n' +
+          '• Example: *\'10 units Laptop Intel i7 at 45000 each, 2 units Laser Printer at 18000 each\'*\n\n' +
+          'You can write multiple items in one message. Type **done** when you are finished!',
         newState,
       };
     }
