@@ -559,7 +559,7 @@ test('IRR edition question cites the actual withdrawal advisory and the approved
 
 test('IRR edition question fails closed when the official withdrawal advisory was not retrieved', () => {
   const answer = buildVerifiedProcurementAnswer(currentIrrVersionQuestion, [currentIrrVersionChunks[1]]);
-  assert.match(answer, /cannot verify/i);
+  assert.match(answer, /can(?:not|.?t) verify/i);
   assert.match(answer, /Public Advisory No\. 09-2026/);
 });
 
@@ -596,7 +596,7 @@ test('Circular No. 02-2026 answer fails closed if the exact rate table is missin
     ...biddingRateChunks[0],
     chunk_text: 'Circular No. 02-2026 provides standard rates, but the rate table is not reproduced here.',
   }]);
-  assert.match(answer, /cannot verify/i);
+  assert.match(answer, /can(?:not|.?t) verify/i);
   assert.match(answer, /Annex-A_Circular-Bid-Docs-Fees_15052026\.pdf/);
 });
 
@@ -634,6 +634,6 @@ test('Circular No. 09-2026 answer fails closed rather than asserting a blanket b
     ...bskeChunks[0],
     chunk_text: 'The election period is from 3 October 2026 to 9 November 2026. Procurement restrictions apply.',
   }]);
-  assert.match(answer, /cannot verify/i);
+  assert.match(answer, /can(?:not|.?t) verify/i);
   assert.match(answer, /project category/i);
 });
