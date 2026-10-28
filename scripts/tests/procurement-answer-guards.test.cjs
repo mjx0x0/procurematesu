@@ -43,8 +43,8 @@ const transitionCircularChunks = [{
     'GPPB Circular No. 01-2025: Policy Guidance on Section 113 (Transitory Provision) in Relation to Section 115 (Repealing Clause) of RA No. 12009 and its IRR.',
     'Section 2.1: This Circular applies to State Universities and Colleges (SUCs).',
     'Section 4.2: RA No. 12009 expressly repealed RA No. 9184; RA No. 12009 and its IRR are already effective.',
-    'Section 5.1: RA No. 9184 and its IRR apply to procurement projects published before the effectivity of the IRR of RA No. 12009, which was 25 February 2025.',
-    'Section 5.2.1: Procuring entities shall continue using guidelines and forms issued under RA No. 9184 until the necessary guidelines, forms and requirements under relevant provisions of RA No. 12009 and its IRR have been issued by the GPPB.',
+    'LEGACY PROCUREMENT PROJECTS — CIRCULAR SECTION 5.1: RA No. 9184 and its IRR remain applicable to procurement projects published before the effectivity of the IRR of RA No. 12009, namely before 25 February 2025.',
+    'Section 5.2.1: Procuring entities shall continue using guidelines and forms issued under RA No. 9184 until the necessary guidelines, forms, and requirements under relevant provisions of RA No. 12009 and its IRR have been issued by the GPPB.',
     'Section 5.3.1: New Standard Procurement Forms became mandatory on 21 September 2025.',
     'Section 5.4: The three-year transitory period began with approval of new Standard Procurement Forms on 14 May 2025; the Circular identifies 15 May 2028 as the deadline for full compliance.',
   ].join('\n'),
@@ -190,6 +190,27 @@ test('current-law question distinguishes RA 12009 repeal from limited transition
   assert.match(answer, /15 May 2028/);
   assert.match(answer, /Public Advisory No\. 09-2026/);
   assert.ok(answer.includes(transitionCircularUrl));
+});
+
+
+test('current-law guard accepts the exact Oxford-comma wording stored in the live transition circular chunk', () => {
+  const liveStyleChunks = [{
+    ...transitionCircularChunks[0],
+    chunk_text: [
+      'GPPB CIRCULAR NO. 01-2025',
+      'Scope: expressly applies to State Universities and Colleges (SUCs), including SUCs such as MSU-General Santos, under Circular Section 2.1.',
+      'RA No. 12009 Section 115 expressly repeals RA No. 9184.',
+      'LEGACY PROCUREMENT PROJECTS — CIRCULAR SECTION 5.1',
+      'RA No. 9184 and its IRR remain applicable to procurement projects published before the effectivity of the IRR of RA No. 12009, namely before 25 February 2025.',
+      'CONTINUED USE OF PARTICULAR GUIDELINES AND FORMS — CIRCULAR SECTION 5.2.1',
+      'Procuring entities shall continue to use guidelines and forms issued under RA No. 9184 and its IRR until the necessary guidelines, forms, and requirements under the relevant provisions of RA No. 12009 and its IRR have been issued by the GPPB.',
+      'The three-year period for full compliance is identified as 15 May 2028.'
+    ].join('\n')
+  }];
+  const answer = buildVerifiedProcurementAnswer('Is RA 9184 still the current procurement law for MSU-Gensan?', liveStyleChunks);
+  assert.ok(answer);
+  assert.match(answer, /No—not as the general governing law/i);
+  assert.doesNotMatch(answer, /can’t verify this procurement rule/i);
 });
 
 test('current-law answer fails closed without verified official transition-circular provenance', () => {
