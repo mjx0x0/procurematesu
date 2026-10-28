@@ -6,6 +6,7 @@ on:
     paths:
       - "lib/procurement-answer-guards.js"
       - "app/api/chat/route.ts"
+      - "app/api/chat/send/route.ts"
       - "lib/document-retrieval.ts"
       - "lib/procurement-issuance-intents.js"
       - "scripts/tests/procurement-answer-guards.test.cjs"
@@ -18,6 +19,7 @@ on:
     paths:
       - "lib/procurement-answer-guards.js"
       - "app/api/chat/route.ts"
+      - "app/api/chat/send/route.ts"
       - "lib/document-retrieval.ts"
       - "lib/procurement-issuance-intents.js"
       - "scripts/tests/procurement-answer-guards.test.cjs"
