@@ -64,6 +64,14 @@ test('SVP documentary questions retrieve both Section 34 and Circular No. 06-202
   );
 });
 
+
+test('procurement modes list questions retrieve Resolution No. 12-2025 and the approved IRR', () => {
+  assert.deepEqual(
+    names('What procurement modes are available under RA No. 12009?'),
+    ['GPPB Resolution No. 12-2025', 'Implementing Rules and Regulations of RA 12009'],
+  );
+});
+
 test('bidding-document fee questions scope to Circular No. 02-2026', () => {
   assert.deepEqual(
     names('What is the standard rate for bidding documents?'),
