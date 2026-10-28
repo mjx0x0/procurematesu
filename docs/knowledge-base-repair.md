@@ -18,7 +18,7 @@ The repair script is deliberately separate from `scripts/ingest-docs.js`. The or
    node scripts/repair-knowledge-base.js --embeddings-only
    ```
 
-4. Confirm the dry run reports only the expected missing-embedding counts. The read-only count at the time of this update is 408 total missing vectors: 376 IRR chunks, 30 PMO Administrative Manual chunks, one university-directory chunk, and one temporary-relocation-advisory chunk. Recheck the counts at run time.
+4. Confirm the dry run reports only the expected missing-embedding counts. Historical snapshot only: an earlier audit reported 408 missing vectors. That count is stale and must not be used for the current database; recheck the counts at run time. On 28 October 2026, after current-issuance additions, the live database had 15 rows with NULL embeddings; the 376 chunks for the verified GPPB-approved RA No. 12009 IRR all had embeddings and the correct official source URL/status metadata.
 
 5. If the counts are as expected and the local `.env.local` points to the intended Supabase project, apply **only the missing embeddings**:
 
@@ -108,3 +108,27 @@ The source-gated answer guard now has separate handling for:
 - Current PMO Director contact questions (only the verified official MSU-GenSan University Directory chunk and its source URL can support the deterministic answer; unrelated manual/legal chunks are excluded from retrieval for this intent).
 
 The regression tests now check concise-vs-detailed SVP routing, official circular citation/link, historical RA 9184/2016 IRR citation, and suppression of unrelated content in the contact response. After pulling the branch, run `npm run test:procurement`, `npm run lint`, and `npx next build`; full local build checks must still be run on the current branch before merge.
+
+ 
+## Core GPPB issuance coverage added on 28 October 2026
+
+The live Supabase knowledge base now includes curated source-labeled summaries (not full issuance text) for:
+
+- GPPB Resolution No. 03-2025 — Standard Procurement Forms and categories.
+- GPPB Resolution No. 12-2025 — Procurement Mode Selection Decision Tree and the caution that the tree is guidance, not definitive authorization.
+- GPPB Circular No. 01-2026 — Direct Procurement for Science, Technology, and Innovation.
+- GPPB Circular Nos. 02-2026 to 05-2026 — sale of bidding documents, printing services, tied-bid method, and legal assistance/indemnification.
+- GPPB Circular Nos. 07-2026 to 09-2026 — Framework Agreements, disaster-related procurement, and the time-bound November 2026 BSKE election period.
+
+The source URLs, dates, statuses, and conditions are recorded in chunk metadata and each summary. The full official text and associated annexes remain the controlling reference; the summaries explicitly avoid substituting for rate tables, decision-tree graphics, or detailed procedural conditions. Circular No. 01-2025 was already present, but its existing chunk still needs an embedding repair.
+
+The current retrieval module was updated on the review branch to add exact source-scoped retrieval for these specialized questions, rank the selected issuance above generic keyword matches, and put the official source URL in the prompt's excerpt header. The new regression tests check that representative prompts map to the correct named issuance and that unrelated PR-status prompts do not trigger these specialized sources.
+
+After adding the new summaries, the live database count was 2,993 chunks and 15 NULL embeddings. Current keyword retrieval does not use vectors; it remains important to run the embedding repair before enabling vector retrieval. The repair only updates existing rows and should be run locally against the intended Supabase project:
+
+```bash
+node scripts/repair-knowledge-base.js --embeddings-only
+node scripts/repair-knowledge-base.js --apply --embeddings-only
+```
+
+Recheck counts first and confirm that .env.local points to the intended Supabase project. Never commit .env.local or expose the service-role key.
