@@ -1,0 +1,28 @@
+name: Procurement answer guard tests
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "lib/procurement-answer-guards.js"
+      - "scripts/tests/procurement-answer-guards.test.cjs"
+      - ".github/workflows/procurement-guard-tests.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "lib/procurement-answer-guards.js"
+      - "scripts/tests/procurement-answer-guards.test.cjs"
+      - ".github/workflows/procurement-guard-tests.yml"
+
+jobs:
+  procurement-answer-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run procurement answer guard regression tests
+        run: node --test scripts/tests/procurement-answer-guards.test.cjs
