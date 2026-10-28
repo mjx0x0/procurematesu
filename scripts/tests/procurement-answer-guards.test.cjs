@@ -26,7 +26,7 @@ const svpChunks = [
 
 const workflowChunks = [{
   document_name: 'PMO Administrative Manual',
-  chunk_text: 'Receipt of Purchase Request; review against PPMP and APP; validation by the PMO Director; control number; endorsement to Budget Management Office; PR signed by the Chancellor or authorized approving authority.',
+  chunk_text: 'IV. PROCESS FLOW. Receipt of Purchase Request; review against PPMP and APP; validation by the PMO Director; control number; endorsement to Budget Management Office; receipt of approved PR signed by the Chancellor or authorized approving authority; generation of RFQs based on approved PRs.',
 }];
 
 const historicalChunks = [
@@ -35,6 +35,21 @@ const historicalChunks = [
 ];
 
 const circularSourceUrl = 'https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf';
+const transitionCircularUrl = 'https://www.gppb.gov.ph/wp-content/uploads/2025/10/GPPB-Resolution-No.-05-2025.pdf';
+const transitionCircularChunks = [{
+  document_name: 'GPPB Circular No. 01-2025',
+  document_type: 'gppb_circular',
+  chunk_text: [
+    'GPPB Circular No. 01-2025: Policy Guidance on Section 113 (Transitory Provision) in Relation to Section 115 (Repealing Clause) of RA No. 12009 and its IRR.',
+    'Section 2.1: This Circular applies to State Universities and Colleges (SUCs).',
+    'Section 4.2: RA No. 12009 expressly repealed RA No. 9184; RA No. 12009 and its IRR are already effective.',
+    'Section 5.1: RA No. 9184 and its IRR apply to procurement projects published before the effectivity of the IRR of RA No. 12009, which was 25 February 2025.',
+    'Section 5.2.1: Procuring entities shall continue using guidelines and forms issued under RA No. 9184 until the necessary guidelines, forms and requirements under relevant provisions of RA No. 12009 and its IRR have been issued by the GPPB.',
+    'Section 5.3.1: New Standard Procurement Forms became mandatory on 21 September 2025.',
+    'Section 5.4: The three-year transitory period began with approval of new Standard Procurement Forms on 14 May 2025; the Circular identifies 15 May 2028 as the deadline for full compliance.',
+  ].join('\n'),
+  metadata: { source_url: transitionCircularUrl, source_authority: 'gppb_current_issuance', document_status: 'current_transition_guidance_for_ra_12009' }
+}];
 const circularChunks = [
   {
     "document_name": "GPPB Circular No. 06-2026",
@@ -160,6 +175,60 @@ test('paraphrased small-purchase question receives a concise method recommendati
   assert.match(answer, /Circular No\. 06-2026/);
   assert.ok(answer.length < 1000, `Expected concise answer, got ${answer.length} characters`);
   assert.doesNotMatch(answer, /Quotation requirements — Sections 34\.1 and 34\.3\(c\)/);
+});
+
+
+test('current-law question distinguishes RA 12009 repeal from limited transition rules for SUCs', () => {
+  const query = 'Is RA 9184 still the current procurement law for MSU-Gensan?';
+  const answer = buildVerifiedProcurementAnswer(query, transitionCircularChunks);
+  assert.ok(answer);
+  assert.match(answer, /No—not as the general governing law for new procurement activities/i);
+  assert.match(answer, /expressly repealed RA No\. 9184/i);
+  assert.match(answer, /State Universities and Colleges/i);
+  assert.match(answer, /published before.*25 February 2025/i);
+  assert.match(answer, /continue using particular guidelines and forms/i);
+  assert.match(answer, /15 May 2028/);
+  assert.match(answer, /Public Advisory No\. 09-2026/);
+  assert.ok(answer.includes(transitionCircularUrl));
+});
+
+test('current-law answer fails closed without verified official transition-circular provenance', () => {
+  const answer = buildVerifiedProcurementAnswer('Is RA 9184 still current procurement law?', [
+    {
+      document_name: 'GPPB Circular No. 01-2025',
+      chunk_text: 'RA No. 12009 repealed RA No. 9184.',
+      metadata: { source_url: 'https://example.com/not-official' },
+    },
+  ]);
+  assert.match(answer, /can’t verify this procurement rule/i);
+  assert.doesNotMatch(answer, /No—not as the general governing law/i);
+});
+
+test('Draft does not advance to Step 1 until PMO confirms receipt of the printed PR form', () => {
+  const query = 'When does a newly created PR move from Draft to Step 1 in ProcureMateSU?';
+  const answer = buildVerifiedProcurementAnswer(query, []);
+  assert.ok(answer);
+  assert.match(answer, /stays in Draft until the Procurement Office receives the required printed PR form/i);
+  assert.match(answer, /confirms receipt in ProcureMateSU/i);
+  assert.match(answer, /Creating or saving the PR online does not by itself move it to Step 1/i);
+  assert.match(answer, /system workflow rule/i);
+});
+
+test('PMO receipt workflow answers with the manual sequence and does not present later documents as intake prerequisites', () => {
+  const query = 'What happens to a Purchase Request after it is received by the Procurement Management Office?';
+  const chunks = [{
+    document_name: 'PMO Administrative Manual',
+    chunk_text: 'IV. PROCESS FLOW. 1. Receipt of Purchase Request (PR): Receive duly accomplished PRs from end-user units. 2. Verification Against PPMP/APP: review against approved PPMP and APP. 3. Validation by PMO Director: review, validation, and signature. 4. Pre-Numbering and Control of PRs: assign control numbers and record in tracking log. 5. Endorsement to Budget Management Office for fund availability and obligation clearance. 6. Receipt of Approved PRs signed by Chancellor or authorized approving authority. 7. Generation of RFQs based on approved PRs with technical specifications and approved ABC.',
+    metadata: { source_file: 'PMO ADMINISTRATIVE MANUAL.pdf', document_status: 'manual_version_and_approval_not_verified' },
+  }];
+  const answer = buildVerifiedProcurementAnswer(query, chunks);
+  assert.ok(answer);
+  assert.match(answer, /PPMP\/APP verification/i);
+  assert.match(answer, /PMO Director validation/i);
+  assert.match(answer, /Budget Management Office/i);
+  assert.match(answer, /RFQ generation/i);
+  assert.match(answer, /version and approval status are not independently verified/i);
+  assert.doesNotMatch(answer, /RFQs, Small Value Procurement records, Abstracts of Quotations.*to confirm.*before any further action/i);
 });
 
 test('SVP handler abstains if current IRR section evidence is absent', () => {
