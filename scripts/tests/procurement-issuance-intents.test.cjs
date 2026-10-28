@@ -37,7 +37,7 @@ test('IRR edition/withdrawal questions retrieve the actual Public Advisory and a
     ['GPPB Public Advisory No. 09-2026', 'Implementing Rules and Regulations of RA 12009'],
   );
   assert.deepEqual(
-    names('Was the March 2026 IRR edition withdrawn?'),
+    names('Was the March 2026 IRR edition of RA No. 12009 withdrawn?'),
     ['GPPB Public Advisory No. 09-2026', 'Implementing Rules and Regulations of RA 12009'],
   );
 });
