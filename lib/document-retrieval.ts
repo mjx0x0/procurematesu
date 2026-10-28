@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { searchProcurementKnowledge as searchLocalDocs } from '@/lib/procurement-docs';
+import { getOfficialIssuanceRetrievalTargets } from '@/lib/procurement-issuance-intents';
 
 export interface RetrievedChunk {
   id?: string | number;
@@ -115,6 +116,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   const asksNoSvpQuotation = asksSvpDetails
     && /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b/i.test(query);
 
+  const officialIssuanceTargets = getOfficialIssuanceRetrievalTargets(query);
+
   // Expand common procurement/institutional aliases before searching. This makes
   // short questions such as "PRO director" searchable without requiring the user
   // to know the exact office name used in the source documents.
@@ -163,6 +166,17 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           .eq('document_name', documentName)
           .ilike('chunk_text', `%${contentPhrase}%`)
           .limit(4);
+
+      // Specialized official issuances are source-scoped before generic keyword
+      // searches so new, concise issuance summaries are not hidden behind older
+      // chunks that happen to contain common words such as "procurement" or "forms".
+      for (const target of officialIssuanceTargets) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', target.documentName)
+            .limit(target.limit || 12)
+        );
+      }
 
       // Broad per-word searches can miss the relevant chunk because each term
       // query returns only its first few matches. Add source-scoped searches for
@@ -378,6 +392,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const asksInstitutional = /\b(msu|gensan|university|pmo|pro|procurement office|department|chancellor|budget office|purchase request|pr|workflow|process|approval|logbook|director|contact|office)\b/i.test(query);
           if (asksLegal && isCurrentProcurementLawSource(identity)) score += 24;
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
+          const issuanceTarget = officialIssuanceTargets.find((target) => target.documentName === documentName);
+          if (issuanceTarget) score += issuanceTarget.priorityBoost || 1000;
           if (asksUniversityChancellor && documentName === 'MSU-GenSan University Directory') score += 1000;
           if (asksCurrentLawStatus && documentName === 'GPPB Circular No. 01-2025') score += 1000;
           if (asksDraftToStepOne && documentName === 'ProcureMateSU System Workflow') score += 1000;
@@ -417,11 +433,13 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // quotations, posting, and the no-quotation exception independently.
   const resultLimit = asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
-    : (asksUniversityChancellor || asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation || asksCurrentLawStatus || asksPmoReceiptQuestion)
-      ? Math.max(limit, 8)
-      : asksDraftToStepOne
-        ? Math.max(limit, 4)
-        : limit;
+    : officialIssuanceTargets.length > 0
+      ? Math.max(limit, Math.min(18, 4 + officialIssuanceTargets.length * 2))
+      : (asksUniversityChancellor || asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation || asksCurrentLawStatus || asksPmoReceiptQuestion)
+        ? Math.max(limit, 8)
+        : asksDraftToStepOne
+          ? Math.max(limit, 4)
+          : limit;
   const ranked = Array.from(candidates.values())
     .sort((a, b) => b.score - a.score)
     .slice(0, resultLimit);
@@ -460,7 +478,9 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         section ? `section/article: ${section}` : '',
         page ? `PDF page: ${page}` : '',
       ].filter(Boolean).join(' | ');
-      const docHeader = `[DOCUMENT EXCERPT ${index + 1}: ${chunk.document_name.toUpperCase()} (${chunk.document_type})${location ? ` | ${location}` : ''}]`;
+      const rawSourceUrl = metadataField(chunk.metadata, ['source_url', 'official_url', 'source_link']);
+      const sourceCitation = /^https?:\/\//i.test(rawSourceUrl) ? ` | official source: ${rawSourceUrl}` : '';
+      const docHeader = `[DOCUMENT EXCERPT ${index + 1}: ${chunk.document_name.toUpperCase()} (${chunk.document_type})${location ? ` | ${location}` : ''}${sourceCitation}]`;
       return `${docHeader}\n${chunk.chunk_text}`;
     })
     .join('\n\n========================================\n\n');
