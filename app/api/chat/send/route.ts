@@ -4,6 +4,7 @@ import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js
 import { GoogleGenAI } from '@google/genai';
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
 import { isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
+import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
 
@@ -146,6 +147,18 @@ export async function POST(request: NextRequest) {
         .eq('id', sessionId)
         .eq('user_id', user.id);
       draftState = {};
+    }
+
+    const scopeDecision = getProcurementScopeDecision(message, {
+      activePRDraft: Boolean(draftState.drafting),
+    });
+    if (!scopeDecision.allowed) {
+      // Do not pass unrelated, prompt-injection, or disclosure requests to
+      // slot validation, retrieval, or an AI provider.
+      return NextResponse.json({
+        response: PROCUREMENT_SCOPE_RESPONSE,
+        sources: ['ProcureMateSU scope and security guard'],
+      });
     }
 
     if (draftState.drafting) {
