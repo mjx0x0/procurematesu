@@ -16,3 +16,11 @@ export interface ExtractedPRDetails {
 export function extractPRDetailsRuleBased(text: string): ExtractedPRDetails;
 
 export function hasCompletePRDetails(extracted: ExtractedPRDetails | null | undefined): boolean;
+
+export function hasExplicitPricedItemDetails(value: string): boolean;
+
+export function mergePRDetailsFromDepartmentReply(
+  purpose: string | null | undefined,
+  reply: string,
+  existing?: ExtractedPRDetails | null
+): ExtractedPRDetails;
