@@ -22,11 +22,11 @@ test('standard procurement forms questions scope to Resolution No. 03-2025', () 
 test('procurement mode selection and decision-tree questions scope to Resolution No. 12-2025', () => {
   assert.deepEqual(
     names('What does the Procurement Mode Selection Decision Tree do?'),
-    ['GPPB Resolution No. 12-2025'],
+    ['GPPB Resolution No. 12-2025', 'Implementing Rules and Regulations of RA 12009'],
   );
   assert.deepEqual(
     names('Which procurement mode should we examine?'),
-    ['GPPB Resolution No. 12-2025'],
+    ['GPPB Resolution No. 12-2025', 'Implementing Rules and Regulations of RA 12009'],
   );
 });
 
@@ -39,6 +39,28 @@ test('IRR edition/withdrawal questions retrieve the actual Public Advisory and a
   assert.deepEqual(
     names('Was the March 2026 IRR edition of RA No. 12009 withdrawn?'),
     ['GPPB Public Advisory No. 09-2026', 'Implementing Rules and Regulations of RA 12009'],
+  );
+});
+
+
+test('standard-forms questions retrieve Resolution No. 03-2025 directly', () => {
+  assert.deepEqual(
+    names('When did the new Standard Procurement Forms become mandatory, and what GPPB resolution approved them?'),
+    ['GPPB Resolution No. 03-2025'],
+  );
+});
+
+test('SVP threshold questions retrieve the approved IRR Section 34', () => {
+  assert.deepEqual(
+    names('What is the Small Value Procurement threshold under RA No. 12009 and how many quotations are required?'),
+    ['Implementing Rules and Regulations of RA 12009'],
+  );
+});
+
+test('SVP documentary questions retrieve both Section 34 and Circular No. 06-2026', () => {
+  assert.deepEqual(
+    names('For an SUC using Small Value Procurement, explain the threshold and applicable supplier documents.'),
+    ['Implementing Rules and Regulations of RA 12009', 'GPPB Circular No. 06-2026'],
   );
 });
 
@@ -114,7 +136,8 @@ test('unrelated MSU purchase-request status question does not trigger specialize
 
 test('target objects carry deterministic priority and source limits', () => {
   const targets = getOfficialIssuanceRetrievalTargets('What is the procurement mode selection decision tree?');
-  assert.equal(targets.length, 1);
-  assert.equal(targets[0].priorityBoost, 1000);
-  assert.equal(targets[0].limit, 12);
+  assert.equal(targets.length, 2);
+  assert.equal(targets[0].documentName, 'GPPB Resolution No. 12-2025');
+  assert.equal(targets[0].priorityBoost, 1700);
+  assert.equal(targets[0].limit, 8);
 });
