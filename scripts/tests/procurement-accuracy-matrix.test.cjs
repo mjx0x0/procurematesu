@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } = require('../../lib/procurement-answer-guards.js');
+const { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion, isBiddingDocumentsRateQuestion } = require('../../lib/procurement-answer-guards.js');
 
 test('all six preview accuracy prompts route through the source-gated answer guard', () => {
   const prompts = [
@@ -18,6 +18,15 @@ test('all six preview accuracy prompts route through the source-gated answer gua
     assert.equal(isDeterministicProcurementPolicyQuestion(prompt), true, 'not routed through the answer guard: ' + prompt);
     assert.notEqual(buildVerifiedProcurementAnswer(prompt, []), null, 'no source-aware fail-closed answer: ' + prompt);
   }
+});
+
+test('hyphenated bidding-document fee wording reaches the verified fee-table handler', () => {
+  const prompt = 'Give all maximum bidding-document fees under GPPB Circular No. 02-2026 by Approved Budget for the Contract (ABC) range. Are these fees mandatory?';
+  assert.equal(isBiddingDocumentsRateQuestion(prompt), true);
+  const fallback = buildVerifiedProcurementAnswer(prompt, []);
+  assert.match(fallback, /complete, verified rate table/i);
+  assert.match(fallback, /will not estimate or invent/i);
+  assert.ok(fallback.includes('https://www.gppb.gov.ph/wp-content/uploads/2026/07/Annex-A_Circular-Bid-Docs-Fees_15052026.pdf'));
 });
 
 test('ordinary PR drafting requests are not intercepted by the policy-question preflight', () => {
