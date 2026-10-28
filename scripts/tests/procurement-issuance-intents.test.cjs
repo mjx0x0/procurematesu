@@ -79,6 +79,13 @@ test('bidding-document fee questions scope to Circular No. 02-2026', () => {
   );
 });
 
+test('the exact hyphenated bidding-document fee prompt routes to Circular No. 02-2026', () => {
+  assert.deepEqual(
+    names('Give all maximum bidding-document fees under GPPB Circular No. 02-2026 by Approved Budget for the Contract (ABC) range. Are these fees mandatory?'),
+    ['GPPB Circular No. 02-2026'],
+  );
+});
+
 test('printing-services questions scope to Circular No. 03-2026', () => {
   assert.deepEqual(
     names('Can an SUC use private printers for printing services?'),
