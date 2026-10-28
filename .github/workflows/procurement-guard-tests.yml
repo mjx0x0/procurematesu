@@ -16,7 +16,6 @@ on:
       - "scripts/tests/procurement-answer-guards.test.cjs"
       - "scripts/tests/procurement-issuance-intents.test.cjs"
       - "scripts/tests/procurement-accuracy-matrix.test.cjs"
-      - "scripts/tests/procurement-accuracy-matrix.test.cjs"
       - "package.json"
       - ".github/workflows/procurement-guard-tests.yml"
   pull_request:
