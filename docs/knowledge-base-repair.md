@@ -65,6 +65,13 @@ Test at least:
 - A question that has no matching source; the assistant should admit the retrieval gap instead of guessing.
 
 Do not call the test complete merely because embeddings exist. In the current keyword-based implementation, verify source ranking/filtering and answer grounding directly. Separately test vector retrieval if/when that feature is implemented.
+
+## Corrections for IRR edition, bidding-document rates, and 2026 BSKE restrictions
+
+- **IRR edition:** GPPB Public Advisory No. 09-2026, posted 31 July 2026, is the official withdrawal notice for the "1st Edition, as of 31 March 2026" IRR. Route edition/version questions to the separate Public Advisory record and the IRR approved through GPPB Resolution No. 02-2025. Do not cite GPPB Circular No. 01-2025 as the withdrawal notice; that circular covers transitory provisions.
+- **Bidding-document rates:** Circular No. 02-2026, Annex A to GPPB Resolution No. 08-2026, Section 5.2 sets maximum—not mandatory—costs: ABC ≤ ₱500,000 = ₱500; > ₱500,000 to ₱1 million = ₱1,000; > ₱1 million to ₱5 million = ₱5,000; > ₱5 million to ₱10 million = ₱10,000; > ₱10 million to ₱50 million = ₱25,000; > ₱50 million to ₱500 million = ₱50,000; > ₱500 million = ₱75,000. These rates apply to the competitive-selection modes specified in Section 3.2, not automatically to every procurement mode.
+- **2026 BSKE:** Circular No. 09-2026's overall election period is 3 October–9 November 2026. The public-works/housing and social-welfare Notice of Award/public-fund prohibition is 18 September–1 November; specified Ayuda/TUPAD/AKAP/AICS/4Ps distribution is restricted 23 October–2 November with burial/medical exceptions; barangay-funded roads and bridges are restricted 23 October–1 November. Section 4.2 exemptions, the COMELEC exemption process, and Section 7 cancellation/postponement rule must be retrieved with these dates. Never summarize this as a blanket ban on all procurement during the full election period.
+
 ## Retrieval and answer-grounding regression fixes
 
 The chat route now has source-gated deterministic answers for three high-risk, repeatedly tested question types:
@@ -120,11 +127,11 @@ The live Supabase knowledge base now includes curated source-labeled summaries (
 - GPPB Circular Nos. 02-2026 to 05-2026 — sale of bidding documents, printing services, tied-bid method, and legal assistance/indemnification.
 - GPPB Circular Nos. 07-2026 to 09-2026 — Framework Agreements, disaster-related procurement, and the time-bound November 2026 BSKE election period.
 
-The source URLs, dates, statuses, and conditions are recorded in chunk metadata and each summary. The full official text and associated annexes remain the controlling reference; the summaries explicitly avoid substituting for rate tables, decision-tree graphics, or detailed procedural conditions. Circular No. 01-2025 was already present, but its existing chunk still needs an embedding repair.
+The source URLs, dates, statuses, and conditions are recorded in chunk metadata and each summary. The full official text and associated annexes remain the controlling reference. The Circular No. 02-2026 summary now includes all seven maximum-cost bands transcribed from Section 5.2 of the official PDF; the deterministic answer guard only presents the table when all bands and the official source URL are retrieved. Circular No. 09-2026 now records the overall election period separately from the narrower restriction windows, project-category exceptions, COMELEC exemption process, and cancellation/postponement clause.
 
 The current retrieval module was updated on the review branch to add exact source-scoped retrieval for these specialized questions, rank the selected issuance above generic keyword matches, and put the official source URL in the prompt's excerpt header. The new regression tests check that representative prompts map to the correct named issuance and that unrelated PR-status prompts do not trigger these specialized sources.
 
-After adding the new summaries, the live database count was 2,993 chunks and 15 NULL embeddings. Current keyword retrieval does not use vectors; it remains important to run the embedding repair before enabling vector retrieval. The repair only updates existing rows and should be run locally against the intended Supabase project:
+After these corrections, the live database has 2,994 chunks. The two revised circular summaries and the new Public Advisory No. 09-2026 chunk were marked with NULL embeddings so they can be re-embedded from the corrected source text; current keyword retrieval does not use vectors, but these embeddings should be repaired before enabling vector retrieval. Run the embedding repair locally against the intended Supabase project:
 
 ```bash
 node scripts/repair-knowledge-base.js --embeddings-only
