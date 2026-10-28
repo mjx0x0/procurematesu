@@ -569,7 +569,7 @@ const biddingRateChunks = [{
   document_type: 'gppb_circular',
   chunk_text: [
     'GPPB Circular No. 02-2026, Sections 3.1–3.2: Applies to procuring entities including State Universities and Colleges, for Goods, Infrastructure Projects and Consulting Services through competitive selection.',
-    'Section 5.2. The cost of Bidding Documents shall correspond to the ABC range indicated in the table; this is the maximum amount that Procuring Entities can set.',
+    'Section 5.2. The cost of Bidding Documents shall correspond to the ABC range indicated in the table. The amount that a procuring entity may set is the MAXIMUM cost of the bidding documents. It is a ceiling, not a mandatory fee that every entity must charge.',
     'PHP 500,000 and below — 500.00',
     'More than 500,000 up to 1 Million — 1,000.00',
     'More than 1 Million up to 5 Million — 5,000.00',
