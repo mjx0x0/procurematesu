@@ -735,9 +735,17 @@ function buildDraftCompletionResponse(
   const encodedPrintData = encodeURIComponent(Buffer.from(JSON.stringify(printPayload)).toString('base64'));
   const printUrl = `/dashboard/pr-print?data=${encodedPrintData}`;
 
-  // Encode for New PR Form page (/dashboard/new-pr?...)
-  const itemsJson = encodeURIComponent(JSON.stringify(extracted.items));
-  const newPrUrl = `/dashboard/new-pr?department=${encodeURIComponent(dept)}&purpose=${encodeURIComponent(purpose)}&items=${itemsJson}&total=${total}`;
+  // Encode every query value safely. In particular, URLSearchParams escapes
+  // parentheses in department names such as "College of Education (CED)".
+  // The chat UI parses Markdown links using parentheses as delimiters, so raw
+  // parentheses here would truncate the href before purpose/items/total.
+  const newPrParams = new URLSearchParams({
+    department: dept,
+    purpose,
+    items: JSON.stringify(extracted.items),
+    total: String(total),
+  });
+  const newPrUrl = `/dashboard/new-pr?${newPrParams.toString()}`;
 
   let summary = `🎉 **Your Purchase Request Draft is Ready!**\n\n`;
   summary += `🏢 **Department**: ${dept}\n`;

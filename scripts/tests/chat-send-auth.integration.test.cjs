@@ -36,7 +36,7 @@ const sessions = new Map([
       step: null,
       collected: {
         purpose: 'Procurement of laboratory glassware for Chemistry classes',
-        department: 'College of Education',
+        department: 'College of Education (CED)',
         extracted: {
           purpose: 'Procurement of laboratory glassware for Chemistry classes',
           department: 'College of Education',
@@ -330,6 +330,22 @@ test('authenticated chatbot API enforces identity, account status, session owner
 
       assert.equal(correction.status, 200, JSON.stringify(correction.payload));
       assert.match(correction.payload.response, /60 pcs @ ₱150\.00 = \*\*₱9,000\.00\*\*/);
+
+      // Match the same Markdown-link pattern used by ChatMessageContent.tsx.
+      // A raw ')' in the href would truncate this link at "(CED)".
+      const correctionFormLink = correction.payload.response.match(/\[Open in New PR Form\]\(([^)]+)\)/);
+      assert.ok(correctionFormLink, 'The completed draft should include a parseable New PR Form link.');
+      const correctionFormUrl = new URL(correctionFormLink[1], 'https://procurematesu.test');
+      assert.equal(correctionFormUrl.pathname, '/dashboard/new-pr');
+      assert.equal(correctionFormUrl.searchParams.get('department'), 'College of Education (CED)');
+      assert.equal(correctionFormUrl.searchParams.get('purpose'), 'Procurement of laboratory glassware for Chemistry classes');
+      const correctedFormItems = JSON.parse(correctionFormUrl.searchParams.get('items') || '[]');
+      assert.equal(correctedFormItems.length, 1);
+      assert.equal(correctedFormItems[0].item_description, 'laboratory glassware');
+      assert.equal(correctedFormItems[0].quantity, 60);
+      assert.equal(correctedFormItems[0].unit, 'pcs');
+      assert.equal(correctedFormItems[0].unit_cost, 150);
+      assert.equal(correctionFormUrl.searchParams.get('total'), '9000');
       assert.match(correction.payload.response, /Estimated Total Amount.*₱9,000\.00/s);
       let savedState = sessions.get('session-completed-draft').state;
       assert.equal(savedState.drafting, false);
@@ -346,6 +362,17 @@ test('authenticated chatbot API enforces identity, account status, session owner
 
       assert.equal(addition.status, 200, JSON.stringify(addition.payload));
       assert.match(addition.payload.response, /60 pcs @ ₱150\.00 = \*\*₱9,000\.00\*\*/);
+      const additionFormLink = addition.payload.response.match(/\[Open in New PR Form\]\(([^)]+)\)/);
+      assert.ok(additionFormLink, 'The updated draft should include a parseable New PR Form link.');
+      const additionFormUrl = new URL(additionFormLink[1], 'https://procurematesu.test');
+      assert.equal(additionFormUrl.searchParams.get('department'), 'College of Education (CED)');
+      const addedFormItems = JSON.parse(additionFormUrl.searchParams.get('items') || '[]');
+      assert.equal(addedFormItems.length, 2);
+      assert.equal(addedFormItems[1].item_description, 'laboratory gloves');
+      assert.equal(addedFormItems[1].quantity, 2);
+      assert.equal(addedFormItems[1].unit, 'boxes');
+      assert.equal(addedFormItems[1].unit_cost, 300);
+      assert.equal(additionFormUrl.searchParams.get('total'), '9600');
       assert.match(addition.payload.response, /2 boxes @ ₱300\.00 = \*\*₱600\.00\*\*/);
       assert.match(addition.payload.response, /Estimated Total Amount.*₱9,600\.00/s);
       savedState = sessions.get('session-completed-draft').state;
