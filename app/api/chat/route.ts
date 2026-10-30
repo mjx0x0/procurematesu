@@ -520,7 +520,7 @@ async function handleDraftPRFlow(
     case 'purpose': {
       const extracted = await extractPRDetails(message);
       collected.purpose = extracted.purpose || message.trim();
-      collected.department = extracted.department || null;
+      collected.department = extracted.department || undefined;
       collected.extracted = extracted;
       newState.collected = collected;
 
@@ -579,7 +579,7 @@ async function handleDraftPRFlow(
         message,
         existingExtracted
       );
-      collected.department = extracted.department || null;
+      collected.department = extracted.department || undefined;
       collected.purpose = extracted.purpose || collected.purpose || existingExtracted.purpose || '';
       collected.extracted = extracted;
       newState.collected = collected;
