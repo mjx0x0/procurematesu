@@ -497,13 +497,187 @@ async function handleDraftPRFlow(
 
   switch (step) {
     case 'purpose': {
-      const extracted = await extractPRDetails(message);\n      collected.purpose = extracted.purpose || message.trim();\n      collected.department = extracted.department || null;\n      collected.extracted = extracted;\n      newState.collected = collected;\n\n      if (hasCompletePRDetails(extracted)) {\n        return buildDraftCompletionResponse(extracted, {\n          ...newState, drafting: false, step: null,\n          collected: { ...collected, extracted },\n        });\n      }\n\n      if (!extracted.department) {\n        newState.step = 'department';\n        const captured = extracted.items.length\n          ? `\\n\\n📦 I also captured **${extracted.items.length} item(s)** from your message.`\n          : '';\n        return {\n          response:\n            `✅ Purpose recorded: **"${collected.purpose}"**${captured}\\n\\n` +\n            `Next, which **department, college, or office** is requesting this? You may include item details in the same reply.\\n` +\n            `*(Example: 'College of Education, 50 pcs of laboratory glassware at ₱150 each')*`,\n          newState,\n        };\n      }\n\n      if (!extracted.items.length) {\n        newState.step = 'items';\n        return {\n          response:\n            `✅ Purpose and department recorded: **${extracted.department}**\\n\\n` +\n            `Now list the **items/services** needed, including each description, quantity, unit, and estimated unit cost. You may provide multiple items in one message.`,\n          newState,\n        };\n      }\n\n      const missing = getMissingItemFields(extracted.items);\n      newState.step = 'items';\n      return {\n        response:\n          `✅ Purpose and department recorded. I captured **${extracted.items.length} item(s)**, but some details are incomplete:\\n\\n` +\n          missing.map((entry) => `• **Item ${entry.index}${entry.description ? ` (${entry.description})` : ''}:** ${entry.missing.join(', ')}`).join('\\n') +\n          `\\n\\nPlease provide the missing details. You can also add more items, then type **done** when the list is complete.`,\n        newState,\n      };\n    }\n    case 'department': {\n      // A department reply may also contain one or more item lines. Merge all\n      // explicit details with the purpose already captured in the prior turn.\n      const existingExtracted = collected.extracted && typeof collected.extracted === 'object'\n        ? collected.extracted\n        : { department: null, purpose: collected.purpose || null, items: [], total_amount: 0 };\n      const extracted = mergePRDetailsFromDepartmentReply(\n        collected.purpose || existingExtracted.purpose,\n        message,\n        existingExtracted\n      );\n      collected.department = extracted.department || null;\n      collected.purpose = extracted.purpose || collected.purpose || existingExtracted.purpose || '';\n      collected.extracted = extracted;\n      newState.collected = collected;\n\n      if (!extracted.department) {\n        newState.step = 'department';\n        return {\n          response:\n            `I kept your previously recorded purpose and any item details. I still need the **requesting department, college, office, or unit**. Please identify it clearly.`,\n          newState,\n        };\n      }\n\n      if (hasCompletePRDetails(extracted)) {\n        return buildDraftCompletionResponse(extracted, {\n          ...newState, drafting: false, step: null,\n          collected: { ...collected, extracted },\n        });\n      }\n\n      if (!extracted.items.length) {\n        newState.step = 'items';\n        return {\n          response:\n            `✅ Department set: **${extracted.department}**\\n\\n` +\n            `Now list the **items/services** needed, including description, quantity, unit, and estimated unit cost. You may provide multiple items in one message.`,\n          newState,\n        };\n      }\n\n      const missing = getMissingItemFields(extracted.items);\n      newState.step = 'items';\n      return {\n        response:\n          `✅ Department set: **${extracted.department}**. I kept the purpose you already provided and captured **${extracted.items.length} item(s)**.\\n\\n` +\n          `Still needed:\\n` +\n          missing.map((entry) => `• **Item ${entry.index}${entry.description ? ` (${entry.description})` : ''}:** ${entry.missing.join(', ')}`).join('\\n') +\n          `\\n\\nPlease provide only the missing details. You can add other items too, then type **done** when finished.`,\n        newState,\n      };\n    }\n    case 'items': {\n      const isDone = /^(?:done|finish|finished|that'?s all|thats all|no more items)[.!\\s]*$/i.test(lower);\n      const current = collected.extracted && typeof collected.extracted === 'object'\n        ? collected.extracted\n        : { department: collected.department || null, purpose: collected.purpose || null, items: [], total_amount: 0 };\n\n      if (isDone) {\n        if (hasCompletePRDetails(current)) {\n          return buildDraftCompletionResponse(current, {\n            ...newState, drafting: false, step: null,\n            collected: { ...collected, extracted: current },\n          });\n        }\n        const missing = getMissingItemFields(current.items || []);\n        newState.step = 'items';\n        const missingText = missing.length\n          ? missing.map((entry) => `• **Item ${entry.index}${entry.description ? ` (${entry.description})` : ''}:** ${entry.missing.join(', ')}`).join('\\n')\n          : '• At least one item with a description, quantity, unit, and estimated unit cost';\n        return {\n          response:\n            `I cannot finalize the draft yet because some required details are missing:\\n\\n${missingText}\\n\\nPlease provide only those details. I will keep the information already captured.`,\n          newState,\n        };\n      }\n\n      const update = applyPRItemMessage(current.items || [], message, {\n        purpose: current.purpose || collected.purpose || '',\n        department: current.department || collected.department || null,\n      });\n      if (update.action === 'clarify' || update.action === 'unrecognized') {\n        newState.step = 'items';\n        newState.collected = collected;\n        return {\n          response: `I kept your current draft unchanged. ${update.reason}\\n\\nFor example: *10 pcs laboratory glassware at ₱150 each* or *change item 1 quantity to 12*.`,\n          newState,\n        };\n      }\n\n      const extracted = {\n        ...current,\n        items: update.items,\n        total_amount: update.items.reduce((sum: number, item: any) => sum + (Number(item.quantity) || 0) * (Number(item.unit_cost) || 0), 0),\n      };\n      collected.extracted = extracted;\n      collected.items_raw = undefined;\n      newState.collected = collected;\n      newState.step = 'items';\n\n      if (update.action === 'updated') {\n        return {\n          response: `✅ Updated **Item ${update.index + 1}**. I recalculated its line total. You can correct another item, add more items, or type **done** when finished.`,\n          newState,\n        };\n      }\n      if (update.action === 'duplicate') {\n        return {\n          response: `ℹ️ ${update.reason} I did not add a duplicate. You can add another item or type **done** when finished.`,\n          newState,\n        };\n      }\n\n      const missing = getMissingItemFields(extracted.items);\n      const response = missing.length\n        ? `✅ Captured ${update.added.length} new item(s).\\n\\nStill needed:\\n${missing.map((entry) => `• **Item ${entry.index}${entry.description ? ` (${entry.description})` : ''}:** ${entry.missing.join(', ')}`).join('\\n')}\\n\\nPlease supply the missing fields. You may add more items, then type **done**.`\n        : `✅ Captured ${update.added.length} new item(s). The current list has **${extracted.items.length} item(s)**. You can add another item or type **done** to review and finalize the draft.`;\n      return { response, newState };\n    }\n    default: {
-      newState = { drafting: true, step: 'purpose', collected: {} };
+      const extracted = await extractPRDetails(message);
+      collected.purpose = extracted.purpose || message.trim();
+      collected.department = extracted.department || null;
+      collected.extracted = extracted;
+      newState.collected = collected;
+
+      if (hasCompletePRDetails(extracted)) {
+        return buildDraftCompletionResponse(extracted, {
+          ...newState, drafting: false, step: null,
+          collected: { ...collected, extracted },
+        });
+      }
+
+      if (!extracted.department) {
+        newState.step = 'department';
+        const captured = extracted.items.length
+          ? 'I also captured ' + extracted.items.length + ' item(s) from your message.'
+          : '';
+        return {
+          response: [
+            '✅ Purpose recorded: **' + collected.purpose + '**',
+            captured,
+            'Next, which **department, college, or office** is requesting this? You may include item details in the same reply.',
+            'Example: College of Education, 50 pcs of laboratory glassware at ₱150 each',
+          ].filter(Boolean).join('\n\n'),
+          newState,
+        };
+      }
+
+      if (!extracted.items.length) {
+        newState.step = 'items';
+        return {
+          response: [
+            '✅ Purpose and department recorded: **' + extracted.department + '**',
+            'Now list the **items/services** needed, including each description, quantity, unit, and estimated unit cost. You may provide multiple items in one message.',
+          ].join('\n\n'),
+          newState,
+        };
+      }
+
+      const missing = getMissingItemFields(extracted.items);
+      newState.step = 'items';
       return {
-        response: "Let's start fresh with your Purchase Request. What is the primary **purpose** of this request?",
+        response: [
+          '✅ Purpose and department recorded. I captured **' + extracted.items.length + ' item(s)**, but some details are incomplete:',
+          missing.map((entry) => '• **Item ' + entry.index + (entry.description ? ' (' + entry.description + ')' : '') + ':** ' + entry.missing.join(', ')).join('\n'),
+          'Please provide the missing details. You can also add more items, then type **done** when the list is complete.',
+        ].join('\n\n'),
         newState,
       };
     }
+
+    case 'department': {
+      const existingExtracted = collected.extracted && typeof collected.extracted === 'object'
+        ? collected.extracted
+        : { department: null, purpose: collected.purpose || null, items: [], total_amount: 0 };
+      const extracted = mergePRDetailsFromDepartmentReply(
+        collected.purpose || existingExtracted.purpose,
+        message,
+        existingExtracted
+      );
+      collected.department = extracted.department || null;
+      collected.purpose = extracted.purpose || collected.purpose || existingExtracted.purpose || '';
+      collected.extracted = extracted;
+      newState.collected = collected;
+
+      if (!extracted.department) {
+        newState.step = 'department';
+        return {
+          response: 'I kept your previously recorded purpose and any item details. I still need the **requesting department, college, office, or unit**. Please identify it clearly.',
+          newState,
+        };
+      }
+
+      if (hasCompletePRDetails(extracted)) {
+        return buildDraftCompletionResponse(extracted, {
+          ...newState, drafting: false, step: null,
+          collected: { ...collected, extracted },
+        });
+      }
+
+      if (!extracted.items.length) {
+        newState.step = 'items';
+        return {
+          response: [
+            '✅ Department set: **' + extracted.department + '**',
+            'Now list the **items/services** needed, including description, quantity, unit, and estimated unit cost. You may provide multiple items in one message.',
+          ].join('\n\n'),
+          newState,
+        };
+      }
+
+      const missing = getMissingItemFields(extracted.items);
+      newState.step = 'items';
+      return {
+        response: [
+          '✅ Department set: **' + extracted.department + '**. I kept the purpose you already provided and captured **' + extracted.items.length + ' item(s)**.',
+          'Still needed:',
+          missing.map((entry) => '• **Item ' + entry.index + (entry.description ? ' (' + entry.description + ')' : '') + ':** ' + entry.missing.join(', ')).join('\n'),
+          'Please provide only the missing details. You can add other items too, then type **done** when finished.',
+        ].join('\n\n'),
+        newState,
+      };
+    }
+
+    case 'items': {
+      const isDone = /^(?:done|finish|finished|that's all|thats all|no more items)[.!\\s]*$/i.test(lower);
+      const current = collected.extracted && typeof collected.extracted === 'object'
+        ? collected.extracted
+        : { department: collected.department || null, purpose: collected.purpose || null, items: [], total_amount: 0 };
+
+      if (isDone) {
+        if (hasCompletePRDetails(current)) {
+          return buildDraftCompletionResponse(current, {
+            ...newState, drafting: false, step: null,
+            collected: { ...collected, extracted: current },
+          });
+        }
+        const missing = getMissingItemFields(current.items || []);
+        newState.step = 'items';
+        const missingText = missing.length
+          ? missing.map((entry) => '• **Item ' + entry.index + (entry.description ? ' (' + entry.description + ')' : '') + ':** ' + entry.missing.join(', ')).join('\n')
+          : '• At least one item with a description, quantity, unit, and estimated unit cost';
+        return {
+          response: [
+            'I cannot finalize the draft yet because some required details are missing:',
+            missingText,
+            'Please provide only those details. I will keep the information already captured.',
+          ].join('\n\n'),
+          newState,
+        };
+      }
+
+      const update = applyPRItemMessage(current.items || [], message, {
+        purpose: current.purpose || collected.purpose || '',
+        department: current.department || collected.department || null,
+      });
+      if (update.action === 'clarify' || update.action === 'unrecognized') {
+        newState.step = 'items';
+        newState.collected = collected;
+        return {
+          response: 'I kept your current draft unchanged. ' + update.reason + '\n\nFor example: *10 pcs laboratory glassware at ₱150 each* or *change item 1 quantity to 12*.',
+          newState,
+        };
+      }
+
+      const extracted = {
+        ...current,
+        items: update.items,
+        total_amount: update.items.reduce((sum: number, item: any) => sum + (Number(item.quantity) || 0) * (Number(item.unit_cost) || 0), 0),
+      };
+      collected.extracted = extracted;
+      delete collected.items_raw;
+      newState.collected = collected;
+      newState.step = 'items';
+
+      if (update.action === 'updated') {
+        return {
+          response: '✅ Updated **Item ' + (update.index + 1) + '**. I recalculated its line total. You can correct another item, add more items, or type **done** when finished.',
+          newState,
+        };
+      }
+      if (update.action === 'duplicate') {
+        return {
+          response: 'ℹ️ ' + update.reason + ' I did not add a duplicate. You can add another item or type **done** when finished.',
+          newState,
+        };
+      }
+
+      const missing = getMissingItemFields(extracted.items);
+      const response = missing.length
+        ? [
+            '✅ Captured ' + update.added.length + ' new item(s).',
+            'Still needed:',
+            missing.map((entry) => '• **Item ' + entry.index + (entry.description ? ' (' + entry.description + ')' : '') + ':** ' + entry.missing.join(', ')).join('\n'),
+            'Please supply the missing fields. You may add more items, then type **done**.',
+          ].join('\n\n')
+        : '✅ Captured ' + update.added.length + ' new item(s). The current list has **' + extracted.items.length + ' item(s)**. You can add another item or type **done** to review and finalize the draft.';
+      return { response, newState };
+    }
+
   }
 }
 
