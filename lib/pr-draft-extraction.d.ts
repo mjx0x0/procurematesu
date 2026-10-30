@@ -35,3 +35,5 @@ export function applyPRItemMessage(
   message: string,
   options?: { purpose?: string; department?: string | null }
 ): PRItemAction;
+
+export function isPlausibleDraftReply(step: string, message: string): boolean;
