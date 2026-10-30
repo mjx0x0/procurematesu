@@ -636,3 +636,36 @@ test('Full item replacement changes the targeted line without adding a second li
   assert.equal(result.items[1].unit_cost, 325);
   assert.equal(result.items[1].total_cost, 2600);
 });
+
+
+test('A distinct new item without an action word does not overwrite an incomplete existing line', () => {
+  const existing = [
+    { item_description: '', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 },
+  ];
+  const result = applyPRItemMessage(existing, '2 boxes laboratory gloves at ₱300 each');
+  assert.equal(result.action, 'added');
+  assert.equal(result.items.length, 2);
+  assert.equal(result.items[0].item_description, '');
+  assert.equal(result.items[0].quantity, 50);
+  assert.equal(result.items[1].item_description, 'laboratory gloves');
+  assert.equal(result.items[1].quantity, 2);
+  assert.equal(result.items[1].unit, 'boxes');
+  assert.equal(result.items[1].unit_cost, 300);
+});
+
+test('Multiple new item lines are appended even when an older item is incomplete', () => {
+  const existing = [
+    { item_description: '', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 },
+  ];
+  const result = applyPRItemMessage(
+    existing,
+    '2 boxes laboratory gloves at ₱300 each; 5 reams bond paper at ₱250 each'
+  );
+  assert.equal(result.action, 'added');
+  assert.equal(result.items.length, 3);
+  assert.equal(result.items[0].item_description, '');
+  assert.equal(result.items[1].item_description, 'laboratory gloves');
+  assert.equal(result.items[2].item_description, 'bond paper');
+  assert.equal(result.items[2].quantity, 5);
+  assert.equal(result.items[2].unit, 'reams');
+});
