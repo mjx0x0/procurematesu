@@ -148,6 +148,9 @@ export default function PRPrintContent() {
   const items = data.items || [];
   const totalAmount = data.total_amount || items.reduce((sum, item) => sum + (item.total_cost || 0), 0);
   const currentDate = data.pr_date || new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  // The encoded chatbot preview is not a saved PR. Only show the print action
+  // once a persisted PR record (and its temporary or official control number) exists.
+  const hasSavedPR = Boolean(data.pr_no?.trim() || data.system_tracking_no?.trim());
   const minRows = 6;
   const blankRows = Math.max(0, minRows - items.length);
 
@@ -178,13 +181,15 @@ export default function PRPrintContent() {
           )}
         </div>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-2 bg-[#7B0046] hover:bg-[#610037] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-all cursor-pointer"
-          >
-            <Printer className="h-4 w-4 text-amber-300" />
-            Print Official PR
-          </button>
+          {hasSavedPR && (
+            <button
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-2 bg-[#7B0046] hover:bg-[#610037] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-all cursor-pointer"
+            >
+              <Printer className="h-4 w-4 text-amber-300" />
+              Print Official PR
+            </button>
+          )}
         </div>
       </div>
 

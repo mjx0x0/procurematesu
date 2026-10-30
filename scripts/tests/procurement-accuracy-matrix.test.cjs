@@ -705,6 +705,14 @@ test('printable PR omits the office footer and places a small System Tracking Co
   assert.ok(printSource.includes('System Tracking Control:'));
   assert.ok(printSource.includes('text-[8px] leading-tight text-stone-600 print:text-[7px]'));
   assert.ok(printSource.includes('Not yet assigned'));
+  assert.match(
+    printSource,
+    /const hasSavedPR = Boolean\(data\.pr_no\?\.trim\(\) \|\| data\.system_tracking_no\?\.trim\(\)\);/
+  );
+  assert.match(
+    printSource,
+    /\{hasSavedPR && \(\s*<button[\s\S]*?Print Official PR[\s\S]*?<\/button>\s*\)\}/
+  );
 
   const signatureSection = printSource.indexOf('/* Signature Section Body */');
   const trackingLabel = printSource.indexOf('System Tracking Control:');
