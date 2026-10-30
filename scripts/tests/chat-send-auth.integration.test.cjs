@@ -368,6 +368,37 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.equal(savedState.collected.extracted.total_amount, 9600);
     });
 
+    await t.test('a completed PR draft can be corrected and extended in the same authenticated chat', async () => {
+      sessions.get('session-user-a').state = {
+        drafting: false,
+        draftReady: true,
+        step: null,
+        collected: { extracted: {
+          department: 'College of Education',
+          purpose: 'Procurement of laboratory supplies',
+          items: [{ item_description: 'laboratory glassware', quantity: 10, unit: 'pcs', unit_cost: 150, total_cost: 1500 }],
+          total_amount: 1500,
+        } },
+      };
+      const corrected = await postChat({ token: 'user-a-token', sessionId: 'session-user-a', message: 'Change item 1 quantity to 12 pcs' });
+      assert.equal(corrected.status, 200, JSON.stringify(corrected.payload));
+      assert.match(corrected.payload.response, /Your Purchase Request Draft is Ready/i);
+      assert.match(corrected.payload.response, /12 pcs/);
+      assert.equal(sessions.get('session-user-a').state.collected.extracted.items[0].quantity, 12);
+      assert.equal(sessions.get('session-user-a').state.drafting, false);
+
+      const added = await postChat({ token: 'user-a-token', sessionId: 'session-user-a', message: 'Add another item: 2 boxes gloves at ₱300 each' });
+      assert.equal(added.status, 200, JSON.stringify(added.payload));
+      assert.match(added.payload.response, /Your Purchase Request Draft is Ready/i);
+      assert.match(added.payload.response, /gloves/);
+      const finalItems = sessions.get('session-user-a').state.collected.extracted.items;
+      assert.equal(finalItems.length, 2);
+      assert.equal(finalItems[1].item_description, 'gloves');
+      assert.equal(finalItems[1].quantity, 2);
+      assert.equal(finalItems.reduce((sum, item) => sum + item.total_cost, 0), 2400);
+      assert.equal(sessions.get('session-user-a').state.drafting, false);
+    });
+
     await t.test('a closed chat session cannot accept a new message', async () => {
       sessions.get('session-user-a').is_active = false;
       const result = await postChat({
