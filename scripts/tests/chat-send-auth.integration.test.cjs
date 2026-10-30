@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const http = require('node:http');
 const { spawn } = require('node:child_process');
 const path = require('node:path');
+const { isCompletedPRDraftEdit } = require('../../lib/pr-draft-extraction.js');
 
 const ROOT = path.resolve(__dirname, '../..');
 const users = new Map([
@@ -26,6 +27,31 @@ const sessions = new Map([
   ['session-user-a', { id: 'session-user-a', user_id: 'user-a', is_active: true, state: {} }],
   ['session-user-b', { id: 'session-user-b', user_id: 'user-b', is_active: true, state: {} }],
   ['session-inactive', { id: 'session-inactive', user_id: 'user-inactive', is_active: true, state: {} }],
+  ['session-completed-draft', {
+    id: 'session-completed-draft',
+    user_id: 'user-a',
+    is_active: true,
+    state: {
+      drafting: false,
+      step: null,
+      collected: {
+        purpose: 'Procurement of laboratory glassware for Chemistry classes',
+        department: 'College of Education',
+        extracted: {
+          purpose: 'Procurement of laboratory glassware for Chemistry classes',
+          department: 'College of Education',
+          items: [{
+            item_description: 'laboratory glassware',
+            quantity: 50,
+            unit: 'pcs',
+            unit_cost: 150,
+            total_cost: 7500,
+          }],
+          total_amount: 7500,
+        },
+      },
+    },
+  }],
 ]);
 const storedMessages = [];
 const storedInquiries = [];
@@ -295,6 +321,53 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.equal(storedInquiries.at(-1).user_id, 'user-a');
     });
 
+    await t.test('a completed draft accepts a quantity correction and a new item, then regenerates the final summary', async () => {
+      const correction = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-completed-draft',
+        message: 'Change the quantity from 50 pcs to 60 pcs.',
+      });
+
+      assert.equal(correction.status, 200, JSON.stringify(correction.payload));
+      assert.match(correction.payload.response, /Updated \*\*Item 1\*\*/i);
+      let savedState = sessions.get('session-completed-draft').state;
+      assert.equal(savedState.drafting, true);
+      assert.equal(savedState.step, 'items');
+      assert.equal(savedState.collected.extracted.items[0].quantity, 60);
+      assert.equal(savedState.collected.extracted.items[0].total_cost, 9000);
+      assert.equal(savedState.collected.extracted.total_amount, 9000);
+
+      const addition = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-completed-draft',
+        message: 'Add another item: 2 boxes laboratory gloves at ₱300 each.',
+      });
+
+      assert.equal(addition.status, 200, JSON.stringify(addition.payload));
+      assert.match(addition.payload.response, /Captured 1 new item/i);
+      savedState = sessions.get('session-completed-draft').state;
+      assert.equal(savedState.collected.extracted.items.length, 2);
+      assert.equal(savedState.collected.extracted.items[1].item_description, 'laboratory gloves');
+      assert.equal(savedState.collected.extracted.items[1].quantity, 2);
+      assert.equal(savedState.collected.extracted.items[1].unit, 'boxes');
+      assert.equal(savedState.collected.extracted.items[1].unit_cost, 300);
+
+      const done = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-completed-draft',
+        message: 'done',
+      });
+
+      assert.equal(done.status, 200, JSON.stringify(done.payload));
+      assert.match(done.payload.response, /60 pcs @ ₱150\.00 = \*\*₱9,000\.00\*\*/);
+      assert.match(done.payload.response, /2 boxes @ ₱300\.00 = \*\*₱600\.00\*\*/);
+      assert.match(done.payload.response, /Estimated Total Amount.*₱9,600\.00/s);
+      savedState = sessions.get('session-completed-draft').state;
+      assert.equal(savedState.drafting, false);
+      assert.equal(savedState.step, null);
+      assert.equal(savedState.collected.extracted.total_amount, 9600);
+    });
+
     await t.test('a closed chat session cannot accept a new message', async () => {
       sessions.get('session-user-a').is_active = false;
       const result = await postChat({
@@ -320,4 +393,29 @@ test('the Edge Runtime session proxy handles refresh errors locally without proc
   assert.doesNotMatch(source, /\bprocess\s*\.\s*on\s*\(/);
   assert.match(source, /const originalGetUser = supabase\.auth\.getUser\.bind\(supabase\.auth\)/);
   assert.match(source, /catch \(err: any\) \{\s*if \(isStaleRefreshTokenError\(err\)\)/);
+});
+
+
+test('completed-draft edit detection is session-bound and does not capture ordinary procurement questions', () => {
+  const savedDraft = sessions.get('session-completed-draft').state;
+  assert.equal(
+    isCompletedPRDraftEdit(savedDraft, 'Change the quantity from 50 pcs to 60 pcs.'),
+    true
+  );
+  assert.equal(
+    isCompletedPRDraftEdit(savedDraft, 'Add another item: 2 boxes laboratory gloves at ₱300 each.'),
+    true
+  );
+  assert.equal(
+    isCompletedPRDraftEdit(savedDraft, 'What is the SVP threshold under RA No. 12009?'),
+    false
+  );
+  assert.equal(
+    isCompletedPRDraftEdit({ ...savedDraft, drafting: true }, 'Change the quantity to 60 pcs.'),
+    false
+  );
+  assert.equal(
+    isCompletedPRDraftEdit({ drafting: false, collected: {} }, 'Change the quantity to 60 pcs.'),
+    false
+  );
 });
