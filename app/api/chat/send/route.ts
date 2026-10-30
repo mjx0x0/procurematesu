@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
-import { GoogleGenAI } from '@google/genai';
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
 import { isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
+import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-extraction';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
-import { callGroq } from '@/lib/groq';
 
 const NEW_TOPIC_PATTERN = /\b(what is|what are|how does|how do|explain|tell me about|where is|where can|when is|who is|contact|ra\s*12009|ra\s*9184|small value|svp|bidding|procurement flow|procurement office|new purchase request|draft (?:a )?pr|create (?:a )?pr|track my pr|show me my pr)\b/i;
 const DRAFT_CONTINUATION_PATTERN = /\b(purpose|department|office|section|item|items|quantity|unit|price|cost|budget|supplier|description|yes|no|correct|continue|next)\b/i;
@@ -22,9 +21,6 @@ const PROCUREMENT_FLOW_PATTERN = /\b(?:MSU(?:[- ]?GenSan)?|Mindanao\s+State\s+Un
 const OFFICE_INFO_PATTERN = /\b(?:where(?:'s| is| can I find)|location|address|contact|contacts|phone|telephone|email|e-mail|how can I contact|how do I reach)\b.{0,50}\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO|BAC|procurement)\b|\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO)\b.{0,50}\b(?:where|location|address|contact|phone|telephone|email|reach)\b/i;
 const NEXT_PATTERN = /\b(what|where|which|how)\s+(happens?|comes?|is)\s+next\b|\bwhat'?s\s+next\b|\bnext\s+(step|stage)\b|\bwhat\s+do\s+i\s+do\s+next\b/i;
 
-let slotValidator: GoogleGenAI | null = null;
-function getSlotValidator() { const key = process.env.GEMINI_API_KEY; if (!key) return null; if (!slotValidator) slotValidator = new GoogleGenAI({ apiKey: key }); return slotValidator; }
-
 function shouldResetDrafting(message: string) {
   if (STOP_DRAFTING_PATTERN.test(message)) return true;
   if (OFFICE_INFO_PATTERN.test(message)) return true;
@@ -33,50 +29,16 @@ function shouldResetDrafting(message: string) {
 }
 
 function extractCurrentUserMessage(message: string): string { const marker = /(?:^|\n)Current user message:\s*/i; const match = message.match(marker); if (!match || match.index === undefined) return message.trim(); return message.slice(match.index + match[0].length).trim(); }
-function basicSlotCheck(step: string, message: string) {
-  const text = message.trim(); const letters = (text.match(/[a-z]/gi) || []).length;
-  if (text.length < 3 || letters < 2 || /(.)\1{4,}/i.test(text)) return false;
-  if (letters >= 8 && !/[aeiou]/i.test(text)) return false;
-  if (step === 'purpose' && text.length < 8) return false;
-  if (step === 'department' && text.length < 2) return false;
-  if (step === 'items' && text.length < 2) return false;
-  return true;
-}
 
-async function validateSlotAnswer(step: string, message: string, collected: any) {
-  if (!basicSlotCheck(step, message)) return { valid: false, reason: 'That answer does not look like a valid response for this field.' };
-
-  const prompt = `Validate a user's answer during a Purchase Request slot-filling conversation. The current field is "${step}". Previous collected data: ${JSON.stringify(collected || {})}. User answer: "${message}". Decide whether the answer is semantically relevant to the requested field. Do not require exact MSU department names; plausible university departments/units are valid. For purpose, accept a clear reason or intended use for the procurement. For department, accept a department, office, college, school, unit, laboratory, or similar organizational name. For items, accept goods/materials/equipment/services and quantities or descriptions. Reject greetings, jokes, unrelated conversation, random text, gibberish, or answers that belong to a different slot. Return ONLY JSON: {"valid":true|false,"reason":"short reason"}.`;
-
-  const groqResult = await callGroq(prompt, 'You are a strict Purchase Request slot validator. Return only the requested JSON.', 0, {
-    maxOutputTokens: 180,
-    timeoutMs: 7000,
-    responseFormat: { type: 'json_object' },
-  });
-
-  if (groqResult) {
-    try {
-      const parsed = JSON.parse(groqResult.replace(/```json/gi, '').replace(/```/g, '').trim());
-      return { valid: parsed?.valid === true, reason: typeof parsed?.reason === 'string' ? parsed.reason : '' };
-    } catch {
-      // Fall through to Gemini compatibility fallback.
-    }
+function validateSlotAnswer(step: string, message: string) {
+  // Do not ask an LLM to decide whether a slot reply is relevant. Valid replies
+  // may contain several fields (department + multiple item lines), and model
+  // validators can reject those compound answers. Scope/security checks run
+  // before this function; this check only rejects empty or obvious gibberish.
+  if (!isPlausibleDraftReply(step, message)) {
+    return { valid: false, reason: 'That answer appears incomplete or invalid. Please provide meaningful procurement details.' };
   }
-
-  const client = getSlotValidator();
-  if (!client) return { valid: true, reason: '' };
-
-  try {
-    const response = await client.models.generateContent({
-      model: 'gemini-3.1-flash-lite',
-      contents: prompt,
-      config: { temperature: 0, responseMimeType: 'application/json', maxOutputTokens: 180 },
-    });
-    const parsed = JSON.parse((response.text || '').replace(/```json/gi, '').replace(/```/g, '').trim());
-    return { valid: parsed?.valid === true, reason: typeof parsed?.reason === 'string' ? parsed.reason : '' };
-  } catch {
-    return { valid: true, reason: '' };
-  }
+  return { valid: true, reason: '' };
 }
 
 function normalizePRIdentifier(identifier: string): string {
@@ -149,6 +111,25 @@ export async function POST(request: NextRequest) {
       draftState = {};
     }
 
+    // A completed draft remains editable in its existing chat session.
+    // Reopen only for explicit item corrections or parseable item additions;
+    // all other messages continue through the normal procurement scope path.
+    if (isCompletedPRDraftEdit(draftState, message)) {
+      draftState = { ...draftState, drafting: true, step: 'items' };
+      const { error: reopenError } = await clientToUse
+        .from('chat_sessions')
+        .update({ state: draftState, updated_at: new Date().toISOString() })
+        .eq('id', sessionId)
+        .eq('user_id', user.id);
+      if (reopenError) {
+        console.error('[chat/send] Failed to reopen completed PR draft for editing:', reopenError);
+        return NextResponse.json(
+          { error: 'Unable to reopen this Purchase Request draft. Please retry.' },
+          { status: 500 }
+        );
+      }
+    }
+
     const scopeDecision = getProcurementScopeDecision(message, {
       activePRDraft: Boolean(draftState.drafting),
     });
@@ -183,7 +164,7 @@ export async function POST(request: NextRequest) {
 
     // Only validate a slot when the current message is still part of an active draft.
     if (draftState.drafting && draftState.step) {
-      const validation = await validateSlotAnswer(draftState.step, message, draftState.collected);
+      const validation = validateSlotAnswer(draftState.step, message);
       if (!validation.valid) {
         const prompts: Record<string, string> = {
           purpose: 'Please answer with the **purpose of the procurement** — what the purchase is for or why it is needed.',

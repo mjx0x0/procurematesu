@@ -21,6 +21,7 @@ interface PRData {
   section?: string;
   purpose?: string;
   pr_no?: string;
+  system_tracking_no?: string;
   pr_date?: string;
   current_stage?: string;
   sai_no?: string;
@@ -147,6 +148,9 @@ export default function PRPrintContent() {
   const items = data.items || [];
   const totalAmount = data.total_amount || items.reduce((sum, item) => sum + (item.total_cost || 0), 0);
   const currentDate = data.pr_date || new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  // The encoded chatbot preview is not a saved PR. Only show the print action
+  // once a persisted PR record (and its temporary or official control number) exists.
+  const hasSavedPR = Boolean(data.pr_no?.trim() || data.system_tracking_no?.trim());
   const minRows = 6;
   const blankRows = Math.max(0, minRows - items.length);
 
@@ -177,13 +181,15 @@ export default function PRPrintContent() {
           )}
         </div>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-2 bg-[#7B0046] hover:bg-[#610037] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-all cursor-pointer"
-          >
-            <Printer className="h-4 w-4 text-amber-300" />
-            Print Official PR
-          </button>
+          {hasSavedPR && (
+            <button
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-2 bg-[#7B0046] hover:bg-[#610037] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-all cursor-pointer"
+            >
+              <Printer className="h-4 w-4 text-amber-300" />
+              Print Official PR
+            </button>
+          )}
         </div>
       </div>
 
@@ -393,17 +399,12 @@ export default function PRPrintContent() {
               </p>
             </div>
           </div>
-        </div>
 
-        {/* Subtle Footnote for audit / office tracking */}
-        <div className="mt-2 text-[10px] text-stone-500 font-mono flex items-center justify-between px-1 print:text-[8px] print:text-stone-400">
-          <span>Mindanao State University - General Santos City Procurement Office</span>
-          {data.pr_no && (
-            <span>
-              {isTemporaryPR(data.pr_no)
-                ? `System Tracking Control: ${data.pr_no}`
-                : `Official PR Control: ${data.pr_no}`}
-            </span>
+          {/* Small system-only control reference at the bottom edge of the form. */}
+          {(data.system_tracking_no || (data.pr_no && isTemporaryPR(data.pr_no)) || !data.pr_no) && (
+            <div className="border-t border-black px-2 py-1 text-right font-mono text-[8px] leading-tight text-stone-600 print:text-[7px]">
+              System Tracking Control: {data.system_tracking_no || (data.pr_no && isTemporaryPR(data.pr_no) ? data.pr_no : "Not yet assigned")}
+            </div>
           )}
         </div>
       </div>

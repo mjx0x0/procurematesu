@@ -4,7 +4,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
-import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails, mergePRDetailsFromDepartmentReply } from '@/lib/pr-draft-extraction';
+import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails, mergePRDetailsFromDepartmentReply, applyPRItemMessage, getMissingItemFields, isPRDraftRevisionMessage } from '@/lib/pr-draft-extraction';
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
@@ -30,6 +30,7 @@ const supabase = isSupabaseConfigured
 // In-memory session and message cache for seamless state tracking
 interface SessionState {
   drafting?: boolean;
+  draftReady?: boolean;
   cancelledAt?: string;
   step?: 'purpose' | 'department' | 'items' | null;
   collected?: {
@@ -310,92 +311,10 @@ interface ExtractedPR {
 }
 
 async function extractPRDetails(text: string): Promise<ExtractedPR> {
-  // Deterministic extraction runs first for explicit procurement patterns. This
-  // prevents a model response from dropping quantity/unit/cost that the user
-  // already supplied in the same message.
-  const ruleBased = extractPRDetailsRuleBased(text);
-  const hasExplicitItemDetails =
-    ruleBased.items.length > 0 &&
-    ruleBased.items.some(
-      (item) =>
-        Number(item.quantity) > 0 &&
-        String(item.unit || '').trim().length > 0 &&
-        Number(item.unit_cost) > 0 &&
-        String(item.item_description || '').trim().length > 2
-    );
-
-  if (hasExplicitItemDetails) {
-    return ruleBased;
-  }
-
-  const extractionPrompt = `
-You are an expert procurement assistant parsing purchase request details from user input.
-Input: "${text}"
-
-Extract procurement details even when the user combines the purpose, item description, quantity, unit, price, and department in one natural-language message.
-
-Important parsing rules:
-- Preserve every explicit detail supplied by the user. Never ask for a field that is already present in the input.
-- If the text says "Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses, 10 pieces, 500 pesos per unit", extract:
-  item_description = "laboratory glassware and supplies"
-  quantity = 10
-  unit = "pcs"
-  unit_cost = 500
-  purpose = "Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses"
-- "10 pieces", "10 pcs", "10 units", "10 sets", etc. provide quantity and unit.
-- "500 pesos per unit", "₱500 each", "PHP 500 each", "500 per piece", etc. provide unit_cost.
-- If a department/college/office is explicitly stated, extract it. Otherwise return null.
-- If any item field is genuinely missing, do NOT invent it. Use quantity 0, unit "", and/or unit_cost 0 so the application can ask a follow-up.
-- "for 1st Semester Chemistry courses" is purpose/context unless it names a requesting department.
-- If quantity and price are present but the item name is embedded in the purpose, use the relevant noun phrase before the quantity as the item description.
-
-Return ONLY valid JSON:
-{
-  "department": null,
-  "purpose": null,
-  "items": [],
-  "total_amount": 0
-}
-`;
-
-  try {
-    const raw = await callGeminiWithFallback(extractionPrompt, 'Return only pure raw JSON.', 0.0);
-    if (raw) {
-      const clean = raw.replace(/```json/gi, '').replace(/```/gi, '').trim();
-      const parsed = JSON.parse(clean);
-
-      if (Array.isArray(parsed.items) && parsed.items.length > 0) {
-        const sanitizedItems = parsed.items.map((i: any) => {
-          const qty = Math.max(0, Number(i.quantity) || 0);
-          const cost = Math.max(0, Number(i.unit_cost) || 0);
-          const unit = String(i.unit || '').trim();
-          return {
-            item_description: String(i.item_description || '').trim(),
-            quantity: qty,
-            unit,
-            unit_cost: cost,
-            total_cost: qty * cost,
-          };
-        });
-
-        const total = sanitizedItems.reduce(
-          (acc: number, item: any) => acc + item.total_cost,
-          0
-        );
-
-        return {
-          department: parsed.department ? String(parsed.department).trim() : null,
-          purpose: parsed.purpose ? String(parsed.purpose).trim() : null,
-          items: sanitizedItems,
-          total_amount: total,
-        };
-      }
-    }
-  } catch (e) {
-    console.warn('AI Extraction failed, using deterministic parser:', e);
-  }
-
-  return ruleBased;
+  // PR slot extraction is deterministic. Model output must not invent, merge,
+  // or silently drop item fields; ambiguous values remain missing and are
+  // requested explicitly from the user.
+  return extractPRDetailsRuleBased(text);
 }
 
 function extractPRDetailsRuleBased(text: string): ExtractedPR {
@@ -548,126 +467,112 @@ async function handleDraftPRFlow(
   let newState: SessionState = { ...state };
   const lower = message.toLowerCase().trim();
 
-  // If not currently drafting, initiate
-  if (!state.drafting) {
-    // Check if the user already provided comprehensive details in the first prompt
-    const hasItemsOrCosts = /\b(\d+)\s*(pcs|units|sets|laptops|computers|printers|chairs|tables|paper|reams)?\b/i.test(message) &&
-      (message.includes('department') || message.includes('college') || message.includes('for') || /\b(\d{3,})\b/.test(message));
+  // If not currently drafting, start safely. Complete details may be accepted
+  // immediately, but incomplete details are retained and routed to the exact
+  // next missing slot rather than generating a draft with guessed values.
+  if (!state.drafting && !(state.draftReady && isPRDraftRevisionMessage(message))) {
+    const hasPotentialItemDetails = /\b\d+\s*(?:pcs?|pieces?|units?|sets?|boxes?|reams?|packs?|rolls?|pairs?|bottles?|kits?)\b/i.test(message)
+      || /(?:₱|PHP|Php)\s*\d/i.test(message)
+      || /\b(?:at|each|per\s+unit)\s*\d/i.test(message);
 
-    if (hasItemsOrCosts && !lower.includes('help me draft a pr') && !lower.includes('create a pr')) {
+    if (hasPotentialItemDetails) {
       const extracted = await extractPRDetails(message);
-      if (extracted.items && extracted.items.length > 0) {
-        return buildDraftCompletionResponse(extracted, newState);
+      if (hasCompletePRDetails(extracted)) return buildDraftCompletionResponse(extracted, newState);
+
+      const hasAnyDraftDetails = Boolean(extracted.department || extracted.items.length ||
+        (extracted.purpose && extracted.purpose.length >= 8 && !/\b(?:help me draft|create a pr|draft a pr)\b/i.test(extracted.purpose)));
+      if (hasAnyDraftDetails) {
+        newState.drafting = true;
+        newState.collected = { purpose: extracted.purpose || '', department: extracted.department || undefined, extracted };
+        if (!extracted.department) {
+          newState.step = 'department';
+          return {
+            response: '✅ I captured the purpose and any identifiable item details. Which **department, college, or office** is requesting this? You can include any remaining item details in the same reply.',
+            newState,
+          };
+        }
+        newState.step = 'items';
+        const missing = getMissingItemFields(extracted.items);
+        return {
+          response: missing.length
+            ? '✅ I captured the purpose, department, and ' + extracted.items.length + ' item(s). Still needed:\n' + missing.map((entry) => '• Item ' + entry.index + ': ' + entry.missing.join(', ')).join('\n') + '\nYou can add more items, then type **done**.'
+            : '✅ I captured the purpose and department. Please list any additional items, or type **done** to review the draft.',
+          newState,
+        };
       }
     }
 
     newState.drafting = true;
     newState.step = 'purpose';
     newState.collected = {};
-
     return {
-      response:
-        "📝 **Let's draft a new Purchase Request (PR) together!**\n\n" +
-        "First, what is the **purpose** of this procurement?\n" +
+      response: [
+        "📝 **Let's draft a new Purchase Request (PR) together!**",
+        "First, what is the **purpose** of this procurement?",
         "*(Example: 'Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses')*",
+      ].join('\n\n'),
       newState,
     };
   }
-
-  const step = state.step || 'purpose';
-  const collected = state.collected || {};
+  if (!state.drafting && state.draftReady && isPRDraftRevisionMessage(message)) { newState.drafting = true; newState.step = 'items'; }
+  const step = newState.step || 'purpose';
+  const collected = newState.collected || {};
 
   switch (step) {
     case 'purpose': {
       const extracted = await extractPRDetails(message);
-
       collected.purpose = extracted.purpose || message.trim();
+      collected.department = extracted.department || undefined;
       collected.extracted = extracted;
-
-      if (extracted.department) {
-        collected.department = extracted.department;
-      }
-
-      const itemDetails = extracted.items || [];
-      const completeItems = itemDetails.filter(
-        (item) =>
-          String(item.item_description || '').trim().length > 2 &&
-          Number(item.quantity) > 0 &&
-          String(item.unit || '').trim().length > 0 &&
-          Number(item.unit_cost) > 0
-      );
-
-      const incompleteItems = itemDetails.filter(
-        (item) =>
-          String(item.item_description || '').trim().length <= 2 ||
-          Number(item.quantity) <= 0 ||
-          String(item.unit || '').trim().length === 0 ||
-          Number(item.unit_cost) <= 0
-      );
-
-      const missingFields: string[] = [];
-      if (!extracted.department) missingFields.push('department, college, or office');
-      if (itemDetails.length === 0) {
-        missingFields.push('item description, quantity, unit, and estimated unit cost');
-      } else if (incompleteItems.length > 0) {
-        const first = incompleteItems[0];
-        const missingItemFields: string[] = [];
-        if (String(first.item_description || '').trim().length <= 2) missingItemFields.push('item description');
-        if (Number(first.quantity) <= 0) missingItemFields.push('quantity');
-        if (String(first.unit || '').trim().length === 0) missingItemFields.push('unit');
-        if (Number(first.unit_cost) <= 0) missingItemFields.push('estimated unit cost');
-        missingFields.push(missingItemFields.join(', '));
-      }
-
-      // If every required field is already present in one message, finish
-      // immediately. The user should never have to repeat information.
-      if (hasCompletePRDetails(extracted)) {
-        return buildDraftCompletionResponse(
-          { ...extracted, items: completeItems },
-          { ...newState, drafting: false, step: null, collected }
-        );
-      }
-
       newState.collected = collected;
+
+      if (hasCompletePRDetails(extracted)) {
+        return buildDraftCompletionResponse(extracted, {
+          ...newState, drafting: false, step: null,
+          collected: { ...collected, extracted },
+        });
+      }
 
       if (!extracted.department) {
         newState.step = 'department';
-        const captured =
-          completeItems.length > 0
-            ? `\n\n📦 I already captured **${completeItems.length} complete item(s)**, including quantity, unit, and estimated unit cost. You do not need to repeat them.`
-            : '';
-
+        const captured = extracted.items.length
+          ? 'I also captured ' + extracted.items.length + ' item(s) from your message.'
+          : '';
         return {
-          response:
-            `✅ Purpose recorded: **"${collected.purpose}"**${captured}\n\n` +
-            `Next, which **department, college, or office** is requesting this?\n` +
-            `*(Example: 'College of Science and Mathematics' or 'Office of the University Registrar')*`,
+          response: [
+            '✅ Purpose recorded: **' + collected.purpose + '**',
+            captured,
+            'Next, which **department, college, or office** is requesting this? You may include item details in the same reply.',
+            'Example: College of Education, 50 pcs of laboratory glassware at ₱150 each',
+          ].filter(Boolean).join('\n\n'),
           newState,
         };
       }
 
-      if (incompleteItems.length > 0) {
+      if (!extracted.items.length) {
         newState.step = 'items';
         return {
-          response:
-            `✅ I captured the **${extracted.department}** as the requesting office and extracted the purpose.\n\n` +
-            `📦 I still need the following item detail(s): **${missingFields.filter((f) => !f.includes('department')).join('; ')}**.\n\n` +
-            `Please provide the missing information. You do not need to repeat the details you already gave.`,
+          response: [
+            '✅ Purpose and department recorded: **' + extracted.department + '**',
+            'Now list the **items/services** needed, including each description, quantity, unit, and estimated unit cost. You may provide multiple items in one message.',
+          ].join('\n\n'),
           newState,
         };
       }
 
-      // Department exists and all item fields are complete.
-      return buildDraftCompletionResponse(
-        { ...extracted, items: completeItems },
-        { ...newState, drafting: false, step: null, collected }
-      );
+      const missing = getMissingItemFields(extracted.items);
+      newState.step = 'items';
+      return {
+        response: [
+          '✅ Purpose and department recorded. I captured **' + extracted.items.length + ' item(s)**, but some details are incomplete:',
+          missing.map((entry) => '• **Item ' + entry.index + (entry.description ? ' (' + entry.description + ')' : '') + ':** ' + entry.missing.join(', ')).join('\n'),
+          'Please provide the missing details. You can also add more items, then type **done** when the list is complete.',
+        ].join('\n\n'),
+        newState,
+      };
     }
 
     case 'department': {
-      // The user may answer the department question and include item details
-      // in the same reply. Merge that reply with the purpose already recorded
-      // instead of treating the entire message as a department name.
       const existingExtracted = collected.extracted && typeof collected.extracted === 'object'
         ? collected.extracted
         : { department: null, purpose: collected.purpose || null, items: [], total_amount: 0 };
@@ -676,138 +581,134 @@ async function handleDraftPRFlow(
         message,
         existingExtracted
       );
-
-      collected.department = extracted.department || message.trim();
+      collected.department = extracted.department || undefined;
       collected.purpose = extracted.purpose || collected.purpose || existingExtracted.purpose || '';
       collected.extracted = extracted;
       newState.collected = collected;
 
-      if (hasCompletePRDetails(extracted)) {
-        return buildDraftCompletionResponse(extracted, {
-          ...newState,
-          drafting: false,
-          step: null,
-          collected: { ...collected, extracted },
-        });
-      }
-
-      const incompleteItems = (extracted.items || []).filter(
-        (item: any) =>
-          String(item.item_description || '').trim().length <= 2 ||
-          Number(item.quantity) <= 0 ||
-          String(item.unit || '').trim().length === 0 ||
-          Number(item.unit_cost) <= 0
-      );
-
-      if (incompleteItems.length > 0) {
-        const missingFields = new Set<string>();
-        for (const item of incompleteItems) {
-          if (String(item.item_description || '').trim().length <= 2) missingFields.add('item description');
-          if (Number(item.quantity) <= 0) missingFields.add('quantity');
-          if (String(item.unit || '').trim().length === 0) missingFields.add('unit');
-          if (Number(item.unit_cost) <= 0) missingFields.add('estimated unit cost');
-        }
-
-        newState.step = 'items';
+      if (!extracted.department) {
+        newState.step = 'department';
         return {
-          response:
-            '✅ Department set: **"' + collected.department + '"**\n\n' +
-            '📦 I kept the purpose and department you provided. I still need: **' + Array.from(missingFields).join(', ') + '**.\n\n' +
-            'Please provide only the missing detail(s); you do not need to repeat the information already given.',
+          response: 'I kept your previously recorded purpose and any item details. I still need the **requesting department, college, office, or unit**. Please identify it clearly.',
           newState,
         };
       }
 
+      if (hasCompletePRDetails(extracted)) {
+        return buildDraftCompletionResponse(extracted, {
+          ...newState, drafting: false, step: null,
+          collected: { ...collected, extracted },
+        });
+      }
+
+      if (!extracted.items.length) {
+        newState.step = 'items';
+        return {
+          response: [
+            '✅ Department set: **' + extracted.department + '**',
+            'Now list the **items/services** needed, including description, quantity, unit, and estimated unit cost. You may provide multiple items in one message.',
+          ].join('\n\n'),
+          newState,
+        };
+      }
+
+      const missing = getMissingItemFields(extracted.items);
       newState.step = 'items';
       return {
-        response:
-          '✅ Department set: **"' + collected.department + '"**\n\n' +
-          'Now, please list the **items** you need.\n\n' +
-          'For best results, include **description, quantity, unit, and estimated unit cost** in PHP:\n' +
-          '• Example: *\'10 units Laptop Intel i7 at 45000 each, 2 units Laser Printer at 18000 each\'*\n\n' +
-          'You can write multiple items in one message. Type **done** when you are finished!',
+        response: [
+          '✅ Department set: **' + extracted.department + '**. I kept the purpose you already provided and captured **' + extracted.items.length + ' item(s)**.',
+          'Still needed:',
+          missing.map((entry) => '• **Item ' + entry.index + (entry.description ? ' (' + entry.description + ')' : '') + ':** ' + entry.missing.join(', ')).join('\n'),
+          'Please provide only the missing details. You can add other items too, then type **done** when finished.',
+        ].join('\n\n'),
         newState,
       };
     }
 
     case 'items': {
-      const isDone =
-        lower === 'done' ||
-        lower.includes('finish') ||
-        lower.includes("that's all") ||
-        lower.includes('thats all');
+      const isDone = /^(?:done|finish|finished|that's all|thats all|no more items)[.!\\s]*$/i.test(lower);
+      const current = collected.extracted && typeof collected.extracted === 'object'
+        ? collected.extracted
+        : { department: collected.department || null, purpose: collected.purpose || null, items: [], total_amount: 0 };
 
-      // Do not store the finalization command as if it were an item.
-      if (!isDone) {
-        const existingRaw = collected.items_raw ? collected.items_raw + '; ' : '';
-        collected.items_raw = existingRaw + message.trim();
-      }
-      newState.collected = collected;
-
-      const fullText = `Department: ${collected.department}. Purpose: ${collected.purpose}. Items: ${collected.items_raw || ''}`;
-      const extracted = await extractPRDetails(fullText);
-      const items = extracted.items || [];
-
-      const isCompleteItem = (item: any) =>
-        String(item.item_description || '').trim().length > 2 &&
-        Number(item.quantity) > 0 &&
-        String(item.unit || '').trim().length > 0 &&
-        Number(item.unit_cost) > 0;
-
-      const completeItems = items.filter(isCompleteItem);
-      const incompleteItems = items.filter((item: any) => !isCompleteItem(item));
-
-      if (
-        completeItems.length > 0 &&
-        completeItems.length === items.length &&
-        (isDone || message.length > 15)
-      ) {
-        return buildDraftCompletionResponse(
-          { ...extracted, items: completeItems },
-          newState
-        );
-      }
-
-      // If the user is ready to finish but an item is incomplete, ask for
-      // the exact missing fields instead of repeating the same "type done"
-      // prompt indefinitely. Keep the draft state so the user can fill them in.
-      if (isDone && incompleteItems.length > 0) {
-        const missingDetails = incompleteItems.map((item: any, index: number) => {
-          const missing: string[] = [];
-          const description = String(item.item_description || '').trim();
-          if (description.length <= 2) missing.push('item description');
-          if (Number(item.quantity) <= 0) missing.push('quantity');
-          if (!String(item.unit || '').trim()) missing.push('unit');
-          if (Number(item.unit_cost) <= 0) missing.push('estimated unit cost');
-          const label = description ? `"${description}"` : `item ${index + 1}`;
-          return `• ${label}: ${missing.join(', ')}`;
-        });
-
+      if (isDone) {
+        if (hasCompletePRDetails(current)) {
+          return buildDraftCompletionResponse(current, {
+            ...newState, drafting: false, step: null,
+            collected: { ...collected, extracted: current },
+          });
+        }
+        const missing = getMissingItemFields(current.items || []);
         newState.step = 'items';
-        newState.collected = collected;
+        const missingText = missing.length
+          ? missing.map((entry) => '• **Item ' + entry.index + (entry.description ? ' (' + entry.description + ')' : '') + ':** ' + entry.missing.join(', ')).join('\n')
+          : '• At least one item with a description, quantity, unit, and estimated unit cost';
         return {
-          response:
-            `Almost done! I have the following details, but I need a few missing fields before I can finalize your Purchase Request:\n\n` +
-            missingDetails.join('\n') +
-            `\n\nPlease send only the missing details. For example: *"10 pcs, estimated unit cost ₱500 each."* I will keep the details you already provided.`,
+          response: [
+            'I cannot finalize the draft yet because some required details are missing:',
+            missingText,
+            'Please provide only those details. I will keep the information already captured.',
+          ].join('\n\n'),
           newState,
         };
       }
 
-      return {
-        response:
-          `Got that. Please continue listing any additional items, or type **done** to finalize your draft.`,
-        newState,
+      const update = applyPRItemMessage(current.items || [], message, {
+        purpose: current.purpose || collected.purpose || '',
+        department: current.department || collected.department || null,
+      });
+      if (update.action === 'clarify' || update.action === 'unrecognized') {
+        newState.step = 'items';
+        newState.collected = collected;
+        return {
+          response: 'I kept your current draft unchanged. ' + update.reason + '\n\nFor example: *10 pcs laboratory glassware at ₱150 each* or *change item 1 quantity to 12*.',
+          newState,
+        };
+      }
+
+      const extracted = {
+        ...current,
+        items: update.items,
+        total_amount: update.items.reduce((sum: number, item: any) => sum + (Number(item.quantity) || 0) * (Number(item.unit_cost) || 0), 0),
       };
+      collected.extracted = extracted;
+      delete collected.items_raw;
+      newState.collected = collected;
+      newState.step = 'items';
+
+      if ((update.action === 'updated' || update.action === 'added') && hasCompletePRDetails(extracted)) return buildDraftCompletionResponse(extracted, { ...newState, drafting: false, step: null, draftReady: true, collected: { ...collected, extracted } });
+
+      if (update.action === 'updated') {
+        return {
+          response: '✅ Updated **Item ' + (update.index + 1) + '**. I recalculated its line total. You can correct another item, add more items, or type **done** when finished.',
+          newState,
+        };
+      }
+      if (update.action === 'duplicate') {
+        return {
+          response: 'ℹ️ ' + update.reason + ' I did not add a duplicate. You can add another item or type **done** when finished.',
+          newState,
+        };
+      }
+      if (update.action !== 'added') {
+        return {
+          response: 'I could not confirm that an item was added. Your existing draft details were preserved. Please clarify the item description, quantity, unit, and estimated unit cost.',
+          newState,
+        };
+      }
+
+      const missing = getMissingItemFields(extracted.items);
+      const response = missing.length
+        ? [
+            '✅ Captured ' + update.added.length + ' new item(s).',
+            'Still needed:',
+            missing.map((entry) => '• **Item ' + entry.index + (entry.description ? ' (' + entry.description + ')' : '') + ':** ' + entry.missing.join(', ')).join('\n'),
+            'Please supply the missing fields. You may add more items, then type **done**.',
+          ].join('\n\n')
+        : '✅ Captured ' + update.added.length + ' new item(s). The current list has **' + extracted.items.length + ' item(s)**. You can add another item or type **done** to review and finalize the draft.';
+      return { response, newState };
     }
 
-    default: {
-      newState = { drafting: true, step: 'purpose', collected: {} };
-      return {
-        response: "Let's start fresh with your Purchase Request. What is the primary **purpose** of this request?",
-        newState,
-      };
-    }
   }
 }
 
@@ -817,7 +718,8 @@ function buildDraftCompletionResponse(
 ): { response: string; newState: SessionState } {
   newState.drafting = false;
   newState.step = null;
-  newState.collected = { extracted };
+  newState.draftReady = true;
+  newState.collected = { ...newState.collected, extracted };
 
   const dept = extracted.department || 'Requesting Department (MSU-GenSan)';
   const purpose = extracted.purpose || 'Official university procurement';
@@ -833,9 +735,17 @@ function buildDraftCompletionResponse(
   const encodedPrintData = encodeURIComponent(Buffer.from(JSON.stringify(printPayload)).toString('base64'));
   const printUrl = `/dashboard/pr-print?data=${encodedPrintData}`;
 
-  // Encode for New PR Form page (/dashboard/new-pr?...)
-  const itemsJson = encodeURIComponent(JSON.stringify(extracted.items));
-  const newPrUrl = `/dashboard/new-pr?department=${encodeURIComponent(dept)}&purpose=${encodeURIComponent(purpose)}&items=${itemsJson}&total=${total}`;
+  // Encode every query value safely. In particular, URLSearchParams escapes
+  // parentheses in department names such as "College of Education (CED)".
+  // The chat UI parses Markdown links using parentheses as delimiters, so raw
+  // parentheses here would truncate the href before purpose/items/total.
+  const newPrParams = new URLSearchParams({
+    department: dept,
+    purpose,
+    items: JSON.stringify(extracted.items),
+    total: String(total),
+  });
+  const newPrUrl = `/dashboard/new-pr?${newPrParams.toString()}`;
 
   let summary = `🎉 **Your Purchase Request Draft is Ready!**\n\n`;
   summary += `🏢 **Department**: ${dept}\n`;
@@ -988,7 +898,7 @@ export async function POST(req: NextRequest) {
       inquiryType = 'procurement_guidance';
       // A policy question is a new topic, not input for the pending PR slot.
       updatedState = {};
-    } else if (currentState.drafting) {
+    } else if (currentState.drafting || (currentState.draftReady && isPRDraftRevisionMessage(trimmedMsg))) {
       inquiryType = 'draft_pr';
       const result = await handleDraftPRFlow(trimmedMsg, currentState);
       responseText = result.response;
