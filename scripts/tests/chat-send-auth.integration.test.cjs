@@ -89,7 +89,7 @@ async function handleMockSupabase(request, response) {
   if (url.pathname === '/rest/v1/purchase_requests' && request.method === 'GET') {
     const userId = eqValue(url, 'user_id');
     const prFilter = url.searchParams.get('pr_no');
-    const requestedPrNo = prFilter && prFilter.startsWith('ilike.') ? prFilter.slice(7).toLowerCase() : null;
+    const requestedPrNo = prFilter && prFilter.startsWith('ilike.') ? prFilter.slice(6).toLowerCase() : null;
     const rows = purchaseRequests.filter((pr) =>
       (!userId || pr.user_id === userId) &&
       (!requestedPrNo || pr.pr_no.toLowerCase() === requestedPrNo)
