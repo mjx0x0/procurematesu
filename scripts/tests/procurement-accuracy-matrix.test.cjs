@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion, isBiddingDocumentsRateQuestion } = require('../../lib/procurement-answer-guards.js');
 const { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } = require('../../lib/procurement-scope-guard.js');
-const { extractPRDetailsRuleBased, parsePRItems, hasCompletePRDetails, getMissingItemFields, mergePRDetailsFromDepartmentReply, hasExplicitPricedItemDetails, applyPRItemMessage, isPlausibleDraftReply } = require('../../lib/pr-draft-extraction.js');
+const { extractPRDetailsRuleBased, parsePRItems, hasCompletePRDetails, getMissingItemFields, mergePRDetailsFromDepartmentReply, hasExplicitPricedItemDetails, applyPRItemMessage, isPlausibleDraftReply, isPRDraftRevisionMessage } = require('../../lib/pr-draft-extraction.js');
 
 test('all six preview accuracy prompts route through the source-gated answer guard', () => {
   const prompts = [
@@ -668,4 +668,27 @@ test('Multiple new item lines are appended even when an older item is incomplete
   assert.equal(result.items[2].item_description, 'bond paper');
   assert.equal(result.items[2].quantity, 5);
   assert.equal(result.items[2].unit, 'reams');
+});
+
+test('completed PR drafts remain editable for later quantity corrections and additional items', () => {
+  const completed = {
+    department: 'College of Education',
+    purpose: 'Procurement of laboratory supplies',
+    items: [
+      { item_description: 'laboratory glassware', quantity: 10, unit: 'pcs', unit_cost: 150, total_cost: 1500 },
+    ],
+    total_amount: 1500,
+  };
+  assert.equal(isPRDraftRevisionMessage('Change item 1 quantity to 12 pcs'), true);
+  assert.equal(isPRDraftRevisionMessage('Add another item: 2 boxes gloves at ₱300 each'), true);
+  assert.equal(isPRDraftRevisionMessage('What is the SVP threshold under RA 12009?'), false);
+  const corrected = applyPRItemMessage(completed.items, 'Change item 1 quantity to 12 pcs');
+  assert.equal(corrected.action, 'updated');
+  assert.equal(corrected.items[0].quantity, 12);
+  assert.equal(corrected.items[0].total_cost, 1800);
+  const added = applyPRItemMessage(corrected.items, 'Add another item: 2 boxes gloves at ₱300 each');
+  assert.equal(added.action, 'added');
+  assert.equal(added.items.length, 2);
+  assert.equal(added.items[1].item_description, 'gloves');
+  assert.equal(added.items.reduce((sum, item) => sum + item.total_cost, 0), 2400);
 });
