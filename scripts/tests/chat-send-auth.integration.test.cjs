@@ -282,7 +282,7 @@ test('authenticated chatbot API enforces identity, account status, session owner
       });
 
       assert.equal(result.status, 200, JSON.stringify(result.payload));
-      assert.match(result.payload.response, /purpose of this procurement/i);
+      assert.match(result.payload.response, /purpose\\*\\* of this procurement/i);
       assert.equal(result.payload.state.drafting, true);
       assert.equal(result.payload.state.step, 'purpose');
 
