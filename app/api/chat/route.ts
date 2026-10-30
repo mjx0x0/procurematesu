@@ -686,6 +686,12 @@ async function handleDraftPRFlow(
           newState,
         };
       }
+      if (update.action !== 'added') {
+        return {
+          response: 'I could not confirm that an item was added. Your existing draft details were preserved. Please clarify the item description, quantity, unit, and estimated unit cost.',
+          newState,
+        };
+      }
 
       const missing = getMissingItemFields(extracted.items);
       const response = missing.length
