@@ -466,32 +466,53 @@ async function handleDraftPRFlow(
   let newState: SessionState = { ...state };
   const lower = message.toLowerCase().trim();
 
-  // If not currently drafting, initiate
+  // If not currently drafting, start safely. Complete details may be accepted
+  // immediately, but incomplete details are retained and routed to the exact
+  // next missing slot rather than generating a draft with guessed values.
   if (!state.drafting) {
-    // Check if the user already provided comprehensive details in the first prompt
-    const hasItemsOrCosts = /\b(\d+)\s*(pcs|units|sets|laptops|computers|printers|chairs|tables|paper|reams)?\b/i.test(message) &&
-      (message.includes('department') || message.includes('college') || message.includes('for') || /\b(\d{3,})\b/.test(message));
+    const hasPotentialItemDetails = /\b\d+\s*(?:pcs?|pieces?|units?|sets?|boxes?|reams?|packs?|rolls?|pairs?|bottles?|kits?)\b/i.test(message)
+      || /(?:₱|PHP|Php)\s*\d/i.test(message)
+      || /\b(?:at|each|per\s+unit)\s*\d/i.test(message);
 
-    if (hasItemsOrCosts && !lower.includes('help me draft a pr') && !lower.includes('create a pr')) {
+    if (hasPotentialItemDetails) {
       const extracted = await extractPRDetails(message);
-      if (extracted.items && extracted.items.length > 0) {
-        return buildDraftCompletionResponse(extracted, newState);
+      if (hasCompletePRDetails(extracted)) return buildDraftCompletionResponse(extracted, newState);
+
+      const hasAnyDraftDetails = Boolean(extracted.department || extracted.items.length ||
+        (extracted.purpose && extracted.purpose.length >= 8 && !/\b(?:help me draft|create a pr|draft a pr)\b/i.test(extracted.purpose)));
+      if (hasAnyDraftDetails) {
+        newState.drafting = true;
+        newState.collected = { purpose: extracted.purpose || '', department: extracted.department || undefined, extracted };
+        if (!extracted.department) {
+          newState.step = 'department';
+          return {
+            response: '✅ I captured the purpose and any identifiable item details. Which **department, college, or office** is requesting this? You can include any remaining item details in the same reply.',
+            newState,
+          };
+        }
+        newState.step = 'items';
+        const missing = getMissingItemFields(extracted.items);
+        return {
+          response: missing.length
+            ? '✅ I captured the purpose, department, and ' + extracted.items.length + ' item(s). Still needed:\n' + missing.map((entry) => '• Item ' + entry.index + ': ' + entry.missing.join(', ')).join('\n') + '\nYou can add more items, then type **done**.'
+            : '✅ I captured the purpose and department. Please list any additional items, or type **done** to review the draft.',
+          newState,
+        };
       }
     }
 
     newState.drafting = true;
     newState.step = 'purpose';
     newState.collected = {};
-
     return {
-      response:
-        "📝 **Let's draft a new Purchase Request (PR) together!**\n\n" +
-        "First, what is the **purpose** of this procurement?\n" +
+      response: [
+        "📝 **Let's draft a new Purchase Request (PR) together!**",
+        "First, what is the **purpose** of this procurement?",
         "*(Example: 'Procurement of laboratory glassware and supplies for 1st Semester Chemistry courses')*",
+      ].join('\n\n'),
       newState,
     };
   }
-
   const step = state.step || 'purpose';
   const collected = state.collected || {};
 
