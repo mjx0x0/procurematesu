@@ -2,6 +2,8 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion, isBiddingDocumentsRateQuestion } = require('../../lib/procurement-answer-guards.js');
 const { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } = require('../../lib/procurement-scope-guard.js');
 const { extractPRDetailsRuleBased, parsePRItems, hasCompletePRDetails, getMissingItemFields, mergePRDetailsFromDepartmentReply, hasExplicitPricedItemDetails, applyPRItemMessage, isPlausibleDraftReply, isPRDraftRevisionMessage } = require('../../lib/pr-draft-extraction.js');
@@ -691,4 +693,23 @@ test('completed PR drafts remain editable for later quantity corrections and add
   assert.equal(added.items.length, 2);
   assert.equal(added.items[1].item_description, 'gloves');
   assert.equal(added.items.reduce((sum, item) => sum + item.total_cost, 0), 2400);
+});
+
+
+test('printable PR omits the office footer and places a small System Tracking Control inside the form', () => {
+  const printSource = fs.readFileSync(
+    path.join(__dirname, '../../app/dashboard/pr-print/PRPrintContent.tsx'),
+    'utf8'
+  );
+  assert.doesNotMatch(printSource, /Mindanao State University - General Santos City Procurement Office/);
+  assert.match(printSource, /System Tracking Control:/);
+  assert.match(printSource, /text-\\[8px\\].*print:text-\\[7px\\]/);
+  assert.match(printSource, /Not yet assigned/);
+
+  const signatureSection = printSource.indexOf('/* Signature Section Body */');
+  const trackingLabel = printSource.indexOf('System Tracking Control:');
+  const formBoundary = printSource.indexOf('\\n        </div>\\n      </div>', signatureSection);
+  assert.ok(signatureSection >= 0, 'The signature section should remain in the printable form.');
+  assert.ok(trackingLabel > signatureSection, 'The tracking control should appear after the signature section.');
+  assert.ok(formBoundary > trackingLabel, 'The tracking control should remain inside the form border.');
 });
