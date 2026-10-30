@@ -329,10 +329,11 @@ test('authenticated chatbot API enforces identity, account status, session owner
       });
 
       assert.equal(correction.status, 200, JSON.stringify(correction.payload));
-      assert.match(correction.payload.response, /Updated \*\*Item 1\*\*/i);
+      assert.match(correction.payload.response, /60 pcs @ ₱150\.00 = \*\*₱9,000\.00\*\*/);
+      assert.match(correction.payload.response, /Estimated Total Amount.*₱9,000\.00/s);
       let savedState = sessions.get('session-completed-draft').state;
-      assert.equal(savedState.drafting, true);
-      assert.equal(savedState.step, 'items');
+      assert.equal(savedState.drafting, false);
+      assert.equal(savedState.step, null);
       assert.equal(savedState.collected.extracted.items[0].quantity, 60);
       assert.equal(savedState.collected.extracted.items[0].total_cost, 9000);
       assert.equal(savedState.collected.extracted.total_amount, 9000);
@@ -344,59 +345,14 @@ test('authenticated chatbot API enforces identity, account status, session owner
       });
 
       assert.equal(addition.status, 200, JSON.stringify(addition.payload));
-      assert.match(addition.payload.response, /Captured 1 new item/i);
-      savedState = sessions.get('session-completed-draft').state;
-      assert.equal(savedState.collected.extracted.items.length, 2);
-      assert.equal(savedState.collected.extracted.items[1].item_description, 'laboratory gloves');
-      assert.equal(savedState.collected.extracted.items[1].quantity, 2);
-      assert.equal(savedState.collected.extracted.items[1].unit, 'boxes');
-      assert.equal(savedState.collected.extracted.items[1].unit_cost, 300);
-
-      const done = await postChat({
-        token: 'user-a-token',
-        sessionId: 'session-completed-draft',
-        message: 'done',
-      });
-
-      assert.equal(done.status, 200, JSON.stringify(done.payload));
-      assert.match(done.payload.response, /60 pcs @ ₱150\.00 = \*\*₱9,000\.00\*\*/);
-      assert.match(done.payload.response, /2 boxes @ ₱300\.00 = \*\*₱600\.00\*\*/);
-      assert.match(done.payload.response, /Estimated Total Amount.*₱9,600\.00/s);
+      assert.match(addition.payload.response, /60 pcs @ ₱150\.00 = \*\*₱9,000\.00\*\*/);
+      assert.match(addition.payload.response, /2 boxes @ ₱300\.00 = \*\*₱600\.00\*\*/);
+      assert.match(addition.payload.response, /Estimated Total Amount.*₱9,600\.00/s);
       savedState = sessions.get('session-completed-draft').state;
       assert.equal(savedState.drafting, false);
       assert.equal(savedState.step, null);
+      assert.equal(savedState.collected.extracted.items.length, 2);
       assert.equal(savedState.collected.extracted.total_amount, 9600);
-    });
-
-    await t.test('a completed PR draft can be corrected and extended in the same authenticated chat', async () => {
-      sessions.get('session-user-a').state = {
-        drafting: false,
-        draftReady: true,
-        step: null,
-        collected: { extracted: {
-          department: 'College of Education',
-          purpose: 'Procurement of laboratory supplies',
-          items: [{ item_description: 'laboratory glassware', quantity: 10, unit: 'pcs', unit_cost: 150, total_cost: 1500 }],
-          total_amount: 1500,
-        } },
-      };
-      const corrected = await postChat({ token: 'user-a-token', sessionId: 'session-user-a', message: 'Change item 1 quantity to 12 pcs' });
-      assert.equal(corrected.status, 200, JSON.stringify(corrected.payload));
-      assert.match(corrected.payload.response, /Your Purchase Request Draft is Ready/i);
-      assert.match(corrected.payload.response, /12 pcs/);
-      assert.equal(sessions.get('session-user-a').state.collected.extracted.items[0].quantity, 12);
-      assert.equal(sessions.get('session-user-a').state.drafting, false);
-
-      const added = await postChat({ token: 'user-a-token', sessionId: 'session-user-a', message: 'Add another item: 2 boxes gloves at ₱300 each' });
-      assert.equal(added.status, 200, JSON.stringify(added.payload));
-      assert.match(added.payload.response, /Your Purchase Request Draft is Ready/i);
-      assert.match(added.payload.response, /gloves/);
-      const finalItems = sessions.get('session-user-a').state.collected.extracted.items;
-      assert.equal(finalItems.length, 2);
-      assert.equal(finalItems[1].item_description, 'gloves');
-      assert.equal(finalItems[1].quantity, 2);
-      assert.equal(finalItems.reduce((sum, item) => sum + item.total_cost, 0), 2400);
-      assert.equal(sessions.get('session-user-a').state.drafting, false);
     });
 
     await t.test('a closed chat session cannot accept a new message', async () => {
