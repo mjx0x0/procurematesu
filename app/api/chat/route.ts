@@ -4,7 +4,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
-import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails, mergePRDetailsFromDepartmentReply, applyPRItemMessage, getMissingItemFields } from '@/lib/pr-draft-extraction';
+import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails, mergePRDetailsFromDepartmentReply, applyPRItemMessage, getMissingItemFields, isPRDraftRevisionMessage } from '@/lib/pr-draft-extraction';
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
@@ -30,6 +30,7 @@ const supabase = isSupabaseConfigured
 // In-memory session and message cache for seamless state tracking
 interface SessionState {
   drafting?: boolean;
+  draftReady?: boolean;
   cancelledAt?: string;
   step?: 'purpose' | 'department' | 'items' | null;
   collected?: {
@@ -469,7 +470,7 @@ async function handleDraftPRFlow(
   // If not currently drafting, start safely. Complete details may be accepted
   // immediately, but incomplete details are retained and routed to the exact
   // next missing slot rather than generating a draft with guessed values.
-  if (!state.drafting) {
+  if (!state.drafting && !(state.draftReady && isPRDraftRevisionMessage(message))) {
     const hasPotentialItemDetails = /\b\d+\s*(?:pcs?|pieces?|units?|sets?|boxes?|reams?|packs?|rolls?|pairs?|bottles?|kits?)\b/i.test(message)
       || /(?:₱|PHP|Php)\s*\d/i.test(message)
       || /\b(?:at|each|per\s+unit)\s*\d/i.test(message);
@@ -513,8 +514,9 @@ async function handleDraftPRFlow(
       newState,
     };
   }
-  const step = state.step || 'purpose';
-  const collected = state.collected || {};
+  if (!state.drafting && state.draftReady && isPRDraftRevisionMessage(message)) { newState.drafting = true; newState.step = 'items'; }
+  const step = newState.step || 'purpose';
+  const collected = newState.collected || {};
 
   switch (step) {
     case 'purpose': {
@@ -674,6 +676,8 @@ async function handleDraftPRFlow(
       newState.collected = collected;
       newState.step = 'items';
 
+      if ((update.action === 'updated' || update.action === 'added') && hasCompletePRDetails(extracted)) return buildDraftCompletionResponse(extracted, { ...newState, drafting: false, step: null, draftReady: true, collected: { ...collected, extracted } });
+
       if (update.action === 'updated') {
         return {
           response: '✅ Updated **Item ' + (update.index + 1) + '**. I recalculated its line total. You can correct another item, add more items, or type **done** when finished.',
@@ -714,7 +718,8 @@ function buildDraftCompletionResponse(
 ): { response: string; newState: SessionState } {
   newState.drafting = false;
   newState.step = null;
-  newState.collected = { extracted };
+  newState.draftReady = true;
+  newState.collected = { ...newState.collected, extracted };
 
   const dept = extracted.department || 'Requesting Department (MSU-GenSan)';
   const purpose = extracted.purpose || 'Official university procurement';
@@ -885,7 +890,7 @@ export async function POST(req: NextRequest) {
       inquiryType = 'procurement_guidance';
       // A policy question is a new topic, not input for the pending PR slot.
       updatedState = {};
-    } else if (currentState.drafting) {
+    } else if (currentState.drafting || (currentState.draftReady && isPRDraftRevisionMessage(trimmedMsg))) {
       inquiryType = 'draft_pr';
       const result = await handleDraftPRFlow(trimmedMsg, currentState);
       responseText = result.response;
