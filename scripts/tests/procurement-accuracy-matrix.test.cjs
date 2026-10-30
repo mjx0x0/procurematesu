@@ -702,13 +702,13 @@ test('printable PR omits the office footer and places a small System Tracking Co
     'utf8'
   );
   assert.doesNotMatch(printSource, /Mindanao State University - General Santos City Procurement Office/);
-  assert.match(printSource, /System Tracking Control:/);
-  assert.match(printSource, /text-\\[8px\\].*print:text-\\[7px\\]/);
-  assert.match(printSource, /Not yet assigned/);
+  assert.ok(printSource.includes('System Tracking Control:'));
+  assert.ok(printSource.includes('text-[8px] leading-tight text-stone-600 print:text-[7px]'));
+  assert.ok(printSource.includes('Not yet assigned'));
 
   const signatureSection = printSource.indexOf('/* Signature Section Body */');
   const trackingLabel = printSource.indexOf('System Tracking Control:');
-  const formBoundary = printSource.indexOf('\\n        </div>\\n      </div>', signatureSection);
+  const formBoundary = printSource.indexOf("\n        </div>\n      </div>", signatureSection);
   assert.ok(signatureSection >= 0, 'The signature section should remain in the printable form.');
   assert.ok(trackingLabel > signatureSection, 'The tracking control should appear after the signature section.');
   assert.ok(formBoundary > trackingLabel, 'The tracking control should remain inside the form border.');
