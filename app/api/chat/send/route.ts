@@ -4,7 +4,7 @@ import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
 import { isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
-import { isPlausibleDraftReply } from '@/lib/pr-draft-extraction';
+import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-extraction';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
 
 const NEW_TOPIC_PATTERN = /\b(what is|what are|how does|how do|explain|tell me about|where is|where can|when is|who is|contact|ra\s*12009|ra\s*9184|small value|svp|bidding|procurement flow|procurement office|new purchase request|draft (?:a )?pr|create (?:a )?pr|track my pr|show me my pr)\b/i;
@@ -109,6 +109,25 @@ export async function POST(request: NextRequest) {
         .eq('id', sessionId)
         .eq('user_id', user.id);
       draftState = {};
+    }
+
+    // A completed draft remains editable in its existing chat session.
+    // Reopen only for explicit item corrections or parseable item additions;
+    // all other messages continue through the normal procurement scope path.
+    if (isCompletedPRDraftEdit(draftState, message)) {
+      draftState = { ...draftState, drafting: true, step: 'items' };
+      const { error: reopenError } = await clientToUse
+        .from('chat_sessions')
+        .update({ state: draftState, updated_at: new Date().toISOString() })
+        .eq('id', sessionId)
+        .eq('user_id', user.id);
+      if (reopenError) {
+        console.error('[chat/send] Failed to reopen completed PR draft for editing:', reopenError);
+        return NextResponse.json(
+          { error: 'Unable to reopen this Purchase Request draft. Please retry.' },
+          { status: 500 }
+        );
+      }
     }
 
     const scopeDecision = getProcurementScopeDecision(message, {
