@@ -39,7 +39,7 @@ const sessions = new Map([
         department: 'College of Education (CED)',
         extracted: {
           purpose: 'Procurement of laboratory glassware for Chemistry classes',
-          department: 'College of Education',
+          department: 'College of Education (CED)',
           items: [{
             item_description: 'laboratory glassware',
             quantity: 50,
