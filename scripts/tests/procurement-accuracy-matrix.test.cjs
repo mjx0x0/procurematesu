@@ -568,3 +568,71 @@ test('PR slot sanity check accepts valid short and compound replies but rejects 
   assert.equal(isPlausibleDraftReply('items', 'aaaaa11111'), false);
   assert.equal(isPlausibleDraftReply('purpose', 'x'), false);
 });
+
+
+test('PR drafting fills a missing item description without creating a duplicate line', () => {
+  const existing = [
+    { item_description: '', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 },
+  ];
+  const result = applyPRItemMessage(existing, 'laboratory glassware');
+  assert.equal(result.action, 'updated');
+  assert.equal(result.items.length, 1);
+  assert.equal(result.items[0].item_description, 'laboratory glassware');
+  assert.equal(result.items[0].quantity, 50);
+  assert.equal(result.items[0].unit_cost, 150);
+});
+
+test('PR drafting fills a missing quantity and unit on an existing item', () => {
+  const existing = [
+    { item_description: 'laboratory glassware', quantity: 0, unit: '', unit_cost: 150, total_cost: 0 },
+  ];
+  const result = applyPRItemMessage(existing, '50 pcs');
+  assert.equal(result.action, 'updated');
+  assert.equal(result.items.length, 1);
+  assert.equal(result.items[0].item_description, 'laboratory glassware');
+  assert.equal(result.items[0].quantity, 50);
+  assert.equal(result.items[0].unit, 'pcs');
+  assert.equal(result.items[0].unit_cost, 150);
+});
+
+test('PR drafting fills a missing unit cost on an existing item', () => {
+  const existing = [
+    { item_description: 'laboratory glassware', quantity: 50, unit: 'pcs', unit_cost: 0, total_cost: 0 },
+  ];
+  const result = applyPRItemMessage(existing, '150 pesos each');
+  assert.equal(result.action, 'updated');
+  assert.equal(result.items.length, 1);
+  assert.equal(result.items[0].item_description, 'laboratory glassware');
+  assert.equal(result.items[0].quantity, 50);
+  assert.equal(result.items[0].unit_cost, 150);
+  assert.equal(result.items[0].total_cost, 7500);
+});
+
+test('Adding a new item does not overwrite an existing incomplete item', () => {
+  const existing = [
+    { item_description: '', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 },
+  ];
+  const result = applyPRItemMessage(existing, 'Add another item: 2 boxes laboratory gloves at ₱300 each');
+  assert.equal(result.action, 'added');
+  assert.equal(result.items.length, 2);
+  assert.equal(result.items[0].item_description, '');
+  assert.equal(result.items[1].item_description, 'laboratory gloves');
+  assert.equal(result.items[1].quantity, 2);
+  assert.equal(result.items[1].unit, 'boxes');
+  assert.equal(result.items[1].unit_cost, 300);
+});
+
+test('Full item replacement changes the targeted line without adding a second line', () => {
+  const existing = [
+    { item_description: 'laboratory glassware', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 },
+    { item_description: 'laboratory gloves', quantity: 5, unit: 'boxes', unit_cost: 300, total_cost: 1500 },
+  ];
+  const result = applyPRItemMessage(existing, 'Replace item 2 with 8 boxes nitrile gloves at ₱325 each');
+  assert.equal(result.action, 'updated');
+  assert.equal(result.items.length, 2);
+  assert.equal(result.items[1].item_description, 'nitrile gloves');
+  assert.equal(result.items[1].quantity, 8);
+  assert.equal(result.items[1].unit, 'boxes');
+  assert.equal(result.items[1].unit_cost, 325);
+  assert.equal(result.items[1].total_cost, 2600);
+});
