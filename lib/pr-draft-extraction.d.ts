@@ -37,3 +37,8 @@ export function applyPRItemMessage(
 ): PRItemAction;
 
 export function isPlausibleDraftReply(step: string, message: string): boolean;
+
+export function isCompletedPRDraftEdit(
+  state: { drafting?: boolean; collected?: { extracted?: ExtractedPRDetails } } | null | undefined,
+  message: string
+): boolean;
