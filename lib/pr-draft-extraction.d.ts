@@ -42,3 +42,5 @@ export function isCompletedPRDraftEdit(
   state: { drafting?: boolean; collected?: { extracted?: ExtractedPRDetails } } | null | undefined,
   message: string
 ): boolean;
+
+export function isPRDraftRevisionMessage(message: string): boolean;
