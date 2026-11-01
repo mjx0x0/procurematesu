@@ -18,4 +18,4 @@ export const PR_DRAFT_HANDOFF_VERSION: 1;
 export function createPRDraftHandoffPayload(input: unknown): PRDraftHandoffPayload;
 export function encodePRDraftHandoff(input: unknown): string;
 export function decodePRDraftHandoff(token: string): PRDraftHandoffPayload;
-export function readPRDraftHandoff(searchParams: URLSearchParams): PRDraftHandoffPayload | null;
+export function readPRDraftHandoff(searchParams: { get(name: string): string | null }): PRDraftHandoffPayload | null;
