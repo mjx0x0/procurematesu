@@ -27,6 +27,13 @@ on:
       - "components/chatbot/Chatbot.tsx"
       - "app/dashboard/chatbot/page.tsx"
       - "scripts/tests/chat-response-format.test.cjs"
+      - "lib/procurement-departments.js"
+      - "lib/procurement-departments.d.ts"
+      - "lib/pr-draft-handoff.js"
+      - "lib/pr-draft-handoff.d.ts"
+      - "app/dashboard/new-pr/ProcurementRequestForm.tsx"
+      - "scripts/tests/pr-draft-handoff.test.cjs"
+      - "scripts/tests/chat-send-auth.integration.test.cjs"
   pull_request:
     branches: [master]
     paths:
@@ -53,6 +60,13 @@ on:
       - "components/chatbot/Chatbot.tsx"
       - "app/dashboard/chatbot/page.tsx"
       - "scripts/tests/chat-response-format.test.cjs"
+      - "lib/procurement-departments.js"
+      - "lib/procurement-departments.d.ts"
+      - "lib/pr-draft-handoff.js"
+      - "lib/pr-draft-handoff.d.ts"
+      - "app/dashboard/new-pr/ProcurementRequestForm.tsx"
+      - "scripts/tests/pr-draft-handoff.test.cjs"
+      - "scripts/tests/chat-send-auth.integration.test.cjs"
 jobs:
   procurement-answer-guards:
     runs-on: ubuntu-latest
@@ -64,4 +78,4 @@ jobs:
         with:
           node-version: "20"
       - name: Run procurement answer guard regression tests
-        run: node --test scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs scripts/tests/procurement-scope-guard.test.cjs scripts/tests/chat-response-format.test.cjs
+        run: node --test scripts/tests/pr-draft-handoff.test.cjs scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs scripts/tests/procurement-scope-guard.test.cjs scripts/tests/chat-response-format.test.cjs scripts/tests/chat-send-auth.integration.test.cjs
