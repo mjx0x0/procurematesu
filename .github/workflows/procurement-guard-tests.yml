@@ -6,7 +6,6 @@ on:
     paths:
       - "lib/procurement-answer-guards.js"
       - "lib/procurement-office-location.js"
-      - "lib/procurement-office-location.js"
       - "lib/procurement-answer-guards.d.ts"
       - "lib/procurement-scope-guard.js"
       - "lib/procurement-scope-guard.d.ts"
@@ -19,7 +18,7 @@ on:
       - "scripts/tests/procurement-issuance-intents.test.cjs"
       - "scripts/tests/procurement-accuracy-matrix.test.cjs"
       - "scripts/tests/procurement-office-location.test.cjs"
-      - "scripts/tests/procurement-office-location.test.cjs"
+      - "scripts/tests/procurement-scope-guard.test.cjs"
       - "package.json"
       - ".github/workflows/procurement-guard-tests.yml"
   pull_request:
@@ -37,6 +36,8 @@ on:
       - "scripts/tests/procurement-answer-guards.test.cjs"
       - "scripts/tests/procurement-issuance-intents.test.cjs"
       - "scripts/tests/procurement-accuracy-matrix.test.cjs"
+      - "scripts/tests/procurement-office-location.test.cjs"
+      - "scripts/tests/procurement-scope-guard.test.cjs"
       - "package.json"
       - ".github/workflows/procurement-guard-tests.yml"
 
@@ -51,4 +52,4 @@ jobs:
         with:
           node-version: "20"
       - name: Run procurement answer guard regression tests
-        run: node --test scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs
+        run: node --test scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs scripts/tests/procurement-scope-guard.test.cjs
