@@ -3,6 +3,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
 import { isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
+import { buildProcurementOfficeLocationResponse } from '@/lib/procurement-office-location';
 import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
 import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-extraction';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
@@ -179,15 +180,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (OFFICE_INFO_PATTERN.test(message)) {
-      return NextResponse.json({
-        response:
-          "📍 **MSU-GenSan Procurement Management Office**\n\n" +
-          "The Procurement Management Office is under the Office of the Vice Chancellor for Administration and Finance. The university's official directory lists the campus address as **Fatima, General Santos City, South Cotabato, Philippines, 9500**.\n\n" +
-          "For procurement inquiries, the official university directory lists **Assoc. Prof. Nelson P. Benares, Jr.** as Director and **0908-810-5634** as the office contact number.\n\n" +
-          "Because MSU-GenSan issued a June 2026 advisory about temporary relocation of offices affected by Y-Building damage, please confirm the current temporary office assignment before visiting in person.\n\n" +
-          "If you want, I can also explain what the Procurement Office handles or help you prepare a Purchase Request.",
-        sources: ['MSU-GenSan University Directory', 'MSU-GenSan Temporary Office Relocation Advisory']
-      });
+      return NextResponse.json(buildProcurementOfficeLocationResponse());
     }
 
     // Use the canned workflow only for a direct, single-topic workflow request.
