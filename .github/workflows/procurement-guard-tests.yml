@@ -25,6 +25,7 @@ on:
       - "lib/chat-response-format.d.ts"
       - "components/chatbot/ChatMessageContent.tsx"
       - "components/chatbot/Chatbot.tsx"
+      - "app/dashboard/chatbot/page.tsx"
       - "scripts/tests/chat-response-format.test.cjs"
   pull_request:
     branches: [master]
@@ -50,6 +51,7 @@ on:
       - "lib/chat-response-format.d.ts"
       - "components/chatbot/ChatMessageContent.tsx"
       - "components/chatbot/Chatbot.tsx"
+      - "app/dashboard/chatbot/page.tsx"
       - "scripts/tests/chat-response-format.test.cjs"
 jobs:
   procurement-answer-guards:
