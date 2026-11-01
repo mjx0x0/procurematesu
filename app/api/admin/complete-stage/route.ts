@@ -120,7 +120,6 @@ export async function POST(req: NextRequest) {
           await db.from("purchase_requests").insert({ ...fullOldPR, pr_no: candidateOfficialPrNo, updated_at: now });
           await db.from("pr_items").update({ pr_no: candidateOfficialPrNo }).eq("pr_no", prNo);
           await db.from("pr_stages_completed").update({ pr_no: candidateOfficialPrNo }).eq("pr_no", prNo);
-          await db.from("rfqs").update({ pr_no: candidateOfficialPrNo, reference_no: candidateOfficialPrNo }).eq("pr_no", prNo);
           await db.from("purchase_requests").delete().eq("pr_no", prNo);
           effectivePrNo = candidateOfficialPrNo;
         }
