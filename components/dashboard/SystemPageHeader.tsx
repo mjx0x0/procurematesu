@@ -99,11 +99,11 @@ export function SystemPageHeader({
           )}
           {brandLogo ? (
             <MsuLogo size={36} className="shrink-0" />
-          ) : (
+          ) : PageIcon ? (
             <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#4D002C] text-amber-300 shadow-sm ${compactOnMobile ? "hidden sm:flex" : ""}`}>
-              {PageIcon && <PageIcon className="h-5 w-5" />}
+              <PageIcon className="h-5 w-5" />
             </div>
-          )}
+          ) : null}
           <div className="min-w-0">
             <b className={`block truncate ${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} font-black leading-tight tracking-tight text-[#4D002C]`}>
               {compactOnMobile && (

@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { ChatMessageContent } from "@/components/chatbot/ChatMessageContent";
 import { normalizeAssistantResponse } from "@/lib/chat-response-format";
-import { Bot, Check, Copy, History, Loader2, MessageSquarePlus, Send, Sparkles, Trash2, X, Square, ArrowRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Check, Copy, History, Loader2, MessageSquarePlus, Send, Sparkles, Trash2, X, Square, ArrowRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 
 interface PRChoice {
@@ -527,7 +527,7 @@ export default function ChatbotDashboard() {
   return (
     <div className="chatbot-viewport h-screen h-[100dvh] max-h-screen bg-[#FAF8F5] flex flex-col overflow-hidden">
       {/* Top Navbar */}
-      <SystemPageHeader titlePrimary="AI" titleAccent="Chatbot" mobileTitlePrimary="Gab" mobileTitleAccent="AI" compactOnMobile icon={Bot} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl w-full px-2 sm:px-4 md:px-6">
+      <SystemPageHeader titlePrimary="AI" titleAccent="Chatbot" mobileTitlePrimary="Gab" mobileTitleAccent="AI" compactOnMobile backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl w-full px-2 sm:px-4 md:px-6">
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop Sidebar Toggle Button */}
             <button
@@ -880,6 +880,12 @@ export default function ChatbotDashboard() {
           </div>
         </section>
       </main>
+
+      <footer className="shrink-0 border-t border-stone-200/80 bg-white/70 py-2 text-center backdrop-blur-xs">
+        <p className="text-[11px] font-medium text-stone-500 tracking-normal">
+          © {new Date().getFullYear()} <span className="font-semibold text-stone-700">Mindanao State University - General Santos</span> <span className="mx-1.5 text-stone-300">·</span> <span className="font-semibold text-[#7B0046]">Procurement Management System</span>
+        </p>
+      </footer>
 
       {/* Custom In-App Modal for Deleting Conversation — NO window.confirm browser popup! */}
       {deleteId && (

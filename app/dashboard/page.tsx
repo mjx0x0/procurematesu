@@ -3,13 +3,29 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Loader2 } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  Eye,
+  FileText,
+  Loader2,
+  PlusCircle,
+  Printer,
+} from "lucide-react";
 
 import { Chatbot } from "@/components/chatbot/Chatbot";
 import { NotificationPopover } from "@/components/NotificationPopover";
 
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import { MsuLogo } from "@/components/msu-logo";
+import {
+  PROCUREMENT_STAGES,
+  PROCUREMENT_STAGE_LABELS,
+  PROCUREMENT_STAGE_SHORT_LABELS,
+} from "@/lib/procurement-process";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -21,6 +37,29 @@ interface PurchaseRequest {
 }
 
 const TERMINAL_STAGES = ["completed", "cancelled", "rejected"];
+
+const stageNumber = (status: string) =>
+  PROCUREMENT_STAGES.find((stage) => stage.key === status)?.number;
+
+const isApprovedStage = (status: string) => {
+  const num = stageNumber(status);
+  return num !== undefined && num >= 4;
+};
+
+const statusColor = (status: string) => {
+  if (status === "draft") return "border-stone-200 bg-stone-100 text-stone-700";
+  if (status === "completed") return "border-emerald-200 bg-emerald-50 text-emerald-800";
+  if (status === "rejected" || status === "cancelled") return "border-red-200 bg-red-50 text-red-700";
+  if (isApprovedStage(status)) return "border-[#7B0046]/20 bg-[#7B0046]/5 text-[#7B0046]";
+  return "border-amber-200 bg-amber-50 text-amber-800";
+};
+
+const statusLabel = (status: string) => {
+  if (status === "completed") return "Completed";
+  if (status === "rejected") return "Rejected";
+  if (status === "cancelled") return "Cancelled";
+  return PROCUREMENT_STAGE_SHORT_LABELS[status] || PROCUREMENT_STAGE_LABELS[status] || status.replace(/_/g, " ");
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -85,8 +124,9 @@ export default function DashboardPage() {
     return () => { cancelled = true; };
   }, [router]);
 
-const displayName = user?.user_metadata?.full_name || "Requisitioner";
+  const displayName = user?.user_metadata?.full_name || "Requisitioner";
   const initials = displayName.slice(0, 2).toUpperCase();
+  const pendingDraftsCount = prs.filter((pr) => pr.current_stage === "draft").length;
 
   if (loading) {
     return (
@@ -116,18 +156,23 @@ const displayName = user?.user_metadata?.full_name || "Requisitioner";
       </SystemPageHeader>
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
-        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-6 sm:p-8 md:p-9 text-white shadow-[0_16px_40px_rgba(74,0,42,0.12)]">
-          <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
-          <div className="pointer-events-none absolute -left-16 -bottom-20 h-64 w-64 rounded-full bg-[#7B0046]/35 blur-3xl" />
-          <div className="relative">
-            <div className="max-w-2xl">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white">Good day, {displayName}.</h1>
-              <p className="mt-2 text-xs sm:text-sm leading-relaxed text-white/85">Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.</p>
-            </div>
+        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#480028] via-[#5F0035] to-[#35001D] px-5 py-4 sm:px-7 sm:py-5 md:px-8 md:py-5 text-white shadow-[0_12px_30px_rgba(74,0,42,0.12)]">
+          <div className="pointer-events-none absolute -right-20 -top-28 h-80 w-80 rounded-full bg-[#D4AF37]/15 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 -bottom-20 h-72 w-72 rounded-full bg-[#7B0046]/40 blur-3xl" />
+          <div className="pointer-events-none absolute right-4 -bottom-10 opacity-[0.05] select-none hidden lg:block">
+            <MsuLogo size={180} />
+          </div>
+          <div className="relative z-10 w-full">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
+              Good day, <span className="text-amber-200">{displayName}</span>.
+            </h1>
+            <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-stone-200/90 font-normal w-full">
+              Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.
+            </p>
           </div>
         </section>
 
-        <section className="mt-5 sm:mt-6" aria-label="Main Feature Shortcuts">
+        <section className="mt-4 sm:mt-5" aria-label="Main Feature Shortcuts">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             {/* 1. Create Purchase Request */}
             <Link
@@ -211,10 +256,258 @@ const displayName = user?.user_metadata?.full_name || "Requisitioner";
           </div>
         </section>
 
-        {/* 3 Procurement Overviews (Compact & Subtle) */}
+        {/* PR Overview */}
+        <section className="mt-8 sm:mt-10" aria-label="Purchase Requests Overview">
+          <div className="mb-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+            <div>
+              <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C]">
+                PR Overview
+              </h2>
+              <p className="text-xs text-stone-500 font-normal">
+                Summary of your procurement requests and real-time processing pipeline
+              </p>
+            </div>
+          </div>
 
-        <footer className="mt-12 py-8 text-center text-xs text-stone-500 border-t border-stone-200">
-          © {new Date().getFullYear()} Mindanao State University - General Santos · Procurement Management System
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+            {/* 1. Total Requests */}
+            <div className="rounded-2xl border border-stone-200/90 bg-white p-4 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.02)] transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-stone-500">Total Requests</span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-stone-100 text-stone-600">
+                  <FileText className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="mt-3 text-2xl sm:text-3xl font-black text-[#4D002C] font-mono tracking-tight">
+                {prs.length}
+              </div>
+              <p className="mt-1 text-[11px] font-medium text-stone-400">
+                All-time requisitions filed
+              </p>
+            </div>
+
+            {/* 2. In Review */}
+            <div className="rounded-2xl border border-stone-200/90 bg-white p-4 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.02)] transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-stone-500">Under Review</span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60">
+                  <Clock className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="mt-3 text-2xl sm:text-3xl font-black text-amber-700 font-mono tracking-tight">
+                {stats.pending}
+              </div>
+              <p className="mt-1 text-[11px] font-medium text-stone-400">
+                Active in university workflow
+              </p>
+            </div>
+
+            {/* 3. Completed */}
+            <div className="rounded-2xl border border-stone-200/90 bg-white p-4 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.02)] transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-stone-500">Completed</span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                  <CheckCircle2 className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="mt-3 text-2xl sm:text-3xl font-black text-emerald-700 font-mono tracking-tight">
+                {stats.completed}
+              </div>
+              <p className="mt-1 text-[11px] font-medium text-stone-400">
+                Approved &amp; fulfilled orders
+              </p>
+            </div>
+
+            {/* 4. Action Required Notice */}
+            {pendingDraftsCount > 0 ? (
+              <Link
+                href="/dashboard/purchase-requests"
+                className="rounded-2xl border border-amber-300/90 bg-amber-50/60 p-4 sm:p-5 transition-all shadow-[0_4px_20px_rgba(217,119,6,0.08)] hover:bg-amber-100/60 hover:border-amber-400 block group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                    Action Required
+                  </span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 text-amber-800 border border-amber-300/80 group-hover:scale-105 transition-transform">
+                    <AlertCircle className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="mt-3 text-2xl sm:text-3xl font-black text-[#7B0046] font-mono tracking-tight">
+                  {pendingDraftsCount} {pendingDraftsCount === 1 ? "Draft" : "Drafts"}
+                </div>
+                <p className="mt-1 text-[11px] font-semibold text-amber-900 leading-snug">
+                  Print &amp; physically submit signed copy to Procurement Office
+                </p>
+              </Link>
+            ) : (
+              <div className="rounded-2xl border border-stone-200/90 bg-white p-4 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.02)] transition-all">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-stone-500">Action Required</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-stone-100 text-stone-500">
+                    <CheckCircle2 className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="mt-3 text-2xl sm:text-3xl font-black text-stone-800 font-mono tracking-tight">
+                  0
+                </div>
+                <p className="mt-1 text-[11px] font-medium text-stone-400 leading-snug">
+                  No physical submissions pending
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Recent PR Activity */}
+        <section className="mt-8 sm:mt-10" aria-label="Recent PR Activity">
+          <div className="mb-3.5 flex items-center justify-between gap-2">
+            <div>
+              <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C]">
+                Recent PR Activity
+              </h2>
+              <p className="text-xs text-stone-500 font-normal">
+                Your latest purchase requests and their current processing status
+              </p>
+            </div>
+            {prs.length > 0 && (
+              <Link
+                href="/dashboard/purchase-requests"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#7B0046] hover:text-[#4D002C] transition-colors shrink-0"
+              >
+                <span>View directory ({prs.length})</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            )}
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-[0_4px_20px_rgba(45,35,30,0.03)]">
+            {prs.length === 0 ? (
+              <div className="p-8 sm:p-12 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#7B0046]/10 text-[#7B0046]">
+                  <FileText className="h-6 w-6" />
+                </div>
+                <h3 className="mt-3 text-sm sm:text-base font-bold text-stone-800">
+                  No purchase requests recorded yet
+                </h3>
+                <p className="mx-auto mt-1 max-w-sm text-xs text-stone-500 leading-relaxed">
+                  Create your first digital purchase request draft to track its approval through university procurement.
+                </p>
+                <Link
+                  href="/dashboard/new-pr"
+                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#7B0046] px-4 py-2 text-xs font-bold text-white hover:bg-[#4D002C] transition-colors shadow-xs"
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span>Create New PR</span>
+                </Link>
+              </div>
+            ) : (
+              <div className="divide-y divide-stone-100">
+                {prs.slice(0, 3).map((pr) => {
+                  const isDone = pr.current_stage === "completed";
+                  const isApproved = isApprovedStage(pr.current_stage);
+                  const stageNum = stageNumber(pr.current_stage);
+
+                  return (
+                    <div
+                      key={pr.pr_no}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 hover:bg-stone-50/70 transition-colors"
+                    >
+                      <div className="flex items-start gap-3 min-w-0 flex-1">
+                        <div
+                          className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl border shadow-2xs mt-0.5 ${
+                            isDone
+                              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                              : isApproved
+                              ? "border-[#7B0046]/20 bg-[#7B0046]/5 text-[#7B0046]"
+                              : "border-amber-200 bg-amber-50 text-amber-700"
+                          }`}
+                        >
+                          {isDone ? (
+                            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                          ) : (
+                            <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                            <span className="font-mono text-xs sm:text-sm font-bold text-[#4D002C]">
+                              {pr.pr_no}
+                            </span>
+                            {pr.pr_no?.includes("TEMP") && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-900 border border-amber-200/80">
+                                Temporary No.
+                              </span>
+                            )}
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusColor(
+                                pr.current_stage
+                              )}`}
+                            >
+                              {stageNum && stageNum > 0 ? `Stage ${stageNum} · ` : ""}
+                              {statusLabel(pr.current_stage)}
+                            </span>
+                            <span className="text-[11px] text-stone-400 font-medium">
+                              · {new Date(pr.created_at).toLocaleDateString("en-PH", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </span>
+                          </div>
+
+                          <p className="mt-1 line-clamp-1 text-xs sm:text-sm font-semibold text-stone-800">
+                            {pr.purpose || "Official procurement request"}
+                          </p>
+                          <p className="mt-0.5 text-[11px] text-stone-500 font-medium">
+                            {pr.department || "University Office"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t border-stone-100 sm:border-0">
+                        <div className="text-left sm:text-right">
+                          <p className="text-xs sm:text-sm font-bold text-stone-900 font-mono">
+                            ₱{Number(pr.total || 0).toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <Link
+                            href={`/dashboard/pr/${pr.pr_no}`}
+                            className="inline-flex min-h-9 items-center gap-1 px-3 py-1.5 rounded-xl bg-[#4D002C] text-white text-[11px] sm:text-xs font-bold shadow-xs hover:bg-[#7B0046] transition-colors"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                            <span>Track</span>
+                          </Link>
+                          <Link
+                            href={`/dashboard/pr-print?id=${pr.pr_no}`}
+                            className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 hover:text-stone-900 text-xs font-bold hover:bg-stone-50 transition-colors"
+                            title="Print PR Form"
+                            aria-label={`Print purchase request ${pr.pr_no}`}
+                          >
+                            <Printer className="h-3.5 w-3.5" />
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <footer className="mt-14 border-t border-stone-200/80 pt-6 pb-10 text-center">
+          <div className="mx-auto flex max-w-7xl items-center justify-center">
+            <p className="text-xs font-medium text-stone-500 tracking-normal">
+              © {new Date().getFullYear()} <span className="font-semibold text-stone-700">Mindanao State University - General Santos</span> <span className="mx-1.5 text-stone-300">·</span> <span className="font-semibold text-[#7B0046]">Procurement Management System</span>
+            </p>
+          </div>
         </footer>
       </main>
       <Chatbot />

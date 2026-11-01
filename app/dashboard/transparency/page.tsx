@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ExternalLink, FileText, Search, ShieldCheck, TrendingUp } from "lucide-react";
+import { ExternalLink, FileText, Search, TrendingUp } from "lucide-react";
 import { TRANSPARENCY_PROJECTS, TRANSPARENCY_SOURCE_URL } from "@/lib/transparency-projects";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 
@@ -33,7 +33,7 @@ export default function TransparencyPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <SystemPageHeader titlePrimary="Transparency" titleAccent="Board" icon={ShieldCheck} backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl px-4 sm:px-6" />
+      <SystemPageHeader titlePrimary="Transparency" titleAccent="Board" backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl px-4 sm:px-6" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-6 sm:p-8 md:p-9 text-white shadow-[0_16px_40px_rgba(74,0,42,0.12)] mb-6">

@@ -514,6 +514,14 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
             </div>
           )}
         </div>
+
+        <footer className="mt-14 border-t border-stone-200/80 pt-6 pb-10 text-center">
+          <div className="mx-auto flex max-w-7xl items-center justify-center">
+            <p className="text-xs font-medium text-stone-500 tracking-normal">
+              © {new Date().getFullYear()} <span className="font-semibold text-stone-700">Mindanao State University - General Santos</span> <span className="mx-1.5 text-stone-300">·</span> <span className="font-semibold text-[#7B0046]">Procurement Management System</span>
+            </p>
+          </div>
+        </footer>
       </main>
 
       {showDetails && selectedPR && (

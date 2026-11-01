@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase/client";
 import PRDownloadButton from "@/components/PRDownloadButton";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, getFormDisplayPrNumber } from "@/lib/procurement-process";
-import { CheckCircle, Clock, FileCheck, FileText, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, Clock, FileCheck, Loader2, XCircle } from "lucide-react";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -160,7 +160,7 @@ export default function PRDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" icon={FileText} backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="max-w-5xl px-4" />
+      <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="max-w-5xl px-4" />
 
       <main className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-stone-200">
