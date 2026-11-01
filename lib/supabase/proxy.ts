@@ -30,14 +30,6 @@ function isStaleRefreshTokenError(error: unknown): boolean {
   return false;
 }
 
-if (typeof process !== "undefined" && typeof process.on === "function") {
-  process.on("unhandledRejection", (reason: any) => {
-    if (isStaleRefreshTokenError(reason)) {
-      // Harmless stale refresh token during background session recovery
-      return;
-    }
-  });
-}
 
 export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

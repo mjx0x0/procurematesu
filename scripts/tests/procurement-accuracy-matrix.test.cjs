@@ -2,9 +2,11 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion, isBiddingDocumentsRateQuestion } = require('../../lib/procurement-answer-guards.js');
 const { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } = require('../../lib/procurement-scope-guard.js');
-const { extractPRDetailsRuleBased, hasCompletePRDetails, mergePRDetailsFromDepartmentReply, hasExplicitPricedItemDetails } = require('../../lib/pr-draft-extraction.js');
+const { extractPRDetailsRuleBased, parsePRItems, hasCompletePRDetails, getMissingItemFields, mergePRDetailsFromDepartmentReply, hasExplicitPricedItemDetails, applyPRItemMessage, isPlausibleDraftReply, isPRDraftRevisionMessage } = require('../../lib/pr-draft-extraction.js');
 
 test('all six preview accuracy prompts route through the source-gated answer guard', () => {
   const prompts = [
@@ -437,4 +439,285 @@ test('Department-only reply preserves the prior purpose and items without becomi
   assert.equal(merged.purpose, purpose);
   assert.deepEqual(merged.items, priorExtraction.items);
   assert.equal(hasCompletePRDetails(merged), true);
+});
+
+
+test('PR parser extracts multiple priced items from quantity-first wording', () => {
+  const items = parsePRItems(
+    '10 units Laptop Intel i7 at 45000 each, 2 units Laser Printer at 18000 each'
+  );
+  assert.equal(items.length, 2);
+  assert.deepEqual(items.map((item) => ({
+    description: item.item_description,
+    quantity: item.quantity,
+    unit: item.unit,
+    cost: item.unit_cost,
+    total: item.total_cost,
+  })), [
+    { description: 'Laptop Intel i7', quantity: 10, unit: 'units', cost: 45000, total: 450000 },
+    { description: 'Laser Printer', quantity: 2, unit: 'units', cost: 18000, total: 36000 },
+  ]);
+});
+
+test('PR parser extracts multiple items with description-first and "of" wording', () => {
+  const items = parsePRItems(
+    'laboratory glassware, 10 pcs, 150 pesos each; laboratory gloves, 5 boxes, 300 pesos each'
+  );
+  assert.equal(items.length, 2);
+  assert.equal(items[0].item_description, 'laboratory glassware');
+  assert.equal(items[0].quantity, 10);
+  assert.equal(items[0].unit_cost, 150);
+  assert.equal(items[1].item_description, 'laboratory gloves');
+  assert.equal(items[1].quantity, 5);
+  assert.equal(items[1].unit, 'boxes');
+  assert.equal(items[1].unit_cost, 300);
+
+  const ofWording = parsePRItems(
+    '10 pcs of laboratory glassware at 150 pesos each and 5 boxes of laboratory gloves at 300 pesos each'
+  );
+  assert.equal(ofWording.length, 2);
+  assert.equal(ofWording[0].item_description, 'laboratory glassware');
+  assert.equal(ofWording[1].item_description, 'laboratory gloves');
+});
+
+test('PR parser retains incomplete item fields instead of inventing a description or quantity', () => {
+  const noDescription = parsePRItems('50 pcs at ₱150 each');
+  assert.equal(noDescription.length, 1);
+  assert.equal(noDescription[0].item_description, '');
+  assert.equal(noDescription[0].quantity, 50);
+  assert.equal(noDescription[0].unit, 'pcs');
+  assert.equal(noDescription[0].unit_cost, 150);
+  assert.deepEqual(getMissingItemFields(noDescription), [
+    { index: 1, description: '', missing: ['item description'] },
+  ]);
+
+  const noPrice = parsePRItems('laboratory glassware, 50 pcs');
+  assert.equal(noPrice.length, 1);
+  assert.equal(noPrice[0].item_description, 'laboratory glassware');
+  assert.equal(noPrice[0].quantity, 50);
+  assert.equal(noPrice[0].unit_cost, 0);
+  assert.ok(getMissingItemFields(noPrice)[0].missing.includes('estimated unit cost'));
+
+  const noQuantity = parsePRItems('laboratory glassware at ₱150 each');
+  assert.equal(noQuantity.length, 1);
+  assert.equal(noQuantity[0].item_description, 'laboratory glassware');
+  assert.equal(noQuantity[0].quantity, 0);
+  assert.equal(noQuantity[0].unit, '');
+  assert.ok(getMissingItemFields(noQuantity)[0].missing.includes('quantity'));
+});
+
+test('PR parser extracts a full multi-item PR from one message with department and purpose', () => {
+  const extracted = extractPRDetailsRuleBased(
+    'Procurement of laboratory equipment for Chemistry classes, College of Education, 10 units Laptop Intel i7 at ₱45,000 each, 2 units Laser Printer at ₱18,000 each'
+  );
+  assert.equal(extracted.department, 'College of Education');
+  assert.equal(extracted.items.length, 2);
+  assert.equal(extracted.items[0].item_description, 'Laptop Intel i7');
+  assert.equal(extracted.items[1].item_description, 'Laser Printer');
+  assert.equal(extracted.total_amount, 486000);
+  assert.equal(hasCompletePRDetails(extracted), true);
+});
+
+test('PR drafting adds an additional item without removing or duplicating earlier items', () => {
+  const existing = [
+    { item_description: 'Laptop Intel i7', quantity: 10, unit: 'units', unit_cost: 45000, total_cost: 450000 },
+  ];
+  const added = applyPRItemMessage(existing, 'Add another item: 2 units Laser Printer at ₱18,000 each');
+  assert.equal(added.action, 'added');
+  assert.equal(added.items.length, 2);
+  assert.equal(added.items[0].item_description, 'Laptop Intel i7');
+  assert.equal(added.items[1].item_description, 'Laser Printer');
+  assert.equal(added.items[1].quantity, 2);
+  assert.equal(added.items[1].unit_cost, 18000);
+
+  const duplicate = applyPRItemMessage(added.items, '2 units Laser Printer at ₱18,000 each');
+  assert.equal(duplicate.action, 'duplicate');
+  assert.equal(duplicate.items.length, 2);
+});
+
+test('PR drafting corrections update the selected item and recalculate its total', () => {
+  const existing = [
+    { item_description: 'Laptop Intel i7', quantity: 10, unit: 'units', unit_cost: 45000, total_cost: 450000 },
+    { item_description: 'Laser Printer', quantity: 2, unit: 'units', unit_cost: 18000, total_cost: 36000 },
+  ];
+  const quantity = applyPRItemMessage(existing, 'Actually, change item 1 quantity from 10 to 8 units');
+  assert.equal(quantity.action, 'updated');
+  assert.equal(quantity.items[0].quantity, 8);
+  assert.equal(quantity.items[0].total_cost, 360000);
+  assert.equal(quantity.items[1].quantity, 2);
+
+  const price = applyPRItemMessage(quantity.items, 'Update item 2 unit cost to ₱20,000 each');
+  assert.equal(price.action, 'updated');
+  assert.equal(price.items[1].unit_cost, 20000);
+  assert.equal(price.items[1].total_cost, 40000);
+});
+
+test('PR drafting asks which item to correct when multiple items exist and target is ambiguous', () => {
+  const existing = [
+    { item_description: 'Laptop Intel i7', quantity: 10, unit: 'units', unit_cost: 45000, total_cost: 450000 },
+    { item_description: 'Laser Printer', quantity: 2, unit: 'units', unit_cost: 18000, total_cost: 36000 },
+  ];
+  const result = applyPRItemMessage(existing, 'Change the quantity to 12 units');
+  assert.equal(result.action, 'clarify');
+  assert.match(result.reason, /which item number/i);
+  assert.deepEqual(result.items, existing);
+});
+
+test('PR slot sanity check accepts valid short and compound replies but rejects obvious gibberish', () => {
+  assert.equal(isPlausibleDraftReply('department', 'IT'), true);
+  assert.equal(isPlausibleDraftReply('department', 'College of Education, 50 pcs, 150 pesos each'), true);
+  assert.equal(isPlausibleDraftReply('items', '50 pcs'), true);
+  assert.equal(isPlausibleDraftReply('items', 'aaaaa11111'), false);
+  assert.equal(isPlausibleDraftReply('purpose', 'x'), false);
+});
+
+
+test('PR drafting fills a missing item description without creating a duplicate line', () => {
+  const existing = [
+    { item_description: '', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 },
+  ];
+  const result = applyPRItemMessage(existing, 'laboratory glassware');
+  assert.equal(result.action, 'updated');
+  assert.equal(result.items.length, 1);
+  assert.equal(result.items[0].item_description, 'laboratory glassware');
+  assert.equal(result.items[0].quantity, 50);
+  assert.equal(result.items[0].unit_cost, 150);
+});
+
+test('PR drafting fills a missing quantity and unit on an existing item', () => {
+  const existing = [
+    { item_description: 'laboratory glassware', quantity: 0, unit: '', unit_cost: 150, total_cost: 0 },
+  ];
+  const result = applyPRItemMessage(existing, '50 pcs');
+  assert.equal(result.action, 'updated');
+  assert.equal(result.items.length, 1);
+  assert.equal(result.items[0].item_description, 'laboratory glassware');
+  assert.equal(result.items[0].quantity, 50);
+  assert.equal(result.items[0].unit, 'pcs');
+  assert.equal(result.items[0].unit_cost, 150);
+});
+
+test('PR drafting fills a missing unit cost on an existing item', () => {
+  const existing = [
+    { item_description: 'laboratory glassware', quantity: 50, unit: 'pcs', unit_cost: 0, total_cost: 0 },
+  ];
+  const result = applyPRItemMessage(existing, '150 pesos each');
+  assert.equal(result.action, 'updated');
+  assert.equal(result.items.length, 1);
+  assert.equal(result.items[0].item_description, 'laboratory glassware');
+  assert.equal(result.items[0].quantity, 50);
+  assert.equal(result.items[0].unit_cost, 150);
+  assert.equal(result.items[0].total_cost, 7500);
+});
+
+test('Adding a new item does not overwrite an existing incomplete item', () => {
+  const existing = [
+    { item_description: '', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 },
+  ];
+  const result = applyPRItemMessage(existing, 'Add another item: 2 boxes laboratory gloves at ₱300 each');
+  assert.equal(result.action, 'added');
+  assert.equal(result.items.length, 2);
+  assert.equal(result.items[0].item_description, '');
+  assert.equal(result.items[1].item_description, 'laboratory gloves');
+  assert.equal(result.items[1].quantity, 2);
+  assert.equal(result.items[1].unit, 'boxes');
+  assert.equal(result.items[1].unit_cost, 300);
+});
+
+test('Full item replacement changes the targeted line without adding a second line', () => {
+  const existing = [
+    { item_description: 'laboratory glassware', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 },
+    { item_description: 'laboratory gloves', quantity: 5, unit: 'boxes', unit_cost: 300, total_cost: 1500 },
+  ];
+  const result = applyPRItemMessage(existing, 'Replace item 2 with 8 boxes nitrile gloves at ₱325 each');
+  assert.equal(result.action, 'updated');
+  assert.equal(result.items.length, 2);
+  assert.equal(result.items[1].item_description, 'nitrile gloves');
+  assert.equal(result.items[1].quantity, 8);
+  assert.equal(result.items[1].unit, 'boxes');
+  assert.equal(result.items[1].unit_cost, 325);
+  assert.equal(result.items[1].total_cost, 2600);
+});
+
+
+test('A distinct new item without an action word does not overwrite an incomplete existing line', () => {
+  const existing = [
+    { item_description: '', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 },
+  ];
+  const result = applyPRItemMessage(existing, '2 boxes laboratory gloves at ₱300 each');
+  assert.equal(result.action, 'added');
+  assert.equal(result.items.length, 2);
+  assert.equal(result.items[0].item_description, '');
+  assert.equal(result.items[0].quantity, 50);
+  assert.equal(result.items[1].item_description, 'laboratory gloves');
+  assert.equal(result.items[1].quantity, 2);
+  assert.equal(result.items[1].unit, 'boxes');
+  assert.equal(result.items[1].unit_cost, 300);
+});
+
+test('Multiple new item lines are appended even when an older item is incomplete', () => {
+  const existing = [
+    { item_description: '', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 },
+  ];
+  const result = applyPRItemMessage(
+    existing,
+    '2 boxes laboratory gloves at ₱300 each; 5 reams bond paper at ₱250 each'
+  );
+  assert.equal(result.action, 'added');
+  assert.equal(result.items.length, 3);
+  assert.equal(result.items[0].item_description, '');
+  assert.equal(result.items[1].item_description, 'laboratory gloves');
+  assert.equal(result.items[2].item_description, 'bond paper');
+  assert.equal(result.items[2].quantity, 5);
+  assert.equal(result.items[2].unit, 'reams');
+});
+
+test('completed PR drafts remain editable for later quantity corrections and additional items', () => {
+  const completed = {
+    department: 'College of Education',
+    purpose: 'Procurement of laboratory supplies',
+    items: [
+      { item_description: 'laboratory glassware', quantity: 10, unit: 'pcs', unit_cost: 150, total_cost: 1500 },
+    ],
+    total_amount: 1500,
+  };
+  assert.equal(isPRDraftRevisionMessage('Change item 1 quantity to 12 pcs'), true);
+  assert.equal(isPRDraftRevisionMessage('Add another item: 2 boxes gloves at ₱300 each'), true);
+  assert.equal(isPRDraftRevisionMessage('What is the SVP threshold under RA 12009?'), false);
+  const corrected = applyPRItemMessage(completed.items, 'Change item 1 quantity to 12 pcs');
+  assert.equal(corrected.action, 'updated');
+  assert.equal(corrected.items[0].quantity, 12);
+  assert.equal(corrected.items[0].total_cost, 1800);
+  const added = applyPRItemMessage(corrected.items, 'Add another item: 2 boxes gloves at ₱300 each');
+  assert.equal(added.action, 'added');
+  assert.equal(added.items.length, 2);
+  assert.equal(added.items[1].item_description, 'gloves');
+  assert.equal(added.items.reduce((sum, item) => sum + item.total_cost, 0), 2400);
+});
+
+
+test('printable PR omits the office footer and places a small System Tracking Control inside the form', () => {
+  const printSource = fs.readFileSync(
+    path.join(__dirname, '../../app/dashboard/pr-print/PRPrintContent.tsx'),
+    'utf8'
+  );
+  assert.doesNotMatch(printSource, /Mindanao State University - General Santos City Procurement Office/);
+  assert.ok(printSource.includes('System Tracking Control:'));
+  assert.ok(printSource.includes('text-[8px] leading-tight text-stone-600 print:text-[7px]'));
+  assert.ok(printSource.includes('Not yet assigned'));
+  assert.match(
+    printSource,
+    /const hasSavedPR = Boolean\(data\.pr_no\?\.trim\(\) \|\| data\.system_tracking_no\?\.trim\(\)\);/
+  );
+  assert.match(
+    printSource,
+    /\{hasSavedPR && \(\s*<button[\s\S]*?Print Official PR[\s\S]*?<\/button>\s*\)\}/
+  );
+
+  const signatureSection = printSource.indexOf('/* Signature Section Body */');
+  const trackingLabel = printSource.indexOf('System Tracking Control:');
+  const formBoundary = printSource.indexOf("\n        </div>\n      </div>", signatureSection);
+  assert.ok(signatureSection >= 0, 'The signature section should remain in the printable form.');
+  assert.ok(trackingLabel > signatureSection, 'The tracking control should appear after the signature section.');
+  assert.ok(formBoundary > trackingLabel, 'The tracking control should remain inside the form border.');
 });
