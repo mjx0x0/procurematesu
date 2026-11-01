@@ -8,6 +8,7 @@ import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCo
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
+import { normalizeAssistantResponse } from '@/lib/chat-response-format';
 
 // ============================================================
 // CONFIGURATION & DATABASE FALLBACKS
@@ -216,84 +217,6 @@ function generateOfflineProcurementResponse(query: string, retrievedContext: str
   return "I couldn’t find enough relevant verified information to answer that specific question reliably. Please try rephrasing the question or ask about a specific procurement rule, document, or procedure.";
 }
 
-function cleanAIResponse(text: string): string {
-  if (!text) return text;
-
-  let cleaned = text
-    // Remove HTML/escaped HTML artifacts produced by the model.
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/\\<br\s*\/?>/gi, '\n')
-    .replace(/<\/?(?:div|p|span|table|thead|tbody|tr|th|td)[^>]*>/gi, '')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'");
-
-  // Convert Markdown tables into clean, readable bullets so raw pipes and
-  // separator rows never leak into the chat UI.
-  const lines = cleaned.split('\n');
-  const output: string[] = [];
-  let inTable = false;
-
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
-
-    if (line.includes('|')) {
-      const cells = line
-        .replace(/^\|/, '')
-        .replace(/\|$/, '')
-        .split('|')
-        .map((cell) => cell.trim())
-        .filter(Boolean);
-
-      const isSeparator =
-        cells.length > 0 && cells.every((cell) => /^:?-{2,}:?$/.test(cell));
-
-      if (isSeparator) {
-        inTable = true;
-        continue;
-      }
-
-      if (cells.length >= 2) {
-        inTable = true;
-        const isHeader =
-          output.length === 0 ||
-          (cells[0].toLowerCase() === 'aspect' &&
-            cells[1].toLowerCase().includes('what the act provides'));
-
-        output.push(
-          isHeader
-            ? '**' + cells.join(' — ') + '**'
-            : '• ' + cells.join(' — ')
-        );
-        continue;
-      }
-    }
-
-    if (line) {
-      output.push(rawLine);
-    } else if (!inTable || output[output.length - 1] !== '') {
-      output.push('');
-    }
-
-    if (!line.includes('|')) {
-      inTable = false;
-    }
-  }
-
-  cleaned = output.join('\n')
-    .replace(/\\\|/g, '')
-    .replace(/\|/g, '')
-    .replace(/[ \t]+\n/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-
-  return cleaned;
-}
-
-// ============================================================
 // SMART PR PARSER & EXTRACTOR
 // ============================================================
 
@@ -994,6 +917,7 @@ CRITICAL DIRECTIVES:
 12. If one sub-question is not covered by the excerpts, still answer the other sub-questions. Give a reliable general explanation where appropriate and clearly mark only the unsupported MSU-specific detail as unverified.
 13. Aim for a medium-length response: usually about 120–250 words for a normal question, but use more space when needed to answer all parts accurately. Do not stop mid-sentence or omit the conclusion.
 14. Prefer short paragraphs and bullets or numbered steps when they improve readability.
+33. FORMATTING: Keep formatting consistent and restrained. Use bold only for headings or short labels at the beginning of a line followed by a colon. Do not bold names, source titles, citations, or arbitrary phrases inside a sentence. Do not use italic or bold emphasis in ordinary paragraph prose. Never output unmatched Markdown formatting markers. Put citations on a separate "Source:" line and use a clickable link only when the retrieved source metadata provides its URL.
 15. For simple definition or location/contact questions, give a direct answer first, followed by the most relevant supporting details.
 16. For process questions, use a short numbered list for the actual sequence of steps and a brief explanation afterward.
 17. For procurement-law or MSU-specific procedure answers, include a short source note by default using only the source titles and section/page details actually available in the retrieved excerpts. If no reliable source was retrieved, state that limitation instead of inventing a citation.
@@ -1048,7 +972,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
     }
 
     // Normalize model-generated HTML/escape artifacts before returning or storing the response.
-    responseText = cleanAIResponse(normalizeSourceReferences(responseText, trimmedMsg));
+    responseText = normalizeAssistantResponse(normalizeSourceReferences(responseText, trimmedMsg));
 
     // If the user cancelled while the model was generating, discard the in-flight answer.
     if (supabase && sessionId) {
@@ -1163,7 +1087,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
           );
           if (fallback.trim()) {
             return NextResponse.json({
-              response: cleanAIResponse(normalizeSourceReferences(fallback, query)),
+              response: normalizeAssistantResponse(normalizeSourceReferences(fallback, query)),
               sessionId: 'sess_recovery',
               sources: retrieval.sources.map(normalizeSourceLabel),
               degradedMode: true,
