@@ -122,16 +122,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to update stage history to official number." }, { status: 500, headers: JSON_HEADERS });
     }
 
-    // Step 4: Migrate RFQs if any exist
-    await db.from("rfqs").update({ pr_no: officialPrNo, reference_no: officialPrNo }).eq("pr_no", currentPrNo);
-
-    // Step 5: Delete old temporary PR record
+    // Step 4: Delete old temporary PR record
     const { error: deleteOldError } = await db.from("purchase_requests").delete().eq("pr_no", currentPrNo);
     if (deleteOldError) {
       console.error("[assign-official-pr] Delete old record failed:", deleteOldError);
     }
 
-    // Step 6: Record official pre-numbering event in stage history
+    // Step 5: Record official pre-numbering event in stage history
     const logRemarks = `Official PR Control Number assigned: ${officialPrNo} (updated from ${currentPrNo}).${adminRemarks ? ` Note: ${adminRemarks}` : ""}`;
     await db.from("pr_stages_completed").insert({
       pr_no: officialPrNo,
