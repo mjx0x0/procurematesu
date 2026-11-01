@@ -21,6 +21,11 @@ on:
       - "scripts/tests/procurement-scope-guard.test.cjs"
       - "package.json"
       - ".github/workflows/procurement-guard-tests.yml"
+      - "lib/chat-response-format.js"
+      - "lib/chat-response-format.d.ts"
+      - "components/chatbot/ChatMessageContent.tsx"
+      - "components/chatbot/Chatbot.tsx"
+      - "scripts/tests/chat-response-format.test.cjs"
   pull_request:
     branches: [master]
     paths:
@@ -41,6 +46,11 @@ on:
       - "package.json"
       - ".github/workflows/procurement-guard-tests.yml"
 
+      - "lib/chat-response-format.js"
+      - "lib/chat-response-format.d.ts"
+      - "components/chatbot/ChatMessageContent.tsx"
+      - "components/chatbot/Chatbot.tsx"
+      - "scripts/tests/chat-response-format.test.cjs"
 jobs:
   procurement-answer-guards:
     runs-on: ubuntu-latest
@@ -52,4 +62,4 @@ jobs:
         with:
           node-version: "20"
       - name: Run procurement answer guard regression tests
-        run: node --test scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs scripts/tests/procurement-scope-guard.test.cjs
+        run: node --test scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs scripts/tests/procurement-scope-guard.test.cjs scripts/tests/chat-response-format.test.cjs
