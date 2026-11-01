@@ -4,7 +4,7 @@ import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
 import { isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { buildProcurementOfficeLocationResponse } from '@/lib/procurement-office-location';
-import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
+import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
 import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-extraction';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
 
@@ -140,6 +140,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         response: PROCUREMENT_SCOPE_RESPONSE,
         sources: ['ProcureMateSU scope and security guard'],
+      });
+    }
+
+    // Answer brief social/identity messages deterministically and preserve any
+    // active PR draft; never pass these messages to slot validation or an LLM.
+    if (scopeDecision.reason === 'small_talk') {
+      return NextResponse.json({
+        response: buildProcurementSmallTalkResponse(message),
+        sources: ['Gab AI conversational response'],
       });
     }
 
