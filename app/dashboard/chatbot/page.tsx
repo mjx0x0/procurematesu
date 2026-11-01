@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { ChatMessageContent } from "@/components/chatbot/ChatMessageContent";
+import { normalizeAssistantResponse } from "@/lib/chat-response-format";
 import { Bot, Check, Copy, History, Loader2, MessageSquarePlus, Send, Sparkles, Trash2, X, Square, ArrowRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 
@@ -99,7 +100,7 @@ export default function ChatbotDashboard() {
     const restored = (data || []).map((m: any) => ({
       id: m.id,
       role: m.sender === "user" ? "user" : "assistant",
-      content: m.content,
+      content: m.sender === "user" ? (typeof m.content === "string" ? m.content : "") : normalizeAssistantResponse(m.content),
       timestamp: new Date(m.created_at || Date.now()),
       sources: Array.isArray(m.metadata?.sources) ? m.metadata.sources : undefined,
       prOptions: Array.isArray(m.metadata?.prOptions) ? m.metadata.prOptions : undefined,
@@ -240,7 +241,7 @@ export default function ChatbotDashboard() {
       {
         id: `local-${Date.now()}-${Math.random()}`,
         role,
-        content,
+        content: role === "assistant" ? normalizeAssistantResponse(content) : content,
         timestamp: new Date(),
         prOptions,
       },
@@ -321,10 +322,10 @@ export default function ChatbotDashboard() {
         signal: abortRef.current.signal,
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(data?.error || "Chat request failed");
 
-      addLocal("assistant", data.response || "I could not process that request.");
+      addLocal("assistant", normalizeAssistantResponse(data?.response));
       await supabase
         .from("chat_sessions")
         .update({ title: text.slice(0, 60), updated_at: new Date().toISOString() })
@@ -365,9 +366,9 @@ export default function ChatbotDashboard() {
         credentials: "include",
         body: JSON.stringify({ message: `Track ${prNo}`, sessionId: sid }),
       });
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(data?.error || "Unable to track PR");
-      addLocal("assistant", data.response || `I could not retrieve the status for ${prNo}.`);
+      addLocal("assistant", normalizeAssistantResponse(data?.response));
       await supabase
         .from("chat_sessions")
         .update({ title: `Track ${prNo}`.slice(0, 60), updated_at: new Date().toISOString() })
