@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
-import { getProcurementScopeDecision, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
+import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
 import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails, mergePRDetailsFromDepartmentReply, applyPRItemMessage, getMissingItemFields, isPRDraftRevisionMessage } from '@/lib/pr-draft-extraction';
 import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
@@ -886,6 +886,11 @@ export async function POST(req: NextRequest) {
       responseText = PROCUREMENT_SCOPE_RESPONSE;
       inquiryType = 'scope_redirect';
       updatedState = { ...currentState };
+    } else if (scopeDecision.reason === 'small_talk') {
+      // Keep the response deterministic and leave an active PR draft unchanged.
+      responseText = buildProcurementSmallTalkResponse(trimmedMsg);
+      inquiryType = 'conversation';
+      updatedState = { ...currentState };
     } else if (deterministicPolicyQuestion) {
       const policyRetrieval = await retrieveDocumentChunks(trimmedMsg, 6);
       const verifiedPolicyAnswer = buildVerifiedProcurementAnswer(trimmedMsg, policyRetrieval.chunks);
@@ -1127,6 +1132,14 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
 
     if (query && query.length <= 12000) {
       const recoveryScopeDecision = getProcurementScopeDecision(query);
+      if (recoveryScopeDecision.reason === 'small_talk') {
+        return NextResponse.json({
+          response: buildProcurementSmallTalkResponse(query),
+          sessionId: 'sess_recovery',
+          sources: ['Gab AI conversational response'],
+          degradedMode: true,
+        }, { status: 200 });
+      }
       if (!recoveryScopeDecision.allowed) {
         return NextResponse.json({
           response: PROCUREMENT_SCOPE_RESPONSE,
