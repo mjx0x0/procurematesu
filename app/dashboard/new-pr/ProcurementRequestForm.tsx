@@ -7,6 +7,8 @@ import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { ArrowLeft, FileText, Loader2, Plus, Save, Trash2, X, CheckCircle2, AlertCircle, Printer } from "lucide-react";
 import { firstValidationError, validatePurchaseRequest } from "@/lib/pr-validation";
+import { MSU_DEPARTMENTS } from "@/lib/procurement-departments";
+import { readPRDraftHandoff } from "@/lib/pr-draft-handoff";
 
 interface Item {
   id: string;
@@ -25,20 +27,6 @@ const emptyItem = (): Item => ({
   unit_cost: "",
   total_cost: 0,
 });
-
-const MSU_DEPARTMENTS = [
-  "College of Agriculture",
-  "College of Business Administration and Accountancy (CBAA)",
-  "College of Education (CED)",
-  "College of Engineering",
-  "College of Fisheries & Aquatic Sciences",
-  "College of Health Sciences",
-  "College of Law",
-  "College of Medicine",
-  "College of Natural Sciences and Mathematics (CNSM)",
-  "College of Social Sciences and Humanities (CSSH)",
-  "Institute of Islamic, Arabic, and International Studies (IIAIS)",
-] as const;
 
 const STANDARD_UNITS = [
   { value: "pcs", label: "pcs (Pieces)" },
@@ -94,31 +82,32 @@ export default function ProcurementRequestForm() {
 
   useEffect(() => {
     if (!searchParams) return;
-    const department = searchParams.get("department"); const purpose = searchParams.get("purpose"); const totalParam = searchParams.get("total"); const itemsParam = searchParams.get("items");
-    setForm(prev => ({ ...prev, ...(department ? { department } : {}), ...(purpose ? { purpose } : {}) }));
-    if (department && !MSU_DEPARTMENTS.includes(department as typeof MSU_DEPARTMENTS[number])) {
-      setDepartmentOther(true);
-    }
-    if (itemsParam) {
-      try {
-        const parsed = JSON.parse(itemsParam);
-        if (Array.isArray(parsed) && parsed.length) {
-          setItems(parsed.map((item: any, index: number) => {
-            const qty = Number(item.quantity) || 1;
-            const unitCost = Number(item.unit_cost) || 0;
-            return {
-              id: `${Date.now()}-${index}`,
-              description: item.item_description || "",
-              qty,
-              unit: item.unit || "pcs",
-              unit_cost: unitCost > 0 ? unitCost : "",
-              total_cost: qty * unitCost
-            };
-          }));
-        }
-      } catch {}
-    } else if (totalParam) {
-      setItems(prev => prev.length ? prev : [emptyItem()]);
+
+    try {
+      const draft = readPRDraftHandoff(searchParams);
+      if (!draft) return;
+
+      // Apply the entire validated chatbot draft in one place. The handoff
+      // parser normalizes both current versioned links and older query links.
+      setForm((previous) => ({
+        ...previous,
+        department: draft.department,
+        purpose: draft.purpose,
+      }));
+      setDepartmentOther(!MSU_DEPARTMENTS.includes(draft.department));
+      setItems(draft.items.map((item, index) => ({
+        id: `chatbot-draft-${Date.now()}-${index}`,
+        description: item.item_description,
+        qty: item.quantity,
+        unit: item.unit,
+        unit_cost: item.unit_cost,
+        total_cost: item.total_cost,
+      })));
+      setError(null);
+    } catch (prefillError) {
+      console.error("[PR form] Unable to load chatbot draft:", prefillError);
+      const message = prefillError instanceof Error ? prefillError.message : "The draft data is unreadable.";
+      setError(message + " Please return to Gab AI and generate the PR draft again. Your form has not been submitted.");
     }
   }, [searchParams]);
 
