@@ -9,6 +9,7 @@ import { GoogleGenAI } from '@google/genai';
 import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
 import { normalizeAssistantResponse } from '@/lib/chat-response-format';
+import { createPRDraftHandoffPayload, encodePRDraftHandoff } from '@/lib/pr-draft-handoff';
 
 // ============================================================
 // CONFIGURATION & DATABASE FALLBACKS
@@ -644,30 +645,30 @@ function buildDraftCompletionResponse(
   newState.draftReady = true;
   newState.collected = { ...newState.collected, extracted };
 
-  const dept = extracted.department || 'Requesting Department (MSU-GenSan)';
-  const purpose = extracted.purpose || 'Official university procurement';
-  const total = extracted.total_amount || extracted.items.reduce((s, i) => s + i.total_cost, 0);
-
-  // Encode for Printable PR page (/dashboard/pr-print?data=...)
-  const printPayload = {
-    department: dept,
-    purpose: purpose,
+  // Normalize and validate the same payload that the active New PR Form reads.
+  // A single base64url token avoids partial query-string decoding and Markdown
+  // link truncation when item descriptions contain punctuation or Unicode.
+  const draftPayload = createPRDraftHandoffPayload({
+    department: extracted.department || 'Requesting Department (MSU-GenSan)',
+    purpose: extracted.purpose || 'Official university procurement',
     items: extracted.items,
-    total_amount: total,
+  });
+  const dept = draftPayload.department;
+  const purpose = draftPayload.purpose;
+  const total = draftPayload.total_amount;
+
+  // Encode for Printable PR page (/dashboard/pr-print?data=...).
+  const printPayload = {
+    department: draftPayload.department,
+    purpose: draftPayload.purpose,
+    items: draftPayload.items,
+    total_amount: draftPayload.total_amount,
   };
   const encodedPrintData = encodeURIComponent(Buffer.from(JSON.stringify(printPayload)).toString('base64'));
   const printUrl = `/dashboard/pr-print?data=${encodedPrintData}`;
 
-  // Encode every query value safely. In particular, URLSearchParams escapes
-  // parentheses in department names such as "College of Education (CED)".
-  // The chat UI parses Markdown links using parentheses as delimiters, so raw
-  // parentheses here would truncate the href before purpose/items/total.
-  const newPrParams = new URLSearchParams({
-    department: dept,
-    purpose,
-    items: JSON.stringify(extracted.items),
-    total: String(total),
-  });
+  const handoffToken = encodePRDraftHandoff(draftPayload);
+  const newPrParams = new URLSearchParams({ draft: handoffToken });
   const newPrUrl = `/dashboard/new-pr?${newPrParams.toString()}`;
 
   let summary = `🎉 **Your Purchase Request Draft is Ready!**\n\n`;
