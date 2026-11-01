@@ -108,13 +108,13 @@ function renderInline(value: string, keyPrefix: number): React.ReactNode {
 }
 
 function renderPlainText(value: string, key: string): React.ReactNode {
-  const label = value.match(/^(\s*)\*\*([^*\n]{1,70})\*\*:(.*)$/s);
+  const label = value.match(/^(\s*)\*\*([^*\n]{1,70}:)\*\*(.*)$/s);
   if (!label) return <React.Fragment key={key}>{value}</React.Fragment>;
 
   return (
     <React.Fragment key={key}>
       {label[1]}
-      <strong className="font-semibold text-gray-900">{label[2]}:</strong>
+      <strong className="font-semibold text-gray-900">{label[2]}</strong>
       {label[3]}
     </React.Fragment>
   );
