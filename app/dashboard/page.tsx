@@ -21,6 +21,7 @@ import { NotificationPopover } from "@/components/NotificationPopover";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { MsuLogo } from "@/components/msu-logo";
+import { SYSTEM_NAME } from "@/lib/system-branding";
 import {
   PROCUREMENT_STAGES,
   PROCUREMENT_STAGE_LABELS,
@@ -142,8 +143,8 @@ export default function DashboardPage() {
   return (
     <div className="app-theme min-h-[100svh] overflow-x-hidden bg-[#F7F5F2] text-[#302725] dashboard-page">
       <SystemPageHeader
-        titlePrimary="MSU GenSan Procurement Management"
-        titleAccent="System"
+        titlePrimary="MSU - General Santos Digital Procurement"
+        titleAccent="Logbook & Inquiry System"
         workspaceLabel="End User Workspace"
         brandLogo
         backHref={null}
@@ -505,7 +506,7 @@ export default function DashboardPage() {
         <footer className="mt-14 border-t border-stone-200/80 pt-6 pb-10 text-center">
           <div className="mx-auto flex max-w-7xl items-center justify-center">
             <p className="text-xs font-medium text-stone-500 tracking-normal">
-              © {new Date().getFullYear()} <span className="font-semibold text-stone-700">Mindanao State University - General Santos</span> <span className="mx-1.5 text-stone-300">·</span> <span className="font-semibold text-[#7B0046]">Procurement Management System</span>
+              © {new Date().getFullYear()} <span className="font-semibold text-stone-700">{SYSTEM_NAME}</span>
             </p>
           </div>
         </footer>
