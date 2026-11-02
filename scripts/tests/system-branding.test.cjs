@@ -75,6 +75,51 @@ test('the short ProcureMateSU wordmark and Gab AI assistant identity remain sepa
   assert.match(login, /Gab AI|SYSTEM_NAME/);
 });
 
+
+test('landing page contains distinct process, official resources, and contact sections', () => {
+  const source = read('components/LandingPage.tsx');
+
+  for (const sectionId of ['how-it-works', 'resources', 'transparency', 'contact']) {
+    assert.ok(source.includes('id="' + sectionId + '"'), 'missing section: ' + sectionId);
+  }
+
+  for (const label of [
+    'Create a PR Draft',
+    'Review, Print & Sign',
+    'Submit the Printed Copy',
+    'Office Receipt & Recording',
+    'Track Your Request',
+  ]) {
+    assert.ok(source.includes(label), 'missing process step: ' + label);
+  }
+
+  assert.ok(source.includes('Creating a digital draft does not mean the Procurement Office has officially received the request.'));
+});
+
+test('official resource links use the approved RA 12009 references and GPPB advisory', () => {
+  const source = read('components/LandingPage.tsx');
+  for (const url of [
+    'https://elibrary.judiciary.gov.ph/thebookshelf/showdocs/2/97750',
+    'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf',
+    'https://www.gppb.gov.ph/circulars/',
+    'https://www.gppb.gov.ph/resolutions/',
+    'https://www.gppb.gov.ph/public-advisory-no-09-2026/',
+  ]) {
+    assert.ok(source.includes(url), 'missing official reference: ' + url);
+  }
+  assert.match(source, /GPPB Resolution No\. 02-2025/);
+  assert.match(source, /31 March 2026 IRR edition was withdrawn/);
+});
+
+test('PMO contact information links to the directory and avoids fixed office-hour claims', () => {
+  const source = read('components/LandingPage.tsx');
+  assert.match(source, /Assoc\. Prof\. Nelson P\. Benares, Jr\./);
+  assert.match(source, /tel:\+639088105634/);
+  assert.match(source, /https:\/\/msugensan\.edu\.ph\/about\/university-directory\//);
+  assert.match(source, /Call the PMO before visiting to confirm the current office location/);
+  assert.doesNotMatch(source, /Monday\s*-\s*Friday.*\d{1,2}:\d{2}/i);
+});
+
 test('the New PR physical-submission notice now refers to the digital procurement system', () => {
   const source = read('app/dashboard/new-pr/ProcurementRequestForm.tsx');
   assert.match(source, /through this digital procurement system only records and prepares the PR digitally/);
