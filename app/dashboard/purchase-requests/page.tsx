@@ -7,6 +7,7 @@ import { CheckCircle, Clock, Eye, FileText, Filter, Loader2, PlusCircle, Printer
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, PROCUREMENT_STAGE_SHORT_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import { SYSTEM_NAME } from "@/lib/system-branding";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -445,7 +446,7 @@ export default function PurchaseRequestsPage() {
       </main>
 
       <footer className="mx-auto max-w-7xl px-4 py-6 text-center text-xs text-stone-500">
-        MSU GenSan Procurement Management System · Purchase Requests Directory · RA 12009 Compliant
+        {SYSTEM_NAME} · Purchase Requests Directory · RA 12009 Compliant
       </footer>
     </div>
   );
