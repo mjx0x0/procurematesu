@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { AlertCircle, ArrowRight, Building2, CheckCircle, Eye, EyeOff, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import { MsuLogo } from "@/components/msu-logo";
+import { SYSTEM_NAME } from "@/lib/system-branding";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function LandingLoginCard() {
@@ -23,8 +24,8 @@ export default function LandingLoginCard() {
     const success = params.get("success");
     const authError = params.get("error");
     if (success) setSuccessMessage(success);
-    if (authError === "account") setError("Your account is inactive or has not been approved for the MSU GenSan Procurement System.");
-    if (authError === "unauthorized") setError("Please sign in to access the MSU GenSan Procurement System workspace.");
+    if (authError === "account") setError(`Your account is inactive or has not been approved for the ${SYSTEM_NAME}.`);
+    if (authError === "unauthorized") setError(`Please sign in to access the ${SYSTEM_NAME} workspace.`);
     if (authError === "configuration") setError("The authentication service is temporarily unavailable. Please contact the administrator.");
   }, []);
 
@@ -80,7 +81,7 @@ export default function LandingLoginCard() {
 
     if (!finalUser) {
       await supabase.auth.signOut();
-      setError("Your university account is not provisioned for the MSU GenSan Procurement System. Please contact the administrator.");
+      setError(`Your university account is not provisioned for the ${SYSTEM_NAME}. Please contact the administrator.`);
       setLoading(false);
       return;
     }
@@ -98,7 +99,7 @@ export default function LandingLoginCard() {
     }
     if (finalUser.is_active === false || (finalUser.status && finalUser.status !== "approved")) {
       await supabase.auth.signOut();
-      setError("Your account is inactive or not approved for the MSU GenSan Procurement System. Please contact the administrator.");
+      setError(`Your account is inactive or not approved for the ${SYSTEM_NAME}. Please contact the administrator.`);
       setLoading(false);
       return;
     }
@@ -116,7 +117,7 @@ export default function LandingLoginCard() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-2xl font-black tracking-tight text-[#4D002C]">Welcome!</h2>
-              <p className="mt-1 text-xs text-stone-500">Sign in to the MSU GenSan Procurement System.</p>
+              <p className="mt-1 max-w-sm text-xs leading-relaxed text-stone-500">Sign in to the {SYSTEM_NAME}.</p>
             </div>
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7B0046] to-[#4D002C] shadow-sm border border-[#F5AB26]/25">
               <Lock className="h-5 w-5 text-amber-200" />
