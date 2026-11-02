@@ -1,15 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
+import { SYSTEM_NAME } from "@/lib/system-branding";
 
 /** Keeps legacy UI labels consistent with the current institutional system name. */
 export default function SystemBranding() {
   useEffect(() => {
     const replacements: Record<string, string> = {
-      ProcuremateSU: "MSU GenSan Procurement Management System",
-      "Procuremate SU": "MSU GenSan Procurement Management System",
-      "MSU Gensan Procurement System": "MSU GenSan Procurement Management System",
-      "MSU GenSan Procurement System": "MSU GenSan Procurement Management System",
+      "ProcuremateSU": SYSTEM_NAME,
+      "Procuremate SU": SYSTEM_NAME,
+      "MSU Gensan Procurement System": SYSTEM_NAME,
+      "MSU GenSan Procurement System": SYSTEM_NAME,
+      "MSU GenSan Procurement Management System": SYSTEM_NAME,
+      "MSU GenSan Procurement Management": SYSTEM_NAME,
+      "MSU Gensan Procurement Management System": SYSTEM_NAME,
       "AI Assistant": "Gab AI",
       "Ask AI": "Ask Gab AI",
     };
