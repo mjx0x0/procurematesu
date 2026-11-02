@@ -1,6 +1,6 @@
 {
-  "name": "ProcuremateSU",
-  "description": "Digital procurement logbook and AI assistant for Mindanao State University - General Santos, streamlining purchase requests and ensuring RA 12009 compliance.",
+  "name": "MSU - General Santos Digital Procurement Logbook and Inquiry System",
+  "description": "A centralized digital procurement logbook and inquiry system for Mindanao State University - General Santos, supporting Purchase Request preparation, workflow monitoring, transparency disclosures, and AI-powered procurement policy assistance.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
