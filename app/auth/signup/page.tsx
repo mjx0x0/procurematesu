@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { MsuLogo } from "@/components/msu-logo";
+import { SYSTEM_NAME } from "@/lib/system-branding";
 import {
   Mail,
   Lock,
@@ -145,7 +146,7 @@ export default function SignupPage() {
               </h2>
 
               <p className="mt-2 text-sm text-stone-600 leading-relaxed max-w-md mx-auto">
-                An end-user account for <strong className="text-stone-900 font-bold">{registeredEmail}</strong> has been registered in the MSU GenSan Procurement Management System.
+                An end-user account for <strong className="text-stone-900 font-bold">{registeredEmail}</strong> has been registered in the {SYSTEM_NAME}.
               </p>
 
               {/* Approval status banner */}
