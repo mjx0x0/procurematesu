@@ -258,131 +258,131 @@ export default function DashboardPage() {
         </section>
 
         {/* PR Overview */}
-        <section className="mt-8 sm:mt-10" aria-label="Purchase Requests Overview">
-          <div className="mb-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-            <div>
-              <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C]">
-                PR Overview
-              </h2>
-              <p className="text-xs text-stone-500 font-normal">
-                Summary of your procurement requests and real-time processing pipeline
-              </p>
+        <section className="mt-6 sm:mt-7" aria-label="Purchase Requests Overview">
+          <div className="rounded-2xl border border-stone-200/90 bg-white shadow-[0_2px_12px_rgba(45,35,30,0.03)] overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 px-5 py-3 sm:px-6 bg-stone-50/75 border-b border-stone-200/70">
+              <div className="flex items-center">
+                <h2 className="text-xs sm:text-sm font-bold text-[#4D002C]">
+                  PR Overview
+                </h2>
+              </div>
+              <span className="text-[11px] font-medium text-stone-500">
+                Requisition status &amp; processing pipeline
+              </span>
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
-            {/* 1. Total Requests */}
-            <div className="rounded-2xl border border-stone-200/90 bg-white p-4 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.02)] transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-stone-500">Total Requests</span>
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-stone-100 text-stone-600">
-                  <FileText className="h-4 w-4" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 lg:divide-x divide-stone-100 p-2 sm:p-2.5">
+              {/* 1. Total Requests */}
+              <div className="p-3.5 sm:p-4 flex items-center gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-600">
+                  <FileText className="h-5 w-5" />
                 </div>
-              </div>
-              <div className="mt-3 text-2xl sm:text-3xl font-black text-[#4D002C] font-mono tracking-tight">
-                {prs.length}
-              </div>
-              <p className="mt-1 text-[11px] font-medium text-stone-400">
-                All-time requisitions filed
-              </p>
-            </div>
-
-            {/* 2. In Review */}
-            <div className="rounded-2xl border border-stone-200/90 bg-white p-4 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.02)] transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-stone-500">Under Review</span>
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60">
-                  <Clock className="h-4 w-4" />
-                </div>
-              </div>
-              <div className="mt-3 text-2xl sm:text-3xl font-black text-amber-700 font-mono tracking-tight">
-                {stats.pending}
-              </div>
-              <p className="mt-1 text-[11px] font-medium text-stone-400">
-                Active in university workflow
-              </p>
-            </div>
-
-            {/* 3. Completed */}
-            <div className="rounded-2xl border border-stone-200/90 bg-white p-4 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.02)] transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-stone-500">Completed</span>
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                  <CheckCircle2 className="h-4 w-4" />
-                </div>
-              </div>
-              <div className="mt-3 text-2xl sm:text-3xl font-black text-emerald-700 font-mono tracking-tight">
-                {stats.completed}
-              </div>
-              <p className="mt-1 text-[11px] font-medium text-stone-400">
-                Approved &amp; fulfilled orders
-              </p>
-            </div>
-
-            {/* 4. Action Required Notice */}
-            {pendingDraftsCount > 0 ? (
-              <Link
-                href="/dashboard/purchase-requests"
-                className="rounded-2xl border border-amber-300/90 bg-amber-50/60 p-4 sm:p-5 transition-all shadow-[0_4px_20px_rgba(217,119,6,0.08)] hover:bg-amber-100/60 hover:border-amber-400 block group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-                    Action Required
-                  </span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 text-amber-800 border border-amber-300/80 group-hover:scale-105 transition-transform">
-                    <AlertCircle className="h-4 w-4" />
+                <div className="min-w-0">
+                  <div className="text-2xl font-black text-[#4D002C] font-mono leading-none">
+                    {prs.length}
                   </div>
+                  <div className="text-xs font-semibold text-stone-700 mt-1">Total Requests</div>
+                  <div className="text-[10px] text-stone-400 font-medium">All-time requisitions</div>
                 </div>
-                <div className="mt-3 text-2xl sm:text-3xl font-black text-[#7B0046] font-mono tracking-tight">
-                  {pendingDraftsCount} {pendingDraftsCount === 1 ? "Draft" : "Drafts"}
-                </div>
-                <p className="mt-1 text-[11px] font-semibold text-amber-900 leading-snug">
-                  Print &amp; physically submit signed copy to Procurement Office
-                </p>
-              </Link>
-            ) : (
-              <div className="rounded-2xl border border-stone-200/90 bg-white p-4 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.02)] transition-all">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-stone-500">Action Required</span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-stone-100 text-stone-500">
-                    <CheckCircle2 className="h-4 w-4" />
-                  </div>
-                </div>
-                <div className="mt-3 text-2xl sm:text-3xl font-black text-stone-800 font-mono tracking-tight">
-                  0
-                </div>
-                <p className="mt-1 text-[11px] font-medium text-stone-400 leading-snug">
-                  No physical submissions pending
-                </p>
               </div>
-            )}
+
+              {/* 2. In Review */}
+              <div className="p-3.5 sm:p-4 flex items-center gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60">
+                  <Clock className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-2xl font-black text-amber-700 font-mono leading-none">
+                    {stats.pending}
+                  </div>
+                  <div className="text-xs font-semibold text-stone-700 mt-1">Under Review</div>
+                  <div className="text-[10px] text-stone-400 font-medium">Active in workflow</div>
+                </div>
+              </div>
+
+              {/* 3. Completed */}
+              <div className="p-3.5 sm:p-4 flex items-center gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                  <CheckCircle2 className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-2xl font-black text-emerald-700 font-mono leading-none">
+                    {stats.completed}
+                  </div>
+                  <div className="text-xs font-semibold text-stone-700 mt-1">Completed</div>
+                  <div className="text-[10px] text-stone-400 font-medium">Fulfilled &amp; delivered</div>
+                </div>
+              </div>
+
+              {/* 4. Action Required */}
+              <div className="p-3.5 sm:p-4 flex items-center">
+                {pendingDraftsCount > 0 ? (
+                  <Link
+                    href="/dashboard/purchase-requests"
+                    className="w-full flex items-center gap-3 rounded-xl bg-amber-50/90 border border-amber-300/80 p-2.5 hover:bg-amber-100/80 transition-colors group"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-800 border border-amber-300/80 group-hover:scale-105 transition-transform">
+                      <AlertCircle className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900">
+                          Action Required
+                        </span>
+                      </div>
+                      <div className="text-sm font-black text-[#7B0046] font-mono leading-tight mt-0.5">
+                        {pendingDraftsCount} {pendingDraftsCount === 1 ? "Draft to Submit" : "Drafts to Submit"}
+                      </div>
+                      <div className="text-[10px] font-medium text-amber-800/90 truncate">
+                        Print &amp; physically submit
+                      </div>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-3.5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-500">
+                      <CheckCircle2 className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-2xl font-black text-stone-800 font-mono leading-none">
+                        0
+                      </div>
+                      <div className="text-xs font-semibold text-stone-700 mt-1">Action Required</div>
+                      <div className="text-[10px] text-stone-400 font-medium">All submissions in order</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </section>
 
         {/* Recent PR Activity */}
-        <section className="mt-8 sm:mt-10" aria-label="Recent PR Activity">
-          <div className="mb-3.5 flex items-center justify-between gap-2">
-            <div>
-              <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C]">
-                Recent PR Activity
-              </h2>
-              <p className="text-xs text-stone-500 font-normal">
-                Your latest purchase requests and their current processing status
-              </p>
+        <section className="mt-6 sm:mt-7" aria-label="Recent PR Activity">
+          <div className="rounded-2xl border border-stone-200/90 bg-white shadow-[0_2px_12px_rgba(45,35,30,0.03)] overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 px-5 py-3 sm:px-6 bg-stone-50/75 border-b border-stone-200/70">
+              <div className="flex items-center">
+                <h2 className="text-xs sm:text-sm font-bold text-[#4D002C]">
+                  Recent PR Activity
+                </h2>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] font-medium text-stone-500 hidden sm:inline">
+                  Latest submitted purchase requests
+                </span>
+                {prs.length > 0 && (
+                  <Link
+                    href="/dashboard/purchase-requests"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-[#7B0046] hover:text-[#4D002C] transition-colors"
+                  >
+                    <span>View directory ({prs.length})</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
+              </div>
             </div>
-            {prs.length > 0 && (
-              <Link
-                href="/dashboard/purchase-requests"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#7B0046] hover:text-[#4D002C] transition-colors shrink-0"
-              >
-                <span>View directory ({prs.length})</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            )}
-          </div>
 
-          <div className="overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-[0_4px_20px_rgba(45,35,30,0.03)]">
             {prs.length === 0 ? (
               <div className="p-8 sm:p-12 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#7B0046]/10 text-[#7B0046]">
@@ -412,7 +412,7 @@ export default function DashboardPage() {
                   return (
                     <div
                       key={pr.pr_no}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 hover:bg-stone-50/70 transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 hover:bg-stone-50/60 transition-colors"
                     >
                       <div className="flex items-start gap-3 min-w-0 flex-1">
                         <div

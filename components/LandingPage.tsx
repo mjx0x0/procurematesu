@@ -1,19 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, ClipboardList, ExternalLink, MessageCircle, Search, Workflow } from "lucide-react";
+import { ArrowRight, ExternalLink, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { MsuLogo } from "@/components/msu-logo";
 import LandingLoginCard from "@/components/auth/LandingLoginCard";
 import { TRANSPARENCY_PROJECTS, TRANSPARENCY_SOURCE_URL } from "@/lib/transparency-projects";
 import { SYSTEM_DESCRIPTION, SYSTEM_NAME, SYSTEM_TAGLINE } from "@/lib/system-branding";
-
-const FEATURES = [
-  [ClipboardList, "01", "Prepare Purchase Requests", "Create and review PR information digitally before completing the required physical submission."],
-  [Workflow, "02", "Track the Procurement Flow", "Follow the standardized PMO workflow and view recorded progress for submitted requests."],
-  [MessageCircle, "03", "Ask Gab AI", "Get procurement guidance and assistance grounded in the system's available procurement references."],
-] as const;
 
 const CATEGORIES = ["All", "Infrastructure", "ICT", "Goods & Equipment", "Services"] as const;
 type Category = (typeof CATEGORIES)[number];
@@ -94,11 +88,11 @@ export default function LandingPage() {
               <p className="mb-5 text-center lg:text-left text-xs sm:text-sm font-extrabold uppercase tracking-[0.24em] text-[#FFD043]">
                 MSU – GENERAL SANTOS CITY
               </p>
-              <h1 className="w-full text-center lg:text-left font-black tracking-[-0.035em] leading-[1.02]">
-                <span className="block text-[2.45rem] sm:text-5xl lg:text-[3.5rem] xl:text-[4.05rem] font-black text-[#FFFDF8]">
+              <h1 className="w-full text-center lg:text-left font-black tracking-[-0.035em] leading-[1.14]">
+                <span className="block text-[2.45rem] sm:text-5xl lg:text-[3.5rem] xl:text-[4.05rem] font-black text-[#FFFDF8] pb-1 leading-[1.08]">
                   Digital Procurement
                 </span>
-                <span className="mt-1 block text-[2.25rem] sm:text-5xl lg:text-[3.15rem] xl:text-[3.85rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-[#FFF9E6] via-[#FFD043] to-[#F59E0B]">
+                <span className="mt-1 block pb-2 text-[2.25rem] sm:text-5xl lg:text-[3.15rem] xl:text-[3.85rem] font-black leading-[1.12] text-transparent bg-clip-text bg-gradient-to-r from-[#FFF9E6] via-[#FFD043] to-[#F59E0B]">
                   Logbook &amp; Inquiry System
                 </span>
               </h1>
@@ -159,43 +153,64 @@ export default function LandingPage() {
                 Users can also consult <strong className="font-extrabold text-[#4D002C]">Gab AI</strong> for instant guidance on procurement policies, required attachments, and standard operating procedures.
               </p>
 
-              <div className="mt-6 flex flex-wrap gap-2.5">
-                {["Digital Records", "Workflow Tracking", "Transparency Board", "Gab AI Assistant"].map((x, i) => (
-                  <motion.span
-                    key={x}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.35, delay: i * 0.08 }}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#C27803]/40 bg-[#FFFDF5] px-3.5 py-1.5 text-xs font-bold text-[#805F07] shadow-xs"
-                  >
-                    <CheckCircle2 className="h-3.5 w-3.5 text-[#C27803]" />
-                    {x}
-                  </motion.span>
-                ))}
-              </div>
             </motion.div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                ["Full", "Milestone Tracking", "Complete end-to-end PMO workflow"],
-                ["67", "Public Listings", "Open records on transparency board"],
-                ["2", "Access Roles", "Separated end-user & admin portals"],
-                ["1", "AI Assistant", "Gab AI policy & PR guidance"],
-              ].map(([v, l, d], i) => (
+                {
+                  value: "20",
+                  unit: "Stages",
+                  label: "Workflow Tracking",
+                  desc: "End-to-end PMO milestone verification from draft to delivery",
+                },
+                {
+                  value: "60+",
+                  unit: "Projects",
+                  label: "Transparency Board",
+                  desc: "Publicly accessible university bidding notices, awards & contracts",
+                },
+                {
+                  value: "Dual",
+                  unit: "Portals",
+                  label: "Role-Based Access",
+                  desc: "Separated workspaces for campus requisitioners and PMO admins",
+                },
+                {
+                  value: "24/7",
+                  unit: "Support",
+                  label: "Gab AI Policy Guide",
+                  desc: "Instant compliance answers grounded in RA 12009 & GPPB issuances",
+                },
+              ].map((card, i) => (
                 <motion.div
-                  key={l}
+                  key={card.label}
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-60px" }}
                   transition={{ duration: 0.45, delay: i * 0.08, ease: "easeOut" }}
                   whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                  className="relative min-h-[130px] overflow-hidden rounded-2xl bg-gradient-to-br from-[#5C0035] via-[#6B003E] to-[#4A002A] p-5 text-white shadow-[0_10px_28px_rgba(77,0,44,0.14)] border border-[#F5AB26]/20 cursor-default"
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-[#4D002C] via-[#5B0034] to-[#36001E] p-5 text-white shadow-[0_12px_32px_rgba(77,0,44,0.18)] border border-[#F5AB26]/25 transition-all duration-200"
                 >
-                  <div className="absolute -right-6 -bottom-8 h-20 w-20 rounded-full bg-[#F5AB26]/15" />
-                  <div className="relative text-3xl font-extrabold text-[#F0C83F]">{v}</div>
-                  <div className="relative mt-1 text-xs font-bold text-white">{l}</div>
-                  <div className="relative mt-1 text-xs leading-relaxed text-white/60">{d}</div>
+                  <div className="pointer-events-none absolute -right-8 -bottom-8 h-24 w-24 rounded-full bg-[#F5AB26]/10 blur-xl group-hover:bg-[#F5AB26]/20 transition-colors" />
+
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-3xl sm:text-4xl font-black text-[#FFD043] font-mono tracking-tight">
+                        {card.value}
+                      </div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-200/80 rounded-md bg-white/10 px-2 py-0.5 border border-white/10 backdrop-blur-xs">
+                        {card.unit}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-2 text-sm font-bold text-white tracking-tight">
+                      {card.label}
+                    </h3>
+                  </div>
+
+                  <p className="mt-2.5 text-xs leading-relaxed text-stone-200/80 font-normal">
+                    {card.desc}
+                  </p>
                 </motion.div>
               ))}
             </div>
@@ -203,45 +218,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="border-b border-stone-200/80 bg-[#F8F6F2]">
-        <div className="mx-auto w-full max-w-[1100px] px-6 py-18 sm:px-8 sm:py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="text-center"
-          >
-            <h2 className="text-3xl font-extrabold tracking-tight text-[#4D002C]">
-              One Workspace for University Procurement
-            </h2>
-          </motion.div>
-
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {FEATURES.map(([Icon, n, title, text], i) => (
-              <motion.article
-                key={n}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.48, delay: i * 0.1, ease: "easeOut" }}
-                whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_6px_22px_rgba(40,20,10,0.035)] transition-shadow hover:border-[#F5AB26]/60 hover:shadow-md cursor-default"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFF6E4] text-[#9A7205] border border-[#E9D9AE]">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <span className="text-xs font-mono font-extrabold tracking-wider text-[#C27803]">{n}</span>
-                </div>
-                <h3 className="mt-5 text-base font-extrabold text-[#4D002C]">{title}</h3>
-                <p className="mt-2 text-xs sm:text-sm leading-relaxed text-stone-600">{text}</p>
-              </motion.article>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Transparency Section */}
       <section id="transparency" className="scroll-mt-20 bg-stone-50/60 border-t border-stone-200/80">
