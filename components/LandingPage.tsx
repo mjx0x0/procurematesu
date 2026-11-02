@@ -569,7 +569,7 @@ export default function LandingPage() {
               <p className="mt-4 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#C27803]">Office Information</p>
               <h3 className="mt-1 text-lg font-extrabold text-[#4D002C]">University Directory</h3>
               <p className="mt-2 text-xs leading-relaxed text-stone-600">
-                Check the official directory for the latest office location, contact details, and university information before visiting.
+                Office arrangements may change. Call the PMO before visiting to confirm the current office location and visiting instructions.
               </p>
               <a
                 href="https://msugensan.edu.ph/about/university-directory/"
