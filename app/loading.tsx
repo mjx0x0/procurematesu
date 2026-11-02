@@ -1,4 +1,5 @@
 import { MsuLogo } from "@/components/msu-logo";
+import { SYSTEM_NAME } from "@/lib/system-branding";
 
 export default function Loading() {
   return (
@@ -19,8 +20,8 @@ export default function Loading() {
           Mindanao State University - General Santos
         </div>
 
-        <h3 className="text-lg font-black text-[#4D002C] tracking-tight">
-          Procurement Management System
+        <h3 className="max-w-sm text-center text-base sm:text-lg font-black leading-snug text-[#4D002C] tracking-tight">
+          {SYSTEM_NAME}
         </h3>
         <p className="mt-1 text-xs text-stone-500 font-medium">
           Loading workspace resources...
