@@ -8,6 +8,7 @@ import { ChatMessageContent } from "@/components/chatbot/ChatMessageContent";
 import { normalizeAssistantResponse } from "@/lib/chat-response-format";
 import { Check, Copy, History, Loader2, MessageSquarePlus, Send, Sparkles, Trash2, X, Square, ArrowRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
+import { SYSTEM_NAME } from "@/lib/system-branding";
 
 interface PRChoice {
   pr_no: string;
@@ -883,7 +884,7 @@ export default function ChatbotDashboard() {
 
       <footer className="shrink-0 border-t border-stone-200/80 bg-white/70 py-2 text-center backdrop-blur-xs">
         <p className="text-[11px] font-medium text-stone-500 tracking-normal">
-          © {new Date().getFullYear()} <span className="font-semibold text-stone-700">Mindanao State University - General Santos</span> <span className="mx-1.5 text-stone-300">·</span> <span className="font-semibold text-[#7B0046]">Procurement Management System</span>
+          © {new Date().getFullYear()} <span className="font-semibold text-stone-700">{SYSTEM_NAME}</span>
         </p>
       </footer>
 
