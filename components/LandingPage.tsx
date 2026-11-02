@@ -124,88 +124,6 @@ export default function LandingPage() {
       </section>
 
 
-      {/* How It Works */}
-      <section id="how-it-works" className="scroll-mt-20 border-b border-stone-200/80 bg-[#F8F6F2]">
-        <div className="mx-auto w-full max-w-[1200px] px-6 py-16 sm:px-8 sm:py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="mx-auto max-w-2xl text-center"
-          >
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#C27803]">For MSU-GenSan Personnel</p>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#4D002C] sm:text-4xl">
-              How It Works
-            </h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-stone-600">
-              Follow your Purchase Request from digital preparation to official receipt and progress monitoring.
-            </p>
-          </motion.div>
-
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {[
-              {
-                number: "01",
-                Icon: ClipboardList,
-                title: "Create a PR Draft",
-                description: "Enter the procurement purpose, requesting unit, and item details in the digital form.",
-              },
-              {
-                number: "02",
-                Icon: Printer,
-                title: "Review, Print & Sign",
-                description: "Check the details, print the form, and secure the required university signatures.",
-              },
-              {
-                number: "03",
-                Icon: Building2,
-                title: "Submit the Printed Copy",
-                description: "Bring the signed physical Purchase Request to the Procurement Management Office.",
-              },
-              {
-                number: "04",
-                Icon: FileText,
-                title: "Office Receipt & Recording",
-                description: "The office confirms receipt and records the official PR number for tracking.",
-              },
-              {
-                number: "05",
-                Icon: Workflow,
-                title: "Track Your Request",
-                description: "Monitor recorded updates as your request moves through the university procurement workflow.",
-              },
-            ].map((step, index) => (
-              <motion.article
-                key={step.number}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.42, delay: index * 0.06, ease: "easeOut" }}
-                whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                className="relative flex min-h-[220px] flex-col rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_6px_22px_rgba(40,20,10,0.035)]"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-extrabold tracking-widest text-[#C27803]">{step.number}</span>
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E9D9AE] bg-[#FFF6E4] text-[#7B0046]">
-                    <step.Icon className="h-5 w-5" />
-                  </span>
-                </div>
-                <h3 className="mt-5 text-sm font-extrabold leading-snug text-[#4D002C]">{step.title}</h3>
-                <p className="mt-2 text-xs leading-relaxed text-stone-600">{step.description}</p>
-              </motion.article>
-            ))}
-          </div>
-
-          <div className="mt-6 flex items-start gap-3 rounded-xl border border-[#E7D5A9] bg-[#FFF9E9] px-4 py-3.5 text-xs leading-relaxed text-stone-700">
-            <span className="mt-0.5 shrink-0 text-[#A36B00]"><CheckCircle2 className="h-4 w-4" /></span>
-            <p>
-              <strong className="font-bold text-[#4D002C]">Important:</strong> Creating a digital draft does not mean the Procurement Office has officially received the request. The printed and signed copy must be submitted, and office receipt must be recorded before the request proceeds in the official workflow.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* About Section */}
       <section id="about" className="scroll-mt-20 border-b border-stone-200/80 bg-white">
         <div className="mx-auto w-full max-w-[1100px] px-6 py-20 sm:px-8 sm:py-24">
@@ -305,6 +223,88 @@ export default function LandingPage() {
       </section>
 
 
+
+      {/* How It Works */}
+      <section id="how-it-works" className="scroll-mt-20 border-b border-stone-200/80 bg-[#F8F6F2]">
+        <div className="mx-auto w-full max-w-[1200px] px-6 py-16 sm:px-8 sm:py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="mx-auto max-w-2xl text-center"
+          >
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#C27803]">For MSU-GenSan Personnel</p>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#4D002C] sm:text-4xl">
+              How It Works
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-stone-600">
+              Follow your Purchase Request from digital preparation to official receipt and progress monitoring.
+            </p>
+          </motion.div>
+
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {[
+              {
+                number: "01",
+                Icon: ClipboardList,
+                title: "Create a PR Draft",
+                description: "Enter the procurement purpose, requesting unit, and item details in the digital form.",
+              },
+              {
+                number: "02",
+                Icon: Printer,
+                title: "Review, Print & Sign",
+                description: "Check the details, print the form, and secure the required university signatures.",
+              },
+              {
+                number: "03",
+                Icon: Building2,
+                title: "Submit the Printed Copy",
+                description: "Bring the signed physical Purchase Request to the Procurement Management Office.",
+              },
+              {
+                number: "04",
+                Icon: FileText,
+                title: "Office Receipt & Recording",
+                description: "The office confirms receipt and records the official PR number for tracking.",
+              },
+              {
+                number: "05",
+                Icon: Workflow,
+                title: "Track Your Request",
+                description: "Monitor recorded updates as your request moves through the university procurement workflow.",
+              },
+            ].map((step, index) => (
+              <motion.article
+                key={step.number}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.42, delay: index * 0.06, ease: "easeOut" }}
+                whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                className="relative flex min-h-[220px] flex-col rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_6px_22px_rgba(40,20,10,0.035)]"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-extrabold tracking-widest text-[#C27803]">{step.number}</span>
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E9D9AE] bg-[#FFF6E4] text-[#7B0046]">
+                    <step.Icon className="h-5 w-5" />
+                  </span>
+                </div>
+                <h3 className="mt-5 text-sm font-extrabold leading-snug text-[#4D002C]">{step.title}</h3>
+                <p className="mt-2 text-xs leading-relaxed text-stone-600">{step.description}</p>
+              </motion.article>
+            ))}
+          </div>
+
+          <div className="mt-6 flex items-start gap-3 rounded-xl border border-[#E7D5A9] bg-[#FFF9E9] px-4 py-3.5 text-xs leading-relaxed text-stone-700">
+            <span className="mt-0.5 shrink-0 text-[#A36B00]"><CheckCircle2 className="h-4 w-4" /></span>
+            <p>
+              <strong className="font-bold text-[#4D002C]">Important:</strong> Creating a digital draft does not mean the Procurement Office has officially received the request. The printed and signed copy must be submitted, and office receipt must be recorded before the request proceeds in the official workflow.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* Procurement Laws & Official Resources */}
       <section id="resources" className="scroll-mt-20 border-b border-stone-200/80 bg-white">
@@ -567,18 +567,10 @@ export default function LandingPage() {
                 <MapPin className="h-5 w-5" />
               </span>
               <p className="mt-4 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#C27803]">Office Information</p>
-              <h3 className="mt-1 text-lg font-extrabold text-[#4D002C]">University Directory</h3>
+              <h3 className="mt-1 text-lg font-extrabold text-[#4D002C]">Temporary Office Location</h3>
               <p className="mt-2 text-xs leading-relaxed text-stone-600">
-                Office arrangements may change. Call the PMO before visiting to confirm the current office location and visiting instructions.
+                The Procurement Management Office is temporarily located at the <strong className="font-bold text-[#4D002C]">Science and Technology Training Center (STTC)</strong>. Office arrangements may change, so please contact the PMO before visiting to confirm the current location.
               </p>
-              <a
-                href="https://msugensan.edu.ph/about/university-directory/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-5 inline-flex items-center gap-1.5 text-xs font-bold text-[#7B0046] transition-colors hover:text-[#4D002C]"
-              >
-                View University Directory <ExternalLink className="h-3.5 w-3.5" />
-              </a>
             </motion.div>
           </div>
         </div>
