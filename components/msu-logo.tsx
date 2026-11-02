@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Landmark } from "lucide-react";
+import { SYSTEM_NAME } from "@/lib/system-branding";
 
 interface MsuLogoProps {
   className?: string;
@@ -30,7 +31,7 @@ export function MsuLogo({ className = "", size = 120, showText = false }: MsuLog
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={candidates[currentSrcIndex]}
-          alt="MSU GenSan Procurement Management System Logo"
+          alt={`${SYSTEM_NAME} logo`}
           width={size}
           height={size}
           onError={handleImgError}
