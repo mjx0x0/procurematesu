@@ -204,7 +204,7 @@ export default function ProcurementRequestForm() {
                 <div className="min-w-0">
                   <h2 className="text-sm font-black text-[#4D002C] tracking-tight uppercase">Important: Physical submission is required</h2>
                   <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-stone-700">
-                    Submitting this Purchase Request through ProcuremateSU only records and prepares the PR digitally. It does <strong>not</strong> replace the required physical submission to the Procurement Office.
+                    Submitting this Purchase Request through this digital procurement system only records and prepares the PR digitally. It does <strong>not</strong> replace the required physical submission to the Procurement Office.
                   </p>
                   <p className="mt-1 text-xs sm:text-sm leading-relaxed text-stone-700">
                     After creating your PR, you must <strong>print the PR form</strong> and physically submit the signed copy together with the required supporting documents to the Procurement Office for actual processing.
