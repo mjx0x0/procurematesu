@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MSU GenSan Procurement Management System",
+    title: SYSTEM_NAME,
     description: SYSTEM_DESCRIPTION,
   },
   icons: {
