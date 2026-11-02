@@ -7,6 +7,7 @@ import { motion } from "motion/react";
 import { MsuLogo } from "@/components/msu-logo";
 import LandingLoginCard from "@/components/auth/LandingLoginCard";
 import { TRANSPARENCY_PROJECTS, TRANSPARENCY_SOURCE_URL } from "@/lib/transparency-projects";
+import { SYSTEM_DESCRIPTION, SYSTEM_NAME, SYSTEM_TAGLINE } from "@/lib/system-branding";
 
 const FEATURES = [
   [ClipboardList, "01", "Prepare Purchase Requests", "Create and review PR information digitally before completing the required physical submission."],
@@ -61,7 +62,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(#F5AB26_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
 
         <header className="fixed inset-x-0 top-0 z-50 border-b border-[#F5AB26]/25 bg-[#4A002A]/90 backdrop-blur-md transition-all shadow-[0_4px_24px_rgba(30,0,18,0.35)]">
-          <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-6 px-6 py-3.5 sm:px-8">
+          <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between gap-6 px-6 py-3.5 sm:px-8">
             <Link href="#home" className="flex min-w-0 items-center gap-3.5 group">
               <MsuLogo size={40} />
               <div className="min-w-0 leading-tight">
@@ -69,7 +70,7 @@ export default function LandingPage() {
                   Procure<span className="text-amber-200/90 font-black">M</span>ate<span className="text-amber-200/90 font-black">SU</span>
                 </div>
                 <div className="text-[9px] font-normal font-[system-ui] not-italic uppercase tracking-[0.16em] text-amber-200/70">
-                  MSU – General Santos Procurement
+                  {SYSTEM_TAGLINE}
                 </div>
               </div>
             </Link>
@@ -82,35 +83,38 @@ export default function LandingPage() {
           </div>
         </header>
 
-        <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1200px] items-center gap-10 px-6 pt-24 pb-16 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:py-20">
+        <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1500px] items-center gap-10 px-6 pt-24 pb-16 sm:px-8 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12 lg:py-20">
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="flex flex-col items-center text-center lg:items-start lg:text-left w-full"
           >
-            <h1 className="text-center lg:text-left font-black tracking-[-0.03em] leading-[1.05] w-full">
-              <span className="block text-3xl sm:text-5xl lg:text-[3.4rem] font-black tracking-tight text-white">
-                MSU – General Santos
-              </span>
-              <span className="block mt-1 sm:mt-2 text-4xl sm:text-6xl lg:text-[4.25rem] font-black tracking-tight leading-[1.02] text-transparent bg-clip-text bg-gradient-to-r from-[#FFF9E6] via-[#FFD043] to-[#F59E0B]">
-                Procurement
-              </span>
-              <span className="block mt-1 sm:mt-2 text-3xl sm:text-5xl lg:text-[3.5rem] font-black tracking-tight text-[#FFFDF8]">
-                Management System
-              </span>
-            </h1>
+            <div className="w-full">
+              <p className="mb-5 text-center lg:text-left text-xs sm:text-sm font-extrabold uppercase tracking-[0.24em] text-[#FFD043]">
+                MSU – GENERAL SANTOS CITY
+              </p>
+              <h1 className="w-full text-center lg:text-left font-black tracking-[-0.035em] leading-[1.02]">
+                <span className="block text-[2.45rem] sm:text-5xl lg:text-[3.5rem] xl:text-[4.05rem] font-black text-[#FFFDF8]">
+                  Digital Procurement
+                </span>
+                <span className="mt-1 block text-[2.25rem] sm:text-5xl lg:text-[3.15rem] xl:text-[3.85rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-[#FFF9E6] via-[#FFD043] to-[#F59E0B]">
+                  Logbook &amp; Inquiry System
+                </span>
+              </h1>
 
-            <p className="mt-6 max-w-[560px] text-center lg:text-left text-sm sm:text-base leading-relaxed text-amber-50/90 lg:border-l-2 lg:border-[#C27803] lg:pl-5 font-normal mx-auto lg:mx-0 text-pretty">
-              A centralized institutional workspace for Purchase Request preparation, standardized university procurement workflow monitoring, public transparency records, and automated policy guidance powered by <strong className="font-bold text-[#C27803]">Gab AI</strong>.
-            </p>
+              <p className="mx-auto mt-7 max-w-[700px] border-l-4 border-[#F5AB26] pl-5 text-left text-sm sm:text-base lg:text-[1.05rem] leading-relaxed text-amber-50/95 font-normal lg:mx-0 text-pretty">
+                {SYSTEM_DESCRIPTION}
+              </p>
+              <p className="sr-only">{SYSTEM_NAME}</p>
+            </div>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.65, delay: 0.15, ease: "easeOut" }}
-            className="w-full max-w-[420px] justify-self-center lg:justify-self-end"
+            className="w-full max-w-[520px] justify-self-center lg:justify-self-end"
           >
             <div className="relative">
               <div className="absolute -inset-4 rounded-3xl bg-[#F5AB26]/15 blur-2xl" />
@@ -133,7 +137,7 @@ export default function LandingPage() {
             className="text-center"
           >
             <h2 className="text-3xl font-extrabold tracking-tight text-[#4D002C] sm:text-4xl">
-              About the Procurement System
+              About the Digital Procurement System
             </h2>
           </motion.div>
 
@@ -146,7 +150,7 @@ export default function LandingPage() {
               className="text-sm leading-relaxed text-stone-600 sm:text-base"
             >
               <p>
-                The <strong className="font-extrabold text-[#4D002C]">MSU Gensan Procurement System</strong> provides Mindanao State University - General Santos personnel with an integrated institutional platform for purchase requests, automated status monitoring, and compliant procurement documentation.
+                The <strong className="font-extrabold text-[#4D002C]">{SYSTEM_NAME}</strong> provides Mindanao State University - General Santos personnel with an integrated institutional platform for Purchase Request preparation, procurement workflow monitoring, transparency disclosures, and procurement policy assistance.
               </p>
               <p className="mt-4">
                 Operating strictly in alignment with Philippine public procurement guidelines and university standards, every request progresses through the standardized <strong className="font-extrabold text-[#4D002C]">end-to-end procurement workflow</strong> with complete auditability.
@@ -355,7 +359,7 @@ export default function LandingPage() {
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#F0C83F]">
               Mindanao State University - General Santos
             </p>
-            <h2 className="mt-1 text-xl font-extrabold tracking-tight">Procurement Management System</h2>
+            <h2 className="mt-1 max-w-xl text-xl font-extrabold tracking-tight">{SYSTEM_NAME}</h2>
             <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-white/60">
               Centralized platform for Purchase Requests, standardized procurement workflows, transparency disclosures, and Gab AI assistance.
             </p>
@@ -368,7 +372,7 @@ export default function LandingPage() {
           </Link>
         </motion.div>
         <div className="border-t border-white/10 py-5 text-center text-xs text-white/45">
-          © {new Date().getFullYear()} Mindanao State University - General Santos · Procurement Management System
+          © {new Date().getFullYear()} {SYSTEM_NAME}
         </div>
       </footer>
     </div>
