@@ -76,12 +76,17 @@ test('the short ProcureMateSU wordmark and Gab AI assistant identity remain sepa
 });
 
 
-test('landing page contains distinct process, official resources, and contact sections', () => {
+test('landing page sections are ordered About, How It Works, Resources, Transparency, Contact', () => {
   const source = read('components/LandingPage.tsx');
 
   for (const sectionId of ['how-it-works', 'resources', 'transparency', 'contact']) {
     assert.ok(source.includes('id="' + sectionId + '"'), 'missing section: ' + sectionId);
   }
+
+  const sectionOrder = ['about', 'how-it-works', 'resources', 'transparency', 'contact']
+    .map((sectionId) => source.indexOf('id="' + sectionId + '"'));
+  assert.ok(sectionOrder.every((position) => position >= 0));
+  assert.deepEqual(sectionOrder, [...sectionOrder].sort((a, b) => a - b));
 
   for (const label of [
     'Create a PR Draft',
@@ -111,12 +116,15 @@ test('official resource links use the approved RA 12009 references and GPPB advi
   assert.match(source, /31 March 2026 IRR edition was withdrawn/);
 });
 
-test('PMO contact information links to the directory and avoids fixed office-hour claims', () => {
+test('PMO contact card shows the temporary STTC location without a university directory link', () => {
   const source = read('components/LandingPage.tsx');
   assert.match(source, /Assoc\. Prof\. Nelson P\. Benares, Jr\./);
   assert.match(source, /tel:\+639088105634/);
-  assert.match(source, /https:\/\/msugensan\.edu\.ph\/about\/university-directory\//);
-  assert.match(source, /Call the PMO before visiting to confirm the current office location/);
+  assert.match(source, /Science and Technology Training Center \(STTC\)/);
+  assert.match(source, /Office arrangements may change/);
+  assert.match(source, /contact the PMO before visiting to confirm the current location/);
+  assert.doesNotMatch(source, /https:\/\/msugensan\.edu\.ph\/about\/university-directory\//);
+  assert.doesNotMatch(source, /View University Directory/);
   assert.doesNotMatch(source, /Monday\s*-\s*Friday.*\d{1,2}:\d{2}/i);
 });
 
