@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
+import { SYSTEM_NAME } from "@/lib/system-branding";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { ActionFeedbackModal, type FeedbackTone } from "@/components/ui/ActionFeedbackModal";
 import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
@@ -274,7 +275,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
-      <SystemPageHeader titlePrimary="MSU GenSan Procurement Management" titleAccent="System" mobileTitlePrimary="MSU GenSan" mobileTitleAccent="Admin" compactOnMobile workspaceLabel="Administrator Workspace" brandLogo backHref={null} roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
+      <SystemPageHeader titlePrimary="MSU - General Santos Digital Procurement" titleAccent="Logbook & Inquiry System" mobileTitlePrimary="MSU - General Santos" mobileTitleAccent="Digital Procurement" compactOnMobile workspaceLabel="Administrator Workspace" brandLogo backHref={null} roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
 
       <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-4 sm:py-7">
         <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1><p className="text-[13px] sm:text-sm text-stone-600 mt-1">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-start"><Link href="/admin/users" className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] transition-colors hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:w-auto sm:text-sm"><Users className="h-4 w-4 shrink-0" /> User Approvals</Link><Link href="/admin/inquiries" className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] transition-colors hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:w-auto sm:text-sm"><MessageSquare className="h-4 w-4 shrink-0" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] transition-colors hover:bg-[#FDF2F7] disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:w-auto sm:text-sm"><RefreshCw className={`h-4 w-4 shrink-0 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
@@ -518,7 +519,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
         <footer className="mt-14 border-t border-stone-200/80 pt-6 pb-10 text-center">
           <div className="mx-auto flex max-w-7xl items-center justify-center">
             <p className="text-xs font-medium text-stone-500 tracking-normal">
-              © {new Date().getFullYear()} <span className="font-semibold text-stone-700">Mindanao State University - General Santos</span> <span className="mx-1.5 text-stone-300">·</span> <span className="font-semibold text-[#7B0046]">Procurement Management System</span>
+              © {new Date().getFullYear()} <span className="font-semibold text-stone-700">{SYSTEM_NAME}</span>
             </p>
           </div>
         </footer>
