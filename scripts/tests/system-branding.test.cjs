@@ -101,7 +101,10 @@ test('the short ProcureMateSU wordmark and Gab AI assistant identity remain sepa
   const landing = read('components/LandingPage.tsx');
   const login = read('components/auth/LandingLoginCard.tsx');
   assert.match(landing, /Procure/);
-  assert.ok(landing.includes('>M</span>ate'));
+  assert.ok(landing.includes('>Procure</span>'));
+  assert.ok(landing.includes('>M</span>'));
+  assert.ok(landing.includes('>ate</span>'));
+  assert.ok(landing.includes('>SU</span>'));
   assert.match(landing, /Gab AI/);
   assert.match(login, /Gab AI|SYSTEM_NAME/);
 });
