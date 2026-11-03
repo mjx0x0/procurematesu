@@ -75,7 +75,9 @@ test('main dashboard headers show the ProcureMateSU wordmark with MSU letters hi
 
   assert.match(header, /brandWordmark\?: boolean/);
   assert.match(header, /aria-label=\{brandWordmark \? "ProcureMateSU"/);
-  assert.match(header, /<span>Procure<\/span><span className="text-\[#C27803\]">M<\/span><span>ate<\/span><span className="text-\[#C27803\]">SU<\/span>/);
+  assert.match(header, /Procure.*from-\[#4D002C\].*to-\[#7B0046\]/);
+  assert.match(header, /from-\[#A16207\].*via-\[#D97706\].*to-\[#B45309\]/);
+  assert.match(header, /workspaceLabel && <p className="truncate text-\[10px\] font-extrabold uppercase tracking-\[0\.14em\] text-\[#A16207\]"/);
   assert.match(dashboard, /workspaceLabel="End User Workspace"/);
   assert.match(admin, /workspaceLabel="Administrator Workspace"/);
   assert.match(dashboard, /brandWordmark/);
