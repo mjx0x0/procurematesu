@@ -56,7 +56,7 @@ test('final Monitoring and Documentation stage can be completed through the admi
 
 test('generic legacy IRR source is classified as historical and retrieved for explicit history questions', () => {
   const retrieval = read('lib/document-retrieval.ts');
-  assert.match(retrieval, /\^irr\\s\+irr\\b/);
+  assert.match(retrieval, /\^irr\(\?:\\s\|\$\)/);
   assert.match(retrieval, /'IRR 2016', 'IRR'/);
   assert.match(retrieval, /\.eq\('document_name', 'IRR'\)/);
 });
