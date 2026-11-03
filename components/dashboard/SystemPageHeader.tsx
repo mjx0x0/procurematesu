@@ -128,7 +128,7 @@ export function SystemPageHeader({
                 </>
               )}
             </b>
-            {workspaceLabel && <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#A16207]">{workspaceLabel}</p>}
+            {workspaceLabel && <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#B7791F]">{workspaceLabel}</p>}
           </div>
         </div>
         <div className={`flex shrink-0 items-center justify-end ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-2 sm:gap-3"}`}>
