@@ -60,7 +60,7 @@ function isLegacyProcurementSource(identity: string): boolean {
     return false;
   }
   // The stored document label is "IRR 2016", so recognize both word orders.
-  return /\bra\s*\.?\s*9184\b|local government units procurement manual|\birr\s*2016\b|^irr\s+irr\b|2016.{0,20}irr|legacy_ra_9184_reference|historical_reference_not_current/i.test(identity);
+  return /\bra\s*\.?\s*9184\b|local government units procurement manual|\birr\s*2016\b|^irr(?:\s|$)|2016.{0,20}irr|legacy_ra_9184_reference|historical_reference_not_current/i.test(identity);
 }
 
 function isCurrentProcurementLawSource(identity: string): boolean {
