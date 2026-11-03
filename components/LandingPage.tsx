@@ -59,7 +59,7 @@ export default function LandingPage() {
           <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between gap-6 px-6 py-2.5 sm:px-8">
             <Link
               href="#home"
-              aria-label="ProcureMateSU — MSU General Santos City Digital Procurement Logbook"
+              aria-label="ProcureMateSU — MSU General Santos Digital Procurement Logbook"
               className="group flex min-w-0 items-center gap-3 rounded-2xl py-1 pr-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F6D58A]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#4A002A]"
             >
               <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-[#F2D28A]/45 bg-gradient-to-br from-white/15 via-[#E9B957]/10 to-white/[0.04] shadow-[0_5px_18px_rgba(0,0,0,0.2)] ring-1 ring-white/5">
@@ -98,7 +98,7 @@ export default function LandingPage() {
           >
             <div className="w-full">
               <p className="mb-5 text-center lg:text-left text-xs sm:text-sm font-extrabold uppercase tracking-[0.24em] text-[#FFD043]">
-                MSU – GENERAL SANTOS CITY
+                MSU – GENERAL SANTOS
               </p>
               <h1 className="w-full text-center lg:text-left font-black tracking-[-0.035em] leading-[1.14]">
                 <span className="block text-[2.45rem] sm:text-5xl lg:text-[3.5rem] xl:text-[4.05rem] font-black text-[#FFFDF8] pb-1 leading-[1.08]">
