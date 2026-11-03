@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BookOpen, Building2, CheckCircle2, ClipboardList, ExternalLink, FileText, MapPin, Phone, Printer, Scale, Search, Workflow } from "lucide-react";
+import { ArrowRight, BookOpen, Building2, ClipboardList, ExternalLink, FileText, MapPin, Phone, Printer, Scale, Search, Workflow } from "lucide-react";
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { MsuLogo } from "@/components/msu-logo";
@@ -139,7 +139,7 @@ export default function LandingPage() {
             </h2>
           </motion.div>
 
-          <div className="mt-12 grid items-center gap-12 md:grid-cols-2 md:gap-16">
+          <div className="mx-auto mt-10 max-w-4xl">
             <motion.div
               initial={{ opacity: 0, x: -16 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -159,65 +159,7 @@ export default function LandingPage() {
 
             </motion.div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                {
-                  value: "20",
-                  unit: "Stages",
-                  label: "Workflow Tracking",
-                  desc: "End-to-end PMO milestone verification from draft to delivery",
-                },
-                {
-                  value: "60+",
-                  unit: "Projects",
-                  label: "Transparency Board",
-                  desc: "Publicly accessible university bidding notices, awards & contracts",
-                },
-                {
-                  value: "Dual",
-                  unit: "Portals",
-                  label: "Role-Based Access",
-                  desc: "Separated workspaces for campus requisitioners and PMO admins",
-                },
-                {
-                  value: "24/7",
-                  unit: "Support",
-                  label: "Gab AI Policy Guide",
-                  desc: "Instant compliance answers grounded in RA 12009 & GPPB issuances",
-                },
-              ].map((card, i) => (
-                <motion.div
-                  key={card.label}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.45, delay: i * 0.08, ease: "easeOut" }}
-                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-[#4D002C] via-[#5B0034] to-[#36001E] p-5 text-white shadow-[0_12px_32px_rgba(77,0,44,0.18)] border border-[#F5AB26]/25 transition-all duration-200"
-                >
-                  <div className="pointer-events-none absolute -right-8 -bottom-8 h-24 w-24 rounded-full bg-[#F5AB26]/10 blur-xl group-hover:bg-[#F5AB26]/20 transition-colors" />
 
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <div className="text-3xl sm:text-4xl font-black text-[#FFD043] font-mono tracking-tight">
-                        {card.value}
-                      </div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-200/80 rounded-md bg-white/10 px-2 py-0.5 border border-white/10 backdrop-blur-xs">
-                        {card.unit}
-                      </span>
-                    </div>
-
-                    <h3 className="mt-2 text-sm font-bold text-white tracking-tight">
-                      {card.label}
-                    </h3>
-                  </div>
-
-                  <p className="mt-2.5 text-xs leading-relaxed text-stone-200/80 font-normal">
-                    {card.desc}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
@@ -297,12 +239,6 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <div className="mt-6 flex items-start gap-3 rounded-xl border border-[#E7D5A9] bg-[#FFF9E9] px-4 py-3.5 text-xs leading-relaxed text-stone-700">
-            <span className="mt-0.5 shrink-0 text-[#A36B00]"><CheckCircle2 className="h-4 w-4" /></span>
-            <p>
-              <strong className="font-bold text-[#4D002C]">Important:</strong> Creating a digital draft does not mean the Procurement Office has officially received the request. The printed and signed copy must be submitted, and office receipt must be recorded before the request proceeds in the official workflow.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -388,22 +324,6 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <div className="mt-5 flex flex-col gap-2 rounded-xl border border-amber-200 bg-amber-50/80 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-2.5">
-              <span className="mt-0.5 text-amber-700"><BookOpen className="h-4 w-4" /></span>
-              <p className="text-xs leading-relaxed text-stone-700">
-                <strong className="font-bold text-[#4D002C]">IRR reference reminder:</strong> GPPB Public Advisory No. 09-2026 says the 31 March 2026 IRR edition was withdrawn. Use the IRR approved under GPPB Resolution No. 02-2025.
-              </p>
-            </div>
-            <a
-              href="https://www.gppb.gov.ph/public-advisory-no-09-2026/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex shrink-0 items-center gap-1.5 text-xs font-bold text-[#7B0046] hover:text-[#4D002C]"
-            >
-              Read GPPB Advisory <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-          </div>
         </div>
       </section>
 
