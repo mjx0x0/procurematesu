@@ -166,7 +166,7 @@ export default function DashboardPage() {
           </div>
           <div className="relative z-10 w-full">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
-              Good day, <span className="text-amber-200">{displayName}</span>.
+              Good day, <span className="text-white">{displayName}</span>.
             </h1>
             <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-stone-200/90 font-normal w-full">
               Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.

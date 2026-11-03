@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { ChatMessageContent } from "@/components/chatbot/ChatMessageContent";
 import { normalizeAssistantResponse } from "@/lib/chat-response-format";
-import { Check, Copy, History, Loader2, MessageSquarePlus, Send, Sparkles, Trash2, X, Square, ArrowRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Check, Copy, History, Loader2, MessageSquare, MessageSquarePlus, Send, Sparkles, Trash2, X, Square, ArrowRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { SYSTEM_NAME } from "@/lib/system-branding";
 
@@ -85,7 +85,7 @@ export default function ChatbotDashboard() {
       .from("chat_sessions")
       .select("id,title,created_at,updated_at,is_active")
       .eq("user_id", uid)
-      .order("updated_at", { ascending: false });
+      .order("created_at", { ascending: false });
     if (error) throw error;
     setSessions((data || []) as ChatSession[]);
     return (data || []) as ChatSession[];
@@ -112,6 +112,8 @@ export default function ChatbotDashboard() {
   const createSession = async (uid: string) => {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
+    // Deactivate existing sessions so only the new session is marked active
+    await supabase.from("chat_sessions").update({ is_active: false }).eq("user_id", uid);
     const { error } = await supabase.from("chat_sessions").insert({
       id,
       user_id: uid,
@@ -144,7 +146,7 @@ export default function ChatbotDashboard() {
         if (cancelled) return;
         setUserId(user.id);
         const list = await loadSessions(user.id);
-        const active = list.find((s) => s.is_active);
+        const active = list.find((s) => s.is_active) || (list.length > 0 ? list[0] : null);
         if (active) {
           setSessionId(active.id);
           await loadMessages(active.id);
@@ -302,11 +304,15 @@ export default function ChatbotDashboard() {
 
         await persistMessage(sid, "assistant", response, prs.length ? { prOptions: prs } : {});
         addLocal("assistant", response, prs.length ? prs : undefined);
-        await supabase
-          .from("chat_sessions")
-          .update({ title: text.slice(0, 60), updated_at: new Date().toISOString() })
-          .eq("id", sid);
-        if (userId) await loadSessions(userId);
+        const currentSession = sessions.find((s) => s.id === sid);
+        const shouldUpdateTitle = !currentSession || !currentSession.title || currentSession.title === "New conversation";
+        if (shouldUpdateTitle) {
+          await supabase
+            .from("chat_sessions")
+            .update({ title: text.slice(0, 60), updated_at: new Date().toISOString() })
+            .eq("id", sid);
+          if (userId) await loadSessions(userId);
+        }
         return;
       }
 
@@ -327,11 +333,15 @@ export default function ChatbotDashboard() {
       if (!response.ok) throw new Error(data?.error || "Chat request failed");
 
       addLocal("assistant", normalizeAssistantResponse(data?.response));
-      await supabase
-        .from("chat_sessions")
-        .update({ title: text.slice(0, 60), updated_at: new Date().toISOString() })
-        .eq("id", sid);
-      if (userId) await loadSessions(userId);
+      const currentSession = sessions.find((s) => s.id === sid);
+      const shouldUpdateTitle = !currentSession || !currentSession.title || currentSession.title === "New conversation";
+      if (shouldUpdateTitle) {
+        await supabase
+          .from("chat_sessions")
+          .update({ title: text.slice(0, 60), updated_at: new Date().toISOString() })
+          .eq("id", sid);
+        if (userId) await loadSessions(userId);
+      }
     } catch (e: any) {
       if (e?.name === "AbortError") return;
       console.error("Chat error:", e);
@@ -370,11 +380,15 @@ export default function ChatbotDashboard() {
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(data?.error || "Unable to track PR");
       addLocal("assistant", normalizeAssistantResponse(data?.response));
-      await supabase
-        .from("chat_sessions")
-        .update({ title: `Track ${prNo}`.slice(0, 60), updated_at: new Date().toISOString() })
-        .eq("id", sid);
-      if (userId) await loadSessions(userId);
+      const currentSession = sessions.find((s) => s.id === sid);
+      const shouldUpdateTitle = !currentSession || !currentSession.title || currentSession.title === "New conversation";
+      if (shouldUpdateTitle) {
+        await supabase
+          .from("chat_sessions")
+          .update({ title: `Track ${prNo}`.slice(0, 60), updated_at: new Date().toISOString() })
+          .eq("id", sid);
+        if (userId) await loadSessions(userId);
+      }
     } catch (e: any) {
       console.error(e);
       setMessages((prev) =>
@@ -396,7 +410,7 @@ export default function ChatbotDashboard() {
       if (sessionId) {
         await supabase
           .from("chat_sessions")
-          .update({ is_active: false, updated_at: new Date().toISOString() })
+          .update({ is_active: false })
           .eq("id", sessionId)
           .eq("user_id", userId);
       }
@@ -474,12 +488,14 @@ export default function ChatbotDashboard() {
     }
     try {
       setLoading(true);
-      if (userId) await supabase.from("chat_sessions").update({ is_active: false }).eq("user_id", userId);
-      await supabase
-        .from("chat_sessions")
-        .update({ is_active: true, updated_at: new Date().toISOString() })
-        .eq("id", sid)
-        .eq("user_id", userId);
+      if (userId) {
+        await supabase.from("chat_sessions").update({ is_active: false }).eq("user_id", userId);
+        await supabase
+          .from("chat_sessions")
+          .update({ is_active: true })
+          .eq("id", sid)
+          .eq("user_id", userId);
+      }
       setSessionId(sid);
       await loadMessages(sid);
       if (userId) await loadSessions(userId);
@@ -488,6 +504,17 @@ export default function ChatbotDashboard() {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const formatSessionDate = (dateStr?: string) => {
+    if (!dateStr) return "";
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "";
+      return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+    } catch {
+      return "";
     }
   };
 
@@ -526,9 +553,21 @@ export default function ChatbotDashboard() {
     );
 
   return (
-    <div className="chatbot-viewport h-screen h-[100dvh] max-h-screen bg-[#FAF8F5] flex flex-col overflow-hidden">
+    <div
+      className="chatbot-viewport h-screen h-[100dvh] max-h-screen bg-white flex flex-col overflow-hidden"
+      aria-label={SYSTEM_NAME}
+    >
       {/* Top Navbar */}
-      <SystemPageHeader titlePrimary="AI" titleAccent="Chatbot" mobileTitlePrimary="Gab" mobileTitleAccent="AI" compactOnMobile backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl w-full px-2 sm:px-4 md:px-6">
+      <SystemPageHeader
+        titlePrimary="AI"
+        titleAccent="Chatbot"
+        mobileTitlePrimary="Gab"
+        mobileTitleAccent="AI"
+        compactOnMobile
+        backHref="/dashboard"
+        roleLabel="End User"
+        containerClassName="w-full px-3 sm:px-6 max-w-none"
+      >
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop Sidebar Toggle Button */}
             <button
@@ -591,23 +630,23 @@ export default function ChatbotDashboard() {
       </SystemPageHeader>
 
       {/* Main Layout */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 md:p-6 flex gap-4 min-h-0 overflow-hidden">
+      <main className="flex-1 w-full flex min-h-0 overflow-hidden p-0 m-0">
         {/* Desktop Sidebar: Chat History with toggleable collapse & expand */}
         <aside
-          className={`hidden md:flex flex-col shrink-0 bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden h-full transition-all duration-300 ease-in-out ${
-            sidebarOpen ? "w-72 opacity-100" : "w-0 p-0 border-0 opacity-0 pointer-events-none -mr-4"
+          className={`hidden md:flex flex-col shrink-0 bg-white border-r border-stone-200 overflow-hidden h-full transition-all duration-300 ease-in-out ${
+            sidebarOpen ? "w-72 lg:w-80 opacity-100" : "w-0 p-0 border-r-0 opacity-0 pointer-events-none"
           }`}
         >
-          <div className="p-4 border-b border-stone-100 flex justify-between items-center bg-stone-50/50 shrink-0">
-            <div className="min-w-0">
-              <h2 className="font-bold text-[#4D002C] text-sm flex items-center gap-1.5 truncate">
+          <div className="px-4 py-3.5 border-b border-stone-200/80 flex justify-between items-start bg-white shrink-0">
+            <div>
+              <h2 className="font-bold text-[#4D002C] text-sm flex items-center gap-1.5 leading-snug">
                 <History className="h-4 w-4 text-[#7B0046] shrink-0" /> Chat History
               </h2>
-              <p className="text-[11px] text-stone-500 mt-0.5 truncate">Saved conversations</p>
+              <p className="text-[11px] text-stone-500 mt-0.5">Saved conversations</p>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-200/60 transition-colors shrink-0"
+              className="p-1 rounded-md text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors shrink-0"
               title="Hide chat history"
               aria-label="Hide chat history"
             >
@@ -619,40 +658,59 @@ export default function ChatbotDashboard() {
             <button
               onClick={startNewChat}
               disabled={loading}
-              className="w-full py-2.5 rounded-xl border border-dashed border-[#7B0046]/40 text-[#7B0046] bg-purple-50/50 hover:bg-purple-50 text-xs font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              className="w-full py-2.5 px-3 rounded-xl border border-dashed border-[#7B0046]/40 text-[#7B0046] bg-transparent hover:bg-purple-50/40 text-xs font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
             >
-              <MessageSquarePlus className="h-4 w-4" /> Start New Conversation
+              <MessageSquarePlus className="h-4 w-4 text-[#7B0046]" />
+              <span>Start New Conversation</span>
             </button>
           </div>
 
-          <div className="flex-1 min-h-0 px-2 pb-3 overflow-y-auto space-y-1">
-            {visibleSessions.map((s) => (
-              <div
-                key={s.id}
-                className={`group flex items-center gap-1 rounded-xl transition-colors ${
-                  s.id === sessionId ? "bg-purple-50 text-[#7B0046]" : "hover:bg-stone-50 text-stone-700"
-                }`}
-              >
-                <button
-                  onClick={() => selectSession(s.id)}
-                  className="flex-1 min-w-0 text-left px-3 py-2.5"
+          <div className="flex-1 min-h-0 px-3 pb-3 overflow-y-auto space-y-1">
+            {visibleSessions.map((s) => {
+              const isCurrent = s.id === sessionId;
+              return (
+                <div
+                  key={s.id}
+                  className={`group relative flex items-center rounded-xl transition-colors ${
+                    isCurrent
+                      ? "bg-[#FAF5FA] text-[#4D002C]"
+                      : "text-stone-700 hover:bg-stone-50"
+                  }`}
                 >
-                  <p className={`text-xs font-semibold truncate ${s.id === sessionId ? "text-[#7B0046]" : "text-stone-700"}`}>
-                    {s.title || "New conversation"}
-                  </p>
-                  <p className="text-[10px] text-stone-400 mt-0.5">
-                    {new Date(s.updated_at || s.created_at).toLocaleDateString()}
-                  </p>
-                </button>
-                <button
-                  onClick={() => setDeleteId(s.id)}
-                  title="Delete chat"
-                  className="opacity-0 group-hover:opacity-100 p-2 text-stone-400 hover:text-red-600 transition-opacity"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            ))}
+                  <button
+                    onClick={() => selectSession(s.id)}
+                    className="flex-1 min-w-0 text-left px-3 py-2.5 pr-4"
+                  >
+                    <p
+                      className={`text-xs truncate ${
+                        isCurrent ? "font-bold text-[#4D002C]" : "font-semibold text-stone-800"
+                      }`}
+                    >
+                      {s.title || "New conversation"}
+                    </p>
+                    <p className="text-[11px] text-stone-400 mt-0.5">
+                      {formatSessionDate(s.created_at || s.updated_at)}
+                    </p>
+                  </button>
+                  {isCurrent && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-7 bg-[#7B0046] rounded-l-full"
+                    />
+                  )}
+                  <button
+                    onClick={() => setDeleteId(s.id)}
+                    title="Delete chat"
+                    aria-label="Delete chat"
+                    className={`opacity-0 group-hover:opacity-100 p-2 text-stone-400 hover:text-red-600 transition-opacity rounded-lg hover:bg-black/5 shrink-0 ${
+                      isCurrent ? "mr-2.5" : "mr-1"
+                    }`}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              );
+            })}
             {!visibleSessions.length && (
               <p className="text-center text-xs text-stone-400 py-8 px-4">
                 No saved conversations yet. Send a message to start!
@@ -672,65 +730,82 @@ export default function ChatbotDashboard() {
 
             {/* Drawer Sheet */}
             <div className="relative w-80 max-w-[85vw] bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-left duration-200">
-              <div className="p-4 border-b border-stone-200 flex justify-between items-center bg-[#FAF8F5]">
-                <div className="flex items-center gap-2">
-                  <div className="bg-[#7B0046] p-1.5 rounded-lg text-amber-300">
-                    <History className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <h2 className="font-bold text-[#4D002C] text-sm">Chat History</h2>
-                    <p className="text-[11px] text-stone-500">Your saved conversations</p>
-                  </div>
+              <div className="px-4 py-3.5 border-b border-stone-200/80 flex justify-between items-start bg-white">
+                <div>
+                  <h2 className="font-bold text-[#4D002C] text-sm flex items-center gap-1.5 leading-snug">
+                    <History className="h-4 w-4 text-[#7B0046] shrink-0" /> Chat History
+                  </h2>
+                  <p className="text-[11px] text-stone-500 mt-0.5">Saved conversations</p>
                 </div>
                 <button
                   onClick={() => setMobileHistoryOpen(false)}
-                  className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-200"
+                  className="p-1 rounded-md text-stone-400 hover:text-stone-700 hover:bg-stone-100"
+                  aria-label="Close chat history"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
 
-              <div className="p-3">
+              <div className="p-3 shrink-0">
                 <button
                   onClick={startNewChat}
                   disabled={loading}
-                  className="w-full py-2.5 rounded-xl border border-dashed border-[#7B0046]/40 text-[#7B0046] bg-purple-50/50 hover:bg-purple-50 text-xs font-bold flex items-center justify-center gap-2"
+                  className="w-full py-2.5 px-3 rounded-xl border border-dashed border-[#7B0046]/40 text-[#7B0046] bg-transparent hover:bg-purple-50/40 text-xs font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                 >
-                  <MessageSquarePlus className="h-4 w-4" /> New Conversation
+                  <MessageSquarePlus className="h-4 w-4 text-[#7B0046]" />
+                  <span>Start New Conversation</span>
                 </button>
               </div>
 
-              <div className="flex-1 px-2 pb-4 overflow-y-auto space-y-1">
-                {visibleSessions.map((s) => (
-                  <div
-                    key={s.id}
-                    className={`flex items-center gap-1 rounded-xl transition-colors ${
-                      s.id === sessionId ? "bg-purple-50 text-[#7B0046]" : "hover:bg-stone-50 text-stone-700"
-                    }`}
-                  >
-                    <button
-                      onClick={() => selectSession(s.id)}
-                      className="flex-1 min-w-0 text-left px-3 py-2.5"
+              <div className="flex-1 px-3 pb-4 overflow-y-auto space-y-1">
+                {visibleSessions.map((s) => {
+                  const isCurrent = s.id === sessionId;
+                  return (
+                    <div
+                      key={s.id}
+                      className={`group relative flex items-center rounded-xl transition-colors ${
+                        isCurrent
+                          ? "bg-[#FAF5FA] text-[#4D002C]"
+                          : "text-stone-700 hover:bg-stone-50"
+                      }`}
                     >
-                      <p className={`text-xs font-semibold truncate ${s.id === sessionId ? "text-[#7B0046]" : "text-stone-700"}`}>
-                        {s.title || "New conversation"}
-                      </p>
-                      <p className="text-[10px] text-stone-400 mt-0.5">
-                        {new Date(s.updated_at || s.created_at).toLocaleDateString()}
-                      </p>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setMobileHistoryOpen(false);
-                        setDeleteId(s.id);
-                      }}
-                      title="Delete chat"
-                      className="p-2 text-stone-400 hover:text-red-600"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))}
+                      <button
+                        onClick={() => selectSession(s.id)}
+                        className="flex-1 min-w-0 text-left px-3 py-2.5 pr-4"
+                      >
+                        <p
+                          className={`text-xs truncate ${
+                            isCurrent ? "font-bold text-[#4D002C]" : "font-semibold text-stone-800"
+                          }`}
+                        >
+                          {s.title || "New conversation"}
+                        </p>
+                        <p className="text-[11px] text-stone-400 mt-0.5">
+                          {formatSessionDate(s.created_at || s.updated_at)}
+                        </p>
+                      </button>
+                      {isCurrent && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-7 bg-[#7B0046] rounded-l-full"
+                        />
+                      )}
+                      <button
+                        onClick={() => {
+                          setMobileHistoryOpen(false);
+                          setDeleteId(s.id);
+                        }}
+                        title="Delete chat"
+                        aria-label="Delete chat"
+                        className={`p-2 text-stone-400 hover:text-red-600 rounded-lg ${
+                          isCurrent ? "mr-2.5" : "mr-1"
+                        }`}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  );
+                })}
                 {!visibleSessions.length && (
                   <p className="text-center text-xs text-stone-400 py-8 px-4">
                     No saved conversations yet.
@@ -742,124 +817,128 @@ export default function ChatbotDashboard() {
         )}
 
         {/* Chat Area */}
-        <section className="flex-1 min-w-0 bg-white rounded-2xl border border-stone-200 shadow-sm flex flex-col overflow-hidden h-full">
+        <section className="flex-1 min-w-0 bg-white flex flex-col overflow-hidden h-full">
           {/* Messages Container */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 space-y-4">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex w-full min-w-0 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
+          <div className="flex-1 min-h-0 overflow-y-auto px-3.5 py-4 sm:px-6 sm:py-6 space-y-4">
+            <div className="mx-auto w-full max-w-4xl space-y-4">
+              {messages.map((msg) => (
                 <div
-                  className={`w-fit min-w-0 max-w-[92%] break-words [overflow-wrap:anywhere] sm:max-w-[80%] rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm leading-relaxed ${
-                    msg.role === "user"
-                      ? "bg-gradient-to-r from-[#7B0046] to-[#610037] text-white rounded-tr-sm shadow-xs"
-                      : "bg-[#FAF8F5] border border-stone-200 text-stone-800 rounded-tl-sm shadow-2xs"
-                  }`}
+                  key={msg.id}
+                  className={`flex w-full min-w-0 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  {msg.isLoading ? (
-                    <div className="flex items-center gap-1.5 py-1">
-                      <span className="w-2 h-2 rounded-full bg-[#7B0046] animate-bounce" />
-                      <span className="w-2 h-2 rounded-full bg-[#C27803] animate-bounce [animation-delay:150ms]" />
-                      <span className="w-2 h-2 rounded-full bg-[#7B0046] animate-bounce [animation-delay:300ms]" />
-                      <span className="text-xs text-stone-500 ml-2">Consulting procurement guidelines...</span>
-                    </div>
-                  ) : (
-                    <>
-                      <ChatMessageContent content={msg.content} isUser={msg.role === "user"} />
-
-                      {/* Interactive Trackable PR Option Cards */}
-                      {msg.prOptions && msg.prOptions.length > 0 && (
-                        <div className="mt-3 space-y-2">
-                          <p className="text-[11px] font-bold uppercase tracking-wider text-[#7B0046]">
-                            Select a PR to track:
-                          </p>
-                          {msg.prOptions.map((pr) => (
-                            <button
-                              key={pr.pr_no}
-                              onClick={() => handlePRSelection(pr.pr_no)}
-                              disabled={loading}
-                              className="w-full text-left p-3 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 hover:border-purple-200 transition-colors shadow-2xs disabled:opacity-50 block group"
-                            >
-                              <div className="flex justify-between items-center gap-2">
-                                <span className="text-xs sm:text-sm font-bold text-[#7B0046] group-hover:underline">
-                                  {pr.pr_no}
-                                </span>
-                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-semibold border border-amber-200 truncate max-w-[140px]">
-                                  {statusLabel(pr.current_stage)}
-                                </span>
-                              </div>
-                              <p className="text-xs text-stone-700 mt-1 line-clamp-2">
-                                {pr.purpose || "Official Purchase Request"}
-                              </p>
-                              <div className="flex items-center justify-between text-[10px] text-stone-400 mt-2 pt-1 border-t border-stone-100">
-                                <span>
-                                  ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                </span>
-                                <span className="text-[#7B0046] font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                                  Track Stage <ArrowRight className="h-3 w-3" />
-                                </span>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Message Footer: Timestamp & Copy */}
-                      <div className="flex justify-between items-center mt-2 pt-1 border-t border-black/5">
-                        <span className={`text-[10px] ${msg.role === "user" ? "text-amber-200/80" : "text-stone-400"}`}>
-                          {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </span>
-                        {msg.role === "assistant" && (
-                          <button
-                            onClick={() => copyMessage(msg.id, msg.content)}
-                            className="text-stone-400 hover:text-stone-700 p-1 transition-colors"
-                            title="Copy response"
-                          >
-                            {copiedId === msg.id ? (
-                              <Check className="h-3.5 w-3.5 text-emerald-600" />
-                            ) : (
-                              <Copy className="h-3.5 w-3.5" />
-                            )}
-                          </button>
-                        )}
+                  <div
+                    className={`w-fit min-w-0 max-w-[92%] break-words [overflow-wrap:anywhere] sm:max-w-[80%] rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm leading-relaxed ${
+                      msg.role === "user"
+                        ? "bg-gradient-to-r from-[#7B0046] to-[#610037] text-white rounded-tr-sm shadow-xs"
+                        : "bg-[#FAF8F5] border border-stone-200 text-stone-800 rounded-tl-sm shadow-2xs"
+                    }`}
+                  >
+                    {msg.isLoading ? (
+                      <div className="flex items-center gap-1.5 py-1">
+                        <span className="w-2 h-2 rounded-full bg-[#7B0046] animate-bounce" />
+                        <span className="w-2 h-2 rounded-full bg-[#C27803] animate-bounce [animation-delay:150ms]" />
+                        <span className="w-2 h-2 rounded-full bg-[#7B0046] animate-bounce [animation-delay:300ms]" />
+                        <span className="text-xs text-stone-500 ml-2">Consulting procurement guidelines...</span>
                       </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
+                    ) : (
+                      <>
+                        <ChatMessageContent content={msg.content} isUser={msg.role === "user"} />
 
-            {loading && (
-              <div className="flex justify-start">
-                <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl rounded-tl-sm p-3 text-xs text-stone-500 flex items-center gap-2">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#7B0046]" />
-                  <span>Procurement Assistant is analyzing...</span>
+                        {/* Interactive Trackable PR Option Cards */}
+                        {msg.prOptions && msg.prOptions.length > 0 && (
+                          <div className="mt-3 space-y-2">
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-[#7B0046]">
+                              Select a PR to track:
+                            </p>
+                            {msg.prOptions.map((pr) => (
+                              <button
+                                key={pr.pr_no}
+                                onClick={() => handlePRSelection(pr.pr_no)}
+                                disabled={loading}
+                                className="w-full text-left p-3 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 hover:border-purple-200 transition-colors shadow-2xs disabled:opacity-50 block group"
+                              >
+                                <div className="flex justify-between items-center gap-2">
+                                  <span className="text-xs sm:text-sm font-bold text-[#7B0046] group-hover:underline">
+                                    {pr.pr_no}
+                                  </span>
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-semibold border border-amber-200 truncate max-w-[140px]">
+                                    {statusLabel(pr.current_stage)}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-stone-700 mt-1 line-clamp-2">
+                                  {pr.purpose || "Official Purchase Request"}
+                                </p>
+                                <div className="flex items-center justify-between text-[10px] text-stone-400 mt-2 pt-1 border-t border-stone-100">
+                                  <span>
+                                    ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                  </span>
+                                  <span className="text-[#7B0046] font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                                    Track Stage <ArrowRight className="h-3 w-3" />
+                                  </span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Message Footer: Timestamp & Copy */}
+                        <div className="flex justify-between items-center mt-2 pt-1 border-t border-black/5">
+                          <span className={`text-[10px] ${msg.role === "user" ? "text-amber-200/80" : "text-stone-400"}`}>
+                            {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                          {msg.role === "assistant" && (
+                            <button
+                              onClick={() => copyMessage(msg.id, msg.content)}
+                              className="text-stone-400 hover:text-stone-700 p-1 transition-colors"
+                              title="Copy response"
+                            >
+                              {copiedId === msg.id ? (
+                                <Check className="h-3.5 w-3.5 text-emerald-600" />
+                              ) : (
+                                <Copy className="h-3.5 w-3.5" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
+              ))}
+
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl rounded-tl-sm p-3 text-xs text-stone-500 flex items-center gap-2">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-[#7B0046]" />
+                    <span>Procurement Assistant is analyzing...</span>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
           </div>
 
           {/* Quick Suggestions Chips */}
-          <div className="shrink-0 px-3 py-1.5 bg-[#FAF8F5] border-t border-stone-200/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            <Sparkles className="h-3 w-3 text-[#C27803] shrink-0" />
-            <span className="text-[10px] font-semibold text-stone-500 shrink-0 hidden xs:inline">Try:</span>
-            {SUGGESTIONS.map((s) => (
-              <button
-                key={s}
-                onClick={() => sendMessage(s)}
-                disabled={loading}
-                className="whitespace-nowrap text-[11px] px-2.5 py-1 rounded-full bg-white border border-stone-200 hover:border-[#7B0046]/30 text-stone-700 hover:bg-[#FDF2F7] hover:text-[#7B0046] transition-colors shadow-2xs disabled:opacity-50"
-              >
-                {s}
-              </button>
-            ))}
+          <div className="shrink-0 px-3.5 py-2 sm:px-6 bg-[#FAF8F5] border-t border-stone-200/70">
+            <div className="mx-auto w-full max-w-4xl flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+              <Sparkles className="h-3 w-3 text-[#C27803] shrink-0" />
+              <span className="text-[10px] font-semibold text-stone-500 shrink-0 hidden xs:inline">Try:</span>
+              {SUGGESTIONS.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => sendMessage(s)}
+                  disabled={loading}
+                  className="whitespace-nowrap text-[11px] px-2.5 py-1 rounded-full bg-white border border-stone-200 hover:border-[#7B0046]/30 text-stone-700 hover:bg-[#FDF2F7] hover:text-[#7B0046] transition-colors shadow-2xs disabled:opacity-50"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Input Box */}
-          <div className="chatbot-composer shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 border-t border-stone-200 bg-white mt-auto">
-            <div className="flex gap-2 items-center">
+          <div className="chatbot-composer shrink-0 px-3.5 py-3 sm:px-6 sm:py-3.5 border-t border-stone-200 bg-white">
+            <div className="mx-auto w-full max-w-4xl flex gap-2 items-center">
               <input
                 ref={inputRef}
                 value={input}
@@ -867,12 +946,12 @@ export default function ChatbotDashboard() {
                 onKeyDown={keyDown}
                 disabled={loading}
                 placeholder="Ask about RA 12009, PR drafting, or type 'Track my PR'..."
-                className="flex-1 min-w-0 rounded-xl border border-stone-300 bg-white text-gray-900 placeholder:text-stone-400 px-3.5 py-2 text-xs sm:text-sm outline-none focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-2xs"
+                className="flex-1 min-w-0 rounded-xl border border-stone-300 bg-white text-gray-900 placeholder:text-stone-400 px-3.5 py-2.5 text-xs sm:text-sm outline-none focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-2xs"
               />
               <button
                 onClick={() => loading ? stopResponse() : sendMessage()}
                 disabled={!loading && !input.trim()}
-                className="shrink-0 h-11 sm:h-9.5 px-3.5 sm:px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#8E0052] hover:from-[#610037] hover:to-[#7B0046] text-white disabled:opacity-40 transition-colors shadow-xs flex items-center justify-center border border-amber-400/20"
+                className="shrink-0 h-10 sm:h-10 px-4 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#8E0052] hover:from-[#610037] hover:to-[#7B0046] text-white disabled:opacity-40 transition-colors shadow-xs flex items-center justify-center border border-amber-400/20"
                 aria-label={loading ? "Stop response" : "Send message"}
               >
                 {loading ? <Square className="h-3.5 w-3.5 text-amber-200 fill-current" /> : <Send className="h-3.5 w-3.5 text-amber-200" />}
@@ -881,12 +960,6 @@ export default function ChatbotDashboard() {
           </div>
         </section>
       </main>
-
-      <footer className="shrink-0 border-t border-stone-200/80 bg-white/70 py-2 text-center backdrop-blur-xs">
-        <p className="text-[11px] font-medium text-stone-500 tracking-normal">
-          © {new Date().getFullYear()} <span className="font-semibold text-stone-700">{SYSTEM_NAME}</span>
-        </p>
-      </footer>
 
       {/* Custom In-App Modal for Deleting Conversation — NO window.confirm browser popup! */}
       {deleteId && (

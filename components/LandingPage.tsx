@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BookOpen, Building2, ClipboardList, ExternalLink, FileText, MapPin, Phone, Printer, Scale, Search, Workflow } from "lucide-react";
+import { ArrowRight, Building2, ClipboardList, ExternalLink, FileText, MapPin, Phone, Printer, Search, Workflow } from "lucide-react";
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { MsuLogo } from "@/components/msu-logo";
@@ -261,8 +261,7 @@ export default function LandingPage() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="mx-auto max-w-2xl text-center"
           >
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#C27803]">Primary References</p>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#4D002C] sm:text-4xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-[#4D002C] sm:text-4xl">
               Procurement Laws & Official Resources
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-stone-600">
@@ -273,7 +272,6 @@ export default function LandingPage() {
           <div className="mt-9 grid gap-4 md:grid-cols-2">
             {[
               {
-                Icon: Scale,
                 label: "Republic Act No. 12009",
                 subtitle: "New Government Procurement Act",
                 description: "Read the statute establishing the current New Government Procurement Act framework.",
@@ -281,7 +279,6 @@ export default function LandingPage() {
                 linkLabel: "Read the Act",
               },
               {
-                Icon: BookOpen,
                 label: "Approved Implementing Rules",
                 subtitle: "GPPB Resolution No. 02-2025",
                 description: "Access the IRR approved by the GPPB and published in the Official Gazette on 10 February 2025.",
@@ -289,7 +286,6 @@ export default function LandingPage() {
                 linkLabel: "View the approved IRR",
               },
               {
-                Icon: FileText,
                 label: "GPPB Circulars",
                 subtitle: "Policy guidance and procedures",
                 description: "Browse official circulars containing procurement guidelines and supplemental policy instructions.",
@@ -297,7 +293,6 @@ export default function LandingPage() {
                 linkLabel: "Browse circulars",
               },
               {
-                Icon: ClipboardList,
                 label: "GPPB Resolutions",
                 subtitle: "Board approvals and issuances",
                 description: "Review resolutions approving procurement policies, standard forms, and related guidelines.",
@@ -318,14 +313,13 @@ export default function LandingPage() {
                 className="group flex min-h-[160px] flex-col rounded-2xl border border-stone-200 bg-[#FCFBF8] p-5 shadow-[0_4px_18px_rgba(40,20,10,0.025)] transition-colors hover:border-[#C27803]/60 hover:bg-white"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E9D9AE] bg-[#FFF6E4] text-[#7B0046]">
-                    <resource.Icon className="h-5 w-5" />
-                  </span>
-                  <ExternalLink className="h-4 w-4 text-stone-400 transition-colors group-hover:text-[#7B0046]" />
+                  <div>
+                    <h3 className="text-base font-extrabold text-[#4D002C]">{resource.label}</h3>
+                    <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#A36B00]">{resource.subtitle}</p>
+                  </div>
+                  <ExternalLink className="h-4 w-4 shrink-0 text-stone-400 transition-colors group-hover:text-[#7B0046]" />
                 </div>
-                <h3 className="mt-4 text-base font-extrabold text-[#4D002C]">{resource.label}</h3>
-                <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#A36B00]">{resource.subtitle}</p>
-                <p className="mt-2 text-xs leading-relaxed text-stone-600">{resource.description}</p>
+                <p className="mt-2.5 text-xs leading-relaxed text-stone-600">{resource.description}</p>
                 <span className="mt-auto pt-4 inline-flex items-center gap-1.5 text-xs font-bold text-[#7B0046]">
                   {resource.linkLabel} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>
@@ -450,8 +444,7 @@ export default function LandingPage() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="mx-auto max-w-2xl text-center"
           >
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#C27803]">University Assistance</p>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#4D002C] sm:text-4xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-[#4D002C] sm:text-4xl">
               Contact & Support
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-stone-600">
