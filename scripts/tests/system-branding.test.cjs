@@ -15,6 +15,19 @@ test('the shared branding constant contains the exact official system name', () 
   assert.ok(source.includes('export const SYSTEM_SHORT_NAME = "ProcureMateSU";'));
 });
 
+
+test('landing page brand lockup uses a framed logo, refined gradient wordmark, and compact institutional tagline', () => {
+  const landing = read('components/LandingPage.tsx');
+  const branding = read('lib/system-branding.ts');
+
+  assert.match(landing, /aria-label="ProcureMateSU/);
+  assert.match(landing, /rounded-\[15px\].*border border-\[#F2D28A\]\/45/s);
+  assert.ok(landing.includes('from-white via-[#FFF5E5] to-[#F1E4EF]'));
+  assert.ok(landing.includes('from-[#FFF0B5] via-[#F6C453] to-[#C9871B]'));
+  assert.match(landing, /Digital Procurement Logbook/);
+  assert.match(branding, /SYSTEM_TAGLINE = "MSU – General Santos City"/);
+});
+
 test('the public landing hero follows the requested Digital Procurement headline hierarchy', () => {
   const source = read('components/LandingPage.tsx');
   assert.match(source, /MSU – GENERAL SANTOS CITY/);
