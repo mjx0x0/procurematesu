@@ -60,7 +60,7 @@ function isLegacyProcurementSource(identity: string): boolean {
     return false;
   }
   // The stored document label is "IRR 2016", so recognize both word orders.
-  return /\bra\s*\.?\s*9184\b|local government units procurement manual|\birr\s*2016\b|2016.{0,20}irr|legacy_ra_9184_reference|historical_reference_not_current/i.test(identity);
+  return /\bra\s*\.?\s*9184\b|local government units procurement manual|\birr\s*2016\b|^irr(?:\s|$)|2016.{0,20}irr|legacy_ra_9184_reference|historical_reference_not_current/i.test(identity);
 }
 
 function isCurrentProcurementLawSource(identity: string): boolean {
@@ -252,7 +252,11 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
             .ilike('chunk_text', '%Revised Implementing Rules and Regulations%').limit(4),
           supabase.from('document_chunks').select(selectedColumns)
             .eq('document_name', 'IRR 2016')
-            .ilike('chunk_text', '%Section 1%').limit(4)
+            .ilike('chunk_text', '%Section 1%').limit(4),
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'IRR')
+            .ilike('chunk_text', '%REVISED IMPLEMENTING RULES AND REGULATIONS OF REPUBLIC ACT%')
+            .limit(4)
         );
       }
 
@@ -344,7 +348,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           // Explicit historical questions are source-scoped: only RA 9184 and its
           // 2016 IRR can support the answer. Current RA 12009 excerpts are excluded
           // even when they mention the predecessor law.
-          if (asksHistoricalRa9184 && !['RA 9184', 'IRR 2016'].includes(documentName)) continue;
+          if (asksHistoricalRa9184 && !['RA 9184', 'IRR 2016', 'IRR'].includes(documentName)) continue;
 
           // A current-law status question must be anchored in the official 2025
           // transition circular, not diluted by the historical RA 9184/2016 IRR chunks.

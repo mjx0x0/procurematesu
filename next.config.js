@@ -7,10 +7,7 @@ module.exports = (phase) => {
   return {
     distDir: isDev ? '.next-dev' : '.next',
     reactStrictMode: true,
-    swcMinify: true,
-    experimental: {
-      serverComponentsExternalPackages: ['@xenova/transformers'],
-    },
+    serverExternalPackages: ['@xenova/transformers'],
     async headers() {
       return [
         {

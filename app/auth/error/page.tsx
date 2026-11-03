@@ -4,13 +4,11 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 
 interface AuthErrorPageProps {
-  searchParams?: { [key: string]: string | string[] | undefined } | Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps) {
-  const resolvedParams = searchParams && typeof (searchParams as any).then === "function" 
-    ? await (searchParams as Promise<{ [key: string]: string | string[] | undefined }>)
-    : (searchParams as { [key: string]: string | string[] | undefined } | undefined);
+  const resolvedParams = searchParams ? await searchParams : undefined;
 
   const errorMessage = resolvedParams?.error 
     ? (Array.isArray(resolvedParams.error) ? resolvedParams.error[0] : resolvedParams.error)
