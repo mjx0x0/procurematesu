@@ -113,7 +113,7 @@ export function SystemPageHeader({
             >
               {brandWordmark ? (
                 <span>
-                  <span>Procure</span><span className="text-[#C27803]">M</span><span>ate</span><span className="text-[#C27803]">SU</span>
+                  <span className="bg-gradient-to-r from-[#4D002C] via-[#64113F] to-[#7B0046] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">M</span><span className="bg-gradient-to-r from-[#7B0046] via-[#64113F] to-[#4D002C] bg-clip-text text-transparent">ate</span><span className="bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">SU</span>
                 </span>
               ) : (
                 <>
@@ -128,7 +128,7 @@ export function SystemPageHeader({
                 </>
               )}
             </b>
-            {workspaceLabel && <p className="truncate text-[10px] font-bold uppercase tracking-wider text-[#C27803]">{workspaceLabel}</p>}
+            {workspaceLabel && <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#A16207]">{workspaceLabel}</p>}
           </div>
         </div>
         <div className={`flex shrink-0 items-center justify-end ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-2 sm:gap-3"}`}>
