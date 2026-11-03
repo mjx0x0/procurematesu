@@ -98,7 +98,6 @@ test('landing page sections are ordered About, How It Works, Resources, Transpar
     assert.ok(source.includes(label), 'missing process step: ' + label);
   }
 
-  assert.ok(source.includes('Creating a digital draft does not mean the Procurement Office has officially received the request.'));
 });
 
 test('official resource links use the approved RA 12009 references and GPPB advisory', () => {
@@ -108,12 +107,10 @@ test('official resource links use the approved RA 12009 references and GPPB advi
     'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf',
     'https://www.gppb.gov.ph/circulars/',
     'https://www.gppb.gov.ph/resolutions/',
-    'https://www.gppb.gov.ph/public-advisory-no-09-2026/',
   ]) {
     assert.ok(source.includes(url), 'missing official reference: ' + url);
   }
   assert.match(source, /GPPB Resolution No\. 02-2025/);
-  assert.match(source, /31 March 2026 IRR edition was withdrawn/);
 });
 
 test('PMO contact card shows the temporary STTC location without a university directory link', () => {
@@ -126,6 +123,27 @@ test('PMO contact card shows the temporary STTC location without a university di
   assert.doesNotMatch(source, /https:\/\/msugensan\.edu\.ph\/about\/university-directory\//);
   assert.doesNotMatch(source, /View University Directory/);
   assert.doesNotMatch(source, /Monday\s*-\s*Friday.*\d{1,2}:\d{2}/i);
+});
+
+
+test('the three user-identified landing-page callouts and About statistics are removed', () => {
+  const source = read('components/LandingPage.tsx');
+
+  assert.doesNotMatch(source, /value: "20"/);
+  assert.doesNotMatch(source, /value: "60\+"/);
+  assert.doesNotMatch(source, /label: "Workflow Tracking"/);
+  assert.doesNotMatch(source, /label: "Role-Based Access"/);
+  assert.doesNotMatch(source, /label: "Gab AI Policy Guide"/);
+  assert.doesNotMatch(source, /Creating a digital draft does not mean the Procurement Office has officially received the request/);
+  assert.doesNotMatch(source, /IRR reference reminder/);
+  assert.doesNotMatch(source, /public-advisory-no-09-2026/);
+
+  // The section headings and useful process/resource cards remain available.
+  assert.match(source, /About the Digital Procurement System/);
+  assert.match(source, /How It Works/);
+  assert.match(source, /Submit the Printed Copy/);
+  assert.match(source, /Republic Act No\. 12009/);
+  assert.match(source, /Approved Implementing Rules/);
 });
 
 test('the New PR physical-submission notice now refers to the digital procurement system', () => {
