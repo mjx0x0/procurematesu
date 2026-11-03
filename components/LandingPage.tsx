@@ -57,16 +57,25 @@ export default function LandingPage() {
 
         <header className="fixed inset-x-0 top-0 z-50 border-b border-[#F5AB26]/25 bg-[#4A002A]/90 backdrop-blur-md transition-all shadow-[0_4px_24px_rgba(30,0,18,0.35)]">
           <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between gap-6 px-6 py-3.5 sm:px-8">
-            <Link href="#home" className="flex min-w-0 items-center gap-3.5 group">
-              <MsuLogo size={40} />
-              <div className="min-w-0 leading-tight">
-                <div className="text-sm font-extrabold tracking-tight sm:text-base text-white group-hover:text-amber-200 transition-colors">
-                  Procure<span className="text-amber-200/90 font-black">M</span>ate<span className="text-amber-200/90 font-black">SU</span>
-                </div>
-                <div className="text-[9px] font-normal font-[system-ui] not-italic uppercase tracking-[0.16em] text-amber-200/70">
-                  {SYSTEM_TAGLINE}
-                </div>
-              </div>
+            <Link
+              href="#home"
+              aria-label="ProcureMateSU — MSU General Santos City Digital Procurement Logbook"
+              className="group flex min-w-0 items-center gap-3.5 rounded-2xl py-1.5 pr-3 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F6D58A]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#4A002A]"
+            >
+              <span className="relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-[15px] border border-[#F2D28A]/45 bg-gradient-to-br from-white/15 via-[#E9B957]/10 to-white/[0.04] shadow-[0_5px_18px_rgba(0,0,0,0.2)] ring-1 ring-white/5">
+                <span className="pointer-events-none absolute inset-[3px] rounded-[12px] border border-white/10" />
+                <MsuLogo size={39} className="relative z-10 drop-shadow-[0_2px_5px_rgba(0,0,0,0.2)]" />
+              </span>
+              <span className="min-w-0 leading-none">
+                <span className="flex items-center whitespace-nowrap text-[17px] font-black tracking-[-0.04em] sm:text-[20px]">
+                  <span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">M</span><span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">ate</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">SU</span>
+                </span>
+                <span className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[8px] font-bold uppercase tracking-[0.13em] sm:text-[8.5px]">
+                  <span className="text-[#F6D58A]">{SYSTEM_TAGLINE}</span>
+                  <span className="h-1 w-1 shrink-0 rounded-full bg-[#E9B957] shadow-[0_0_6px_rgba(233,185,87,0.7)]" />
+                  <span className="text-white/75">Digital Procurement Logbook</span>
+                </span>
+              </span>
             </Link>
 
             <nav className="hidden items-center gap-5 text-xs font-bold text-white/90 lg:flex">
