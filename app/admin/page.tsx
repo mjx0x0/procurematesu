@@ -203,7 +203,11 @@ export default function AdminDashboard() {
   const submitAction = async () => {
     if (!selectedPR || !action || busy) return;
     if ((action === "remark" || action === "reject") && !remarks.trim()) { showFeedback("warning", "Remark Required", "Please provide a remark before continuing."); return; }
-    if (action === "complete" && !nextStage(selectedPR)) { showFeedback("info", "Process Complete", "This purchase request has already reached the final stage."); return; }
+    const isFinalWorkflowStage = selectedPR.current_stage === "monitoring_documentation";
+    if (action === "complete" && !nextStage(selectedPR) && !isFinalWorkflowStage) {
+      showFeedback("info", "Process Complete", "This purchase request has already reached the final stage.");
+      return;
+    }
     if (
       action === "complete" &&
       selectedPR.current_stage === "pr_pre_numbering" &&
@@ -221,7 +225,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({
           prNo: selectedPR.pr_no,
           action,
-          newStatus: action === "complete" ? nextStage(selectedPR)?.key : undefined,
+          newStatus: action === "complete" ? (nextStage(selectedPR)?.key || (isFinalWorkflowStage ? "completed" : undefined)) : undefined,
           remarks: remarks.trim(),
           officialPrNo: (action === "complete" && selectedPR.current_stage === "pr_pre_numbering") ? (officialPrInput.trim() || undefined) : undefined,
         })
@@ -239,11 +243,13 @@ export default function AdminDashboard() {
       const nextInfo = action === "complete" && result.newStatus ? STAGES.find((s) => s.key === result.newStatus) : null;
       const finalPrNo = result.officialPrNo || selectedPR.pr_no;
       if (action === "complete") {
-        showFeedback(
-          "success",
-          "Stage Completed Successfully",
-          `${finalPrNo} has been advanced to ${nextInfo ? `Stage ${nextInfo.number}: ${nextInfo.label}` : "the next stage"}.${result.oldPrNo ? ` PR number was updated from ${result.oldPrNo} to official number ${result.officialPrNo}.` : ""}`
-        );
+        const completionMessage = result.newStatus === "completed"
+          ? finalPrNo + " has been marked as Completed."
+          : finalPrNo + " has been advanced to " + (nextInfo ? "Stage " + nextInfo.number + ": " + nextInfo.label : "the next stage") + ".";
+        const renumberMessage = result.oldPrNo
+          ? " PR number was updated from " + result.oldPrNo + " to official number " + result.officialPrNo + "."
+          : "";
+        showFeedback("success", "Stage Completed Successfully", completionMessage + renumberMessage);
       }
       else if (action === "remark") showFeedback("success", "Remark Recorded", `Your procurement remark for ${selectedPR.pr_no} has been recorded.`);
       else showFeedback("success", "Purchase Request Rejected", `${selectedPR.pr_no} has been marked as rejected.`);
@@ -254,9 +260,9 @@ export default function AdminDashboard() {
   const deleteRequest = async () => {
     if (!deletePR) return;
     try {
-      const { error: itemsError } = await supabase.from("pr_items").delete().eq("pr_no", deletePR); if (itemsError) throw itemsError;
-      const { error: historyError } = await supabase.from("pr_stages_completed").delete().eq("pr_no", deletePR); if (historyError) throw historyError;
-      const { error } = await supabase.from("purchase_requests").delete().eq("pr_no", deletePR); if (error) throw error;
+      // Existing ON DELETE CASCADE foreign keys remove the child rows atomically.
+      const { error } = await supabase.from("purchase_requests").delete().eq("pr_no", deletePR);
+      if (error) throw error;
       const deleted = deletePR;
       setDeletePR(null);
       if (selectedPR?.pr_no === deleted) {
