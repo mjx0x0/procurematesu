@@ -143,10 +143,11 @@ export default function DashboardPage() {
   return (
     <div className="app-theme min-h-[100svh] overflow-x-hidden bg-[#F7F5F2] text-[#302725] dashboard-page">
       <SystemPageHeader
-        titlePrimary="MSU - General Santos Digital Procurement"
-        titleAccent="Logbook & Inquiry System"
+        titlePrimary="ProcureMateSU"
+        titleAccent=""
         workspaceLabel="End User Workspace"
         brandLogo
+        brandWordmark
         backHref={null}
         roleLabel={isAdmin ? "Administrator" : "Requisitioner"}
         showAdminPortal={isAdmin}
