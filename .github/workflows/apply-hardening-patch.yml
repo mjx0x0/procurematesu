@@ -23,12 +23,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           base64 -d scripts/.apply-hardening.patch.b64 > /tmp/hardening.patch.gz
           gzip -dc /tmp/hardening.patch.gz > /tmp/hardening.patch
           git am --3way /tmp/hardening.patch
           rm -f scripts/.apply-hardening.patch.b64 .github/workflows/apply-hardening-patch.yml
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Remove temporary patch transfer files"
           git push origin HEAD:fix/security-and-workflow-hardening-2026-11
