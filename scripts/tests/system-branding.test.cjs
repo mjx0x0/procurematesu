@@ -61,9 +61,25 @@ test('sign-in, registration, logo accessibility, loading and workspace labels ar
   for (const source of [login, signup, logo, dashboard, admin, purchaseRequests, chatbot, loading]) {
     assert.match(source, /SYSTEM_NAME/);
   }
-  assert.match(dashboard, /titleAccent="Logbook & Inquiry System"/);
-  assert.match(admin, /titleAccent="Logbook & Inquiry System"/);
+  assert.match(dashboard, /brandWordmark/);
+  assert.match(dashboard, /workspaceLabel="End User Workspace"/);
+  assert.match(admin, /brandWordmark/);
+  assert.match(admin, /workspaceLabel="Administrator Workspace"/);
   assert.match(login, /Sign in to the \{SYSTEM_NAME\}/);
+});
+
+test('main dashboard headers show the ProcureMateSU wordmark with MSU letters highlighted and role-specific workspace labels', () => {
+  const header = read('components/dashboard/SystemPageHeader.tsx');
+  const dashboard = read('app/dashboard/page.tsx');
+  const admin = read('app/admin/page.tsx');
+
+  assert.match(header, /brandWordmark\?: boolean/);
+  assert.match(header, /aria-label=\{brandWordmark \? "ProcureMateSU"/);
+  assert.match(header, /<span>Procure<\/span><span className="text-\[#C27803\]">M<\/span><span>ate<\/span><span className="text-\[#C27803\]">SU<\/span>/);
+  assert.match(dashboard, /workspaceLabel="End User Workspace"/);
+  assert.match(admin, /workspaceLabel="Administrator Workspace"/);
+  assert.match(dashboard, /brandWordmark/);
+  assert.match(admin, /brandWordmark/);
 });
 
 test('the short ProcureMateSU wordmark and Gab AI assistant identity remain separate', () => {
