@@ -28,16 +28,19 @@ test('landing page brand lockup uses a framed logo, refined gradient wordmark, a
   assert.ok(landing.includes('grid h-11 w-11 shrink-0 place-items-center'));
   assert.ok(landing.includes('<MsuLogo size={35}'));
   assert.match(landing, /Digital Procurement Logbook/);
-  assert.match(branding, /SYSTEM_TAGLINE = "MSU – General Santos City"/);
+  assert.match(branding, /SYSTEM_TAGLINE = "MSU – General Santos"/);
 });
 
 test('the public landing hero follows the requested Digital Procurement headline hierarchy', () => {
   const source = read('components/LandingPage.tsx');
-  assert.match(source, /MSU – GENERAL SANTOS CITY/);
+  assert.match(source, /MSU – GENERAL SANTOS/);
   assert.match(source, /Digital Procurement/);
   assert.match(source, /Logbook &amp; Inquiry System/);
   assert.match(source, /SYSTEM_DESCRIPTION/);
   assert.match(source, /SYSTEM_TAGLINE/);
+  assert.match(source, /MSU – GENERAL SANTOS/);
+  assert.doesNotMatch(source, /MSU – GENERAL SANTOS CITY/);
+  assert.doesNotMatch(source, /MSU General Santos City Digital Procurement Logbook/);
   assert.match(source, /SYSTEM_NAME/);
 });
 
@@ -82,6 +85,8 @@ test('sign-in, registration, logo accessibility, loading and workspace labels ar
   assert.match(admin, /brandWordmark/);
   assert.match(admin, /workspaceLabel="Administrator Workspace"/);
   assert.match(login, /Sign in to the \{SYSTEM_NAME\}/);
+  assert.match(logo, /General Santos/);
+  assert.doesNotMatch(logo, /General Santos City/);
 });
 
 test('main dashboard headers show the ProcureMateSU wordmark with MSU letters highlighted and role-specific workspace labels', () => {
