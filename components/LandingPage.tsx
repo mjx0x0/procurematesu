@@ -145,7 +145,7 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.55, ease: "easeOut" }}
-              className="text-sm leading-relaxed text-stone-600 sm:text-base"
+              className="text-justify text-sm leading-relaxed text-stone-600 sm:text-base"
             >
               <p>
                 The <strong className="font-extrabold text-[#4D002C]">{SYSTEM_NAME}</strong> provides Mindanao State University - General Santos personnel with an integrated institutional platform for Purchase Request preparation, procurement workflow monitoring, transparency disclosures, and procurement policy assistance.
