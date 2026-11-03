@@ -56,15 +56,15 @@ export default function LandingPage() {
         <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(#F5AB26_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
 
         <header className="fixed inset-x-0 top-0 z-50 border-b border-[#F5AB26]/25 bg-[#4A002A]/90 backdrop-blur-md transition-all shadow-[0_4px_24px_rgba(30,0,18,0.35)]">
-          <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between gap-6 px-6 py-3.5 sm:px-8">
+          <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between gap-6 px-6 py-2.5 sm:px-8">
             <Link
               href="#home"
               aria-label="ProcureMateSU — MSU General Santos City Digital Procurement Logbook"
-              className="group flex min-w-0 items-center gap-3.5 rounded-2xl py-1.5 pr-3 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F6D58A]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#4A002A]"
+              className="group flex min-w-0 items-center gap-3 rounded-2xl py-1 pr-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F6D58A]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#4A002A]"
             >
-              <span className="relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-[15px] border border-[#F2D28A]/45 bg-gradient-to-br from-white/15 via-[#E9B957]/10 to-white/[0.04] shadow-[0_5px_18px_rgba(0,0,0,0.2)] ring-1 ring-white/5">
-                <span className="pointer-events-none absolute inset-[3px] rounded-[12px] border border-white/10" />
-                <MsuLogo size={39} className="relative z-10 drop-shadow-[0_2px_5px_rgba(0,0,0,0.2)]" />
+              <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-[#F2D28A]/45 bg-gradient-to-br from-white/15 via-[#E9B957]/10 to-white/[0.04] shadow-[0_5px_18px_rgba(0,0,0,0.2)] ring-1 ring-white/5">
+                <span className="pointer-events-none absolute inset-[3px] rounded-[11px] border border-white/10" />
+                <MsuLogo size={35} className="relative z-10 drop-shadow-[0_2px_5px_rgba(0,0,0,0.2)]" />
               </span>
               <span className="min-w-0 leading-none">
                 <span className="flex items-center whitespace-nowrap text-[17px] font-black tracking-[-0.04em] sm:text-[20px]">
