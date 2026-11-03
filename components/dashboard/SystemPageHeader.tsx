@@ -15,6 +15,7 @@ interface SystemPageHeaderProps {
   containerClassName?: string;
   workspaceLabel?: string;
   brandLogo?: boolean;
+  brandWordmark?: boolean;
   roleLabel?: string;
   showAdminPortal?: boolean;
   compactOnMobile?: boolean;
@@ -31,6 +32,7 @@ export function SystemPageHeader({
   containerClassName = "max-w-7xl px-4 sm:px-6 lg:px-8",
   workspaceLabel,
   brandLogo = false,
+  brandWordmark = false,
   roleLabel = "End User",
   showAdminPortal = false,
   compactOnMobile = false,
@@ -105,15 +107,26 @@ export function SystemPageHeader({
             </div>
           ) : null}
           <div className="min-w-0">
-            <b className={`block truncate ${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} font-black leading-tight tracking-tight text-[#4D002C]`}>
-              {compactOnMobile && (
-                <span className="sm:hidden">
-                  {mobileTitlePrimary ?? titlePrimary} <span className="text-[#C27803]">{mobileTitleAccent ?? titleAccent}</span>
+            <b
+              aria-label={brandWordmark ? "ProcureMateSU" : undefined}
+              className={`block truncate ${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} font-black leading-tight tracking-tight text-[#4D002C]`}
+            >
+              {brandWordmark ? (
+                <span>
+                  <span>Procure</span><span className="text-[#C27803]">M</span><span>ate</span><span className="text-[#C27803]">SU</span>
                 </span>
+              ) : (
+                <>
+                  {compactOnMobile && (
+                    <span className="sm:hidden">
+                      {mobileTitlePrimary ?? titlePrimary} <span className="text-[#C27803]">{mobileTitleAccent ?? titleAccent}</span>
+                    </span>
+                  )}
+                  <span className={compactOnMobile ? "hidden sm:inline" : ""}>
+                    {titlePrimary} <span className="text-[#C27803]">{titleAccent}</span>
+                  </span>
+                </>
               )}
-              <span className={compactOnMobile ? "hidden sm:inline" : ""}>
-                {titlePrimary} <span className="text-[#C27803]">{titleAccent}</span>
-              </span>
             </b>
             {workspaceLabel && <p className="truncate text-[10px] font-bold uppercase tracking-wider text-[#C27803]">{workspaceLabel}</p>}
           </div>
