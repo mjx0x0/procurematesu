@@ -171,7 +171,7 @@ export default function PRDetailPage() {
         <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="max-w-5xl px-4" />
       </div>
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-8 print:max-w-none print:w-full print:px-0 print:py-0">
         <div className="rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6 print:hidden">
           <div className="min-w-0 flex-1 space-y-2.5">
             <div className="flex items-center gap-3 flex-wrap">
@@ -225,8 +225,8 @@ export default function PRDetailPage() {
 
         {error && <div className="mb-5 bg-red-50 border border-red-200 text-red-700 p-3.5 rounded-xl text-xs font-medium">{error}</div>}
 
-        <section className="bg-white rounded-2xl shadow-xs border border-stone-300 p-4 sm:p-8 overflow-x-auto print:p-0 print:border-0 print:shadow-none">
-          <div className="min-w-[700px] border-2 border-black text-black bg-white">
+        <section className="bg-white rounded-2xl shadow-xs border border-stone-300 p-4 sm:p-8 overflow-x-auto print:w-full print:min-w-0 print:overflow-visible print:p-0 print:border-0 print:shadow-none">
+          <div className="min-w-[700px] border-2 border-black text-black bg-white print:w-full print:min-w-0 print:box-border">
             <div className="border-b-2 border-black text-center py-3 px-4">
               <h2 className="text-xl font-black uppercase tracking-wider font-serif">PURCHASE REQUEST</h2>
               <p className="text-sm font-bold mt-0.5 tracking-wide font-serif">MINDANAO STATE UNIVERSITY - General Santos City</p>
