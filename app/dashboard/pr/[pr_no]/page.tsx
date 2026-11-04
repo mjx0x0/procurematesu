@@ -167,10 +167,12 @@ export default function PRDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="max-w-5xl px-4" />
+      <div className="print:hidden">
+        <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="max-w-5xl px-4" />
+      </div>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
-        <div className="rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6 print:border-none print:shadow-none print:p-0 print:mb-4">
+        <div className="rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6 print:hidden">
           <div className="min-w-0 flex-1 space-y-2.5">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-black text-[#4D002C] font-mono tracking-tight">
