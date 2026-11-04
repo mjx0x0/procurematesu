@@ -671,39 +671,39 @@ export default function ChatbotDashboard() {
               return (
                 <div
                   key={s.id}
-                  className={`group relative flex items-center rounded-xl transition-colors ${
+                  className={`group relative flex items-center rounded-xl transition-all duration-150 ${
                     isCurrent
-                      ? "bg-[#FAF5FA] text-[#4D002C]"
-                      : "text-stone-700 hover:bg-stone-50"
+                      ? "bg-[#7B0046]/10 border border-[#7B0046]/30 shadow-xs"
+                      : "border border-transparent text-stone-700 hover:bg-stone-100/80 hover:text-stone-900"
                   }`}
                 >
                   <button
                     onClick={() => selectSession(s.id)}
-                    className="flex-1 min-w-0 text-left px-3 py-2.5 pr-4"
+                    className="flex-1 min-w-0 text-left px-3.5 py-2.5"
                   >
                     <p
                       className={`text-xs truncate ${
-                        isCurrent ? "font-bold text-[#4D002C]" : "font-semibold text-stone-800"
+                        isCurrent ? "font-bold text-[#5C0034]" : "font-semibold text-stone-800"
                       }`}
                     >
                       {s.title || "New conversation"}
                     </p>
-                    <p className="text-[11px] text-stone-400 mt-0.5">
+                    <p
+                      className={`text-[11px] mt-0.5 ${
+                        isCurrent ? "text-[#7B0046]/80 font-medium" : "text-stone-400"
+                      }`}
+                    >
                       {formatSessionDate(s.created_at || s.updated_at)}
                     </p>
                   </button>
-                  {isCurrent && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-7 bg-[#7B0046] rounded-l-full"
-                    />
-                  )}
                   <button
                     onClick={() => setDeleteId(s.id)}
                     title="Delete chat"
                     aria-label="Delete chat"
-                    className={`opacity-0 group-hover:opacity-100 p-2 text-stone-400 hover:text-red-600 transition-opacity rounded-lg hover:bg-black/5 shrink-0 ${
-                      isCurrent ? "mr-2.5" : "mr-1"
+                    className={`opacity-0 group-hover:opacity-100 p-2 transition-opacity rounded-lg shrink-0 mr-1.5 ${
+                      isCurrent
+                        ? "text-stone-500 hover:text-red-600 hover:bg-[#7B0046]/15"
+                        : "text-stone-400 hover:text-red-600 hover:bg-stone-200/60"
                     }`}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -763,33 +763,31 @@ export default function ChatbotDashboard() {
                   return (
                     <div
                       key={s.id}
-                      className={`group relative flex items-center rounded-xl transition-colors ${
+                      className={`group relative flex items-center rounded-xl transition-all duration-150 ${
                         isCurrent
-                          ? "bg-[#FAF5FA] text-[#4D002C]"
-                          : "text-stone-700 hover:bg-stone-50"
+                          ? "bg-[#7B0046]/10 border border-[#7B0046]/30 shadow-xs"
+                          : "border border-transparent text-stone-700 hover:bg-stone-100/80 hover:text-stone-900"
                       }`}
                     >
                       <button
                         onClick={() => selectSession(s.id)}
-                        className="flex-1 min-w-0 text-left px-3 py-2.5 pr-4"
+                        className="flex-1 min-w-0 text-left px-3.5 py-2.5"
                       >
                         <p
                           className={`text-xs truncate ${
-                            isCurrent ? "font-bold text-[#4D002C]" : "font-semibold text-stone-800"
+                            isCurrent ? "font-bold text-[#5C0034]" : "font-semibold text-stone-800"
                           }`}
                         >
                           {s.title || "New conversation"}
                         </p>
-                        <p className="text-[11px] text-stone-400 mt-0.5">
+                        <p
+                          className={`text-[11px] mt-0.5 ${
+                            isCurrent ? "text-[#7B0046]/80 font-medium" : "text-stone-400"
+                          }`}
+                        >
                           {formatSessionDate(s.created_at || s.updated_at)}
                         </p>
                       </button>
-                      {isCurrent && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-7 bg-[#7B0046] rounded-l-full"
-                        />
-                      )}
                       <button
                         onClick={() => {
                           setMobileHistoryOpen(false);
@@ -797,8 +795,10 @@ export default function ChatbotDashboard() {
                         }}
                         title="Delete chat"
                         aria-label="Delete chat"
-                        className={`p-2 text-stone-400 hover:text-red-600 rounded-lg ${
-                          isCurrent ? "mr-2.5" : "mr-1"
+                        className={`p-2 rounded-lg shrink-0 mr-1.5 transition-colors ${
+                          isCurrent
+                            ? "text-stone-500 hover:text-red-600 hover:bg-[#7B0046]/15"
+                            : "text-stone-400 hover:text-red-600 hover:bg-stone-200/60"
                         }`}
                       >
                         <Trash2 className="h-3.5 w-3.5" />

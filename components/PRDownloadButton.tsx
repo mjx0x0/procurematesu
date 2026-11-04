@@ -32,7 +32,15 @@ interface PRItem {
   total_cost: number;
 }
 
-export default function PRDownloadButton({ pr, items = [] }: { pr: PRData; items?: PRItem[] }) {
+export default function PRDownloadButton({
+  pr,
+  items = [],
+  className = "",
+}: {
+  pr: PRData;
+  items?: PRItem[];
+  className?: string;
+}) {
   const [downloading, setDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
@@ -85,14 +93,14 @@ export default function PRDownloadButton({ pr, items = [] }: { pr: PRData; items
   };
 
   return (
-    <div className="relative">
+    <div className={`relative ${className}`}>
       <button
         type="button"
         onClick={handleDownload}
         disabled={downloading}
-        className="ui-button ui-button-primary text-xs sm:text-sm shadow-xs"
+        className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#5A0033] hover:from-[#6B003D] hover:to-[#4A002A] text-white px-4 text-xs sm:text-sm font-semibold shadow-xs transition active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
       >
-        {downloading ? <Loader2 className="h-4 w-4 animate-spin text-amber-300" /> : <FileDown className="h-4 w-4 text-amber-300" />}
+        {downloading ? <Loader2 className="h-4 w-4 animate-spin text-amber-300 shrink-0" /> : <FileDown className="h-4 w-4 text-amber-300 shrink-0" />}
         <span>{downloading ? "Generating PR..." : "Download PR Form"}</span>
       </button>
       {downloadError && (

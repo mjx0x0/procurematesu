@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle, Clock, Eye, FileText, Filter, Loader2, PlusCircle, Printer, Search } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, Eye, FileText, Filter, Loader2, PlusCircle, Printer, Search } from "lucide-react";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, PROCUREMENT_STAGE_SHORT_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
@@ -49,7 +49,23 @@ export default function PurchaseRequestsPage() {
   const [prs, setPrs] = useState<PurchaseRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [stageFilter, setStageFilter] = useState<"all" | "approved" | "under_review" | "completed">("all");
+  const [stageFilter, setStageFilter] = useState<"all" | "draft" | "under_review" | "approved" | "completed">("all");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const stageParam = params.get("stage");
+      if (stageParam === "draft") {
+        setStageFilter("draft");
+      } else if (stageParam === "under_review") {
+        setStageFilter("under_review");
+      } else if (stageParam === "approved") {
+        setStageFilter("approved");
+      } else if (stageParam === "completed") {
+        setStageFilter("completed");
+      }
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -90,20 +106,24 @@ export default function PurchaseRequestsPage() {
 
   const counts = useMemo(() => {
     const total = prs.length;
+    const drafts = prs.filter((p) => p.current_stage === "draft").length;
     const approved = prs.filter((p) => isApprovedStage(p.current_stage) && p.current_stage !== "completed").length;
-    const underReview = prs.filter((p) => !isApprovedStage(p.current_stage) && !TERMINAL_STAGES.includes(p.current_stage)).length;
+    const underReview = prs.filter((p) => p.current_stage !== "draft" && !isApprovedStage(p.current_stage) && !TERMINAL_STAGES.includes(p.current_stage)).length;
     const completed = prs.filter((p) => p.current_stage === "completed").length;
-    return { total, approved, underReview, completed };
+    return { total, drafts, approved, underReview, completed };
   }, [prs]);
 
   const filteredPrs = useMemo(() => {
     const q = query.trim().toLowerCase();
     return prs.filter((pr) => {
       // Filter by tab
+      if (stageFilter === "draft" && pr.current_stage !== "draft") {
+        return false;
+      }
       if (stageFilter === "approved" && (!isApprovedStage(pr.current_stage) || pr.current_stage === "completed")) {
         return false;
       }
-      if (stageFilter === "under_review" && (isApprovedStage(pr.current_stage) || TERMINAL_STAGES.includes(pr.current_stage))) {
+      if (stageFilter === "under_review" && (pr.current_stage === "draft" || isApprovedStage(pr.current_stage) || TERMINAL_STAGES.includes(pr.current_stage))) {
         return false;
       }
       if (stageFilter === "completed" && pr.current_stage !== "completed") {
@@ -166,7 +186,7 @@ export default function PurchaseRequestsPage() {
         </section>
 
         {/* Overview Stats Bar */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4 mb-6">
           <button
             type="button"
             onClick={() => setStageFilter("all")}
@@ -183,8 +203,27 @@ export default function PurchaseRequestsPage() {
 
           <button
             type="button"
+            onClick={() => setStageFilter("draft")}
+            className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${
+              stageFilter === "draft"
+                ? "border-amber-600 bg-white shadow-sm ring-2 ring-amber-500/20"
+                : "border-amber-200/90 bg-amber-50/40 hover:border-amber-300"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-wider text-amber-800">Draft PRs</p>
+              {counts.drafts > 0 && (
+                <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+              )}
+            </div>
+            <p className="mt-1 text-2xl sm:text-3xl font-black text-amber-800">{counts.drafts}</p>
+            <p className="text-[11px] text-amber-800/90 font-medium mt-0.5">To submit physically</p>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setStageFilter("under_review")}
-            className={`rounded-xl border p-4 text-left transition-all ${
+            className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${
               stageFilter === "under_review"
                 ? "border-[#C27803] bg-white shadow-sm ring-2 ring-[#C27803]/20"
                 : "border-stone-200 bg-white hover:border-stone-300"
@@ -198,7 +237,7 @@ export default function PurchaseRequestsPage() {
           <button
             type="button"
             onClick={() => setStageFilter("approved")}
-            className={`rounded-xl border p-4 text-left transition-all ${
+            className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${
               stageFilter === "approved"
                 ? "border-blue-600 bg-white shadow-sm ring-2 ring-blue-500/20"
                 : "border-stone-200 bg-white hover:border-stone-300"
@@ -212,7 +251,7 @@ export default function PurchaseRequestsPage() {
           <button
             type="button"
             onClick={() => setStageFilter("completed")}
-            className={`rounded-xl border p-4 text-left transition-all ${
+            className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${
               stageFilter === "completed"
                 ? "border-emerald-600 bg-white shadow-sm ring-2 ring-emerald-500/20"
                 : "border-stone-200 bg-white hover:border-stone-300"
@@ -244,8 +283,19 @@ export default function PurchaseRequestsPage() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => setStageFilter("draft")}
+                  className={`flex-none whitespace-nowrap px-2.5 py-2 sm:px-3 sm:py-1.5 rounded-lg text-xs transition-all ${
+                    stageFilter === "draft"
+                      ? "bg-white text-amber-900 font-bold shadow-xs border border-amber-300 ring-1 ring-amber-400/40"
+                      : "text-amber-800 hover:text-amber-950 font-semibold"
+                  }`}
+                >
+                  Draft PRs ({counts.drafts})
+                </button>
+                <button
+                  type="button"
                   onClick={() => setStageFilter("under_review")}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  className={`flex-none whitespace-nowrap px-2.5 py-2 sm:px-3 sm:py-1.5 rounded-lg text-xs transition-all ${
                     stageFilter === "under_review"
                       ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
                       : "text-stone-600 hover:text-stone-900 font-semibold"
@@ -256,7 +306,7 @@ export default function PurchaseRequestsPage() {
                 <button
                   type="button"
                   onClick={() => setStageFilter("approved")}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  className={`flex-none whitespace-nowrap px-2.5 py-2 sm:px-3 sm:py-1.5 rounded-lg text-xs transition-all ${
                     stageFilter === "approved"
                       ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
                       : "text-stone-600 hover:text-stone-900 font-semibold"
@@ -267,7 +317,7 @@ export default function PurchaseRequestsPage() {
                 <button
                   type="button"
                   onClick={() => setStageFilter("completed")}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  className={`flex-none whitespace-nowrap px-2.5 py-2 sm:px-3 sm:py-1.5 rounded-lg text-xs transition-all ${
                     stageFilter === "completed"
                       ? "bg-white text-[#4D002C] font-bold shadow-xs border border-stone-200/60"
                       : "text-stone-600 hover:text-stone-900 font-semibold"
@@ -291,16 +341,41 @@ export default function PurchaseRequestsPage() {
             </div>
           </div>
 
+          {/* Draft PR Physical Submission Notice Banner */}
+          {stageFilter === "draft" && (
+            <div className="border-b border-amber-200/90 bg-gradient-to-r from-amber-50 via-amber-50/70 to-stone-50 px-4 py-3.5 sm:px-6">
+              <div className="flex items-start gap-3">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-800 border border-amber-300">
+                  <AlertCircle className="h-4 w-4" />
+                </div>
+                <div className="text-xs leading-relaxed text-amber-950">
+                  <p className="font-bold text-amber-900">
+                    Draft Purchase Requests Awaiting Physical Submission
+                  </p>
+                  <p className="mt-0.5 text-stone-700">
+                    These PRs are drafted and saved online. Requisitioners must print the official PR form (using the Print button below) and physically submit it with required attachments (PPMP/APP reference, specifications) to the Procurement Management Office (PMO) to begin official verification.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* List of PRs */}
           {filteredPrs.length === 0 ? (
             <div className="p-12 text-center">
               <FileText className="mx-auto h-12 w-12 text-stone-300" />
               <h3 className="mt-3 text-sm sm:text-base font-bold text-stone-800">
-                {query ? "No matching purchase requests found" : "No purchase requests in this section"}
+                {query
+                  ? "No matching purchase requests found"
+                  : stageFilter === "draft"
+                  ? "No draft purchase requests awaiting submission"
+                  : "No purchase requests in this section"}
               </h3>
               <p className="mx-auto mt-1 max-w-sm text-xs text-stone-500 leading-relaxed">
                 {query
                   ? "Try searching for a different keyword or clearing the search filter."
+                  : stageFilter === "draft"
+                  ? "All your created purchase requests have been submitted or you have not drafted a new request yet."
                   : "Submit a new procurement request to track its progress through university approval."}
               </p>
               {query ? (
@@ -340,6 +415,8 @@ export default function PurchaseRequestsPage() {
                             ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                             : isApproved
                             ? "border-[#7B0046]/15 bg-[#7B0046]/5 text-[#7B0046]"
+                            : pr.current_stage === "draft"
+                            ? "border-amber-300 bg-amber-50 text-amber-800"
                             : "border-amber-200 bg-amber-50 text-amber-700"
                         }`}
                       >
@@ -347,6 +424,8 @@ export default function PurchaseRequestsPage() {
                           <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                         ) : isApproved ? (
                           <CheckCircle className="h-5 w-5" />
+                        ) : pr.current_stage === "draft" ? (
+                          <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-amber-800" />
                         ) : (
                           <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
                         )}
@@ -369,11 +448,11 @@ export default function PurchaseRequestsPage() {
                                 : isApproved
                                 ? "bg-stone-100 text-stone-700 border-stone-200"
                                 : pr.current_stage === "draft"
-                                ? "bg-stone-100 text-stone-700 border-stone-200"
+                                ? "bg-amber-100 text-amber-900 border-amber-300"
                                 : "bg-amber-50 text-amber-800 border-amber-200/70"
                             }`}
                           >
-                            {isDone ? "Completed" : isApproved ? "Approved" : pr.current_stage === "draft" ? "Draft" : "Under Review"}
+                            {isDone ? "Completed" : isApproved ? "Approved" : pr.current_stage === "draft" ? "Draft · Submit Physically" : "Under Review"}
                           </span>
                           <span className="text-[11px] sm:text-xs text-stone-400 font-medium">
                             · {new Date(pr.created_at).toLocaleDateString("en-PH", {
@@ -390,6 +469,12 @@ export default function PurchaseRequestsPage() {
                         <p className="mt-0.5 text-[11px] sm:text-xs text-stone-500 font-medium">
                           {pr.department || "University Office"}
                         </p>
+                        {pr.current_stage === "draft" && (
+                          <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-medium text-amber-800">
+                            <AlertCircle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+                            <span>Action needed: Print official form &amp; physically submit to Procurement Office</span>
+                          </div>
+                        )}
                         <div className="mt-2 sm:hidden">
                           <span
                             className={`inline-flex max-w-full items-center rounded-lg border px-2 py-1 text-[11px] font-semibold leading-snug ${statusColor(pr.current_stage)}`}
@@ -429,11 +514,16 @@ export default function PurchaseRequestsPage() {
                         </Link>
                         <Link
                           href={`/dashboard/pr-print?id=${pr.pr_no}`}
-                          className="inline-flex min-h-10 min-w-10 items-center justify-center gap-1 px-2.5 py-2 rounded-xl border border-stone-200 bg-white text-stone-700 text-xs font-bold hover:bg-stone-50 transition-colors"
-                          title="Print PR Form"
+                          className={`inline-flex min-h-10 items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl border text-xs font-bold transition-colors ${
+                            pr.current_stage === "draft"
+                              ? "border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 shadow-xs"
+                              : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
+                          }`}
+                          title="Print PR Form to physically submit to Procurement Office"
                           aria-label={`Print purchase request ${pr.pr_no}`}
                         >
                           <Printer className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">Print PR</span>
                         </Link>
                       </div>
                     </div>

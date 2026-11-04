@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase/client";
 import PRDownloadButton from "@/components/PRDownloadButton";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, getFormDisplayPrNumber } from "@/lib/procurement-process";
-import { CheckCircle, Clock, FileCheck, Loader2, XCircle } from "lucide-react";
+import { AlertCircle, Building2, Calendar, CheckCircle, Clock, FileCheck, Loader2, MessageSquare, Printer, XCircle } from "lucide-react";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -108,7 +108,14 @@ export default function PRDetailPage() {
   }, [prNo, router]);
 
   const statusLabel = (status: string) => PROCUREMENT_STAGE_LABELS[status] || ({ completed: "Completed", rejected: "Rejected", cancelled: "Cancelled" } as Record<string, string>)[status] || status;
-  const statusClass = (status: string) => status === "completed" ? "bg-green-100 text-green-700" : status === "rejected" || status === "cancelled" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700";
+  const statusClass = (status: string) => {
+    if (status === "draft") return "bg-stone-100 text-stone-700 border-stone-200";
+    if (status === "completed") return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    if (status === "rejected" || status === "cancelled") return "bg-red-50 text-red-700 border-red-200";
+    const num = PROCUREMENT_STAGES.find((s) => s.key === status)?.number;
+    if (num !== undefined && num >= 4) return "bg-blue-50 text-blue-700 border-blue-200";
+    return "bg-amber-50 text-amber-800 border-amber-200";
+  };
   const totalAmount = items.reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
 
   const timelineGroups: TimelineGroup[] = (() => {
@@ -163,38 +170,54 @@ export default function PRDetailPage() {
       <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="max-w-5xl px-4" />
 
       <main className="max-w-5xl mx-auto px-4 py-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-stone-200">
-          <div>
+        <div className="rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6 print:border-none print:shadow-none print:p-0 print:mb-4">
+          <div className="min-w-0 flex-1 space-y-2.5">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-black text-[#4D002C] font-mono tracking-tight">
                 {pr.pr_no}
               </h1>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClass(pr.current_stage)}`}>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${statusClass(pr.current_stage)}`}>
+                <span className="h-1.5 w-1.5 rounded-full bg-current" />
                 {statusLabel(pr.current_stage)}
               </span>
             </div>
-            <div className="flex items-center gap-2 mt-1 text-xs text-stone-500 font-medium">
-              <span>Department: <strong className="text-stone-800">{pr.department}</strong></span>
-              <span>•</span>
-              <span>Created on {new Date(pr.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+            <div className="flex items-center gap-x-4 gap-y-1.5 text-xs text-stone-600 font-medium flex-wrap">
+              <span className="inline-flex items-center gap-1.5">
+                <Building2 className="h-3.5 w-3.5 text-stone-400" />
+                <span>Department: <strong className="text-stone-800 font-semibold">{pr.department}</strong></span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5 text-stone-400" />
+                <span>Created on {new Date(pr.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+              </span>
+              {totalAmount > 0 && (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="text-stone-400 font-mono font-bold">₱</span>
+                  <span>Total: <strong className="text-[#4D002C] font-bold">₱{totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
+                </span>
+              )}
             </div>
             {pr.pr_no?.includes("TEMP") && (
-              <div className="mt-3 bg-amber-50/90 border border-amber-300 text-amber-950 p-3 rounded-xl text-xs flex items-start gap-2.5">
-                <span className="font-bold text-sm">ℹ️</span>
-                <p className="leading-relaxed">
-                  <strong>Temporary Tracking Number:</strong> This request is currently assigned a temporary PR number (<code>{pr.pr_no}</code>). The official university PR control number will be assigned by the Procurement Office at <strong>Step 4 (Pre-Numbering and Control of PRs)</strong> and will update automatically here.
-                </p>
+              <div className="pt-1">
+                <div className="bg-amber-50/80 border border-amber-200/90 text-amber-950 p-3 sm:p-3.5 rounded-xl text-xs flex items-start gap-2.5 leading-relaxed">
+                  <AlertCircle className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+                  <p>
+                    <strong className="font-bold text-amber-900">Temporary Tracking Number:</strong> This request is currently assigned a temporary PR number (<code>{pr.pr_no}</code>). The official university PR control number will be assigned by the Procurement Office at <strong className="font-bold text-amber-900">Step 4 (Pre-Numbering and Control of PRs)</strong> and will update automatically here.
+                  </p>
+                </div>
               </div>
             )}
           </div>
-          <div className="flex gap-2.5 flex-wrap items-center">
-            <PRDownloadButton pr={pr} items={items} />
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap sm:flex-nowrap shrink-0 self-start lg:self-center">
             <button
+              type="button"
               onClick={() => window.print()}
-              className="ui-button ui-button-secondary text-xs sm:text-sm font-semibold print:hidden"
+              className="inline-flex items-center justify-center gap-2 h-10 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 hover:border-stone-400 text-stone-700 px-4 text-xs sm:text-sm font-semibold shadow-xs transition active:scale-[0.98] print:hidden whitespace-nowrap"
             >
-              Print
+              <Printer className="h-4 w-4 text-stone-600 shrink-0" />
+              <span>Print Form</span>
             </button>
+            <PRDownloadButton pr={pr} items={items} />
           </div>
         </div>
 
@@ -274,70 +297,100 @@ export default function PRDetailPage() {
           )}
         </section>
 
-        <div className="pr-timeline bg-white rounded-xl p-6 shadow-sm border border-stone-200 mt-8 mb-8 print:hidden">
-          <div className="flex items-end justify-between gap-4 pb-4 mb-5 border-b border-stone-200">
-            <div>
-              <h3 className="font-bold text-[#4D002C] flex items-center gap-2"><Clock className="h-5 w-5 text-[#7B0046]" />Processing Timeline</h3>
+        <div className="pr-timeline rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-7 shadow-[0_2px_12px_rgba(0,0,0,0.03)] mt-8 mb-8 print:hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-stone-200/80">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046] border border-[#7B0046]/15">
+                <Clock className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-[#4D002C] tracking-tight">Processing Timeline</h3>
+                <p className="text-xs text-stone-500">Official log of completed procurement stages and office remarks</p>
+              </div>
             </div>
-            <div className="hidden sm:flex items-center gap-2 rounded-full border border-[#D8C58E] bg-[#FBF7EA] px-3 py-1.5 text-[9px] font-extrabold tracking-[0.16em] text-[#8E6A08] uppercase">
-              <span>{timelineGroups.length}</span> recorded stage{timelineGroups.length === 1 ? "" : "s"}
+            <div className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border border-stone-200 bg-stone-50 px-3 py-1 text-xs font-semibold text-stone-600">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              <span>{timelineGroups.length} recorded milestone{timelineGroups.length === 1 ? "" : "s"}</span>
             </div>
           </div>
 
           {stages.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-stone-300 bg-stone-50 py-10 text-center text-sm text-stone-500">No stages recorded yet.</div>
+            <div className="rounded-xl border border-dashed border-stone-200 bg-stone-50/60 py-12 px-4 text-center">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-stone-100 text-stone-400 mb-3">
+                <Clock className="h-5 w-5" />
+              </div>
+              <p className="text-sm font-semibold text-stone-700">No timeline entries recorded yet</p>
+              <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">Milestones will appear here automatically as your purchase request progresses through the procurement workflow.</p>
+            </div>
           ) : (
-            <div className="space-y-4">
+            <div className="relative pl-6 sm:pl-8 before:absolute before:left-3 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-stone-200 space-y-6">
               {timelineGroups.map((group) => {
                 const event = group.stage;
+                const stageBadgeLabel = group.stageNumber === 0 
+                  ? "Draft Stage" 
+                  : group.stageNumber < 999 
+                    ? `Stage ${group.stageNumber}` 
+                    : "Milestone";
+
                 return (
-                  <article key={group.key} className="relative rounded-xl border border-stone-200 bg-[#FFFEFC] overflow-hidden shadow-[0_2px_10px_rgba(53,7,8,0.04)]">
-                    <div className="flex items-start">
-                      <div className="w-[68px] shrink-0 self-stretch bg-[#FBF7F0] border-r border-stone-200 flex flex-col items-center justify-start pt-5">
-                        <span className="text-[9px] font-extrabold tracking-[0.16em] text-[#9A7410] uppercase">Stage</span>
-                        <span className="mt-1 text-2xl leading-none font-black text-[#7B0046]">{group.stageNumber < 999 ? group.stageNumber : "—"}</span>
-                      </div>
+                  <div key={group.key} className="relative group/timeline">
+                    {/* Timeline Node Icon */}
+                    <div className="absolute -left-6 sm:-left-8 top-1.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white border-2 border-emerald-500 text-emerald-600 shadow-xs z-10">
+                      <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-emerald-50 text-emerald-600" />
+                    </div>
 
-                      <div className="flex-1 min-w-0 p-4 sm:p-5">
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                          <div className="min-w-0">
-                            <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-stone-400 mb-1">Process stage</p>
-                            <h4 className="font-bold text-[14px] leading-snug text-[#321617]">{group.stageName}</h4>
-                          </div>
-                          {event && (
-                            <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-green-50 border border-green-200 px-2.5 py-1 text-[10px] font-semibold text-green-700">
-                              <CheckCircle className="h-3.5 w-3.5" />
-                              Completed · {new Date(event.completed_at).toLocaleString()}
-                            </div>
-                          )}
+                    <article className="rounded-xl border border-stone-200/90 bg-[#FFFEFC] hover:border-stone-300 transition-colors p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono font-bold text-[#7B0046] bg-[#7B0046]/8 border border-[#7B0046]/15">
+                            {stageBadgeLabel}
+                          </span>
+                          <h4 className="font-bold text-sm sm:text-base text-stone-900 leading-snug">
+                            {group.stageName}
+                          </h4>
                         </div>
-
-                        {event?.remarks || event?.notes ? (
-                          <div className="mt-4 rounded-lg border-l-2 border-[#7B0046] bg-[#FAF7F2] px-3.5 py-2.5">
-                            <p className="text-[9px] font-extrabold tracking-[0.16em] uppercase text-[#9A7410] mb-1">Stage remark</p>
-                            <p className="text-xs leading-relaxed text-stone-600">{event.remarks || event.notes}</p>
-                          </div>
-                        ) : null}
-
-                        {group.remarks.length > 0 && (
-                          <div className="mt-4 pt-3 border-t border-dashed border-stone-200">
-                            <p className="text-[9px] font-extrabold tracking-[0.16em] uppercase text-[#9A7410] mb-2">Additional remarks</p>
-                            <div className="space-y-1.5">
-                              {group.remarks.map((remark) => (
-                                <div key={remark.id} className="flex items-start gap-2 text-xs text-stone-600">
-                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#C27803]" />
-                                  <div className="min-w-0 flex-1">
-                                    <span className="leading-relaxed">{remark.remarks || remark.notes || "No remarks provided."}</span>
-                                    <span className="ml-2 text-[10px] text-stone-400">{new Date(remark.completed_at).toLocaleString()}</span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                        {event && (
+                          <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+                            <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
+                            <span>
+                              Completed · {new Date(event.completed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} at {new Date(event.completed_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                            </span>
                           </div>
                         )}
                       </div>
-                    </div>
-                  </article>
+
+                      {event?.remarks || event?.notes ? (
+                        <div className="mt-3.5 rounded-lg border border-stone-200/80 bg-stone-50/80 p-3 sm:p-3.5">
+                          <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase text-[#7B0046] mb-1">
+                            <MessageSquare className="h-3 w-3" />
+                            <span>Stage Remark</span>
+                          </div>
+                          <p className="text-xs leading-relaxed text-stone-700">{event.remarks || event.notes}</p>
+                        </div>
+                      ) : null}
+
+                      {group.remarks.length > 0 && (
+                        <div className="mt-3.5 pt-3 border-t border-stone-100">
+                          <p className="text-[10px] font-bold tracking-wider uppercase text-stone-400 mb-2">Additional Remarks</p>
+                          <div className="space-y-2">
+                            {group.remarks.map((remark) => (
+                              <div key={remark.id} className="flex items-start gap-2.5 rounded-lg bg-stone-50/50 border border-stone-100 p-2.5 text-xs">
+                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#C27803]" />
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                    <span className="leading-relaxed text-stone-700">{remark.remarks || remark.notes || "No remarks provided."}</span>
+                                    <span className="text-[10px] text-stone-400 font-mono shrink-0">
+                                      {new Date(remark.completed_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })} {new Date(remark.completed_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </article>
+                  </div>
                 );
               })}
             </div>

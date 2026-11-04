@@ -319,7 +319,7 @@ export default function DashboardPage() {
               <div className="p-3.5 sm:p-4 flex items-center">
                 {pendingDraftsCount > 0 ? (
                   <Link
-                    href="/dashboard/purchase-requests"
+                    href="/dashboard/purchase-requests?stage=draft"
                     className="w-full flex items-center gap-3 rounded-xl bg-amber-50/90 border border-amber-300/80 p-2.5 hover:bg-amber-100/80 transition-colors group"
                   >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-800 border border-amber-300/80 group-hover:scale-105 transition-transform">
