@@ -124,18 +124,18 @@ export default function LandingPage() {
           </div>
         </header>
 
-        <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1500px] items-center gap-8 px-4 pt-20 pb-12 sm:gap-10 sm:px-8 sm:pt-24 sm:pb-16 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12 lg:py-20">
+        <div className="landing-hero-layout relative z-10 mx-auto grid min-h-screen w-full max-w-[1500px] items-center gap-8 px-4 pt-20 pb-12 sm:gap-10 sm:px-8 sm:pt-24 sm:pb-16 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12 lg:py-20">
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex flex-col items-center text-center lg:items-start lg:text-left w-full"
+            className="landing-hero-copy flex flex-col items-center text-center lg:items-start lg:text-left w-full"
           >
             <div className="w-full">
-              <p className="mb-5 text-center lg:text-left text-xs sm:text-sm font-extrabold uppercase tracking-[0.24em] text-[#FFD043]">
+              <p className="landing-hero-kicker mb-5 text-center lg:text-left text-xs sm:text-sm font-extrabold uppercase tracking-[0.24em] text-[#FFD043]">
                 MSU – GENERAL SANTOS
               </p>
-              <h1 className="w-full text-center lg:text-left font-black tracking-[-0.035em] leading-[1.14]">
+              <h1 className="landing-hero-title w-full text-center lg:text-left font-black tracking-[-0.035em] leading-[1.14]">
                 <span className="block text-[2rem] sm:text-5xl lg:text-[3.5rem] xl:text-[4.05rem] font-black text-[#FFFDF8] pb-1 leading-[1.08]">
                   Digital Procurement
                 </span>
@@ -144,7 +144,7 @@ export default function LandingPage() {
                 </span>
               </h1>
 
-              <p className="mx-auto mt-7 max-w-[700px] border-l-4 border-[#F5AB26] pl-5 text-left text-sm sm:text-base lg:text-[1.05rem] leading-relaxed text-amber-50/95 font-normal lg:mx-0 text-pretty">
+              <p className="landing-hero-description mx-auto mt-7 max-w-[700px] border-l-4 border-[#F5AB26] pl-5 text-left text-sm sm:text-base lg:text-[1.05rem] leading-relaxed text-amber-50/95 font-normal lg:mx-0 text-pretty">
                 {SYSTEM_DESCRIPTION}
               </p>
               <p className="sr-only">{SYSTEM_NAME}</p>

@@ -404,7 +404,7 @@ export default function ProcurementRequestForm() {
                                 type="text"
                                 value={item.description}
                                 onChange={(e) => updateItem(index, { description: e.target.value })}
-                                placeholder="e.g., Desktop Computer: Core i7 13th Gen, 16GB RAM, 512GB SSD, 24&quot; IPS Monitor, Win 11 Pro"
+                                placeholder="e.g., Desktop computer, Core i7, 16GB RAM, 512GB SSD"
                                 className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-lg border border-stone-300 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
                               />
                               {item.description.trim().length > 0 && item.description.trim().length < 15 && (
@@ -477,7 +477,7 @@ export default function ProcurementRequestForm() {
                               />
                             </td>
                             <td data-label="Subtotal (₱)" className="py-3 px-3 text-right font-mono font-bold text-stone-900 text-sm sm:text-base">
-                              ₱{((Number(item.qty) || 0) * (Number(item.unit_cost) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              <span className="pr-item-subtotal-value">₱{((Number(item.qty) || 0) * (Number(item.unit_cost) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             </td>
                             <td className="py-3 px-2 text-center">
                               <button
