@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
+import { SYSTEM_NAME } from "@/lib/system-branding";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { CheckCircle, Clock, FileCheck, Loader2, XCircle, ChevronRight } from "lucide-react";
 
@@ -219,7 +220,7 @@ export default function AdminDashboard() {
 
         <footer className="mt-10 border-t border-stone-200/80 pt-5 pb-8 text-center">
           <p className="text-xs font-medium text-stone-500">
-            © {new Date().getFullYear()} ProcureMateSU
+            © {new Date().getFullYear()} {SYSTEM_NAME}
           </p>
         </footer>
       </main>
