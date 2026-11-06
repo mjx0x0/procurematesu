@@ -142,7 +142,7 @@ const [riskFilter, setRiskFilter] = useState("all");
             <select
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="ui-select w-full px-3 py-2 text-sm"
+              className="ui-select min-w-0 w-full px-2.5 sm:px-3 py-2 text-xs sm:text-sm"
             >
               <option value="all">All Departments</option>
               {departments.map((d) => (
@@ -169,13 +169,13 @@ const [riskFilter, setRiskFilter] = useState("all");
                 title="From date"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="col-span-1 flex min-w-0 items-center gap-1.5 sm:gap-2">
               <span className="text-xs text-stone-400 font-bold whitespace-nowrap">To:</span>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="ui-input w-full px-3 py-2 text-xs"
+                className="ui-input min-w-0 w-full px-2 sm:px-3 py-2 text-[11px] sm:text-xs"
                 title="To date"
               />
             </div>
