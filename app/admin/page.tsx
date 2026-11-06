@@ -9,7 +9,7 @@ import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-
 import { ActionFeedbackModal, type FeedbackTone } from "@/components/ui/ActionFeedbackModal";
 import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
-import { Bot, Check, CheckCircle, Clock, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Trash2, User, Users, X, XCircle, AlertCircle, ChevronRight } from "lucide-react";
+import { Check, CheckCircle, Clock, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Trash2, User, Users, X, XCircle, AlertCircle, ChevronRight } from "lucide-react";
 
 interface PR {
   pr_no: string;
@@ -287,25 +287,6 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
         <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1><p className="text-xs sm:text-sm text-stone-600 mt-1">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-start"><Link href="/admin/users" className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] transition-colors hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:w-auto sm:text-sm"><Users className="h-4 w-4 shrink-0" /> User Approvals</Link><Link href="/admin/inquiries" className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] transition-colors hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:w-auto sm:text-sm"><MessageSquare className="h-4 w-4 shrink-0" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] transition-colors hover:bg-[#FDF2F7] disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:w-auto sm:text-sm"><RefreshCw className={`h-4 w-4 shrink-0 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-7">{[[stats.total, "Total PRs", FileCheck, "text-[#7B0046]"], [stats.pending, "In Progress", Clock, "text-amber-600"], [stats.completed, "Completed", CheckCircle, "text-emerald-700"], [stats.rejected, "Rejected", XCircle, "text-red-600"]].map(([n, l, I, c]: any) => <div key={l} className="bg-white rounded-2xl p-3 sm:p-4 border border-stone-200 shadow-[0_5px_20px_rgba(45,20,10,0.035)]"><div className="flex justify-between items-center"><div><div className={`text-xl sm:text-2xl font-bold ${c}`}>{n}</div><div className="text-[11px] sm:text-xs font-semibold text-stone-600 mt-0.5">{l}</div></div><I className={`h-4 w-4 sm:h-5 sm:w-5 ${c}`} /></div></div>)}</div>
-
-        <section aria-label="System Tools" className="mb-5 sm:mb-7 rounded-2xl border border-stone-200 bg-white p-3.5 sm:p-4 shadow-[0_4px_18px_rgba(45,20,10,0.025)]">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <h2 className="text-sm font-bold text-[#4D002C]">System Tools</h2>
-              <p className="mt-0.5 text-[11px] sm:text-xs text-stone-500">Additional monitoring and chatbot quality checks for administrators.</p>
-            </div>
-            <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
-              <Link href="/admin/monitoring" className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-bold text-stone-700 transition hover:border-[#7B0046]/30 hover:bg-[#FDF2F7] sm:w-auto">
-                <FileText className="h-4 w-4 text-[#7B0046]" />
-                PR Monitoring
-              </Link>
-              <Link href="/admin/ai-evaluation" className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#7B0046] px-3.5 py-2 text-xs font-bold text-white transition hover:bg-[#4D002C] sm:w-auto">
-                <Bot className="h-4 w-4 text-amber-300" />
-                AI Evaluation
-              </Link>
-            </div>
-          </div>
-        </section>
 
         {/* Filter and Search Bar */}
         <div className="bg-white rounded-2xl border border-stone-200 p-3 sm:p-4 mb-4 sm:mb-5 shadow-[0_5px_20px_rgba(45,20,10,0.03)] flex flex-col lg:flex-row gap-2 sm:gap-3 items-stretch lg:items-center justify-between">
