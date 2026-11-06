@@ -284,29 +284,49 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
       <SystemPageHeader titlePrimary="ProcureMateSU" titleAccent="" compactOnMobile workspaceLabel="Administrative Workspace" brandLogo brandWordmark backHref={null} roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
 
       <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-3.5 sm:py-7">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5 mb-5 sm:mb-7">
-          <div>
-            <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1>
-            <p className="text-xs sm:text-sm text-stone-600 mt-1">Manage Purchase Requests through the official university PMO procurement workflow.</p>
-          </div>
-          <div className="flex w-full items-center gap-2 sm:w-auto sm:gap-2.5">
-            <Link
-              href="/admin/users"
-              className="inline-flex min-h-11 flex-1 sm:flex-initial items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] shadow-xs transition-colors hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:text-sm"
-            >
-              <Users className="h-4 w-4 shrink-0" />
-              <span>User Approvals</span>
-            </Link>
-            <Link
-              href="/admin/inquiries"
-              className="inline-flex min-h-11 flex-1 sm:flex-initial items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] shadow-xs transition-colors hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:text-sm"
-            >
-              <MessageSquare className="h-4 w-4 shrink-0" />
-              <span>Inquiries</span>
-            </Link>
-
-          </div>
+        <div className="mb-4 sm:mb-5">
+          <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1>
+          <p className="text-xs sm:text-sm text-stone-600 mt-1">Manage Purchase Requests, staff access, and procurement inquiries from one workspace.</p>
         </div>
+
+        {/* Centralized admin workspace navigation */}
+        <nav aria-label="Admin main menu" className="mb-5 sm:mb-7 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+          <Link
+            href="#purchase-requests"
+            className="group flex min-h-[124px] flex-col rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_5px_20px_rgba(45,20,10,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#7B0046]/30 hover:shadow-[0_8px_24px_rgba(77,0,44,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:p-5"
+          >
+            <h2 className="text-base sm:text-lg font-bold text-[#4D002C]">Purchase Requests</h2>
+            <p className="mt-1.5 text-xs leading-relaxed text-stone-600">Review, update, and manage submitted purchase requests.</p>
+            <span className="mt-auto flex items-center justify-between border-t border-stone-100 pt-3 text-xs font-bold text-[#7B0046]">
+              Open logbook
+              <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
+          </Link>
+
+          <Link
+            href="/admin/users"
+            className="group flex min-h-[124px] flex-col rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_5px_20px_rgba(45,20,10,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#7B0046]/30 hover:shadow-[0_8px_24px_rgba(77,0,44,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:p-5"
+          >
+            <h2 className="text-base sm:text-lg font-bold text-[#4D002C]">User Approvals</h2>
+            <p className="mt-1.5 text-xs leading-relaxed text-stone-600">Review account registrations and manage staff access.</p>
+            <span className="mt-auto flex items-center justify-between border-t border-stone-100 pt-3 text-xs font-bold text-[#7B0046]">
+              Review accounts
+              <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
+          </Link>
+
+          <Link
+            href="/admin/inquiries"
+            className="group flex min-h-[124px] flex-col rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_5px_20px_rgba(45,20,10,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#7B0046]/30 hover:shadow-[0_8px_24px_rgba(77,0,44,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:p-5"
+          >
+            <h2 className="text-base sm:text-lg font-bold text-[#4D002C]">Inquiries</h2>
+            <p className="mt-1.5 text-xs leading-relaxed text-stone-600">Review procurement questions and Gab AI responses.</p>
+            <span className="mt-auto flex items-center justify-between border-t border-stone-100 pt-3 text-xs font-bold text-[#7B0046]">
+              View inquiries
+              <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
+          </Link>
+        </nav>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-7">{[[stats.total, "Total PRs", FileCheck, "text-[#7B0046]"], [stats.pending, "In Progress", Clock, "text-amber-600"], [stats.completed, "Completed", CheckCircle, "text-emerald-700"], [stats.rejected, "Rejected", XCircle, "text-red-600"]].map(([n, l, I, c]: any) => <div key={l} className="bg-white rounded-2xl p-3 sm:p-4 border border-stone-200 shadow-[0_5px_20px_rgba(45,20,10,0.035)]"><div className="flex justify-between items-center"><div><div className={`text-xl sm:text-2xl font-bold ${c}`}>{n}</div><div className="text-[11px] sm:text-xs font-semibold text-stone-600 mt-0.5">{l}</div></div><I className={`h-4 w-4 sm:h-5 sm:w-5 ${c}`} /></div></div>)}</div>
 
@@ -357,7 +377,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
         </div>
 
         {/* Purchase Requests Table Card */}
-        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-[0_8px_30px_rgba(45,20,10,0.04)]">
+        <div id="purchase-requests" className="scroll-mt-24 bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-[0_8px_30px_rgba(45,20,10,0.04)]">
           <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-stone-50/50">
             <div>
               <h2 className="text-base sm:text-xl font-bold text-[#4D002C]">Purchase Requests</h2>
