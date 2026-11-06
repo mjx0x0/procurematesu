@@ -26,10 +26,8 @@ const userItems: SidebarItem[] = [
 
 const adminItems: SidebarItem[] = [
   { href: "/admin", label: "Digital Logbook", icon: BarChart3 },
-  { href: "/admin/monitoring", label: "PR Monitoring", icon: FileText },
   { href: "/admin/users", label: "User Approvals", icon: Users },
   { href: "/admin/inquiries", label: "Inquiry Logs", icon: MessageSquare },
-  { href: "/admin/ai-evaluation", label: "AI Evaluation", icon: Bot },
 ];
 
 const userMobileItems: SidebarItem[] = [
@@ -43,9 +41,7 @@ const userMobileItems: SidebarItem[] = [
 const adminMobileItems: SidebarItem[] = [
   { href: "/admin", label: "Logbook", icon: BarChart3 },
   { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/monitoring", label: "Tracking", icon: FileText },
   { href: "/admin/inquiries", label: "Inquiries", icon: MessageSquare },
-  { href: "/admin/ai-evaluation", label: "AI Eval", icon: Bot },
 ];
 
 export default function AppSidebar({ mode }: AppSidebarProps) {
