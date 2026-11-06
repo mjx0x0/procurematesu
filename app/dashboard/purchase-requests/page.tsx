@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertCircle, CheckCircle, Clock, Eye, FileText, Filter, Loader2, PlusCircle, Printer, Search } from "lucide-react";
-import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, PROCUREMENT_STAGE_SHORT_LABELS } from "@/lib/procurement-process";
+import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { SYSTEM_NAME } from "@/lib/system-branding";
@@ -384,7 +384,6 @@ export default function PurchaseRequestsPage() {
                         <p className="mt-0.5 text-[11px] sm:text-xs text-stone-500 font-medium">
                           {pr.department || "University Office"}
                         </p>
-
                       </div>
                     </div>
 
