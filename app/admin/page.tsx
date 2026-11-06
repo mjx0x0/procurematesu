@@ -206,9 +206,12 @@ export default function AdminDashboard() {
 
           <div className="grid grid-cols-2 gap-px bg-stone-100 p-1.5 sm:p-2 md:grid-cols-4">
             {summaryItems.map(({ label, value, color, Icon }) => (
-              <div key={label} className="flex min-h-[82px] flex-col justify-center bg-white p-3 sm:p-4">
-                <div className={`text-xl sm:text-2xl font-bold ${color}`}>{value}</div>
-                <div className="mt-1 text-[11px] sm:text-xs font-semibold text-stone-700">{label}</div>
+              <div key={label} className="flex min-h-[82px] items-center justify-between gap-2 bg-white p-3 sm:p-4">
+                <div className="min-w-0">
+                  <div className={`text-xl sm:text-2xl font-bold ${color}`}>{value}</div>
+                  <div className="mt-1 text-[11px] sm:text-xs font-semibold text-stone-700">{label}</div>
+                </div>
+                <Icon className={`h-4 w-4 shrink-0 sm:h-5 sm:w-5 ${color}`} />
               </div>
             ))}
           </div>
