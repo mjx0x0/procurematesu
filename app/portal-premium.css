@@ -240,7 +240,7 @@
     grid-column: 1 / -1;
   }
 
-  .pr-items-entry-table tbody td:nth-child(6) {
+  .pr-items-entry-table tbody td:nth-child(7) {
     grid-column: 2;
     align-items: flex-end;
     justify-content: flex-end;
@@ -252,7 +252,7 @@
     min-width: 0;
   }
 
-  .pr-items-entry-table tbody td:nth-child(6) button {
+  .pr-items-entry-table tbody td:nth-child(7) button {
     min-width: 2.5rem;
     min-height: 2.5rem;
   }
