@@ -8,7 +8,7 @@ import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-
 import { ActionFeedbackModal, type FeedbackTone } from "@/components/ui/ActionFeedbackModal";
 import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
-import { Check, CheckCircle, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Trash2, User, X, XCircle, AlertCircle, ChevronRight } from "lucide-react";
+import { Check, CheckCircle, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Trash2, User, X, XCircle, AlertCircle } from "lucide-react";
 
 interface PR {
   pr_no: string;
@@ -282,16 +282,6 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
           <p className="text-xs sm:text-sm text-stone-600 mt-1">Review, filter, and manage submitted purchase requests through the official PMO procurement workflow.</p>
         </div>
 
--translate-y-0.5 hover:border-[#7B0046]/30 hover:shadow-[0_8px_24px_rgba(77,0,44,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:p-5"
-          >
-            <h2 className="text-base sm:text-lg font-bold text-[#4D002C]">Inquiries</h2>
-            <p className="mt-1.5 text-xs leading-relaxed text-stone-600">Review procurement questions and Gab AI responses.</p>
-            <span className="mt-auto flex items-center justify-between border-t border-stone-100 pt-3 text-xs font-bold text-[#7B0046]">
-              View inquiries
-              <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </span>
-          </Link>
-        </nav>
 
 
         {/* Filter and Search Bar */}
