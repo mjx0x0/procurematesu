@@ -582,8 +582,8 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
               {/* Procurement Actions & Workflow Controls Card */}
               <div className="bg-white rounded-2xl border border-stone-200/90 p-3 sm:p-5 shadow-xs space-y-3">
                 {/* Primary Stage Action Card */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-stone-50/90 p-3 sm:p-5 rounded-xl border border-stone-200/90 shadow-xs">
-                  <div className="flex items-center gap-3.5 min-w-0">
+                <div className="admin-pr-stage-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-stone-50/90 p-3 sm:p-5 rounded-xl border border-stone-200/90 shadow-xs">
+                  <div className="admin-pr-stage-summary flex items-center gap-3.5 min-w-0">
                     <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-[#7B0046] text-white shadow-xs border border-[#630038]">
                       <span className="font-mono font-bold text-base sm:text-lg leading-none tracking-tight">
                         {detailStage?.number ? detailStage.number : "PR"}
@@ -601,7 +601,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+                  <div className="admin-pr-stage-controls flex flex-wrap items-center gap-2 sm:shrink-0">
                     {/* Step 4 Official PR Assignment button - Only at Stage 4 */}
                     {selectedPR.current_stage === "pr_pre_numbering" && (
                       <button
