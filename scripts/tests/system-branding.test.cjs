@@ -24,7 +24,7 @@ test('landing page brand lockup uses a framed logo, refined gradient wordmark, a
   assert.match(landing, /rounded-\[14px\].*border border-\[#F2D28A\]\/45/s);
   assert.ok(landing.includes('from-white via-[#FFF5E5] to-[#F1E4EF]'));
   assert.ok(landing.includes('from-[#FFF0B5] via-[#F6C453] to-[#C9871B]'));
-  assert.ok(landing.includes('px-6 py-2.5 sm:px-8'));
+  assert.ok(landing.includes('px-4 py-2.5 sm:gap-6 sm:px-8'));
   assert.ok(landing.includes('grid h-11 w-11 shrink-0 place-items-center'));
   assert.ok(landing.includes('<MsuLogo size={35}'));
   assert.match(landing, /Digital Procurement Logbook/);
