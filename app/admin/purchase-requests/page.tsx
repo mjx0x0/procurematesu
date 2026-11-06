@@ -553,9 +553,9 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
       {showDetails && selectedPR && (
         <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 pb-8 sm:pb-10">
-          <section className="admin-pr-detail-modal mx-auto w-full max-w-6xl overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+          <section className="admin-pr-detail-page mx-auto w-full max-w-6xl overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
             {/* Modal Header */}
-            <div className="admin-pr-detail-header bg-white border-b border-stone-200 px-3.5 sm:px-6 py-4 sm:py-5 shadow-2xs">
+            <div className="admin-pr-detail-page-header bg-white border-b border-stone-200 px-3.5 sm:px-6 py-4 sm:py-5 shadow-2xs">
               <div className="min-w-0 flex-1">
                 <div className="flex min-w-0 items-center gap-2 sm:gap-3 flex-wrap">
                   <h3 className="max-w-full break-words text-base sm:text-xl font-extrabold text-[#4D002C] tracking-tight">PR {selectedPR.pr_no}</h3>
@@ -589,7 +589,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
             </div>
 
             {/* Modal Body */}
-            <div className="admin-pr-detail-body p-3 sm:p-6 space-y-4 sm:space-y-5">
+            <div className="admin-pr-detail-page-body p-3 sm:p-6 space-y-4 sm:space-y-5">
               {/* Procurement Actions & Workflow Controls Card */}
               <div className="bg-white rounded-2xl border border-stone-200/90 p-3 sm:p-5 shadow-xs space-y-3">
                 {/* Primary Stage Action Card */}
