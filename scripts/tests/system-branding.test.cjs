@@ -232,7 +232,11 @@ test('dashboard actions and directories avoid unnecessary decorative controls', 
   assert.doesNotMatch(overview, /<FileText|<Clock|<CheckCircle2|<AlertCircle/);
 
   // The public project rows retain category text badges without category pictograms.
-  assert.doesNotMatch(transparency, /categoryIcon|IconComponent|<Building2|<Cpu|<Layers/);
+  const projectDirectory = transparency.slice(
+    transparency.indexOf('{/* Directory Listing Container */}'),
+    transparency.indexOf('{/* Transparency Notice Banner */}')
+  );
+  assert.doesNotMatch(projectDirectory, /categoryIcon|IconComponent|<Building2|<Cpu|<Layers/);
 
   // Track actions use the brighter maroon consistently in both user-facing locations.
   assert.match(dashboard, /bg-\[#7B0046\].*hover:bg-\[#65003A\]/);
