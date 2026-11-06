@@ -90,25 +90,19 @@ export function SystemPageHeader({
     }
   };
 
-  const brandedHeader = brandLogo && brandWordmark;
-  const headerClassName = [
-    "sticky top-0 z-50",
-    compactOnMobile ? "h-14 chatbot-mobile-header" : "h-16",
-    "shrink-0 border-b backdrop-blur-md",
-    brandedHeader
-      ? "border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)]"
-      : "border-stone-200 bg-white/95 shadow-xs",
-    brandedHeader ? "sm:h-[72px]" : "sm:h-[68px]",
-  ].join(" ");
-
-  const titleClassName = brandWordmark
-    ? "block truncate font-black leading-tight text-[17px] tracking-[-0.04em] sm:text-[20px]"
-    : "block truncate font-black leading-tight " +
-      (compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl") +
-      " tracking-tight text-[#4D002C]";
-
   return (
-    <nav data-compact-mobile={compactOnMobile ? "true" : undefined} className={headerClassName}>
+    <nav
+      data-compact-mobile={compactOnMobile ? "true" : undefined}
+      className={
+        brandLogo && brandWordmark
+          ? compactOnMobile
+            ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)] backdrop-blur-md sm:h-[72px]"
+            : "sticky top-0 z-50 h-16 shrink-0 border-b border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)] backdrop-blur-md sm:h-[72px]"
+          : compactOnMobile
+            ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]"
+            : "sticky top-0 z-50 h-16 shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]"
+      }
+    >
       <div className={`mx-auto flex h-full items-center justify-between ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-3"} ${containerClassName}`}>
         <div className={`flex min-w-0 items-center ${compactOnMobile ? "gap-1.5 sm:gap-3" : "gap-2 sm:gap-3"}`}>
           {backHref !== null && (
@@ -133,7 +127,7 @@ export function SystemPageHeader({
           <div className="min-w-0">
             <b
               aria-label={brandWordmark ? "ProcureMateSU" : undefined}
-              className={titleClassName}
+              className={`block truncate font-black leading-tight ${brandWordmark ? "text-[17px] tracking-[-0.04em] sm:text-[20px]" : `${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} tracking-tight text-[#4D002C]`}`}
             >
               {brandWordmark ? (
                 <span className="flex items-center whitespace-nowrap">
@@ -152,18 +146,17 @@ export function SystemPageHeader({
                 </>
               )}
             </b>
-            {workspaceLabel && (
-              brandWordmark ? (
-                <p className="mt-1.5 flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.10em] sm:text-[8.5px] sm:tracking-[0.13em]">
-                  <span className="shrink-0 text-[#F6D58A]">{workspaceLabel}</span>
-                  <span aria-hidden="true" className="h-1 w-1 shrink-0 rounded-full bg-[#E9B957]" />
-                  <span className="truncate text-white/75">Digital Procurement System</span>
-                </p>
-              ) : (
-                <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">
-                  {workspaceLabel}
-                </p>
-              )}
+            {workspaceLabel && brandWordmark && (
+              <p className="mt-1.5 flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.10em] sm:text-[8.5px] sm:tracking-[0.13em]">
+                <span className="shrink-0 text-[#F6D58A]">{workspaceLabel}</span>
+                <span aria-hidden="true" className="h-1 w-1 shrink-0 rounded-full bg-[#E9B957]" />
+                <span className="truncate text-white/75">Digital Procurement System</span>
+              </p>
+            )}
+            {workspaceLabel && !brandWordmark && (
+              <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">
+                {workspaceLabel}
+              </p>
             )}
           </div>
         </div>
