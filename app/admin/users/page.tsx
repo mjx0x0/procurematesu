@@ -89,15 +89,15 @@ const loadUsers = useCallback(async () => {
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">
       <SystemPageHeader titlePrimary="User" titleAccent="Management" icon={Users} backHref="/admin" roleLabel="Administrator" containerClassName="max-w-6xl px-4" />
 
-      <main className="max-w-6xl mx-auto px-4 py-7">
+      <main className="max-w-6xl mx-auto px-3.5 py-4 sm:px-6 sm:py-7">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">End-User Accounts</h1>
-            <p className="text-sm text-stone-600 mt-1">Review and authorize institutional account registrations.</p>
+            <h1 className="text-xl sm:text-3xl font-black tracking-tight text-[#4D002C]">End-User Accounts</h1>
+            <p className="text-xs sm:text-sm text-stone-600 mt-1">Review and authorize institutional account registrations.</p>
           </div>
           <button
             onClick={loadUsers}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-stone-200 bg-white text-xs font-bold text-stone-700 hover:bg-stone-50 transition-colors shadow-xs"
+            className="inline-flex min-h-10 w-full sm:w-auto items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs font-bold text-stone-700 hover:bg-stone-50 transition-colors shadow-xs"
           >
             <RefreshCw className="h-3.5 w-3.5 text-[#C27803]" /> Refresh Accounts
           </button>
@@ -120,12 +120,12 @@ const loadUsers = useCallback(async () => {
           </div>
         )}
 
-        <div className="flex gap-2 flex-wrap mb-5">
+        <div className="flex gap-1.5 sm:gap-2 flex-wrap mb-4 sm:mb-5">
           {(["pending", "approved", "rejected", "all"] as const).map((value) => (
             <button
               key={value}
               onClick={() => setFilter(value)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all shadow-xs ${
+              className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-bold border transition-all shadow-xs ${
                 filter === value
                   ? "bg-gradient-to-r from-[#7B0046] to-[#4D002C] text-white border-[#4D002C]"
                   : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
@@ -154,7 +154,7 @@ const loadUsers = useCallback(async () => {
             filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className="ui-card p-5 hover:border-amber-200 transition-all hover:shadow-md"
+                className="ui-card p-3.5 sm:p-5 hover:border-amber-200 transition-all hover:shadow-md"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex items-start gap-3.5 min-w-0">
@@ -194,11 +194,11 @@ const loadUsers = useCallback(async () => {
                   </div>
 
                   {user.role !== "admin" && user.status === "pending" && (
-                    <div className="flex items-center gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-stone-100">
+                    <div className="grid w-full grid-cols-2 sm:flex sm:w-auto items-center gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-stone-100">
                       <button
                         disabled={busyId === user.id}
                         onClick={() => updateStatus(user.id, "approved")}
-                        className="ui-button ui-button-primary text-xs py-2 px-3.5 disabled:opacity-50"
+                        className="ui-button ui-button-primary w-full justify-center text-[11px] sm:text-xs py-2 px-2.5 sm:px-3.5 disabled:opacity-50"
                       >
                         {busyId === user.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -210,7 +210,7 @@ const loadUsers = useCallback(async () => {
                       <button
                         disabled={busyId === user.id}
                         onClick={() => updateStatus(user.id, "rejected")}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-red-200 bg-red-50 text-red-700 text-xs font-bold hover:bg-red-100 transition-colors disabled:opacity-50 shadow-xs"
+                        className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl border border-red-200 bg-red-50 text-red-700 text-[11px] sm:text-xs font-bold hover:bg-red-100 transition-colors disabled:opacity-50 shadow-xs"
                       >
                         {busyId === user.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
