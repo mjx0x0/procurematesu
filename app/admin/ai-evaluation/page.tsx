@@ -42,18 +42,18 @@ useEffect(() => {
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">
       <SystemPageHeader titlePrimary="AI" titleAccent="Evaluation" icon={Bot} backHref="/admin" roleLabel="Administrator" containerClassName="max-w-6xl px-4" />
 
-      <main className="max-w-6xl mx-auto px-4 py-7">
+      <main className="max-w-6xl mx-auto px-3.5 py-4 sm:px-6 sm:py-7">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Evaluation Results</h1>
-            <p className="text-sm text-stone-600 mt-1">
+            <h1 className="text-xl sm:text-3xl font-black tracking-tight text-[#4D002C]">Evaluation Results</h1>
+            <p className="text-xs sm:text-sm text-stone-600 mt-1">
               Run automated test questions to benchmark Gab AI retrieval grounding, concept coverage, and statutory references.
             </p>
           </div>
           <button
             onClick={run}
             disabled={running}
-            className="ui-button ui-button-primary text-xs py-2.5 px-4 disabled:opacity-60"
+            className="ui-button ui-button-primary w-full sm:w-auto justify-center text-xs py-2.5 px-4 disabled:opacity-60"
           >
             {running ? (
               <Loader2 className="h-4 w-4 animate-spin text-amber-300" />
@@ -71,12 +71,12 @@ useEffect(() => {
         )}
 
         {average !== null && (
-          <div className="ui-card p-5 mb-6 border-amber-200/80 bg-gradient-to-br from-white to-amber-50/20">
+          <div className="ui-card p-3.5 sm:p-5 mb-4 sm:mb-6 border-amber-200/80 bg-gradient-to-br from-white to-amber-50/20">
             <div className="text-[11px] uppercase tracking-wider text-stone-500 font-bold">
               Latest Composite Score
             </div>
-            <div className="text-4xl font-black text-[#4D002C] mt-1">{average}%</div>
-            <div className="text-xs text-stone-500 mt-1 font-medium">
+            <div className="text-3xl sm:text-4xl font-black text-[#4D002C] mt-1">{average}%</div>
+            <div className="text-[11px] sm:text-xs text-stone-500 mt-1 font-medium">
               Weighted breakdown: expected-concept coverage 55%, retrieval grounding 25%, sources 10%, response availability 10%.
             </div>
           </div>
@@ -85,7 +85,7 @@ useEffect(() => {
         {results.length > 0 && (
           <section className="space-y-4 mb-8">
             {results.map((r) => (
-              <article key={r.test_name} className="ui-card p-5">
+              <article key={r.test_name} className="ui-card p-3.5 sm:p-5">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div>
                     <h2 className="font-bold text-[#4D002C] text-base">{r.test_name}</h2>
@@ -102,8 +102,8 @@ useEffect(() => {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
-                  <div className="rounded-xl bg-stone-50 border border-stone-200 p-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3 sm:mt-4 text-xs">
+                  <div className="rounded-xl bg-stone-50 border border-stone-200 p-2.5 sm:p-3">
                     <span className="text-stone-500">Keyword Coverage</span>
                     <div className="font-bold text-stone-900 text-sm mt-0.5">{r.keyword_coverage.toFixed(0)}%</div>
                   </div>
