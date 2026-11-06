@@ -90,17 +90,22 @@ export function SystemPageHeader({
     }
   };
 
-  const headerClassName = brandLogo && brandWordmark
-    ? compactOnMobile
-      ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)] backdrop-blur-md sm:h-[72px]"
-      : "sticky top-0 z-50 h-16 shrink-0 border-b border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)] backdrop-blur-md sm:h-[72px]"
-    : compactOnMobile
-      ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]"
-      : "sticky top-0 z-50 h-16 shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]";
+  const brandedHeader = brandLogo && brandWordmark;
+  const headerClassName = [
+    "sticky top-0 z-50",
+    compactOnMobile ? "h-14 chatbot-mobile-header" : "h-16",
+    "shrink-0 border-b backdrop-blur-md",
+    brandedHeader
+      ? "border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)]"
+      : "border-stone-200 bg-white/95 shadow-xs",
+    brandedHeader ? "sm:h-[72px]" : "sm:h-[68px]",
+  ].join(" ");
 
   const titleClassName = brandWordmark
     ? "block truncate font-black leading-tight text-[17px] tracking-[-0.04em] sm:text-[20px]"
-    : `block truncate font-black leading-tight ${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} tracking-tight text-[#4D002C]`;
+    : "block truncate font-black leading-tight " +
+      (compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl") +
+      " tracking-tight text-[#4D002C]";
 
   return (
     <nav data-compact-mobile={compactOnMobile ? "true" : undefined} className={headerClassName}>
