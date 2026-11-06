@@ -3,11 +3,8 @@
 import { useMemo, useState } from "react";
 import {
   AlertCircle,
-  Building2,
-  Cpu,
   ExternalLink,
   FileText,
-  Layers,
   Search,
   ShieldCheck,
   X,
@@ -45,20 +42,6 @@ const categoryColor = (cat: string) => {
       return "bg-cyan-50 text-cyan-800 border-cyan-200/70";
     default:
       return "bg-stone-100 text-stone-700 border-stone-200/70";
-  }
-};
-
-const categoryIcon = (cat: string) => {
-  switch (cat) {
-    case "Infrastructure":
-      return Building2;
-    case "ICT":
-      return Cpu;
-    case "Services":
-    case "Goods & Equipment":
-      return Layers;
-    default:
-      return FileText;
   }
 };
 
@@ -275,18 +258,12 @@ export default function TransparencyPage() {
               </div>
             ) : (
               filtered.map((project, index) => {
-                const IconComponent = categoryIcon(project.category);
                 return (
                   <article
                     key={`${project.year}-${project.reference || project.title}-${index}`}
                     className="p-4 sm:p-5 hover:bg-[#FFFDF7] transition-colors flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4"
                   >
-                    <div className="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
-                      <div className="shrink-0 flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#7B0046]/10 text-[#7B0046] border border-[#7B0046]/15 mt-0.5">
-                        <IconComponent className="h-5 w-5" />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2 mb-1.5">
                           <span className="text-[11px] font-bold font-mono px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200">
                             {project.year}
@@ -315,7 +292,6 @@ export default function TransparencyPage() {
                             </span>
                           </div>
                         )}
-                      </div>
                     </div>
 
                     <div className="shrink-0 pt-2 sm:pt-0 sm:self-center border-t border-stone-100 sm:border-0 flex items-center justify-between sm:justify-end gap-2">
