@@ -131,9 +131,7 @@ export function SystemPageHeader({
           )}
           {brandLogo ? (
             brandWordmark ? (
-              <div className="relative grid h-11 w-11 shrink-0 place-items-center rounded-[14px] border border-[#F2D28A]/45 bg-white/[0.08] shadow-xs">
-                <MsuLogo size={35} className="relative z-10" />
-              </div>
+              <MsuLogo size={38} className="shrink-0" />
             ) : (
               <MsuLogo size={36} className="shrink-0" />
             )
