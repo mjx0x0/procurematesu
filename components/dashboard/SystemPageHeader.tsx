@@ -147,7 +147,7 @@ export function SystemPageHeader({
               )}
             </b>
             {workspaceLabel && (
-              {brandWordmark ? (
+              brandWordmark ? (
                 <p className="mt-1.5 flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.10em] sm:text-[8.5px] sm:tracking-[0.13em]">
                   <span className="shrink-0 text-[#F6D58A]">{workspaceLabel}</span>
                   <span aria-hidden="true" className="h-1 w-1 shrink-0 rounded-full bg-[#E9B957]" />
