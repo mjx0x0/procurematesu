@@ -752,6 +752,9 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                               </span>
                             </div>
                             <p className={`text-xs font-semibold mt-0.5 ${state === "current" ? "text-stone-900" : "text-stone-700"}`}>{stage.label}</p>
+                            {isCurrent && detailStage?.description && (
+                              <p className="mt-1 text-[10px] leading-relaxed text-stone-500">{detailStage.description}</p>
+                            )}
                           </div>
                           {state === "current" && <ChevronRight className="h-4 w-4 text-stone-400 shrink-0 mt-1" />}
                         </div>
