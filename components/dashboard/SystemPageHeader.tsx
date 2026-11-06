@@ -100,7 +100,14 @@ export function SystemPageHeader({
             </Link>
           )}
           {brandLogo ? (
-            <MsuLogo size={36} className="shrink-0" />
+            brandWordmark ? (
+              <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-[#D8B76B]/70 bg-gradient-to-br from-white via-[#FFF9EA] to-[#F7F0F5] shadow-[0_3px_12px_rgba(77,0,44,0.10)] ring-1 ring-[#7B0046]/5">
+                <span className="pointer-events-none absolute inset-[3px] rounded-[11px] border border-[#7B0046]/10" />
+                <MsuLogo size={35} className="relative z-10 drop-shadow-[0_2px_5px_rgba(77,0,44,0.12)]" />
+              </span>
+            ) : (
+              <MsuLogo size={36} className="shrink-0" />
+            )
           ) : PageIcon ? (
             <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#4D002C] text-amber-300 shadow-sm ${compactOnMobile ? "hidden sm:flex" : ""}`}>
               <PageIcon className="h-5 w-5" />
@@ -109,11 +116,11 @@ export function SystemPageHeader({
           <div className="min-w-0">
             <b
               aria-label={brandWordmark ? "ProcureMateSU" : undefined}
-              className={`block truncate ${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} font-black leading-tight tracking-tight text-[#4D002C]`}
+              className={`block truncate ${brandWordmark ? "text-[17px] sm:text-[20px] tracking-[-0.04em]" : compactOnMobile ? "text-sm sm:text-xl tracking-tight" : "text-lg sm:text-xl tracking-tight"} font-black leading-tight text-[#4D002C]`}
             >
               {brandWordmark ? (
-                <span>
-                  <span className="bg-gradient-to-r from-[#4D002C] via-[#64113F] to-[#7B0046] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">M</span><span className="bg-gradient-to-r from-[#7B0046] via-[#64113F] to-[#4D002C] bg-clip-text text-transparent">ate</span><span className="bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">SU</span>
+                <span className="flex items-center whitespace-nowrap">
+                  <span className="bg-gradient-to-r from-[#4D002C] via-[#64113F] to-[#7B0046] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">M</span><span className="bg-gradient-to-r from-[#4D002C] via-[#64113F] to-[#7B0046] bg-clip-text text-transparent">ate</span><span className="bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">SU</span>
                 </span>
               ) : (
                 <>
@@ -129,9 +136,21 @@ export function SystemPageHeader({
               )}
             </b>
             {workspaceLabel && (
-              <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">
-                {workspaceLabel}
-              </p>
+              brandWordmark ? (
+                <p className="mt-1 flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[7px] font-extrabold uppercase tracking-[0.10em] sm:mt-1.5 sm:gap-1.5 sm:text-[8.5px] sm:tracking-[0.13em]">
+                  <span className="shrink-0 bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">
+                    {workspaceLabel}
+                  </span>
+                  <span aria-hidden="true" className="h-1 w-1 shrink-0 rounded-full bg-[#D89A2B]" />
+                  <span className="truncate text-[#7B0046]/75">
+                    Digital Procurement System
+                  </span>
+                </p>
+              ) : (
+                <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">
+                  {workspaceLabel}
+                </p>
+              )
             )}
           </div>
         </div>
