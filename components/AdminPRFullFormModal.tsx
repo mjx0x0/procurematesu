@@ -356,6 +356,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
               </div>
             </div>
           </div>
+          </div>
 
           <div className="mx-auto mt-4 max-w-4xl rounded-xl border border-stone-200 bg-white p-3.5 sm:mt-5 sm:p-4 print:hidden">
             <h3 className="mb-3 text-sm font-extrabold text-[#4D002C]">Submitted PR Record</h3>
