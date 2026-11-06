@@ -9,7 +9,7 @@ import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-
 import { ActionFeedbackModal, type FeedbackTone } from "@/components/ui/ActionFeedbackModal";
 import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
-import { Check, CheckCircle, Clock, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Trash2, User, Users, X, XCircle, AlertCircle, ChevronRight } from "lucide-react";
+import { Check, CheckCircle, Clock, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Trash2, User, X, XCircle, AlertCircle, ChevronRight } from "lucide-react";
 
 interface PR {
   pr_no: string;
