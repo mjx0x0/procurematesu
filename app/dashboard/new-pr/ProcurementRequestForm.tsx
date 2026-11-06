@@ -385,7 +385,7 @@ export default function ProcurementRequestForm() {
                       <tbody className="divide-y divide-stone-100 bg-white">
                         {items.map((item, index) => (
                           <tr key={item.id} className="hover:bg-stone-50/60 transition-colors">
-                            <td data-label="" className="py-3 px-3 text-center font-semibold text-stone-400">
+                            <td className="py-3 px-3 text-center font-semibold text-stone-400">
                               {index + 1}
                             </td>
                             <td data-label="Item Description" className="py-3 px-3">
@@ -468,7 +468,7 @@ export default function ProcurementRequestForm() {
                             <td data-label="Subtotal (₱)" className="py-3 px-3 text-right font-mono font-bold text-stone-900 text-sm sm:text-base">
                               ₱{((Number(item.qty) || 0) * (Number(item.unit_cost) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
-                            <td data-label="" className="py-3 px-2 text-center">
+                            <td className="py-3 px-2 text-center">
                               <button
                                 type="button"
                                 onClick={() => removeItem(index)}
