@@ -316,45 +316,38 @@ export default function DashboardPage() {
               </div>
 
               {/* 4. Action Required */}
-              <div className="p-3.5 sm:p-4 flex items-center">
-                {pendingDraftsCount > 0 ? (
-                  <Link
-                    href="/dashboard/purchase-requests?stage=draft"
-                    className="w-full flex items-center gap-3 rounded-xl bg-amber-50/90 border border-amber-300/80 p-2.5 hover:bg-amber-100/80 transition-colors group"
-                  >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-800 border border-amber-300/80 group-hover:scale-105 transition-transform">
-                      <AlertCircle className="h-4 w-4" />
+              {pendingDraftsCount > 0 ? (
+                <Link
+                  href="/dashboard/purchase-requests?stage=draft"
+                  className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5 transition-colors hover:bg-amber-50/30"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60">
+                    <AlertCircle className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xl sm:text-2xl font-black text-amber-700 font-mono leading-none">
+                      {pendingDraftsCount}
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900">
-                          Action Required
-                        </span>
-                      </div>
-                      <div className="text-sm font-black text-[#7B0046] font-mono leading-tight mt-0.5">
-                        {pendingDraftsCount} {pendingDraftsCount === 1 ? "Draft to Submit" : "Drafts to Submit"}
-                      </div>
-                      <div className="text-[10px] font-medium text-amber-800/90 truncate">
-                        Print &amp; physically submit
-                      </div>
-                    </div>
-                  </Link>
-                ) : (
-                  <div className="flex items-center gap-3.5">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-500">
-                      <CheckCircle2 className="h-5 w-5" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-xl sm:text-2xl font-black text-stone-800 font-mono leading-none">
-                        0
-                      </div>
-                      <div className="text-xs font-semibold text-stone-700 mt-1">Action Required</div>
-                      <div className="text-[10px] text-stone-400 font-medium">All submissions in order</div>
+                    <div className="text-xs font-semibold text-stone-700 mt-1">Action Required</div>
+                    <div className="text-[10px] text-stone-400 font-medium">
+                      {pendingDraftsCount === 1 ? "Draft to submit" : "Drafts to submit"}
                     </div>
                   </div>
-                )}
-              </div>
+                </Link>
+              ) : (
+                <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-600 border border-stone-200/70">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xl sm:text-2xl font-black text-[#4D002C] font-mono leading-none">
+                      0
+                    </div>
+                    <div className="text-xs font-semibold text-stone-700 mt-1">Action Required</div>
+                    <div className="text-[10px] text-stone-400 font-medium">All submissions in order</div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
