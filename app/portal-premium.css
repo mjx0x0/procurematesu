@@ -291,3 +291,243 @@
     display: none;
   }
 }
+
+
+/* Targeted mobile layout polish for the landing hero, PR item cards, and admin PR actions. */
+@media (max-width: 767px) {
+  .landing-hero-layout {
+    padding-top: calc(6rem + env(safe-area-inset-top)) !important;
+    padding-bottom: 2.5rem !important;
+    row-gap: 2rem !important;
+  }
+
+  .landing-hero-kicker {
+    margin-bottom: 1.1rem !important;
+    font-size: 0.68rem !important;
+    letter-spacing: 0.2em !important;
+  }
+
+  .landing-hero-title {
+    max-width: 35rem;
+    margin-inline: auto;
+    line-height: 1.08 !important;
+  }
+
+  .landing-hero-title > span:first-child {
+    font-size: clamp(1.85rem, 7.4vw, 2.15rem) !important;
+    line-height: 1.08 !important;
+  }
+
+  .landing-hero-title > span:last-child {
+    margin-top: 0.25rem !important;
+    font-size: clamp(1.65rem, 6.8vw, 1.95rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  .landing-hero-description {
+    max-width: 34rem !important;
+    margin: 1.25rem auto 0 !important;
+    border-left: 0 !important;
+    padding-left: 0 !important;
+    text-align: center !important;
+    text-wrap: pretty;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Compact, aligned PR item cards: description, quantity/unit, cost/subtotal, remove. */
+  .pr-items-entry-table tbody tr {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 0.75rem;
+    margin: 0.65rem;
+    padding: 0.95rem;
+    align-items: start;
+  }
+
+  .pr-items-entry-table tbody td {
+    min-width: 0;
+    align-self: stretch;
+  }
+
+  .pr-items-entry-table tbody td[data-label]::before {
+    margin-bottom: 0.45rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.01em;
+  }
+
+  .pr-items-entry-table tbody td:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+
+  .pr-items-entry-table tbody td:nth-child(3),
+  .pr-items-entry-table tbody td:nth-child(5) {
+    grid-column: 1;
+  }
+
+  .pr-items-entry-table tbody td:nth-child(4),
+  .pr-items-entry-table tbody td:nth-child(6) {
+    grid-column: 2;
+  }
+
+  .pr-items-entry-table tbody td input,
+  .pr-items-entry-table tbody td select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 3rem;
+    height: 3rem;
+    padding-inline: 0.7rem;
+    font-size: 16px !important;
+    line-height: 1.25;
+  }
+
+  .pr-items-entry-table tbody td:nth-child(2) input {
+    text-align: left;
+  }
+
+  .pr-items-entry-table tbody td:nth-child(6) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    text-align: left !important;
+  }
+
+  .pr-item-subtotal-value {
+    display: flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #E7E5E4;
+    border-radius: 0.65rem;
+    background: #FAF7F2;
+    color: #4D002C;
+    font-size: 0.9rem;
+    font-weight: 800;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .pr-items-entry-table tbody td:nth-child(7) {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    border-top: 1px solid #F0EEEB !important;
+    padding-top: 0.35rem !important;
+  }
+
+  .pr-items-entry-table tbody td:nth-child(7) button {
+    display: inline-flex;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #F0EEEB;
+    border-radius: 0.7rem;
+    background: #FAF7F2;
+  }
+
+  .pr-items-entry-table tfoot tr {
+    gap: 0.5rem;
+    padding: 0.35rem 0.4rem;
+  }
+
+  .pr-items-entry-table tfoot td:first-child {
+    font-size: 0.65rem;
+    letter-spacing: 0.035em;
+    line-height: 1.35;
+  }
+
+  .pr-items-entry-table tfoot td:nth-child(2) {
+    font-size: 0.95rem;
+    padding-inline: 0.4rem !important;
+  }
+
+  /* Admin PR action card: keep the stage description and controls in a clear vertical hierarchy. */
+  .admin-dashboard-page .admin-pr-stage-card {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch !important;
+    gap: 0.9rem !important;
+    padding: 0.9rem !important;
+  }
+
+  .admin-dashboard-page .admin-pr-stage-summary {
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .admin-dashboard-page .admin-pr-stage-summary > div:last-child {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .admin-dashboard-page .admin-pr-stage-summary p {
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+  }
+
+  .admin-dashboard-page .admin-pr-stage-controls {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    gap: 0.55rem !important;
+  }
+
+  .admin-dashboard-page .admin-pr-stage-controls > button,
+  .admin-dashboard-page .admin-pr-stage-controls > div {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 2.85rem;
+    align-items: center;
+    justify-content: center;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.25;
+    padding-inline: 0.8rem;
+  }
+
+  /* A consistent two-column action grid prevents Reject/Delete from wrapping unevenly. */
+  .admin-dashboard-page .admin-pr-secondary-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch !important;
+    gap: 0.6rem !important;
+  }
+
+  .admin-dashboard-page .admin-pr-secondary-actions > div {
+    display: contents !important;
+  }
+
+  .admin-dashboard-page .admin-pr-secondary-actions button {
+    display: inline-flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 2.85rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.6rem 0.45rem !important;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-dashboard-page .admin-pr-secondary-actions button svg {
+    flex: 0 0 auto;
+  }
+
+  .admin-dashboard-page .admin-pr-secondary-actions button span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
