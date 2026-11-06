@@ -230,7 +230,7 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-7 grid gap-3 sm:mt-10 sm:gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {[
               {
                 number: "01",
@@ -270,16 +270,16 @@ export default function LandingPage() {
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.42, delay: index * 0.06, ease: "easeOut" }}
                 whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                className="relative flex min-h-[220px] flex-col rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_6px_22px_rgba(40,20,10,0.035)]"
+                className="relative flex min-h-[148px] flex-col rounded-xl border border-stone-200 bg-white p-4 shadow-[0_6px_22px_rgba(40,20,10,0.035)] sm:min-h-[220px] sm:rounded-2xl sm:p-5"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-extrabold tracking-widest text-[#C27803]">{step.number}</span>
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E9D9AE] bg-[#FFF6E4] text-[#7B0046]">
-                    <step.Icon className="h-5 w-5" />
+                  <span className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl border border-[#E9D9AE] bg-[#FFF6E4] text-[#7B0046]">
+                    <step.Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                   </span>
                 </div>
-                <h3 className="mt-5 text-sm font-extrabold leading-snug text-[#4D002C]">{step.title}</h3>
-                <p className="mt-2 text-xs leading-relaxed text-stone-600">{step.description}</p>
+                <h3 className="mt-3 text-[13px] font-extrabold leading-snug text-[#4D002C] sm:mt-5 sm:text-sm">{step.title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-stone-600 sm:mt-2">{step.description}</p>
               </motion.article>
             ))}
           </div>
