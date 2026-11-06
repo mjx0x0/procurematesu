@@ -97,7 +97,7 @@ test('main dashboard headers show the ProcureMateSU wordmark with MSU letters hi
   assert.match(header, /brandWordmark\?: boolean/);
   assert.match(header, /aria-label=\{brandWordmark \? "ProcureMateSU"/);
   assert.ok(header.includes('<MsuLogo size={38} className="shrink-0" />'));
-  assert.doesNotMatch(header, /rounded-\\\[14px\\\].*border border-\\\[#F2D28A\\\]\\/45/);
+  assert.ok(!header.includes('rounded-[14px] border border-[#F2D28A]/45'));
   assert.ok(header.includes('from-white via-[#FFF5E5] to-[#F1E4EF]'));
   assert.ok(header.includes('from-[#FFF0B5] via-[#F6C453] to-[#C9871B]'));
   assert.ok(header.includes('bg-[#4A002A]/95'));
