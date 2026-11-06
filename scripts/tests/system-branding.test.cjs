@@ -83,7 +83,7 @@ test('sign-in, registration, logo accessibility, loading and workspace labels ar
   assert.match(dashboard, /brandWordmark/);
   assert.match(dashboard, /workspaceLabel="End User Workspace"/);
   assert.match(admin, /brandWordmark/);
-  assert.match(admin, /workspaceLabel="Administrator Workspace"/);
+  assert.match(admin, /workspaceLabel="Administrative Workspace"/);
   assert.match(login, /Sign in to the \{SYSTEM_NAME\}/);
   assert.match(logo, /General Santos/);
   assert.doesNotMatch(logo, /General Santos City/);
@@ -100,9 +100,13 @@ test('main dashboard headers show the ProcureMateSU wordmark with MSU letters hi
   assert.ok(header.includes('from-white via-[#FFF5E5] to-[#F1E4EF]'));
   assert.ok(header.includes('from-[#FFF0B5] via-[#F6C453] to-[#C9871B]'));
   assert.ok(header.includes('bg-[#4A002A]/95'));
+  assert.ok(header.includes('Digital Procurement System'));
   assert.ok(header.includes('text-[#F6D58A]'));
+  assert.ok(header.includes('text-white/75'));
+  assert.ok(header.includes('tracking-[0.10em]'));
+  assert.ok(header.includes('rounded-full bg-[#E9B957]'));
   assert.match(dashboard, /workspaceLabel="End User Workspace"/);
-  assert.match(admin, /workspaceLabel="Administrator Workspace"/);
+  assert.match(admin, /workspaceLabel="Administrative Workspace"/);
   assert.match(dashboard, /brandWordmark/);
   assert.match(admin, /brandWordmark/);
 });
