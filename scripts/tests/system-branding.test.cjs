@@ -109,7 +109,16 @@ test('main dashboard headers show the ProcureMateSU wordmark with MSU letters hi
   const globalStyles = read('app/globals.css');
   assert.ok(globalStyles.includes('nav[class*="sticky"][data-workspace-brand="true"]'));
   assert.ok(globalStyles.includes('background: #4A002A !important;'));
+  assert.ok(globalStyles.includes('border-top: 0 !important;'));
   assert.ok(globalStyles.includes('position: sticky !important;'));
+  const notifications = read('components/NotificationPopover.tsx');
+  assert.match(notifications, /variant = "default"/);
+  assert.ok(notifications.includes('bg-white/[0.09] text-white/90'));
+  assert.ok(notifications.includes('bg-[#F6C453] text-[#4A002A]'));
+  assert.ok(notifications.includes('ring-[#4A002A]'));
+  assert.ok(header.includes('border-white/20 bg-white/[0.09] text-white/95'));
+  assert.ok(header.includes('bg-[#F6D58A]/15 text-[#F6D58A]'));
+  assert.ok(dashboard.includes('<NotificationPopover variant="workspace" />'));
   assert.ok(globalStyles.includes('top: 0 !important;'));
   assert.match(dashboard, /overflow-x-clip/);
   assert.doesNotMatch(dashboard, /overflow-x-hidden/);
