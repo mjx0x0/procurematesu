@@ -231,8 +231,8 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
             </p>
           </div>
 
-          <div className="overflow-x-auto overscroll-x-contain pb-2 print:overflow-visible print:pb-0">
-            <div id="admin-pr-print" className="hidden w-full min-w-[720px] max-w-4xl bg-white text-black shadow-sm md:block print:block print:border-0 print:shadow-none">
+          <div className="mx-auto w-full max-w-5xl overflow-x-auto overscroll-x-contain pb-2 print:overflow-visible print:pb-0">
+            <div id="admin-pr-print" className="mx-auto hidden w-full min-w-[720px] max-w-5xl bg-white text-black shadow-sm md:block print:block print:border-0 print:shadow-none">
             <div className="border-2 border-black text-black">
               <div className="border-b-2 border-black px-4 py-3 text-center">
                 <h1 className="font-serif text-xl font-black uppercase tracking-wider">PURCHASE REQUEST</h1>
