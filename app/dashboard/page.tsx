@@ -175,22 +175,22 @@ export default function DashboardPage() {
         </section>
 
         <section className="mt-4 sm:mt-5" aria-label="Main Feature Shortcuts">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
             {/* 1. Create Purchase Request */}
             <Link
               href="/dashboard/new-pr"
-              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[160px] sm:min-h-[170px]"
+              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-3 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[146px] sm:min-h-[160px]"
             >
               <div className="flex flex-col gap-2">
-                <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C] transition-colors">
+                <h2 className="text-sm sm:text-base font-bold tracking-tight text-[#4D002C] transition-colors">
                   Create PR
                 </h2>
-                <p className="text-xs sm:text-[13px] text-stone-500 font-normal leading-relaxed">
+                <p className="text-[11px] sm:text-[13px] text-stone-500 font-normal leading-relaxed">
                   Draft and submit a new request with automated compliance checking
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-[#7B0046]">
+              <div className="pt-2.5 sm:pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] sm:text-xs font-bold text-[#7B0046]">
                 <span>Action</span>
                 <ArrowRight className="h-4 w-4 transition-transform shrink-0" />
               </div>
@@ -199,18 +199,18 @@ export default function DashboardPage() {
             {/* 2. View Purchase Requests */}
             <Link
               href="/dashboard/purchase-requests"
-              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[160px] sm:min-h-[170px]"
+              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-3 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[146px] sm:min-h-[160px]"
             >
               <div className="flex flex-col gap-2">
-                <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C] transition-colors">
+                <h2 className="text-sm sm:text-base font-bold tracking-tight text-[#4D002C] transition-colors">
                   Purchase Requests
                 </h2>
-                <p className="text-xs sm:text-[13px] text-stone-500 font-normal leading-relaxed">
+                <p className="text-[11px] sm:text-[13px] text-stone-500 font-normal leading-relaxed">
                   Monitor approval stages, view full records, and print official PR documents
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-600 group-hover:text-[#7B0046]">
+              <div className="pt-2.5 sm:pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] sm:text-xs font-bold text-stone-600 group-hover:text-[#7B0046]">
                 <span>{prs.length} {prs.length === 1 ? "Record" : "Records"}</span>
                 <ArrowRight className="h-4 w-4 transition-transform shrink-0" />
               </div>
@@ -219,18 +219,18 @@ export default function DashboardPage() {
             {/* 3. Gab AI Chatbot */}
             <Link
               href="/dashboard/chatbot"
-              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[160px] sm:min-h-[170px]"
+              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-3 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[146px] sm:min-h-[160px]"
             >
               <div className="flex flex-col gap-2">
-                <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C] transition-colors">
-                  AI Chatbot
+                <h2 className="text-sm sm:text-base font-bold tracking-tight text-[#4D002C] transition-colors">
+                  Gab AI
                 </h2>
-                <p className="text-xs sm:text-[13px] text-stone-500 font-normal leading-relaxed">
+                <p className="text-[11px] sm:text-[13px] text-stone-500 font-normal leading-relaxed">
                   Get instant guidance on RA 12009, PR preparation, and procurement steps
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-600 group-hover:text-[#7B0046]">
+              <div className="pt-2.5 sm:pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] sm:text-xs font-bold text-stone-600 group-hover:text-[#7B0046]">
                 <span>Gab AI</span>
                 <ArrowRight className="h-4 w-4 transition-transform shrink-0" />
               </div>
@@ -239,18 +239,18 @@ export default function DashboardPage() {
             {/* 4. Transparency Board */}
             <Link
               href="/dashboard/transparency"
-              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[160px] sm:min-h-[170px]"
+              className="group relative flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-3 sm:p-5 shadow-[0_4px_20px_rgba(45,35,30,0.03)] hover:shadow-[0_14px_34px_rgba(77,0,44,0.08)] hover:border-[#7B0046]/50 hover:-translate-y-1 transition-all duration-200 cursor-pointer min-h-[146px] sm:min-h-[160px]"
             >
               <div className="flex flex-col gap-2">
-                <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#4D002C] transition-colors">
+                <h2 className="text-sm sm:text-base font-bold tracking-tight text-[#4D002C] transition-colors">
                   Transparency Board
                 </h2>
-                <p className="text-xs sm:text-[13px] text-stone-500 font-normal leading-relaxed">
+                <p className="text-[11px] sm:text-[13px] text-stone-500 font-normal leading-relaxed">
                   Access official university bidding notices, published awards, and contracts
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-stone-600 group-hover:text-[#7B0046]">
+              <div className="pt-2.5 sm:pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] sm:text-xs font-bold text-stone-600 group-hover:text-[#7B0046]">
                 <span>Browse</span>
                 <ArrowRight className="h-4 w-4 transition-transform shrink-0" />
               </div>
@@ -272,14 +272,14 @@ export default function DashboardPage() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 lg:divide-x divide-stone-100 p-2 sm:p-2.5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-stone-100 p-1.5 sm:p-2">
               {/* 1. Total Requests */}
-              <div className="p-3.5 sm:p-4 flex items-center gap-3.5">
+              <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-600">
                   <FileText className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-2xl font-black text-[#4D002C] font-mono leading-none">
+                  <div className="text-xl sm:text-2xl font-black text-[#4D002C] font-mono leading-none">
                     {prs.length}
                   </div>
                   <div className="text-xs font-semibold text-stone-700 mt-1">Total Requests</div>
@@ -288,12 +288,12 @@ export default function DashboardPage() {
               </div>
 
               {/* 2. In Review */}
-              <div className="p-3.5 sm:p-4 flex items-center gap-3.5">
+              <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60">
                   <Clock className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-2xl font-black text-amber-700 font-mono leading-none">
+                  <div className="text-xl sm:text-2xl font-black text-amber-700 font-mono leading-none">
                     {stats.pending}
                   </div>
                   <div className="text-xs font-semibold text-stone-700 mt-1">Under Review</div>
@@ -302,12 +302,12 @@ export default function DashboardPage() {
               </div>
 
               {/* 3. Completed */}
-              <div className="p-3.5 sm:p-4 flex items-center gap-3.5">
+              <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-2xl font-black text-emerald-700 font-mono leading-none">
+                  <div className="text-xl sm:text-2xl font-black text-emerald-700 font-mono leading-none">
                     {stats.completed}
                   </div>
                   <div className="text-xs font-semibold text-stone-700 mt-1">Completed</div>
@@ -346,7 +346,7 @@ export default function DashboardPage() {
                       <CheckCircle2 className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-2xl font-black text-stone-800 font-mono leading-none">
+                      <div className="text-xl sm:text-2xl font-black text-stone-800 font-mono leading-none">
                         0
                       </div>
                       <div className="text-xs font-semibold text-stone-700 mt-1">Action Required</div>
