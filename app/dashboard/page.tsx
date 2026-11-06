@@ -141,7 +141,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="app-theme min-h-[100svh] overflow-x-hidden bg-[#F7F5F2] text-[#302725] dashboard-page">
+    <div className="app-theme min-h-[100svh] overflow-x-clip bg-[#F7F5F2] text-[#302725] dashboard-page">
       <SystemPageHeader
         titlePrimary="ProcureMateSU"
         titleAccent=""
