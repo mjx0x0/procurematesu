@@ -278,7 +278,7 @@ export default function DashboardPage() {
               </div>
 
               {/* 2. In Review */}
-              <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
+              <div className="bg-white min-h-[82px] p-3 sm:p-3.5 flex flex-col justify-center">
                 
                 <div className="min-w-0">
                   <div className="text-xl sm:text-2xl font-black text-amber-700 font-mono leading-none">
@@ -290,7 +290,7 @@ export default function DashboardPage() {
               </div>
 
               {/* 3. Completed */}
-              <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
+              <div className="bg-white min-h-[82px] p-3 sm:p-3.5 flex flex-col justify-center">
                 
                 <div className="min-w-0">
                   <div className="text-xl sm:text-2xl font-black text-emerald-700 font-mono leading-none">
@@ -305,7 +305,7 @@ export default function DashboardPage() {
               {pendingDraftsCount > 0 ? (
                 <Link
                   href="/dashboard/purchase-requests?stage=draft"
-                  className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5 transition-colors hover:bg-amber-50/30"
+                  className="bg-white min-h-[82px] p-3 sm:p-3.5 flex flex-col justify-center transition-colors hover:bg-amber-50/30"
                 >
                   
                   <div className="min-w-0">
@@ -319,7 +319,7 @@ export default function DashboardPage() {
                   </div>
                 </Link>
               ) : (
-                <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
+                <div className="bg-white min-h-[82px] p-3 sm:p-3.5 flex flex-col justify-center">
                   
                   <div className="min-w-0">
                     <div className="text-xl sm:text-2xl font-black text-[#4D002C] font-mono leading-none">
