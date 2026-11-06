@@ -112,10 +112,10 @@ export function SystemPageHeader({
           )}
           {brandLogo ? (
             brandWordmark ? (
-              <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-[#F2D28A]/45 bg-gradient-to-br from-white/15 via-[#E9B957]/10 to-white/[0.04] shadow-[0_5px_18px_rgba(0,0,0,0.2)] ring-1 ring-white/5">
+              <div className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-[#F2D28A]/45 bg-gradient-to-br from-white/15 via-[#E9B957]/10 to-white/[0.04] shadow-[0_5px_18px_rgba(0,0,0,0.2)] ring-1 ring-white/5">
                 <span className="pointer-events-none absolute inset-[3px] rounded-[11px] border border-white/10" />
                 <MsuLogo size={35} className="relative z-10 drop-shadow-[0_2px_5px_rgba(0,0,0,0.2)]" />
-              </span>
+              </div>
             ) : (
               <MsuLogo size={36} className="shrink-0" />
             )
