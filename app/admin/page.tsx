@@ -770,7 +770,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
               {/* Activity & Remarks */}
               <div className="border border-stone-200 rounded-xl p-4 bg-white">
-                <h4 className="text-xs uppercase tracking-wide text-stone-400 font-semibold mb-3">Recorded Activity</h4>
+                <h4 className="text-xs uppercase tracking-wide text-stone-400 font-semibold mb-3">Activity &amp; Remarks</h4>
                 {history.length ? (
                   <div className="space-y-2">
                     {history.map((h, i) => (
