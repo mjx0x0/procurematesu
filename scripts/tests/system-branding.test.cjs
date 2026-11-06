@@ -105,6 +105,14 @@ test('main dashboard headers show the ProcureMateSU wordmark with MSU letters hi
   assert.ok(header.includes('text-white/75'));
   assert.ok(header.includes('tracking-[0.10em]'));
   assert.ok(header.includes('rounded-full bg-[#E9B957]'));
+  assert.ok(header.includes('data-workspace-brand={brandLogo && brandWordmark ? "true" : undefined}'));
+  const globalStyles = read('app/globals.css');
+  assert.ok(globalStyles.includes('nav[class*="sticky"][data-workspace-brand="true"]'));
+  assert.ok(globalStyles.includes('background: #4A002A !important;'));
+  assert.ok(globalStyles.includes('position: sticky !important;'));
+  assert.ok(globalStyles.includes('top: 0 !important;'));
+  assert.match(dashboard, /overflow-x-clip/);
+  assert.doesNotMatch(dashboard, /overflow-x-hidden/);
   assert.match(dashboard, /workspaceLabel="End User Workspace"/);
   assert.match(admin, /workspaceLabel="Administrative Workspace"/);
   assert.match(dashboard, /brandWordmark/);
