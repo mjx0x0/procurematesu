@@ -93,6 +93,7 @@ export function SystemPageHeader({
   return (
     <nav
       data-compact-mobile={compactOnMobile ? "true" : undefined}
+      data-workspace-brand={brandLogo && brandWordmark ? "true" : undefined}
       className={
         brandLogo && brandWordmark
           ? compactOnMobile
