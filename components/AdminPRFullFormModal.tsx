@@ -141,22 +141,6 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
                   <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">PR Date</p>
                   <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(currentDate)}</p>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">SAI No.</p>
-                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.sai_no || "—")}</p>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">SAI Date</p>
-                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.sai_date || "—")}</p>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">ALOBS No.</p>
-                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.alobs_no || "—")}</p>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">ALOBS Date</p>
-                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.alobs_date || "—")}</p>
-                </div>
               </div>
               <div className="mt-3 border-t border-stone-100 pt-3">
                 <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Purpose</p>
@@ -231,8 +215,9 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
             </p>
           </div>
 
-          <div className="mx-auto w-full max-w-5xl overflow-x-auto overscroll-x-contain pb-2 print:overflow-visible print:pb-0">
-            <div id="admin-pr-print" className="mx-auto hidden w-full min-w-[720px] max-w-5xl bg-white text-black shadow-sm md:block print:block print:border-0 print:shadow-none">
+          <div className="admin-pr-official-form-scroll mx-auto w-full max-w-5xl overflow-x-auto overscroll-x-contain pb-2 print:overflow-visible print:pb-0">
+            <p className="mb-2 px-1 text-center text-[11px] font-semibold text-stone-500 md:hidden print:hidden">Official Purchase Request Form · Swipe horizontally to view the complete form.</p>
+            <div id="admin-pr-print" className="admin-pr-official-document mx-auto block w-full min-w-[720px] max-w-5xl bg-white text-black shadow-sm print:block print:border-0 print:shadow-none">
             <div className="border-2 border-black text-black">
               <div className="border-b-2 border-black px-4 py-3 text-center">
                 <h1 className="font-serif text-xl font-black uppercase tracking-wider">PURCHASE REQUEST</h1>
