@@ -147,15 +147,17 @@ export function SystemPageHeader({
               )}
             </b>
             {workspaceLabel && (
-              <p
-                className={
-                  brandWordmark
-                    ? "mt-1.5 truncate text-[8px] font-bold uppercase tracking-[0.13em] text-[#F6D58A] sm:text-[8.5px]"
-                    : "truncate text-[10px] font-extrabold uppercase tracking-[0.14em] bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent"
-                }
-              >
-                {workspaceLabel}
-              </p>
+              {brandWordmark ? (
+                <p className="mt-1.5 flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.10em] sm:text-[8.5px] sm:tracking-[0.13em]">
+                  <span className="shrink-0 text-[#F6D58A]">{workspaceLabel}</span>
+                  <span aria-hidden="true" className="h-1 w-1 shrink-0 rounded-full bg-[#E9B957]" />
+                  <span className="truncate text-white/75">Digital Procurement System</span>
+                </p>
+              ) : (
+                <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">
+                  {workspaceLabel}
+                </p>
+              )}
             )}
           </div>
         </div>
