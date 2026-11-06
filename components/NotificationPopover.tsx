@@ -43,7 +43,7 @@ function formatTimeAgo(isoString: string): string {
   }
 }
 
-export function NotificationPopover() {
+export function NotificationPopover({ variant = "default" }: { variant?: "default" | "workspace" }) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
@@ -147,17 +147,21 @@ export function NotificationPopover() {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className={`relative flex h-10 w-10 sm:h-9 sm:w-9 cursor-pointer items-center justify-center rounded-xl border transition active:scale-95 ${
-          open
-            ? "border-[#7B0046]/30 bg-[#FDF2F7] text-[#7B0046]"
-            : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50 hover:text-[#7B0046]"
+        className={`relative flex h-10 w-10 sm:h-9 sm:w-9 cursor-pointer items-center justify-center rounded-xl border transition active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F6D58A]/60 ${
+          variant === "workspace"
+            ? open
+              ? "border-[#F6D58A]/50 bg-white/15 text-[#F6D58A]"
+              : "border-white/20 bg-white/[0.09] text-white/90 hover:border-[#F6D58A]/45 hover:bg-white/15 hover:text-[#F6D58A]"
+            : open
+              ? "border-[#7B0046]/30 bg-[#FDF2F7] text-[#7B0046]"
+              : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50 hover:text-[#7B0046]"
         }`}
         aria-label={`Notifications${unread ? `, ${unread} unread` : ""}`}
         aria-expanded={open}
       >
         <Bell className="h-4 w-4" />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#7B0046] px-1 text-[10px] font-black text-white shadow-xs ring-2 ring-white">
+          <span className={`absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-black shadow-xs ring-2 ${variant === "workspace" ? "bg-[#F6C453] text-[#4A002A] ring-[#4A002A]" : "bg-[#7B0046] text-white ring-white"}`}>
             {unread > 9 ? "9+" : unread}
           </span>
         )}

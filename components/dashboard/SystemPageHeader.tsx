@@ -164,12 +164,20 @@ export function SystemPageHeader({
         <div className={`flex shrink-0 items-center justify-end ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-2 sm:gap-3"}`}>
           {children && <div className={`flex shrink-0 items-center ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-2 sm:gap-3"}`}>{children}</div>}
           <div ref={accountMenuRef} className="relative shrink-0">
-            <button type="button" onClick={() => setAccountMenuOpen((previous) => !previous)} className={compactOnMobile ? "flex h-10 max-w-[48vw] cursor-pointer items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-1.5 text-xs text-stone-700 transition hover:border-stone-300 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 sm:max-w-[250px] sm:gap-2 sm:px-3" : "flex h-11 sm:h-10 max-w-[48vw] cursor-pointer items-center gap-2 rounded-xl border border-stone-200 bg-white px-2.5 text-xs text-stone-700 transition hover:border-stone-300 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 sm:max-w-[250px] sm:px-3"} aria-expanded={accountMenuOpen} aria-label="User account menu">
-              <div className={`flex ${compactOnMobile ? "h-6 w-6 sm:h-7 sm:w-7" : "h-7 w-7"} shrink-0 items-center justify-center rounded-full bg-[#7B0046]/10 text-[#7B0046]`}>
+            <button
+              type="button"
+              onClick={() => setAccountMenuOpen((previous) => !previous)}
+              className={`flex ${compactOnMobile ? "h-10 max-w-[48vw] gap-1.5 px-1.5 sm:gap-2 sm:px-3" : "h-11 max-w-[48vw] gap-2 px-2.5 sm:h-10 sm:px-3"} cursor-pointer items-center rounded-xl border text-xs transition focus:outline-none focus:ring-2 sm:max-w-[250px] ${brandWordmark
+                ? "border-white/20 bg-white/[0.09] text-white/95 hover:border-[#F6D58A]/45 hover:bg-white/[0.15] focus:ring-[#F6D58A]/50"
+                : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50 focus:ring-[#7B0046]/20"}`}
+              aria-expanded={accountMenuOpen}
+              aria-label="User account menu"
+            >
+              <div className={`flex ${compactOnMobile ? "h-6 w-6 sm:h-7 sm:w-7" : "h-7 w-7"} shrink-0 items-center justify-center rounded-full ${brandWordmark ? "bg-[#F6D58A]/15 text-[#F6D58A]" : "bg-[#7B0046]/10 text-[#7B0046]"}`}>
                 <User className="h-3.5 w-3.5" />
               </div>
-              <span className="hidden max-w-[170px] truncate text-xs font-medium text-stone-800 sm:inline">{displayName}</span>
-              <ChevronDown className={`h-3.5 w-3.5 shrink-0 text-stone-400 transition-transform ${accountMenuOpen ? "rotate-180 text-[#7B0046]" : ""}`} />
+              <span className={`hidden max-w-[170px] truncate text-xs font-medium sm:inline ${brandWordmark ? "text-white/95" : "text-stone-800"}`}>{displayName}</span>
+              <ChevronDown className={`h-3.5 w-3.5 shrink-0 transition-transform ${brandWordmark ? "text-white/65" : "text-stone-400"} ${accountMenuOpen ? `rotate-180 ${brandWordmark ? "text-[#F6D58A]" : "text-[#7B0046]"}` : ""}`} />
             </button>
             {accountMenuOpen && (
               <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-60 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">

@@ -153,7 +153,7 @@ export default function DashboardPage() {
         showAdminPortal={isAdmin}
         containerClassName="max-w-[1220px] px-3.5 sm:px-7 lg:px-8"
       >
-        <NotificationPopover />
+        <NotificationPopover variant="workspace" />
         <div className="hidden h-7 w-px bg-white/20 sm:block" />
       </SystemPageHeader>
 
