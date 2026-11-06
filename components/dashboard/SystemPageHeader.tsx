@@ -90,19 +90,20 @@ export function SystemPageHeader({
     }
   };
 
+  const headerClassName = brandLogo && brandWordmark
+    ? compactOnMobile
+      ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)] backdrop-blur-md sm:h-[72px]"
+      : "sticky top-0 z-50 h-16 shrink-0 border-b border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)] backdrop-blur-md sm:h-[72px]"
+    : compactOnMobile
+      ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]"
+      : "sticky top-0 z-50 h-16 shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]";
+
+  const titleClassName = brandWordmark
+    ? "block truncate font-black leading-tight text-[17px] tracking-[-0.04em] sm:text-[20px]"
+    : `block truncate font-black leading-tight ${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} tracking-tight text-[#4D002C]`;
+
   return (
-    <nav
-      data-compact-mobile={compactOnMobile ? "true" : undefined}
-      className={
-        brandLogo && brandWordmark
-          ? compactOnMobile
-            ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)] backdrop-blur-md sm:h-[72px]"
-            : "sticky top-0 z-50 h-16 shrink-0 border-b border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)] backdrop-blur-md sm:h-[72px]"
-          : compactOnMobile
-            ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]"
-            : "sticky top-0 z-50 h-16 shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]"
-      }
-    >
+    <nav data-compact-mobile={compactOnMobile ? "true" : undefined} className={headerClassName}>
       <div className={`mx-auto flex h-full items-center justify-between ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-3"} ${containerClassName}`}>
         <div className={`flex min-w-0 items-center ${compactOnMobile ? "gap-1.5 sm:gap-3" : "gap-2 sm:gap-3"}`}>
           {backHref !== null && (
@@ -127,7 +128,7 @@ export function SystemPageHeader({
           <div className="min-w-0">
             <b
               aria-label={brandWordmark ? "ProcureMateSU" : undefined}
-              className={`block truncate font-black leading-tight ${brandWordmark ? "text-[17px] tracking-[-0.04em] sm:text-[20px]" : `${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} tracking-tight text-[#4D002C]`}`}
+              className={titleClassName}
             >
               {brandWordmark ? (
                 <span className="flex items-center whitespace-nowrap">
