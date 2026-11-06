@@ -162,105 +162,20 @@ export default function PurchaseRequestsPage() {
       <SystemPageHeader titlePrimary="Purchase" titleAccent="Requests" backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl px-3.5 sm:px-6 lg:px-8" />
 
       <main className="mx-auto max-w-7xl px-3.5 py-6 sm:px-6 sm:py-8 lg:px-8">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#4A002A] via-[#6B003E] to-[#3D0024] p-6 sm:p-8 md:p-9 text-white shadow-[0_16px_40px_rgba(74,0,42,0.12)] mb-5 sm:mb-6">
-          <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-3xl" />
-          <div className="pointer-events-none absolute -left-16 -bottom-20 h-64 w-64 rounded-full bg-[#7B0046]/35 blur-3xl" />
-          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
-            <div className="max-w-2xl">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
-                Purchase Requests Directory
-              </h1>
-              <p className="mt-2 text-xs sm:text-sm leading-relaxed text-white/85">
-                Track, filter, and monitor all your university purchase requests as they advance through verification, PMO approval, bidding, and delivery stages.
-              </p>
-            </div>
-            <Link
-              href="/dashboard/new-pr"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#F0C83F]/50 bg-gradient-to-r from-[#F0C83F] to-[#D4A82C] px-5 py-3 text-xs sm:text-sm font-extrabold text-[#4D002C] shadow-md transition hover:-translate-y-0.5 shrink-0"
-            >
-              <PlusCircle className="h-4 w-4" />
-              <span>Create Purchase Request</span>
-            </Link>
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#4D002C]">My Purchase Requests</h1>
+            <p className="mt-1 max-w-2xl text-xs sm:text-sm leading-relaxed text-stone-600">
+              Review your requests, check their current status, and print drafts for physical submission.
+            </p>
           </div>
-        </section>
-
-        {/* Overview Stats Bar */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4 mb-6">
-          <button
-            type="button"
-            onClick={() => setStageFilter("all")}
-            className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${
-              stageFilter === "all"
-                ? "border-[#7B0046] bg-white shadow-sm ring-2 ring-[#7B0046]/10"
-                : "border-stone-200 bg-white hover:border-stone-300"
-            }`}
+          <Link
+            href="/dashboard/new-pr"
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#7B0046] px-4 py-2.5 text-xs sm:text-sm font-bold text-white shadow-xs transition hover:bg-[#4D002C] shrink-0"
           >
-            <p className="text-xs font-bold uppercase tracking-wider text-stone-500">All Requests</p>
-            <p className="mt-1 text-xl sm:text-3xl font-black text-[#4D002C]">{counts.total}</p>
-            <p className="text-[11px] text-stone-500 mt-0.5">Total submissions</p>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setStageFilter("draft")}
-            className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${
-              stageFilter === "draft"
-                ? "border-amber-600 bg-white shadow-sm ring-2 ring-amber-500/20"
-                : "border-amber-200/90 bg-amber-50/40 hover:border-amber-300"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-bold uppercase tracking-wider text-amber-800">Draft PRs</p>
-              {counts.drafts > 0 && (
-                <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-              )}
-            </div>
-            <p className="mt-1 text-2xl sm:text-3xl font-black text-amber-800">{counts.drafts}</p>
-            <p className="text-[11px] text-amber-800/90 font-medium mt-0.5">To submit physically</p>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setStageFilter("under_review")}
-            className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${
-              stageFilter === "under_review"
-                ? "border-[#C27803] bg-white shadow-sm ring-2 ring-[#C27803]/20"
-                : "border-stone-200 bg-white hover:border-stone-300"
-            }`}
-          >
-            <p className="text-xs font-bold uppercase tracking-wider text-amber-700">Under Review</p>
-            <p className="mt-1 text-2xl sm:text-3xl font-black text-[#9A7205]">{counts.underReview}</p>
-            <p className="text-[11px] text-stone-500 mt-0.5">Stages 1 to 3</p>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setStageFilter("approved")}
-            className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${
-              stageFilter === "approved"
-                ? "border-blue-600 bg-white shadow-sm ring-2 ring-blue-500/20"
-                : "border-stone-200 bg-white hover:border-stone-300"
-            }`}
-          >
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-700">Approved</p>
-            <p className="mt-1 text-2xl sm:text-3xl font-black text-blue-900">{counts.approved}</p>
-            <p className="text-[11px] text-stone-500 mt-0.5">Stage 4 and beyond</p>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setStageFilter("completed")}
-            className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${
-              stageFilter === "completed"
-                ? "border-emerald-600 bg-white shadow-sm ring-2 ring-emerald-500/20"
-                : "border-stone-200 bg-white hover:border-stone-300"
-            }`}
-          >
-            <p className="text-xs font-bold uppercase tracking-wider text-emerald-700">Completed</p>
-            <p className="mt-1 text-2xl sm:text-3xl font-black text-emerald-800">{counts.completed}</p>
-            <p className="text-[11px] text-stone-500 mt-0.5">Successfully delivered</p>
-          </button>
+            <PlusCircle className="h-4 w-4" />
+            <span>Create Purchase Request</span>
+          </Link>
         </div>
 
         {/* Directory Container */}
@@ -469,20 +384,7 @@ export default function PurchaseRequestsPage() {
                         <p className="mt-0.5 text-[11px] sm:text-xs text-stone-500 font-medium">
                           {pr.department || "University Office"}
                         </p>
-                        {pr.current_stage === "draft" && (
-                          <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-medium text-amber-800">
-                            <AlertCircle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
-                            <span>Action needed: Print official form &amp; physically submit to Procurement Office</span>
-                          </div>
-                        )}
-                        <div className="mt-2 sm:hidden">
-                          <span
-                            className={`inline-flex max-w-full items-center rounded-lg border px-2 py-1 text-[11px] font-semibold leading-snug ${statusColor(pr.current_stage)}`}
-                          >
-                            {stageNum && stageNum > 0 ? `Stage ${stageNum} · ` : ""}
-                            {PROCUREMENT_STAGE_SHORT_LABELS[pr.current_stage] || statusLabel(pr.current_stage)}
-                          </span>
-                        </div>
+
                       </div>
                     </div>
 
