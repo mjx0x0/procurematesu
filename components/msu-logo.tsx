@@ -35,7 +35,7 @@ export function MsuLogo({ className = "", size = 120, showText = false }: MsuLog
           width={size}
           height={size}
           onError={handleImgError}
-          className="object-contain drop-shadow-sm select-none transition-transform duration-300 hover:scale-105"
+          className="object-contain select-none transition-transform duration-200"
           style={{ width: size, height: size, maxHeight: size, maxWidth: size }}
         />
       ) : (

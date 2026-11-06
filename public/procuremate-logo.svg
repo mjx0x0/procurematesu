@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000" width="512" height="512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="200 146 1600 1600" width="512" height="512">
 <defs><radialGradient id="g" cx="43%" cy="43%" r="65%"><stop offset="0" stop-color="#ff9700"/><stop offset="48%" stop-color="#d35a2e"/><stop offset="100%" stop-color="#85005c"/></radialGradient></defs>
 <g fill="url(#g)" fill-rule="evenodd">
 <path d="M1454 1546L1440 1551L1428 1558L1414 1571L1404 1587L1399 1602L1399 1607L1398 1608L1399 1635L1403 1647L1410 1660L1418 1670L1430 1680L1443 1687L1456 1691L1462 1691L1463 1692L1487 1691L1502 1686L1513 1680L1527 1668L1535 1657L1541 1645L1545 1630L1545 1607L1539 1587L1530 1572L1519 1561L1509 1554L1496 1548L1483 1545Z"/>

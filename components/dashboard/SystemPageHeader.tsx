@@ -8,12 +8,15 @@ import { MsuLogo } from "@/components/msu-logo";
 import { supabase } from "@/lib/supabase/client";
 
 interface SystemPageHeaderProps {
-  titlePrimary: string;
-  titleAccent: string;
+  titlePrimary?: string;
+  titleAccent?: string;
   icon?: LucideIcon;
   backHref?: string | null;
   containerClassName?: string;
   workspaceLabel?: string;
+  subtitle?: string;
+  headerTitle?: string;
+  hideSystemSuffix?: boolean;
   brandLogo?: boolean;
   brandWordmark?: boolean;
   roleLabel?: string;
@@ -31,8 +34,11 @@ export function SystemPageHeader({
   backHref = "/dashboard",
   containerClassName = "max-w-7xl px-4 sm:px-6 lg:px-8",
   workspaceLabel,
-  brandLogo = false,
-  brandWordmark = false,
+  subtitle,
+  headerTitle,
+  hideSystemSuffix = false,
+  brandLogo = true,
+  brandWordmark = true,
   roleLabel = "End User",
   showAdminPortal = false,
   compactOnMobile = false,
@@ -79,6 +85,11 @@ export function SystemPageHeader({
     currentUser?.email?.split("@")[0] ||
     "Signed-in user";
 
+  const effectiveWorkspaceLabel =
+    subtitle ||
+    workspaceLabel ||
+    (roleLabel === "Administrator" ? "Administrative Workspace" : "End User Workspace");
+
   const handleLogout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -107,15 +118,21 @@ export function SystemPageHeader({
       <div className={`mx-auto flex h-full items-center justify-between ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-3"} ${containerClassName}`}>
         <div className={`flex min-w-0 items-center ${compactOnMobile ? "gap-1.5 sm:gap-3" : "gap-2 sm:gap-3"}`}>
           {backHref !== null && (
-            <Link href={backHref} className={compactOnMobile ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-stone-500 transition-colors hover:bg-stone-100 hover:text-[#7B0046] focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20" : "flex h-10 w-10 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl text-stone-500 transition-colors hover:bg-stone-100 hover:text-[#7B0046] focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20"} title="Back" aria-label="Back">
-              <ArrowLeft className="h-5 w-5" />
+            <Link
+              href={backHref}
+              className={`group flex shrink-0 items-center justify-center rounded-xl border border-white/20 bg-white/[0.09] text-white/90 hover:border-[#F6D58A]/45 hover:bg-white/15 hover:text-[#F6D58A] active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-[#F6D58A]/50 ${
+                compactOnMobile ? "h-9 w-9" : "h-10 w-10 sm:h-9 sm:w-9"
+              }`}
+              title="Back"
+              aria-label="Back"
+            >
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:-translate-x-0.5" />
             </Link>
           )}
           {brandLogo ? (
             brandWordmark ? (
-              <div className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-[#F2D28A]/45 bg-gradient-to-br from-white/15 via-[#E9B957]/10 to-white/[0.04] shadow-[0_5px_18px_rgba(0,0,0,0.2)] ring-1 ring-white/5">
-                <span className="pointer-events-none absolute inset-[3px] rounded-[11px] border border-white/10" />
-                <MsuLogo size={35} className="relative z-10 drop-shadow-[0_2px_5px_rgba(0,0,0,0.2)]" />
+              <div className="relative grid h-11 w-11 shrink-0 place-items-center rounded-[14px] border border-[#F2D28A]/45 bg-white/[0.08] shadow-xs">
+                <MsuLogo size={35} className="relative z-10" />
               </div>
             ) : (
               <MsuLogo size={36} className="shrink-0" />
@@ -130,7 +147,18 @@ export function SystemPageHeader({
               aria-label={brandWordmark ? "ProcureMateSU" : undefined}
               className={`block truncate font-black leading-tight ${brandWordmark ? "text-[17px] tracking-[-0.04em] sm:text-[20px]" : `${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} tracking-tight text-[#4D002C]`}`}
             >
-              {brandWordmark ? (
+              {headerTitle ? (
+                <span className="flex items-center whitespace-nowrap">
+                  <span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">
+                    {headerTitle.split(" ")[0]}
+                  </span>
+                  {headerTitle.split(" ").slice(1).length > 0 && (
+                    <span className="ml-1.5 bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">
+                      {headerTitle.split(" ").slice(1).join(" ")}
+                    </span>
+                  )}
+                </span>
+              ) : brandWordmark ? (
                 <span className="flex items-center whitespace-nowrap">
                   <span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">M</span><span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">ate</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">SU</span>
                 </span>
@@ -147,16 +175,20 @@ export function SystemPageHeader({
                 </>
               )}
             </b>
-            {workspaceLabel && brandWordmark && (
+            {headerTitle === "Gab AI" || hideSystemSuffix ? (
               <p className="mt-1.5 flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.10em] sm:text-[8.5px] sm:tracking-[0.13em]">
-                <span className="shrink-0 text-[#F6D58A]">{workspaceLabel}</span>
-                <span aria-hidden="true" className="h-1 w-1 shrink-0 rounded-full bg-[#E9B957]" />
-                <span className="truncate text-white/75">Digital Procurement System</span>
+                <span className="shrink-0 text-[#F6D58A]">{effectiveWorkspaceLabel || "Procurement Assistant"}</span>
               </p>
-            )}
-            {workspaceLabel && !brandWordmark && (
+            ) : brandWordmark ? (
+              <p className="mt-1.5 flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.10em] sm:text-[8.5px] sm:tracking-[0.13em]">
+                <span className="shrink-0 text-[#F6D58A]">MSU – General Santos</span>
+                <span aria-hidden="true" className="h-1 w-1 shrink-0 rounded-full bg-[#E9B957]" />
+                <span className="truncate text-white/75">Digital Procurement Logbook</span>
+                <span className="sr-only">Digital Procurement System</span>
+              </p>
+            ) : (
               <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">
-                {workspaceLabel}
+                {effectiveWorkspaceLabel}
               </p>
             )}
           </div>

@@ -284,7 +284,37 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
       <SystemPageHeader titlePrimary="ProcureMateSU" titleAccent="" compactOnMobile workspaceLabel="Administrative Workspace" brandLogo brandWordmark backHref={null} roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
 
       <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-3.5 sm:py-7">
-        <div className="flex flex-col lg:flex-row justify-between gap-5 mb-7"><div><h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1><p className="text-xs sm:text-sm text-stone-600 mt-1">Manage Purchase Requests through the official university PMO procurement workflow.</p></div><div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-start"><Link href="/admin/users" className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] transition-colors hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:w-auto sm:text-sm"><Users className="h-4 w-4 shrink-0" /> User Approvals</Link><Link href="/admin/inquiries" className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] transition-colors hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:w-auto sm:text-sm"><MessageSquare className="h-4 w-4 shrink-0" /> Inquiries</Link><button onClick={() => void manualRefresh()} disabled={refreshing} className="admin-refresh-btn inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] transition-colors hover:bg-[#FDF2F7] disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:w-auto sm:text-sm"><RefreshCw className={`h-4 w-4 shrink-0 ${refreshing ? "animate-spin" : ""}`} /><span>{refreshing ? "Refreshing…" : "Refresh"}</span></button></div></div>
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5 mb-5 sm:mb-7">
+          <div>
+            <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#4D002C]">Admin Dashboard</h1>
+            <p className="text-xs sm:text-sm text-stone-600 mt-1">Manage Purchase Requests through the official university PMO procurement workflow.</p>
+          </div>
+          <div className="flex w-full items-center gap-2 sm:w-auto sm:gap-2.5">
+            <Link
+              href="/admin/users"
+              className="inline-flex min-h-11 flex-1 sm:flex-initial items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] shadow-xs transition-colors hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:text-sm"
+            >
+              <Users className="h-4 w-4 shrink-0" />
+              <span>User Approvals</span>
+            </Link>
+            <Link
+              href="/admin/inquiries"
+              className="inline-flex min-h-11 flex-1 sm:flex-initial items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-semibold text-[#7B0046] shadow-xs transition-colors hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:text-sm"
+            >
+              <MessageSquare className="h-4 w-4 shrink-0" />
+              <span>Inquiries</span>
+            </Link>
+            <button
+              onClick={() => void manualRefresh()}
+              disabled={refreshing}
+              title={refreshing ? "Refreshing…" : "Refresh"}
+              aria-label={refreshing ? "Refreshing…" : "Refresh"}
+              className="admin-refresh-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-white text-[#7B0046] shadow-xs transition-colors hover:bg-[#FDF2F7] hover:border-[#7B0046]/40 active:scale-95 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2"
+            >
+              <RefreshCw className={`h-4 w-4 shrink-0 ${refreshing ? "animate-spin" : ""}`} />
+            </button>
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-7">{[[stats.total, "Total PRs", FileCheck, "text-[#7B0046]"], [stats.pending, "In Progress", Clock, "text-amber-600"], [stats.completed, "Completed", CheckCircle, "text-emerald-700"], [stats.rejected, "Rejected", XCircle, "text-red-600"]].map(([n, l, I, c]: any) => <div key={l} className="bg-white rounded-2xl p-3 sm:p-4 border border-stone-200 shadow-[0_5px_20px_rgba(45,20,10,0.035)]"><div className="flex justify-between items-center"><div><div className={`text-xl sm:text-2xl font-bold ${c}`}>{n}</div><div className="text-[11px] sm:text-xs font-semibold text-stone-600 mt-0.5">{l}</div></div><I className={`h-4 w-4 sm:h-5 sm:w-5 ${c}`} /></div></div>)}</div>
 

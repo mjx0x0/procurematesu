@@ -559,10 +559,9 @@ export default function ChatbotDashboard() {
     >
       {/* Top Navbar */}
       <SystemPageHeader
-        titlePrimary="Gab"
-        titleAccent="AI"
-        mobileTitlePrimary="Gab"
-        mobileTitleAccent="AI"
+        headerTitle="Gab AI"
+        subtitle="Procurement Assistant"
+        hideSystemSuffix
         compactOnMobile
         backHref="/dashboard"
         roleLabel="End User"
@@ -574,15 +573,15 @@ export default function ChatbotDashboard() {
               onClick={() => setSidebarOpen((prev) => !prev)}
               className={`group relative hidden md:inline-flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-150 select-none shadow-2xs active:scale-95 ${
                 sidebarOpen
-                  ? "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50 hover:text-[#7B0046]"
-                  : "border-[#7B0046]/30 bg-[#FDF2F7] text-[#7B0046] hover:border-[#7B0046]/50 hover:bg-[#FBE8F2]"
+                  ? "border-white/20 bg-white/[0.09] text-white/90 hover:border-[#F6D58A]/45 hover:bg-white/15 hover:text-[#F6D58A]"
+                  : "border-[#F6D58A]/40 bg-[#F6D58A]/20 text-[#F6D58A] hover:bg-[#F6D58A]/30"
               }`}
               aria-label={sidebarOpen ? "Hide History" : "Show History"}
             >
               {sidebarOpen ? (
-                <PanelLeftClose className="h-4 w-4 text-stone-500 transition-colors group-hover:text-[#7B0046]" />
+                <PanelLeftClose className="h-4 w-4 text-white/80 transition-colors group-hover:text-[#F6D58A]" />
               ) : (
-                <PanelLeftOpen className="h-4 w-4 text-[#7B0046]" />
+                <PanelLeftOpen className="h-4 w-4 text-[#F6D58A]" />
               )}
               <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-stone-900/90 px-2 py-0.5 text-[11px] font-medium text-white shadow-md opacity-0 transition-opacity duration-150 group-hover:opacity-100 z-50">
                 {sidebarOpen ? "Hide History" : "Show History"}
@@ -592,10 +591,10 @@ export default function ChatbotDashboard() {
             {/* Mobile History Toggle Button */}
             <button
               onClick={() => setMobileHistoryOpen(true)}
-              className="group relative flex md:hidden h-9 w-9 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 shadow-2xs transition-all duration-150 hover:border-stone-300 hover:bg-stone-50 hover:text-[#7B0046] active:scale-95 select-none"
+              className="group relative flex md:hidden h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-white/[0.09] text-white/90 shadow-2xs transition-all duration-150 hover:border-[#F6D58A]/45 hover:bg-white/15 hover:text-[#F6D58A] active:scale-95 select-none"
               aria-label="Chat History"
             >
-              <History className="h-4 w-4 text-stone-500 transition-colors group-hover:text-[#7B0046]" />
+              <History className="h-4 w-4 text-white/80 transition-colors group-hover:text-[#F6D58A]" />
               <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-stone-900/90 px-2 py-0.5 text-[11px] font-medium text-white shadow-md opacity-0 transition-opacity duration-150 group-hover:opacity-100 z-50">
                 Chat History
               </span>
@@ -605,10 +604,10 @@ export default function ChatbotDashboard() {
             <button
               onClick={() => setShowClearModal(true)}
               disabled={loading || !sessionId}
-              className="group relative inline-flex h-9 w-9 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 shadow-2xs transition-all duration-150 hover:border-red-200 hover:bg-red-50/80 hover:text-red-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-stone-200 disabled:hover:bg-white disabled:hover:text-stone-600 select-none"
+              className="group relative inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-white/[0.09] text-white/90 shadow-2xs transition-all duration-150 hover:border-red-400/50 hover:bg-red-500/20 hover:text-red-200 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/20 disabled:hover:bg-white/[0.09] disabled:hover:text-white/90 select-none"
               aria-label="Clear Chat"
             >
-              <Trash2 className="h-4 w-4 text-stone-500 transition-colors group-hover:text-red-600" />
+              <Trash2 className="h-4 w-4 text-white/80 transition-colors group-hover:text-red-300" />
               <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-stone-900/90 px-2 py-0.5 text-[11px] font-medium text-white shadow-md opacity-0 transition-opacity duration-150 group-hover:opacity-100 z-50">
                 Clear Chat
               </span>

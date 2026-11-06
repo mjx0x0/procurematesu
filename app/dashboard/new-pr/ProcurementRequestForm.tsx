@@ -189,9 +189,21 @@ export default function ProcurementRequestForm() {
     <div className="min-h-screen bg-[#FAF8F5] pb-16">
 
       {/* Top Navigation */}
-      <SystemPageHeader titlePrimary="Create PR" titleAccent="Draft" backHref="/dashboard" roleLabel="End User" containerClassName="max-w-5xl px-4" />
+      <SystemPageHeader
+        titlePrimary="Create PR"
+        titleAccent="Draft"
+        workspaceLabel="End User Workspace"
+        backHref="/dashboard"
+        roleLabel="End User"
+        containerClassName="max-w-5xl px-4"
+      />
 
       <main className="max-w-5xl mx-auto px-3.5 sm:px-4 pt-4 sm:pt-6">
+        {/* Page Heading */}
+        <div className="mb-4 sm:mb-5">
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-[#4D002C]">Create Purchase Request</h1>
+        </div>
+
         <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
           {/* Header Banner */}
           <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />

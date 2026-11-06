@@ -63,9 +63,8 @@ export default function LandingPage() {
               aria-label="ProcureMateSU — MSU General Santos Digital Procurement Logbook"
               className="group flex min-w-0 items-center gap-3 rounded-2xl py-1 pr-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F6D58A]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#4A002A]"
             >
-              <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-[#F2D28A]/45 bg-gradient-to-br from-white/15 via-[#E9B957]/10 to-white/[0.04] shadow-[0_5px_18px_rgba(0,0,0,0.2)] ring-1 ring-white/5">
-                <span className="pointer-events-none absolute inset-[3px] rounded-[11px] border border-white/10" />
-                <MsuLogo size={35} className="relative z-10 drop-shadow-[0_2px_5px_rgba(0,0,0,0.2)]" />
+              <span className="relative grid h-11 w-11 shrink-0 place-items-center rounded-[14px] border border-[#F2D28A]/45 bg-white/[0.08] shadow-xs">
+                <MsuLogo size={35} className="relative z-10" />
               </span>
               <span className="min-w-0 leading-none">
                 <span className="flex items-center whitespace-nowrap text-[17px] font-black tracking-[-0.04em] sm:text-[20px]">

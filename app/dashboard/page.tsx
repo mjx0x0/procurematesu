@@ -20,7 +20,6 @@ import { NotificationPopover } from "@/components/NotificationPopover";
 
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
-import { MsuLogo } from "@/components/msu-logo";
 import { SYSTEM_NAME } from "@/lib/system-branding";
 import {
   PROCUREMENT_STAGES,
@@ -158,20 +157,13 @@ export default function DashboardPage() {
       </SystemPageHeader>
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
-        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#480028] via-[#5F0035] to-[#35001D] px-5 py-4 sm:px-7 sm:py-5 md:px-8 md:py-5 text-white shadow-[0_12px_30px_rgba(74,0,42,0.12)]">
-          <div className="pointer-events-none absolute -right-20 -top-28 h-80 w-80 rounded-full bg-[#D4AF37]/15 blur-3xl" />
-          <div className="pointer-events-none absolute -left-16 -bottom-20 h-72 w-72 rounded-full bg-[#7B0046]/40 blur-3xl" />
-          <div className="pointer-events-none absolute right-4 -bottom-10 opacity-[0.05] select-none hidden lg:block">
-            <MsuLogo size={180} />
-          </div>
-          <div className="relative z-10 w-full">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
-              Good day, <span className="text-white">{displayName}</span>.
-            </h1>
-            <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-stone-200/90 font-normal w-full">
-              Manage your purchase requests, follow their progress through the university procurement workflow, and access procurement guidance from one refined workspace.
-            </p>
-          </div>
+        <section className="pt-1 pb-1 sm:pt-2 sm:pb-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-[#4D002C] leading-tight">
+            Procurement Dashboard
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm text-stone-600 max-w-2xl leading-relaxed">
+            Create purchase requests, track approval progress, and access university procurement resources.
+          </p>
         </section>
 
         <section className="mt-4 sm:mt-5" aria-label="Main Feature Shortcuts">
