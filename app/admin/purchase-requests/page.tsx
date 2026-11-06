@@ -336,7 +336,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
         </div>
 
         {/* Purchase Requests Table Card */}
-        <div bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-[0_8px_30px_rgba(45,20,10,0.04)]">
+        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-[0_8px_30px_rgba(45,20,10,0.04)]">
           <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-stone-50/50">
             <div>
               <h2 className="text-base sm:text-xl font-bold text-[#4D002C]">Purchase Requests</h2>
