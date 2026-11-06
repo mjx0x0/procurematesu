@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
-import { CheckCircle, Clock, FileCheck, Loader2, MessageSquare, Users, XCircle, ChevronRight } from "lucide-react";
+import { CheckCircle, Clock, FileCheck, Loader2, XCircle, ChevronRight } from "lucide-react";
 
 interface PRSummary {
   current_stage: string;
