@@ -1,9 +1,9 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import AdminPurchaseRequestsPage from "../page";
+import { AdminPurchaseRequestsWorkspace } from "../page";
 
 export default function AdminPurchaseRequestDetailsRoute() {
   const params = useParams<{ prNo: string }>();
-  return <AdminPurchaseRequestsPage initialPRNo={params.prNo} />;
+  return <AdminPurchaseRequestsWorkspace initialPRNo={params.prNo} />;
 }
