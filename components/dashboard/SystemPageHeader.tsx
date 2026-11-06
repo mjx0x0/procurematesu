@@ -91,7 +91,18 @@ export function SystemPageHeader({
   };
 
   return (
-    <nav data-compact-mobile={compactOnMobile ? "true" : undefined} className={compactOnMobile ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]" : "sticky top-0 z-50 h-16 shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]"}>
+    <nav
+      data-compact-mobile={compactOnMobile ? "true" : undefined}
+      className={
+        brandLogo && brandWordmark
+          ? compactOnMobile
+            ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)] backdrop-blur-md sm:h-[72px]"
+            : "sticky top-0 z-50 h-16 shrink-0 border-b border-[#F5AB26]/25 bg-[#4A002A]/95 shadow-[0_4px_24px_rgba(30,0,18,0.22)] backdrop-blur-md sm:h-[72px]"
+          : compactOnMobile
+            ? "sticky top-0 z-50 h-14 chatbot-mobile-header shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]"
+            : "sticky top-0 z-50 h-16 shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[68px]"
+      }
+    >
       <div className={`mx-auto flex h-full items-center justify-between ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-3"} ${containerClassName}`}>
         <div className={`flex min-w-0 items-center ${compactOnMobile ? "gap-1.5 sm:gap-3" : "gap-2 sm:gap-3"}`}>
           {backHref !== null && (
@@ -100,7 +111,14 @@ export function SystemPageHeader({
             </Link>
           )}
           {brandLogo ? (
-            <MsuLogo size={36} className="shrink-0" />
+            brandWordmark ? (
+              <div className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-[#F2D28A]/45 bg-gradient-to-br from-white/15 via-[#E9B957]/10 to-white/[0.04] shadow-[0_5px_18px_rgba(0,0,0,0.2)] ring-1 ring-white/5">
+                <span className="pointer-events-none absolute inset-[3px] rounded-[11px] border border-white/10" />
+                <MsuLogo size={35} className="relative z-10 drop-shadow-[0_2px_5px_rgba(0,0,0,0.2)]" />
+              </div>
+            ) : (
+              <MsuLogo size={36} className="shrink-0" />
+            )
           ) : PageIcon ? (
             <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#4D002C] text-amber-300 shadow-sm ${compactOnMobile ? "hidden sm:flex" : ""}`}>
               <PageIcon className="h-5 w-5" />
@@ -109,11 +127,11 @@ export function SystemPageHeader({
           <div className="min-w-0">
             <b
               aria-label={brandWordmark ? "ProcureMateSU" : undefined}
-              className={`block truncate ${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} font-black leading-tight tracking-tight text-[#4D002C]`}
+              className={`block truncate font-black leading-tight ${brandWordmark ? "text-[17px] tracking-[-0.04em] sm:text-[20px]" : `${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} tracking-tight text-[#4D002C]`}`}
             >
               {brandWordmark ? (
-                <span>
-                  <span className="bg-gradient-to-r from-[#4D002C] via-[#64113F] to-[#7B0046] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">M</span><span className="bg-gradient-to-r from-[#7B0046] via-[#64113F] to-[#4D002C] bg-clip-text text-transparent">ate</span><span className="bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">SU</span>
+                <span className="flex items-center whitespace-nowrap">
+                  <span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">M</span><span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">ate</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">SU</span>
                 </span>
               ) : (
                 <>
@@ -129,7 +147,13 @@ export function SystemPageHeader({
               )}
             </b>
             {workspaceLabel && (
-              <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent">
+              <p
+                className={
+                  brandWordmark
+                    ? "mt-1.5 truncate text-[8px] font-bold uppercase tracking-[0.13em] text-[#F6D58A] sm:text-[8.5px]"
+                    : "truncate text-[10px] font-extrabold uppercase tracking-[0.14em] bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent"
+                }
+              >
                 {workspaceLabel}
               </p>
             )}

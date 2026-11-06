@@ -24,7 +24,7 @@ test('landing page brand lockup uses a framed logo, refined gradient wordmark, a
   assert.match(landing, /rounded-\[14px\].*border border-\[#F2D28A\]\/45/s);
   assert.ok(landing.includes('from-white via-[#FFF5E5] to-[#F1E4EF]'));
   assert.ok(landing.includes('from-[#FFF0B5] via-[#F6C453] to-[#C9871B]'));
-  assert.ok(landing.includes('px-6 py-2.5 sm:px-8'));
+  assert.ok(landing.includes('px-4 py-2.5 sm:gap-6 sm:px-8'));
   assert.ok(landing.includes('grid h-11 w-11 shrink-0 place-items-center'));
   assert.ok(landing.includes('<MsuLogo size={35}'));
   assert.match(landing, /Digital Procurement Logbook/);
@@ -96,9 +96,11 @@ test('main dashboard headers show the ProcureMateSU wordmark with MSU letters hi
 
   assert.match(header, /brandWordmark\?: boolean/);
   assert.match(header, /aria-label=\{brandWordmark \? "ProcureMateSU"/);
-  assert.ok(header.includes('from-[#4D002C] via-[#64113F] to-[#7B0046]'));
-  assert.ok(header.includes('from-[#A16207] via-[#D97706] to-[#B45309]'));
-  assert.ok(header.includes('font-extrabold uppercase tracking-[0.14em] bg-gradient-to-br from-[#A16207] via-[#D97706] to-[#B45309] bg-clip-text text-transparent'));
+  assert.ok(header.includes('rounded-[14px] border border-[#F2D28A]/45'));
+  assert.ok(header.includes('from-white via-[#FFF5E5] to-[#F1E4EF]'));
+  assert.ok(header.includes('from-[#FFF0B5] via-[#F6C453] to-[#C9871B]'));
+  assert.ok(header.includes('bg-[#4A002A]/95'));
+  assert.ok(header.includes('text-[#F6D58A]'));
   assert.match(dashboard, /workspaceLabel="End User Workspace"/);
   assert.match(admin, /workspaceLabel="Administrator Workspace"/);
   assert.match(dashboard, /brandWordmark/);
