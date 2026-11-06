@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SYSTEM_NAME } from "@/lib/system-branding";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
@@ -47,7 +46,7 @@ const COLORS: Record<string, string> = {
   draft: "bg-gray-100 text-gray-600", rejected: "bg-red-100 text-red-700", cancelled: "bg-red-100 text-red-700", completed: "bg-emerald-100 text-emerald-700",
 };
 
-export default function AdminPurchaseRequestsPage() {
+export default function AdminPurchaseRequestsPage({ initialPRNo }: { initialPRNo?: string }) {
   const router = useRouter();
   const [prs, setPrs] = useState<PR[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +68,7 @@ export default function AdminPurchaseRequestsPage() {
   const [approvalGroupFilter, setApprovalGroupFilter] = useState<"all" | "approved" | "drafts">("all");
 
   const selectedPRRef = useRef<PR | null>(null);
+  const detailRouteLoadedRef = useRef<string | null>(null);
   selectedPRRef.current = selectedPR;
 
   const showFeedback = (tone: FeedbackTone, title: string, message: string) => setFeedback({ open: true, tone, title, message });
@@ -128,6 +128,22 @@ export default function AdminPurchaseRequestsPage() {
     return () => { void supabase.removeChannel(channel); };
   }, []);
 
+  useEffect(() => {
+    if (!initialPRNo || loading || detailRouteLoadedRef.current === initialPRNo) return;
+
+    const matchingPR = prs.find((pr) => pr.pr_no === initialPRNo);
+    if (!matchingPR) {
+      router.replace("/admin/purchase-requests");
+      return;
+    }
+
+    detailRouteLoadedRef.current = initialPRNo;
+    setSelectedPR(matchingPR);
+    setHistory([]);
+    setShowDetails(true);
+    void loadHistory(matchingPR.pr_no);
+  }, [initialPRNo, loading, prs, router]);
+
   const isApprovedPR = (pr: PR) => {
     const stage = STAGES.find((s) => s.key === pr.current_stage);
     return stage ? stage.number >= 4 : ["completed"].includes(pr.current_stage);
@@ -148,7 +164,7 @@ export default function AdminPurchaseRequestsPage() {
   const currentStage = (pr: PR | null) => pr ? STAGES.find((s) => s.key === pr.current_stage) : null;
   const currentIndex = (pr: PR | null) => pr ? STAGES.findIndex((s) => s.key === pr.current_stage) : -1;
   const nextStage = (pr: PR) => { const i = currentIndex(pr); return i >= 0 && i < STAGES.length - 1 ? STAGES[i + 1] : null; };
-  const openDetails = async (pr: PR) => { setSelectedPR(pr); setHistory([]); setShowDetails(true); await loadHistory(pr.pr_no); };
+  const openDetails = (pr: PR) => { router.push(`/admin/purchase-requests/${encodeURIComponent(pr.pr_no)}`); };
   const openAction = (type: "complete" | "remark" | "reject", targetPR?: PR) => {
     if (targetPR) setSelectedPR(targetPR);
     setAction(type);
@@ -265,6 +281,7 @@ export default function AdminPurchaseRequestsPage() {
       }
       await loadData();
       showFeedback("success", "Purchase Request Deleted", `${deleted} and its recorded stage history have been permanently removed.`);
+      if (initialPRNo) router.replace("/admin/purchase-requests");
     } catch (e) { console.error(e); showFeedback("error", "Delete Failed", "The purchase request could not be deleted. Please try again."); }
   };
 if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]"><Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" /></div>;
@@ -275,14 +292,10 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
-      <SystemPageHeader titlePrimary="ProcureMateSU" titleAccent="" compactOnMobile workspaceLabel="Administrative Workspace" brandLogo brandWordmark backHref={null} roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
+      <SystemPageHeader titlePrimary="ProcureMateSU" titleAccent="" compactOnMobile workspaceLabel="Administrative Workspace" brandLogo brandWordmark backHref={initialPRNo ? "/admin/purchase-requests" : "/admin"} roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
 
-      <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-3.5 sm:py-7">
+      <main className={`max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-3.5 sm:py-7 ${initialPRNo ? "hidden" : ""}`}>
         <div className="mb-4 sm:mb-5">
-          <Link href="/admin" className="mb-2 inline-flex min-h-8 items-center text-xs font-semibold text-[#7B0046] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]">
-            <ChevronRight className="mr-1 h-3.5 w-3.5 rotate-180" />
-            Back to Admin Dashboard
-          </Link>
           <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#4D002C]">Purchase Requests</h1>
           <p className="text-xs sm:text-sm text-stone-600 mt-1">Review, filter, and manage submitted purchase requests through the official PMO procurement workflow.</p>
         </div>
@@ -539,10 +552,10 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
       </main>
 
       {showDetails && selectedPR && (
-        <div className="admin-pr-detail-overlay fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center overflow-y-auto p-2 sm:p-5">
-          <div className="admin-pr-detail-modal bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-5xl max-h-[calc(100dvh-1rem)] sm:max-h-[94vh] overflow-hidden flex flex-col border border-stone-200">
+        <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 pb-8 sm:pb-10">
+          <section className="admin-pr-detail-modal mx-auto w-full max-w-6xl overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
             {/* Modal Header */}
-            <div className="admin-pr-detail-header sticky top-0 bg-white border-b border-stone-200 px-3.5 sm:px-6 py-3 sm:py-4 flex justify-between items-start gap-2 z-10 shrink-0 shadow-2xs">
+            <div className="admin-pr-detail-header bg-white border-b border-stone-200 px-3.5 sm:px-6 py-4 sm:py-5 shadow-2xs">
               <div className="min-w-0 flex-1">
                 <div className="flex min-w-0 items-center gap-2 sm:gap-3 flex-wrap">
                   <h3 className="max-w-full break-words text-base sm:text-xl font-extrabold text-[#4D002C] tracking-tight">PR {selectedPR.pr_no}</h3>
@@ -573,17 +586,10 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                   )}
                 </p>
               </div>
-              <button
-                onClick={() => setShowDetails(false)}
-                aria-label="Close PR details"
-                className="shrink-0 p-2 text-stone-400 hover:text-stone-700 rounded-xl hover:bg-stone-100 transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
             </div>
 
             {/* Modal Body */}
-            <div className="admin-pr-detail-body min-h-0 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-5">
+            <div className="admin-pr-detail-body p-3 sm:p-6 space-y-4 sm:space-y-5">
               {/* Procurement Actions & Workflow Controls Card */}
               <div className="bg-white rounded-2xl border border-stone-200/90 p-3 sm:p-5 shadow-xs space-y-3">
                 {/* Primary Stage Action Card */}
@@ -816,8 +822,8 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                 )}
               </div>
             </div>
-          </div>
-        </div>
+          </section>
+        </main>
       )}
 
       {action && selectedPR && (
