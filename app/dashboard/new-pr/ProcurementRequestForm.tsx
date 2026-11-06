@@ -377,7 +377,6 @@ export default function ProcurementRequestForm() {
                           </th>
                           <th className="py-3 px-3 w-36 text-right font-bold text-stone-700">
                             <div>Total (₱)</div>
-                            
                           </th>
                           <th className="py-3 px-2 w-12 text-center font-bold text-stone-500" />
                         </tr>
