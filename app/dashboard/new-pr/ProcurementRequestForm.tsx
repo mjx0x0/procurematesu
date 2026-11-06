@@ -191,25 +191,25 @@ export default function ProcurementRequestForm() {
       {/* Top Navigation */}
       <SystemPageHeader titlePrimary="Create PR" titleAccent="Draft" backHref="/dashboard" roleLabel="End User" containerClassName="max-w-5xl px-4" />
 
-      <main className="max-w-5xl mx-auto px-4 pt-6">
+      <main className="max-w-5xl mx-auto px-3.5 sm:px-4 pt-4 sm:pt-6">
         <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
           {/* Header Banner */}
           <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
           
-          <div className="p-4 sm:p-6 md:p-8">
+          <div className="p-3 sm:p-6 md:p-8">
 
-            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 sm:space-y-8">
               {/* Physical Submission Notice */}
-              <div className="rounded-xl border-2 border-amber-300/80 bg-[#FFFDF7] p-4 sm:p-5 shadow-sm">
+              <div className="rounded-xl border-2 border-amber-300/80 bg-[#FFFDF7] p-3 sm:p-5 shadow-sm">
                 <div className="min-w-0">
-                  <h2 className="text-sm font-black text-[#4D002C] tracking-tight uppercase">Important: Physical submission is required</h2>
-                  <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-stone-700">
+                  <h2 className="text-[13px] sm:text-sm font-black text-[#4D002C] tracking-tight uppercase">Important: Physical submission is required</h2>
+                  <p className="mt-1.5 text-[11px] sm:text-sm leading-relaxed text-stone-700">
                     Submitting this Purchase Request through this digital procurement system only records and prepares the PR digitally. It does <strong>not</strong> replace the required physical submission to the Procurement Office.
                   </p>
-                  <p className="mt-1 text-xs sm:text-sm leading-relaxed text-stone-700">
+                  <p className="mt-1 text-[11px] sm:text-sm leading-relaxed text-stone-700">
                     After creating your PR, you must <strong>print the PR form</strong> and physically submit the signed copy together with the required supporting documents to the Procurement Office for actual processing.
                   </p>
-                  <label className="mt-3.5 flex items-start gap-3 cursor-pointer select-none bg-amber-100/50 hover:bg-amber-100/80 transition-colors p-3 rounded-lg border border-amber-200">
+                  <label className="mt-3 flex items-start gap-2.5 sm:gap-3 cursor-pointer select-none bg-amber-100/50 hover:bg-amber-100/80 transition-colors p-2.5 sm:p-3 rounded-lg border border-amber-200">
                     <input
                       type="checkbox"
                       checked={physicalSubmissionAcknowledged}
@@ -219,7 +219,7 @@ export default function ProcurementRequestForm() {
                       }}
                       className="mt-0.5 h-4 w-4 accent-[#7B0046] cursor-pointer shrink-0"
                     />
-                    <span className="text-xs font-bold leading-5 text-[#4D002C]">
+                    <span className="text-[11px] sm:text-xs font-bold leading-5 text-[#4D002C]">
                       I understand that online submission does not replace physical submission, and I will print and physically submit my PR and required supporting documents to the Procurement Office.
                     </span>
                   </label>
@@ -505,19 +505,19 @@ export default function ProcurementRequestForm() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="space-y-3 rounded-xl border border-stone-200 bg-[#FFFEFC] p-5">
+                  <div className="space-y-3 rounded-xl border border-stone-200 bg-[#FFFEFC] p-3.5 sm:p-5">
                     <label htmlFor="pr-requested-by" className="block text-sm font-bold text-stone-800">
-                      Requested By (Requisitioner Name) <span className="text-[#9E1A1D]">*</span>
+                      Requested By <span className="text-[#9E1A1D]">*</span>
                     </label>
                     <input
                       id="pr-requested-by"
                       required
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Enter your actual full name"
+                      placeholder="Full legal name"
                       className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
                     />
-                    <p className="text-[11px] text-stone-500">Provide your actual legal full name, not an email address.</p>
+                    <p className="text-[11px] text-stone-500">Enter your name as it should appear on the printed PR.</p>
                     
                     <div className="pt-2 space-y-1.5">
                       <label htmlFor="pr-designation" className="block text-sm font-semibold text-stone-700">
@@ -682,7 +682,7 @@ export default function ProcurementRequestForm() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-[70] p-4 animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-stone-200 text-center">
             <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
-            <div className="p-7">
+            <div className="p-4 sm:p-7">
               <div className="mx-auto w-14 h-14 rounded-2xl bg-green-50 border border-green-200 flex items-center justify-center shadow-xs">
                 <CheckCircle2 className="h-7 w-7 text-green-600" />
               </div>
@@ -732,10 +732,10 @@ export default function ProcurementRequestForm() {
       {error && (
         <div
           role="alert"
-          className="fixed bottom-6 right-6 z-[90] max-w-md w-[calc(100vw-2rem)] sm:w-[440px] bg-white rounded-2xl border border-red-200/90 shadow-[0_16px_40px_rgba(45,20,10,0.14)] overflow-hidden transition-all animate-in slide-in-from-bottom-5 duration-200"
+          className="fixed bottom-3 right-3 z-[90] max-w-md w-[calc(100vw-1.5rem)] sm:bottom-6 sm:right-6 sm:w-[440px] bg-white rounded-2xl border border-red-200/90 shadow-[0_16px_40px_rgba(45,20,10,0.14)] overflow-hidden transition-all animate-in slide-in-from-bottom-5 duration-200"
         >
           <div className="h-1 bg-gradient-to-r from-red-600 via-amber-500 to-[#7B0046]" />
-          <div className="p-4 sm:p-5">
+          <div className="p-3.5 sm:p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
                 <div className="p-2 rounded-xl bg-red-50 text-red-700 shrink-0 mt-0.5 border border-red-200/60 shadow-2xs">
