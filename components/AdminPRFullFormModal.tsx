@@ -36,8 +36,8 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
   const total = useMemo(() => items.reduce((sum, item) => sum + Number(item.total_cost || 0), 0) || Number(pr?.total || 0), [items, pr]);
   const visibleMeta = useMemo(() => {
     if (!pr) return [];
-    const hidden = new Set(["id", "user_id", "created_at", "updated_at", "current_stage", "current_status", "total"]);
-    return Object.entries(pr).filter(([key, value]) => !hidden.has(key) && value !== null && value !== undefined && value !== "");
+    const hidden = new Set(["id", "user_id", "created_at", "updated_at", "current_stage", "current_status", "total", "sai_no", "sai_date", "alobs_no", "alobs_date"]);
+    return Object.entries(pr).filter(([key, value]) => !hidden.has(key.toLowerCase()) && value !== null && value !== undefined && value !== "");
   }, [pr]);
   const currentDate = pr?.pr_date || new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   const blankRows = Math.max(0, 6 - items.length);
