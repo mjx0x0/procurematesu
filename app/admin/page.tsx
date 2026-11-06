@@ -641,9 +641,8 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                       <AlertCircle className="h-4.5 w-4.5" />
                     </div>
                     <div className="flex-1 text-xs">
-                      <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div>
                         <p className="font-bold text-stone-900 text-xs sm:text-sm">Step 4 Pre-Numbering Pending: {selectedPR.pr_no}</p>
-
                       </div>
                       <p className="text-stone-600 mt-1 leading-relaxed">
                         This Purchase Request was created with a temporary number. At <strong>Step 4 (Pre-Numbering and Control of PRs)</strong>, you manually input the official PR number. Once entered, the temporary PR number will update in both the end user&apos;s and admin&apos;s PR data.
