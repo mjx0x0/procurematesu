@@ -154,7 +154,7 @@ export default function DashboardPage() {
         containerClassName="max-w-[1220px] px-3.5 sm:px-7 lg:px-8"
       >
         <NotificationPopover />
-        <div className="hidden h-7 w-px bg-stone-200 sm:block" />
+        <div className="hidden h-7 w-px bg-white/20 sm:block" />
       </SystemPageHeader>
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
