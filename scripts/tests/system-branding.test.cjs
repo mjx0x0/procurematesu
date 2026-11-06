@@ -243,3 +243,25 @@ test('dashboard actions and directories avoid unnecessary decorative controls', 
   assert.match(dashboard, /bg-\[#7B0046\].*hover:bg-\[#65003A\]/);
   assert.match(purchaseRequests, /bg-\[#7B0046\].*hover:bg-\[#65003A\]/);
 });
+
+test('admin dashboard centralizes its three primary workspace destinations', () => {
+  const admin = read('app/admin/page.tsx');
+  const userApprovals = read('app/admin/users/page.tsx');
+  const inquiries = read('app/admin/inquiries/page.tsx');
+
+  assert.match(admin, /<nav aria-label="Admin main menu"/);
+  assert.match(admin, /href="#purchase-requests"/);
+  assert.match(admin, /href="\/admin\/users"/);
+  assert.match(admin, /href="\/admin\/inquiries"/);
+  assert.match(admin, /id="purchase-requests"/);
+
+  for (const label of ['Purchase Requests', 'User Approvals', 'Inquiries']) {
+    assert.ok(admin.includes(label), 'missing admin menu item: ' + label);
+  }
+
+  // The existing destinations remain implemented; this is only a new navigation layer.
+  assert.match(userApprovals, /export default function AdminUsersPage/);
+  assert.match(inquiries, /export default function InquiriesPage/);
+  assert.doesNotMatch(admin, /<span>User Approvals<\/span>/);
+  assert.doesNotMatch(admin, /<span>Inquiries<\/span>/);
+});
