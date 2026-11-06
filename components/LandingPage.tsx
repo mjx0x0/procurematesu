@@ -121,7 +121,8 @@ export default function LandingPage() {
                   </Link>
                 ))}
               </nav>
-            )}         </div>
+            )}
+          </div>
         </header>
 
         <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1500px] items-center gap-8 px-4 pt-20 pb-12 sm:gap-10 sm:px-8 sm:pt-24 sm:pb-16 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12 lg:py-20">
