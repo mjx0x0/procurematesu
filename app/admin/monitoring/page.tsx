@@ -97,40 +97,40 @@ const [riskFilter, setRiskFilter] = useState("all");
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">
       <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" icon={BarChart3} backHref="/admin" roleLabel="Administrator" containerClassName="max-w-7xl px-4 sm:px-6" />
 
-      <main className="max-w-7xl mx-auto px-4 py-7">
+      <main className="max-w-7xl mx-auto px-3.5 py-4 sm:px-6 sm:py-7">
         <div className="mb-6">
-          <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Monitoring Overview</h1>
-          <p className="text-sm text-stone-600 mt-1">
+          <h1 className="text-xl sm:text-3xl font-black tracking-tight text-[#4D002C]">Monitoring Overview</h1>
+          <p className="text-xs sm:text-sm text-stone-600 mt-1">
             Track stages, detect turnaround delays, and proactively clear procurement bottlenecks across university departments.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mb-4 sm:mb-6">
           <Metric label="Total PRs" value={metrics.total} icon={<BarChart3 className="h-4 w-4" />} />
           <Metric label="Active in Workflow" value={metrics.active} icon={<Clock className="h-4 w-4" />} />
           <Metric label="Approaching Threshold" value={metrics.approaching} icon={<ShieldAlert className="h-4 w-4" />} warning />
           <Metric label="Potential Delays" value={metrics.delayed} icon={<AlertTriangle className="h-4 w-4" />} danger />
         </div>
 
-        <section className="ui-card p-5 mb-6">
-          <div className="flex items-center gap-2 mb-4 font-bold text-[#4D002C]">
+        <section className="ui-card p-3 sm:p-5 mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4 font-bold text-[#4D002C]">
             <SlidersHorizontal className="h-4 w-4 text-[#C27803]" />
             <span>Advanced Filters & Query</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-            <label className="lg:col-span-2 relative block">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+            <label className="col-span-2 lg:col-span-2 relative block">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search PR no., requester, department, purpose..."
-                className="ui-input w-full pl-10 pr-3 py-2 text-sm"
+                placeholder="Search PR, requester or department..."
+                className="ui-input min-w-0 w-full pl-10 pr-3 py-2 text-xs sm:text-sm"
               />
             </label>
             <select
               value={stageFilter}
               onChange={(e) => setStageFilter(e.target.value)}
-              className="ui-select w-full px-3 py-2 text-sm"
+              className="ui-select min-w-0 w-full px-2.5 sm:px-3 py-2 text-xs sm:text-sm"
             >
               <option value="all">All Stages (1-20)</option>
               {stageOptions.map((s) => (
@@ -142,7 +142,7 @@ const [riskFilter, setRiskFilter] = useState("all");
             <select
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="ui-select w-full px-3 py-2 text-sm"
+              className="ui-select min-w-0 w-full px-2.5 sm:px-3 py-2 text-xs sm:text-sm"
             >
               <option value="all">All Departments</option>
               {departments.map((d) => (
@@ -159,27 +159,27 @@ const [riskFilter, setRiskFilter] = useState("all");
               <option value="approaching">Approaching Attention Threshold</option>
               <option value="delayed">Potentially Delayed</option>
             </select>
-            <div className="flex items-center gap-2">
+            <div className="col-span-1 flex min-w-0 items-center gap-1.5 sm:gap-2">
               <span className="text-xs text-stone-400 font-bold whitespace-nowrap">From:</span>
               <input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="ui-input w-full px-3 py-2 text-xs"
+                className="ui-input min-w-0 w-full px-2 sm:px-3 py-2 text-[11px] sm:text-xs"
                 title="From date"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="col-span-1 flex min-w-0 items-center gap-1.5 sm:gap-2">
               <span className="text-xs text-stone-400 font-bold whitespace-nowrap">To:</span>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="ui-input w-full px-3 py-2 text-xs"
+                className="ui-input min-w-0 w-full px-2 sm:px-3 py-2 text-[11px] sm:text-xs"
                 title="To date"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="col-span-2 lg:col-span-1 flex items-center gap-2">
               <input
                 type="number"
                 min="0"

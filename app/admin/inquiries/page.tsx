@@ -186,18 +186,18 @@ const formatDate = (date: string) => {
       {/* Navigation */}
       <SystemPageHeader titlePrimary="Inquiry" titleAccent="Monitoring" icon={MessageSquare} backHref="/admin" roleLabel="Administrator" containerClassName="max-w-7xl px-4 sm:px-6" />
 
-      <div className="max-w-7xl mx-auto px-4 py-7">
+      <div className="max-w-7xl mx-auto px-3.5 py-4 sm:px-6 sm:py-7">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Chatbot & Helpdesk Logs</h1>
-            <p className="text-sm text-stone-600 mt-1">
+            <h1 className="text-xl sm:text-3xl font-black tracking-tight text-[#4D002C]">Chatbot & Helpdesk Logs</h1>
+            <p className="text-xs sm:text-sm text-stone-600 mt-1">
               <b>{filteredInquiries.length}</b> logged inquiries across user sessions.
             </p>
           </div>
           <button
             onClick={exportCSV}
-            className="ui-button bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 text-xs py-2 px-3.5 shadow-xs"
+            className="ui-button w-full sm:w-auto justify-center bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 text-xs py-2 px-3.5 shadow-xs"
             disabled={filteredInquiries.length === 0}
           >
             <Download className="h-4 w-4 text-[#7B0046]" />
@@ -206,7 +206,7 @@ const formatDate = (date: string) => {
         </div>
 
         {/* Filters */}
-        <div className="ui-card p-4 mb-6">
+        <div className="ui-card p-3 sm:p-4 mb-4 sm:mb-6">
           <div className="flex flex-col md:flex-row gap-3">
             <div className="flex-1 relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
@@ -218,11 +218,11 @@ const formatDate = (date: string) => {
                 className="ui-input w-full pl-10 pr-4 py-2.5 text-sm"
               />
             </div>
-            <div className="flex gap-3 flex-wrap sm:flex-nowrap">
+            <div className="grid grid-cols-1 sm:flex sm:flex-nowrap gap-2 sm:gap-3">
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="ui-select text-sm py-2.5 px-3 min-w-[150px]"
+                className="ui-select w-full sm:w-auto text-sm py-2.5 px-3 min-w-0 sm:min-w-[150px]"
               >
                 <option value="all">All Inquiry Types</option>
                 <option value="general">General</option>
@@ -235,7 +235,7 @@ const formatDate = (date: string) => {
                   type="date"
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  className="ui-input text-sm py-2 px-3"
+                  className="ui-input w-full sm:w-auto text-sm py-2 px-3"
                   title="Filter by date"
                 />
               </div>
@@ -338,10 +338,10 @@ const formatDate = (date: string) => {
       {/* Detail Modal */}
       {showDetailModal && selectedInquiry && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 border border-stone-200 animate-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-3.5 sm:p-6 border border-stone-200 animate-in zoom-in-95 duration-150">
             <div className="flex justify-between items-center mb-5 pb-3 border-b border-stone-100">
               <div className="flex items-center gap-2">
-                <h3 className="text-xl font-bold text-[#4D002C]">Inquiry Detail</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-[#4D002C]">Inquiry Detail</h3>
                 <span
                   className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${getTypeBadge(
                     selectedInquiry.inquiry_type || "general"
@@ -359,7 +359,7 @@ const formatDate = (date: string) => {
             </div>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 p-4 bg-stone-50 rounded-xl border border-stone-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 bg-stone-50 rounded-xl border border-stone-200">
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-stone-400 font-bold">User</p>
                   <p className="font-bold text-stone-900 text-sm mt-0.5">{selectedInquiry.user_name || "N/A"}</p>
@@ -380,14 +380,14 @@ const formatDate = (date: string) => {
 
               <div>
                 <p className="text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1.5">User Prompt</p>
-                <div className="p-3.5 bg-stone-50 rounded-xl border border-stone-200 text-sm text-stone-800 whitespace-pre-wrap font-medium">
+                <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs sm:text-sm text-stone-800 whitespace-pre-wrap font-medium">
                   {selectedInquiry.user_message}
                 </div>
               </div>
 
               <div>
                 <p className="text-[11px] uppercase tracking-wider text-[#C27803] font-bold mb-1.5">Gab AI Response</p>
-                <div className="p-3.5 bg-amber-50/40 rounded-xl border border-amber-200/80 text-sm text-stone-900 whitespace-pre-wrap leading-relaxed">
+                <div className="p-3 bg-amber-50/40 rounded-xl border border-amber-200/80 text-xs sm:text-sm text-stone-900 whitespace-pre-wrap leading-relaxed">
                   {selectedInquiry.bot_response || "No response recorded"}
                 </div>
               </div>

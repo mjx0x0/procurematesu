@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Building2, ClipboardList, ExternalLink, FileText, MapPin, Phone, Printer, Search, Workflow } from "lucide-react";
+import { ArrowRight, Building2, ClipboardList, ExternalLink, FileText, MapPin, Menu, Phone, Printer, Search, Workflow, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { MsuLogo } from "@/components/msu-logo";
@@ -15,6 +15,7 @@ type Category = (typeof CATEGORIES)[number];
 export default function LandingPage() {
   const [category, setCategory] = useState<Category>("All");
   const [query, setQuery] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const projects = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -56,7 +57,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(#F5AB26_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
 
         <header className="fixed inset-x-0 top-0 z-50 border-b border-[#F5AB26]/25 bg-[#4A002A]/90 backdrop-blur-md transition-all shadow-[0_4px_24px_rgba(30,0,18,0.35)]">
-          <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between gap-6 px-6 py-2.5 sm:px-8">
+          <div className="relative mx-auto flex w-full max-w-[1500px] items-center justify-between gap-3 px-4 py-2.5 sm:gap-6 sm:px-8">
             <Link
               href="#home"
               aria-label="ProcureMateSU — MSU General Santos Digital Procurement Logbook"
@@ -86,10 +87,45 @@ export default function LandingPage() {
               <Link href="#transparency" className="hover:text-[#F0C83F] transition-colors">Transparency</Link>
               <Link href="#contact" className="hover:text-[#F0C83F] transition-colors">Contact</Link>
             </nav>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-landing-navigation"
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F6D58A] lg:hidden"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+            {mobileMenuOpen && (
+              <nav
+                id="mobile-landing-navigation"
+                aria-label="Main navigation"
+                className="absolute left-3 right-3 top-full z-50 mt-2 grid gap-1 rounded-2xl border border-[#F5AB26]/25 bg-[#4A002A] p-2.5 shadow-2xl lg:hidden"
+              >
+                {[
+                  ["Home", "#home"],
+                  ["How It Works", "#how-it-works"],
+                  ["About", "#about"],
+                  ["Resources", "#resources"],
+                  ["Transparency", "#transparency"],
+                  ["Contact", "#contact"],
+                ].map(([label, href]) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-xl px-3.5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10 hover:text-[#F0C83F]"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </nav>
+            )}
           </div>
         </header>
 
-        <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1500px] items-center gap-10 px-6 pt-24 pb-16 sm:px-8 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12 lg:py-20">
+        <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1500px] items-center gap-8 px-4 pt-20 pb-12 sm:gap-10 sm:px-8 sm:pt-24 sm:pb-16 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12 lg:py-20">
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
@@ -101,10 +137,10 @@ export default function LandingPage() {
                 MSU – GENERAL SANTOS
               </p>
               <h1 className="w-full text-center lg:text-left font-black tracking-[-0.035em] leading-[1.14]">
-                <span className="block text-[2.45rem] sm:text-5xl lg:text-[3.5rem] xl:text-[4.05rem] font-black text-[#FFFDF8] pb-1 leading-[1.08]">
+                <span className="block text-[2rem] sm:text-5xl lg:text-[3.5rem] xl:text-[4.05rem] font-black text-[#FFFDF8] pb-1 leading-[1.08]">
                   Digital Procurement
                 </span>
-                <span className="mt-1 block pb-2 text-[2.25rem] sm:text-5xl lg:text-[3.15rem] xl:text-[3.85rem] font-black leading-[1.12] text-transparent bg-clip-text bg-gradient-to-r from-[#FFF9E6] via-[#FFD043] to-[#F59E0B]">
+                <span className="mt-1 block pb-2 text-[1.85rem] sm:text-5xl lg:text-[3.15rem] xl:text-[3.85rem] font-black leading-[1.12] text-transparent bg-clip-text bg-gradient-to-r from-[#FFF9E6] via-[#FFD043] to-[#F59E0B]">
                   Logbook &amp; Inquiry System
                 </span>
               </h1>

@@ -161,8 +161,8 @@ export default function PurchaseRequestsPage() {
       {/* Top Navbar */}
       <SystemPageHeader titlePrimary="Purchase" titleAccent="Requests" backHref="/dashboard" roleLabel="End User" containerClassName="max-w-7xl px-3.5 sm:px-6 lg:px-8" />
 
-      <main className="mx-auto max-w-7xl px-3.5 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <main className="mx-auto max-w-7xl px-3.5 py-4 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-4 sm:mb-5 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#4D002C]">My Purchase Requests</h1>
             <p className="mt-1 max-w-2xl text-xs sm:text-sm leading-relaxed text-stone-600">
@@ -258,16 +258,16 @@ export default function PurchaseRequestsPage() {
 
           {/* Draft PR Physical Submission Notice Banner */}
           {stageFilter === "draft" && (
-            <div className="border-b border-amber-200/90 bg-gradient-to-r from-amber-50 via-amber-50/70 to-stone-50 px-4 py-3.5 sm:px-6">
+            <div className="border-b border-amber-200/90 bg-gradient-to-r from-amber-50 via-amber-50/70 to-stone-50 px-3.5 py-2.5 sm:px-6 sm:py-3.5">
               <div className="flex items-start gap-3">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-800 border border-amber-300">
                   <AlertCircle className="h-4 w-4" />
                 </div>
-                <div className="text-xs leading-relaxed text-amber-950">
+                <div className="text-[11px] sm:text-xs leading-relaxed text-amber-950">
                   <p className="font-bold text-amber-900">
                     Draft Purchase Requests Awaiting Physical Submission
                   </p>
-                  <p className="mt-0.5 text-stone-700">
+                  <p className="mt-0.5 text-[11px] sm:text-xs text-stone-700">
                     These PRs are drafted and saved online. Requisitioners must print the official PR form (using the Print button below) and physically submit it with required attachments (PPMP/APP reference, specifications) to the Procurement Management Office (PMO) to begin official verification.
                   </p>
                 </div>
