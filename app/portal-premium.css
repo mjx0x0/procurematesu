@@ -531,3 +531,53 @@
     overflow-wrap: anywhere;
   }
 }
+
+
+/* Final mobile consistency fixes for admin PR actions and official form viewing. */
+@media (max-width: 640px) {
+  .admin-dashboard-page .admin-pr-secondary-actions {
+    grid-auto-rows: 3.25rem !important;
+  }
+
+  .admin-dashboard-page .admin-pr-secondary-actions button {
+    box-sizing: border-box;
+    height: 3.25rem !important;
+    min-height: 3.25rem !important;
+    max-height: 3.25rem !important;
+    align-self: stretch;
+    padding: 0.5rem 0.4rem !important;
+    border-radius: 0.65rem;
+    line-height: 1.15;
+  }
+
+  .admin-dashboard-page .admin-pr-secondary-actions button span {
+    font-size: 0.75rem;
+  }
+
+  .admin-pr-full-form-body {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-pr-official-form-scroll {
+    order: -1;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-bottom: 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+  }
+
+  .admin-pr-official-document {
+    display: block !important;
+    width: 720px !important;
+    min-width: 720px !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+  }
+}
