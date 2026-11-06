@@ -288,6 +288,20 @@ nav.sticky, nav[class*="sticky"] { box-shadow: 0 1px 0 rgba(53,7,8,.04), 0 8px 2
   box-shadow: 0 1px 0 rgba(53,7,8,.04), 0 10px 28px rgba(53,7,8,.055);
 }
 
+/* Keep the branded dashboard workspaces consistent with the public landing header. */
+.app-theme nav[class*="sticky"][data-workspace-brand="true"] {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 60 !important;
+  width: 100%;
+  background: #4A002A !important;
+  border-top: 2px solid #D4AF37 !important;
+  border-bottom: 1px solid rgba(245,171,38,.32) !important;
+  box-shadow: 0 4px 24px rgba(30,0,18,.22);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
 .app-theme main {
   position: relative;
 }
