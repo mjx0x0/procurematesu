@@ -143,19 +143,19 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
                 </div>
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">SAI No.</p>
-                  <p className="mt-0.5 text-xs font-semibold text-stone-800">—</p>
+                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.sai_no || "—")}</p>
                 </div>
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">SAI Date</p>
-                  <p className="mt-0.5 text-xs font-semibold text-stone-800">—</p>
+                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.sai_date || "—")}</p>
                 </div>
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">ALOBS No.</p>
-                  <p className="mt-0.5 text-xs font-semibold text-stone-800">—</p>
+                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.alobs_no || "—")}</p>
                 </div>
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">ALOBS Date</p>
-                  <p className="mt-0.5 text-xs font-semibold text-stone-800">—</p>
+                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.alobs_date || "—")}</p>
                 </div>
               </div>
               <div className="mt-3 border-t border-stone-100 pt-3">
