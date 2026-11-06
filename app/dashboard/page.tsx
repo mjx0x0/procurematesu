@@ -211,7 +211,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="pt-2.5 sm:pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] sm:text-xs font-bold text-stone-600 group-hover:text-[#7B0046]">
-                <span>{prs.length} {prs.length === 1 ? "Record" : "Records"}</span>
+                <span>Open</span>
                 <ArrowRight className="h-4 w-4 transition-transform shrink-0" />
               </div>
             </Link>
