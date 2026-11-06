@@ -275,12 +275,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
-      <header className="sticky top-0 z-50 border-b border-[#F5AB26]/25 bg-[#4A002A] px-4 py-3 text-white shadow-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-          <div className="text-sm font-bold">ProcureMateSU <span className="ml-2 text-[10px] font-semibold tracking-wider text-[#F6D58A]">ADMINISTRATIVE WORKSPACE</span></div>
-          <Link href="/admin" className="rounded-lg border border-white/20 px-3 py-2 text-xs font-semibold text-white hover:bg-white/10">Back to Admin Dashboard</Link>
-        </div>
-      </header>
+      <SystemPageHeader titlePrimary="ProcureMateSU" titleAccent="" compactOnMobile workspaceLabel="Administrative Workspace" brandLogo brandWordmark backHref={null} roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
 
       <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-3.5 sm:py-7">
         <div className="mb-4 sm:mb-5">
