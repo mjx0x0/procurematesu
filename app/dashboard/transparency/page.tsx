@@ -3,8 +3,11 @@
 import { useMemo, useState } from "react";
 import {
   AlertCircle,
+  Building2,
+  Cpu,
   ExternalLink,
   FileText,
+  Layers,
   Search,
   ShieldCheck,
   X,
