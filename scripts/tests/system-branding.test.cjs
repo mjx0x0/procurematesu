@@ -220,13 +220,16 @@ test('the New PR physical-submission notice now refers to the digital procuremen
 
 test('dashboard actions and directories avoid unnecessary decorative controls', () => {
   const admin = read('app/admin/page.tsx');
+  const adminPurchaseRequests = read('app/admin/purchase-requests/page.tsx');
   const dashboard = read('app/dashboard/page.tsx');
   const purchaseRequests = read('app/dashboard/purchase-requests/page.tsx');
   const transparency = read('app/dashboard/transparency/page.tsx');
 
-  // The existing manual refresh action is positioned with the PR group filters instead of a duplicate record count.
-  assert.match(admin, /aria-label=\{refreshing \? "Refreshing…" : "Refresh purchase requests"\}/);
-  assert.doesNotMatch(admin, /\{filtered\.length\} \{filtered\.length === 1 \? "Record" : "Records"\}/);
+  // The existing manual refresh action stays with the dedicated PR logbook filters.
+  assert.match(adminPurchaseRequests, /aria-label=\{refreshing \? "Refreshing…" : "Refresh purchase requests"\}/);
+  assert.doesNotMatch(adminPurchaseRequests, /\{filtered\.length\} \{filtered\.length === 1 \? "Record" : "Records"\}/);
+  assert.doesNotMatch(admin, /Refresh purchase requests/);
+  assert.doesNotMatch(admin, /Search by PR number, purpose, or requesting department/);
 
   // PR Overview keeps its values and labels but no longer renders the four decorative metric pictograms.
   const overview = dashboard.slice(dashboard.indexOf('{/* PR Overview */}'), dashboard.indexOf('{/* Recent PR Activity */}'));
@@ -244,24 +247,43 @@ test('dashboard actions and directories avoid unnecessary decorative controls', 
   assert.match(purchaseRequests, /bg-\[#7B0046\].*hover:bg-\[#65003A\]/);
 });
 
-test('admin dashboard centralizes its three primary workspace destinations', () => {
+test('admin dashboard contains only the three main actions and PR overview', () => {
   const admin = read('app/admin/page.tsx');
+
+  assert.match(admin, /<nav[\s\S]*aria-label="Admin main menu"/);
+  assert.match(admin, /href={item\.href}/);
+  assert.match(admin, /href: "\/admin\/purchase-requests"/);
+  assert.match(admin, /href: "\/admin\/users"/);
+  assert.match(admin, /href: "\/admin\/inquiries"/);
+  assert.match(admin, /PR Overview/);
+  assert.match(admin, /Total PRs/);
+  assert.match(admin, /In Progress/);
+  assert.match(admin, /Completed/);
+  assert.match(admin, /Rejected/);
+
+  // The dashboard no longer embeds the logbook table, search, filters, or workflow actions.
+  assert.doesNotMatch(admin, /Search by PR number|Current Status|Complete Stage|Confirm Receipt of Printed PR/);
+  assert.doesNotMatch(admin, /<table|filtered\.map/);
+});
+
+test('admin Purchase Requests has its own route and retains the existing logbook workflows', () => {
+  const purchaseRequests = read('app/admin/purchase-requests/page.tsx');
   const userApprovals = read('app/admin/users/page.tsx');
   const inquiries = read('app/admin/inquiries/page.tsx');
 
-  assert.match(admin, /<nav aria-label="Admin main menu"/);
-  assert.match(admin, /href="#purchase-requests"/);
-  assert.match(admin, /href="\/admin\/users"/);
-  assert.match(admin, /href="\/admin\/inquiries"/);
-  assert.match(admin, /id="purchase-requests"/);
+  assert.match(purchaseRequests, /export default function AdminPurchaseRequestsPage/);
+  assert.match(purchaseRequests, /href="\/admin"/);
+  assert.match(purchaseRequests, /Back to Admin Dashboard/);
+  assert.match(purchaseRequests, /Search by PR number, purpose, or requesting department/);
+  assert.match(purchaseRequests, /All Statuses/);
+  assert.match(purchaseRequests, /All Departments/);
+  assert.match(purchaseRequests, /Refresh purchase requests/);
+  assert.match(purchaseRequests, /\/api\/admin\/complete-stage/);
+  assert.match(purchaseRequests, /\/api\/admin\/assign-official-pr/);
+  assert.match(purchaseRequests, /Confirm Receipt of Printed PR/);
+  assert.match(purchaseRequests, /Permanently delete/);
 
-  for (const label of ['Purchase Requests', 'User Approvals', 'Inquiries']) {
-    assert.ok(admin.includes(label), 'missing admin menu item: ' + label);
-  }
-
-  // The existing destinations remain implemented; this is only a new navigation layer.
+  // Existing administrator destinations remain separate pages.
   assert.match(userApprovals, /export default function AdminUsersPage/);
   assert.match(inquiries, /export default function InquiriesPage/);
-  assert.doesNotMatch(admin, /<span>User Approvals<\/span>/);
-  assert.doesNotMatch(admin, /<span>Inquiries<\/span>/);
 });
