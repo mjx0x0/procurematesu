@@ -84,30 +84,155 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-3 backdrop-blur-sm sm:p-6 transition-colors">
+    <div className="admin-pr-full-form-overlay fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-2 backdrop-blur-sm sm:p-6 transition-colors">
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-        className="flex max-h-[96vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-stone-100 shadow-2xl border border-stone-200"
+        className="admin-pr-full-form-modal flex h-[calc(100dvh-1rem)] max-h-[96vh] min-h-0 w-full max-w-6xl flex-col overflow-hidden rounded-xl border border-stone-200 bg-stone-100 shadow-2xl sm:h-auto sm:rounded-2xl"
       >
-        <header className="flex shrink-0 items-center justify-between border-b border-stone-200 bg-white px-5 py-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-[#7B0046] p-2 text-[#C27803] shadow-sm">
-              <FileText className="h-5 w-5" />
+        <header className="admin-pr-full-form-header flex shrink-0 items-center justify-between gap-2 border-b border-stone-200 bg-white px-3 py-2.5 sm:px-5 sm:py-4">
+          <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+            <div className="shrink-0 rounded-lg bg-[#7B0046] p-2 text-[#C27803] shadow-sm sm:rounded-xl">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
-            <div>
-              <h2 className="text-lg font-extrabold text-[#4D002C]">Complete Purchase Request — {prNo}</h2>
-              <p className="text-xs text-stone-500">Read-only copy of the end-user&apos;s submitted PR for verification.</p>
+            <div className="min-w-0">
+              <h2 className="text-sm font-extrabold leading-tight text-[#4D002C] sm:text-lg">Complete Purchase Request</h2>
+              <p className="mt-0.5 break-all font-mono text-[11px] font-bold text-[#7B0046] sm:text-xs">{prNo}</p>
+              <p className="text-[10px] leading-snug text-stone-500 sm:text-xs">Read-only copy of the end-user&apos;s submitted PR for verification.</p>
             </div>
           </div>
-          <button onClick={onClose} className="rounded-lg p-2 hover:bg-stone-100 transition-colors">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close Purchase Request"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-900"
+          >
             <X className="h-5 w-5" />
           </button>
         </header>
 
-        <div className="overflow-y-auto p-4 sm:p-6">
-          <div id="admin-pr-print" className="mx-auto max-w-4xl bg-white text-black shadow-sm print:border-0 print:shadow-none">
+        <div className="admin-pr-full-form-body min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-6">
+          <div className="mx-auto mb-3 max-w-4xl space-y-3 md:hidden print:hidden">
+            <section className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-extrabold text-[#4D002C]">PR Details</h3>
+                  <p className="mt-0.5 break-all font-mono text-xs font-bold text-[#7B0046]">
+                    {getFormDisplayPrNumber(String(pr.pr_no || ""), String(pr.current_stage || "")) || "PR number not assigned"}
+                  </p>
+                </div>
+                {String(pr.pr_no || "").includes("TEMP") && (
+                  <span className="shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-bold text-amber-800">
+                    Temporary No.
+                  </span>
+                )}
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-3">
+                <div className="col-span-2 min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Department</p>
+                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.department || "—")}</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Section</p>
+                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.section || "—")}</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">PR Date</p>
+                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(currentDate)}</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">SAI No.</p>
+                  <p className="mt-0.5 text-xs font-semibold text-stone-800">—</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">SAI Date</p>
+                  <p className="mt-0.5 text-xs font-semibold text-stone-800">—</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">ALOBS No.</p>
+                  <p className="mt-0.5 text-xs font-semibold text-stone-800">—</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">ALOBS Date</p>
+                  <p className="mt-0.5 text-xs font-semibold text-stone-800">—</p>
+                </div>
+              </div>
+              <div className="mt-3 border-t border-stone-100 pt-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Purpose</p>
+                <p className="mt-1 whitespace-pre-wrap break-words text-xs leading-relaxed text-stone-800">{String(pr.purpose || "—")}</p>
+                <div className="mt-3 flex items-center justify-between border-t border-stone-100 pt-2.5">
+                  <span className="text-xs font-bold text-stone-600">Total Estimated Cost</span>
+                  <span className="font-mono text-sm font-extrabold text-[#4D002C]">₱{money(total)}</span>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <h3 className="text-sm font-extrabold text-[#4D002C]">Item Details</h3>
+                <span className="rounded-full bg-stone-100 px-2 py-1 text-[10px] font-bold text-stone-600">
+                  {items.length} {items.length === 1 ? "item" : "items"}
+                </span>
+              </div>
+              {items.length > 0 ? (
+                <div className="space-y-2.5">
+                  {items.map((item, idx) => (
+                    <article key={idx} className="rounded-lg border border-stone-200 bg-stone-50/70 p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Item {idx + 1}</p>
+                          <h4 className="mt-0.5 break-words text-xs font-bold leading-relaxed text-stone-900">{String(item.item_description || "No item description")}</h4>
+                        </div>
+                        <span className="shrink-0 font-mono text-xs font-extrabold text-[#4D002C]">₱{money(item.total_cost)}</span>
+                      </div>
+                      <div className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-2 border-t border-stone-200 pt-2.5">
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Quantity / Unit</p>
+                          <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(item.quantity ?? "—") + " " + String(item.unit || "")}</p>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Stock No.</p>
+                          <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(item.stock_no || "—")}</p>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Estimated Unit Cost</p>
+                          <p className="mt-0.5 text-xs font-semibold text-stone-800">{item.unit_cost ? "₱" + money(item.unit_cost) : "—"}</p>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Estimated Cost</p>
+                          <p className="mt-0.5 text-xs font-semibold text-stone-800">{item.total_cost ? "₱" + money(item.total_cost) : "—"}</p>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="rounded-lg border border-dashed border-stone-200 bg-stone-50 p-3 text-xs text-stone-500">No item lines are included in this Purchase Request.</p>
+              )}
+            </section>
+
+            <section className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
+                <h3 className="text-sm font-extrabold text-[#4D002C]">Requested By</h3>
+                <p className="mt-2 break-words text-xs font-bold uppercase text-stone-900">{printedName || "Name not recorded"}</p>
+                <p className="mt-0.5 break-words text-xs text-stone-600">{String(pr.designation || "Designation not recorded")}</p>
+                <p className="mt-2 text-[10px] text-stone-400">Physical signature is on the printed copy.</p>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
+                <h3 className="text-sm font-extrabold text-[#4D002C]">Approved By</h3>
+                <p className="mt-2 break-words text-xs font-bold uppercase text-stone-900">{String(pr.approved_by || "Atty. Shidik T. Abantas, MDM, LLM")}</p>
+                <p className="mt-0.5 break-words text-xs text-stone-600">{String(pr.approved_by_designation || "Chancellor")}</p>
+                <p className="mt-2 text-[10px] text-stone-400">Approval signature is on the printed copy.</p>
+              </div>
+            </section>
+            <p className="px-1 text-center text-[10px] leading-relaxed text-stone-400">
+              Mobile preview of the submitted record. Use Print PR to produce the official university form.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto overscroll-x-contain pb-2 print:overflow-visible print:pb-0">
+            <div id="admin-pr-print" className="hidden w-full min-w-[720px] max-w-4xl bg-white text-black shadow-sm md:block print:block print:border-0 print:shadow-none">
             <div className="border-2 border-black text-black">
               <div className="border-b-2 border-black px-4 py-3 text-center">
                 <h1 className="font-serif text-xl font-black uppercase tracking-wider">PURCHASE REQUEST</h1>
@@ -232,7 +357,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
             </div>
           </div>
 
-          <div className="mx-auto mt-5 max-w-4xl rounded-xl border border-stone-200 bg-white p-4 print:hidden">
+          <div className="mx-auto mt-4 max-w-4xl rounded-xl border border-stone-200 bg-white p-3.5 sm:mt-5 sm:p-4 print:hidden">
             <h3 className="mb-3 text-sm font-extrabold text-[#4D002C]">Submitted PR Record</h3>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               {visibleMeta.map(([key, value]) => (
@@ -243,7 +368,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
               ))}
             </div>
           </div>
-          <div className="mx-auto mt-4 max-w-4xl rounded-xl border border-stone-200 bg-white p-4 print:hidden">
+          <div className="mx-auto mt-3 max-w-4xl rounded-xl border border-stone-200 bg-white p-3.5 sm:mt-4 sm:p-4 print:hidden">
             <h3 className="mb-3 text-sm font-extrabold text-[#4D002C]">Procurement History</h3>
             {history.length ? (
               <div className="space-y-2">
@@ -259,15 +384,81 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
             )}
           </div>
         </div>
-        <footer className="flex shrink-0 justify-end gap-2 border-t border-stone-200 bg-white px-5 py-3 print:hidden">
-          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-lg bg-[#7B0046] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#610037] transition-colors">
+        <footer className="admin-pr-full-form-footer flex shrink-0 justify-end gap-2 border-t border-stone-200 bg-white px-3 py-2.5 sm:px-5 sm:py-3 print:hidden">
+          <button onClick={() => window.print()} className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-[#7B0046] px-3 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#610037] sm:flex-none sm:px-4">
             <Printer className="h-4 w-4" />Print PR
           </button>
-          <button onClick={onClose} className="rounded-lg border border-stone-200 px-4 py-2.5 text-xs font-bold hover:bg-stone-50 transition-colors">
+          <button onClick={onClose} className="min-h-10 flex-1 rounded-lg border border-stone-200 px-3 py-2.5 text-xs font-bold transition-colors hover:bg-stone-50 sm:flex-none sm:px-4">
             Close
           </button>
         </footer>
       </motion.div>
+      <style jsx global>{`
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 8mm;
+          }
+
+          body * {
+            visibility: hidden !important;
+          }
+
+          .admin-pr-full-form-overlay,
+          .admin-pr-full-form-modal,
+          .admin-pr-full-form-body,
+          #admin-pr-print,
+          #admin-pr-print * {
+            visibility: visible !important;
+          }
+
+          .admin-pr-full-form-overlay {
+            position: static !important;
+            display: block !important;
+            padding: 0 !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+          }
+
+          .admin-pr-full-form-modal {
+            position: static !important;
+            display: block !important;
+            width: 100% !important;
+            max-width: none !important;
+            height: auto !important;
+            max-height: none !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            transform: none !important;
+          }
+
+          .admin-pr-full-form-header,
+          .admin-pr-full-form-footer {
+            display: none !important;
+          }
+
+          .admin-pr-full-form-body {
+            display: block !important;
+            overflow: visible !important;
+            padding: 0 !important;
+          }
+
+          #admin-pr-print {
+            display: block !important;
+            position: static !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
