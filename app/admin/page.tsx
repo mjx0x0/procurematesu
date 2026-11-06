@@ -304,15 +304,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
               <MessageSquare className="h-4 w-4 shrink-0" />
               <span>Inquiries</span>
             </Link>
-            <button
-              onClick={() => void manualRefresh()}
-              disabled={refreshing}
-              title={refreshing ? "Refreshing…" : "Refresh"}
-              aria-label={refreshing ? "Refreshing…" : "Refresh"}
-              className="admin-refresh-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-white text-[#7B0046] shadow-xs transition-colors hover:bg-[#FDF2F7] hover:border-[#7B0046]/40 active:scale-95 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2"
-            >
-              <RefreshCw className={`h-4 w-4 shrink-0 ${refreshing ? "animate-spin" : ""}`} />
-            </button>
+
           </div>
         </div>
 
@@ -407,10 +399,16 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                   Under Review <span className="ml-1 text-[11px] font-medium text-stone-500">({prs.filter((p) => !isApprovedPR(p)).length})</span>
                 </button>
               </div>
-              <span className="inline-flex items-center gap-1.5 self-start sm:self-auto shrink-0 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-xs font-bold text-stone-700 w-fit">
-                <span className="h-2 w-2 rounded-full bg-[#7B0046]" />
-                {filtered.length} {filtered.length === 1 ? "Record" : "Records"}
-              </span>
+              <button
+                type="button"
+                onClick={() => void manualRefresh()}
+                disabled={refreshing}
+                title={refreshing ? "Refreshing…" : "Refresh purchase requests"}
+                aria-label={refreshing ? "Refreshing…" : "Refresh purchase requests"}
+                className="admin-refresh-btn inline-flex h-9 w-9 shrink-0 self-end sm:self-auto items-center justify-center rounded-xl border border-stone-200 bg-white text-[#7B0046] shadow-xs transition-colors hover:bg-[#FDF2F7] hover:border-[#7B0046]/40 active:scale-95 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2"
+              >
+                <RefreshCw className={`h-4 w-4 shrink-0 ${refreshing ? "animate-spin" : ""}`} />
+              </button>
             </div>
           </div>
           {filtered.length === 0 ? (

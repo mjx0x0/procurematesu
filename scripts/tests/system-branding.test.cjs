@@ -216,3 +216,29 @@ test('the New PR physical-submission notice now refers to the digital procuremen
   assert.match(source, /through this digital procurement system only records and prepares the PR digitally/);
   assert.doesNotMatch(source, /through ProcuremateSU/);
 });
+
+test('dashboard actions and directories avoid unnecessary decorative controls', () => {
+  const admin = read('app/admin/page.tsx');
+  const dashboard = read('app/dashboard/page.tsx');
+  const purchaseRequests = read('app/dashboard/purchase-requests/page.tsx');
+  const transparency = read('app/dashboard/transparency/page.tsx');
+
+  // The existing manual refresh action is positioned with the PR group filters instead of a duplicate record count.
+  assert.match(admin, /aria-label=\{refreshing \? "Refreshing…" : "Refresh purchase requests"\}/);
+  assert.doesNotMatch(admin, /\{filtered\.length\} \{filtered\.length === 1 \? "Record" : "Records"\}/);
+
+  // PR Overview keeps its values and labels but no longer renders the four decorative metric pictograms.
+  const overview = dashboard.slice(dashboard.indexOf('{/* PR Overview */}'), dashboard.indexOf('{/* Recent PR Activity */}'));
+  assert.doesNotMatch(overview, /<FileText|<Clock|<CheckCircle2|<AlertCircle/);
+
+  // The public project rows retain category text badges without category pictograms.
+  const projectDirectory = transparency.slice(
+    transparency.indexOf('{/* Directory Listing Container */}'),
+    transparency.indexOf('{/* Transparency Notice Banner */}')
+  );
+  assert.doesNotMatch(projectDirectory, /categoryIcon|IconComponent|<Building2|<Cpu|<Layers/);
+
+  // Track actions use the brighter maroon consistently in both user-facing locations.
+  assert.match(dashboard, /bg-\[#7B0046\].*hover:bg-\[#65003A\]/);
+  assert.match(purchaseRequests, /bg-\[#7B0046\].*hover:bg-\[#65003A\]/);
+});
