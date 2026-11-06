@@ -99,7 +99,7 @@ const [riskFilter, setRiskFilter] = useState("all");
 
       <main className="max-w-7xl mx-auto px-4 py-7">
         <div className="mb-6">
-          <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Purchase Requests Tracking Dashboard</h1>
+          <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Monitoring Overview</h1>
           <p className="text-sm text-stone-600 mt-1">
             Track stages, detect turnaround delays, and proactively clear procurement bottlenecks across university departments.
           </p>
