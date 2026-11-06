@@ -46,7 +46,7 @@ const COLORS: Record<string, string> = {
   draft: "bg-gray-100 text-gray-600", rejected: "bg-red-100 text-red-700", cancelled: "bg-red-100 text-red-700", completed: "bg-emerald-100 text-emerald-700",
 };
 
-export default function AdminPurchaseRequestsPage({ initialPRNo }: { initialPRNo?: string }) {
+export function AdminPurchaseRequestsWorkspace({ initialPRNo }: { initialPRNo?: string }) {
   const router = useRouter();
   const [prs, setPrs] = useState<PR[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1043,4 +1043,8 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
       `}</style>
     </div>
   );
+}
+
+export default function AdminPurchaseRequestsPage() {
+  return <AdminPurchaseRequestsWorkspace />;
 }
