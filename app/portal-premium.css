@@ -241,8 +241,9 @@
   }
 
   .pr-items-entry-table tbody td:nth-child(7) {
-    grid-column: 2;
-    align-items: flex-end;
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
     justify-content: flex-end;
   }
 
