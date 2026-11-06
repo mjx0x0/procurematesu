@@ -408,7 +408,7 @@ export default function PurchaseRequestsPage() {
                       <div className="flex items-center gap-1.5 shrink-0">
                         <Link
                           href={`/dashboard/pr/${pr.pr_no}`}
-                          className="inline-flex min-h-10 items-center gap-1 px-2.5 sm:px-3 py-2 rounded-xl bg-[#4D002C] text-white text-[11px] sm:text-xs font-bold shadow-xs hover:bg-[#7B0046] transition-colors"
+                          className="inline-flex min-h-10 items-center gap-1 px-2.5 sm:px-3 py-2 rounded-xl bg-[#7B0046] text-white text-[11px] sm:text-xs font-bold shadow-xs hover:bg-[#65003A] transition-colors"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           <span>Track PR</span>
