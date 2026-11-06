@@ -45,9 +45,9 @@ useEffect(() => {
       <main className="max-w-6xl mx-auto px-4 py-7">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">AI Response Evaluation</h1>
+            <h1 className="text-3xl font-black tracking-tight text-[#4D002C]">Evaluation Results</h1>
             <p className="text-sm text-stone-600 mt-1">
-              Run automated test questions to benchmark Isko BidDo retrieval grounding, concept coverage, and statutory references.
+              Run automated test questions to benchmark Gab AI retrieval grounding, concept coverage, and statutory references.
             </p>
           </div>
           <button

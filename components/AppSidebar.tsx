@@ -18,15 +18,18 @@ interface SidebarItem {
 
 const userItems: SidebarItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
-  { href: "/dashboard/chatbot", label: "Gab AI", icon: Bot, badge: "AI" },
-  { href: "/dashboard/transparency", label: "Transparency", icon: ShieldCheck },
+  { href: "/dashboard/purchase-requests", label: "My Purchase Requests", icon: FileText },
   { href: "/dashboard/new-pr", label: "Create Purchase Request", icon: FilePlus2 },
+  { href: "/dashboard/chatbot", label: "Gab AI", icon: Bot },
+  { href: "/dashboard/transparency", label: "Transparency Board", icon: ShieldCheck },
 ];
 
 const adminItems: SidebarItem[] = [
-  { href: "/admin", label: "Dashboard", icon: BarChart3 },
+  { href: "/admin", label: "Digital Logbook", icon: BarChart3 },
+  { href: "/admin/monitoring", label: "PR Monitoring", icon: FileText },
   { href: "/admin/users", label: "User Approvals", icon: Users },
-  { href: "/admin/inquiries", label: "Inquiries", icon: MessageSquare },
+  { href: "/admin/inquiries", label: "Inquiry Logs", icon: MessageSquare },
+  { href: "/admin/ai-evaluation", label: "AI Evaluation", icon: Bot },
 ];
 
 const userMobileItems: SidebarItem[] = [
@@ -59,8 +62,8 @@ export default function AppSidebar({ mode }: AppSidebarProps) {
       <div className="flex h-[72px] items-center gap-3 border-b border-[#F5AB26]/15 px-5 bg-black/10">
         <MsuLogo size={38} className="shrink-0" />
         <div className="min-w-0 leading-tight">
-          <p className="truncate text-sm font-extrabold tracking-tight text-white">MSU GenSan</p>
-          <p className="text-[10px] font-black tracking-wider text-[#F0C83F] uppercase">Procurement System</p>
+          <p className="truncate text-sm font-extrabold tracking-tight text-white">ProcureMateSU</p>
+          <p className="text-[10px] font-black tracking-wider text-[#F0C83F] uppercase">Digital Procurement</p>
         </div>
       </div>
 

@@ -559,8 +559,8 @@ export default function ChatbotDashboard() {
     >
       {/* Top Navbar */}
       <SystemPageHeader
-        titlePrimary="AI"
-        titleAccent="Chatbot"
+        titlePrimary="Gab"
+        titleAccent="AI"
         mobileTitlePrimary="Gab"
         mobileTitleAccent="AI"
         compactOnMobile
@@ -598,19 +598,6 @@ export default function ChatbotDashboard() {
               <History className="h-4 w-4 text-stone-500 transition-colors group-hover:text-[#7B0046]" />
               <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-stone-900/90 px-2 py-0.5 text-[11px] font-medium text-white shadow-md opacity-0 transition-opacity duration-150 group-hover:opacity-100 z-50">
                 Chat History
-              </span>
-            </button>
-
-            {/* New Chat Button */}
-            <button
-              onClick={startNewChat}
-              disabled={loading}
-              className="group relative inline-flex h-9 w-9 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-700 shadow-2xs transition-all duration-150 hover:border-[#7B0046]/40 hover:bg-[#FDF2F7] hover:text-[#7B0046] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-stone-200 disabled:hover:bg-white disabled:hover:text-stone-700 select-none"
-              aria-label="New Chat"
-            >
-              <MessageSquarePlus className="h-4 w-4 text-[#7B0046] transition-transform group-hover:scale-110" />
-              <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-stone-900/90 px-2 py-0.5 text-[11px] font-medium text-white shadow-md opacity-0 transition-opacity duration-150 group-hover:opacity-100 z-50">
-                New Chat
               </span>
             </button>
 

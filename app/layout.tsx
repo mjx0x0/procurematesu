@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SYSTEM_DESCRIPTION, SYSTEM_NAME } from "@/lib/system-branding";
-import { Inter } from 'next/font/google';
 import { ThemeProvider } from "@/components/ThemeProvider";
 import PageTransition from "@/components/PageTransition";
 import ConsoleSanitizer from "@/components/ConsoleSanitizer";
@@ -9,13 +8,6 @@ import "./globals.css";
 import "./portal-theme.css";
 import "./portal-premium.css";
 import "./page-transitions.css";
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-  weight: ['300', '400', '500', '600', '700', '800', '900'],
-});
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -57,7 +49,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} scroll-smooth`}>
+    <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body className="font-sans antialiased bg-white text-gray-900">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <ConsoleSanitizer />

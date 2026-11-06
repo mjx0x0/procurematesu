@@ -184,3 +184,110 @@
   .admin-dashboard-page .admin-pr-official-overlay,
   .admin-dashboard-page .admin-pr-delete-overlay { z-index: 80 !important; }
 }
+
+/* Mobile PR item entry: preserve the existing controlled fields while removing horizontal table scrolling. */
+@media (max-width: 640px) {
+  .pr-items-entry-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed;
+  }
+
+  .pr-items-entry-table thead {
+    display: none;
+  }
+
+  .pr-items-entry-table tbody {
+    display: block;
+  }
+
+  .pr-items-entry-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 0.75rem;
+    padding: 0.875rem;
+    border: 1px solid #E7E5E4;
+    border-radius: 0.875rem;
+    background: #FFFFFF;
+  }
+
+  .pr-items-entry-table tbody td {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0 !important;
+    border: 0 !important;
+    text-align: left !important;
+  }
+
+  .pr-items-entry-table tbody td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #57534E;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .pr-items-entry-table tbody td:first-child {
+    display: none;
+  }
+
+  .pr-items-entry-table tbody td:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+
+  .pr-items-entry-table tbody td:nth-child(7) {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .pr-items-entry-table tbody td input,
+  .pr-items-entry-table tbody td select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pr-items-entry-table tbody td:nth-child(7) button {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+  }
+
+  .pr-items-entry-table tfoot {
+    display: block;
+    border-top: 1px solid #E7E5E4;
+  }
+
+  .pr-items-entry-table tfoot tr {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .pr-items-entry-table tfoot td {
+    display: block;
+    padding: 0.5rem !important;
+    border: 0 !important;
+  }
+
+  .pr-items-entry-table tfoot td:first-child {
+    flex: 1;
+    text-align: left !important;
+  }
+
+  .pr-items-entry-table tfoot td:nth-child(2) {
+    text-align: right !important;
+    white-space: nowrap;
+  }
+
+  .pr-items-entry-table tfoot td:last-child {
+    display: none;
+  }
+}

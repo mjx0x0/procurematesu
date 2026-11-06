@@ -350,7 +350,7 @@ export default function ProcurementRequestForm() {
 
                 <div className="border border-stone-200 rounded-xl overflow-hidden shadow-xs">
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[760px] text-left border-collapse text-xs sm:text-sm">
+                    <table className="pr-items-entry-table w-full min-w-[760px] text-left border-collapse text-xs sm:text-sm">
                       <thead>
                         <tr className="bg-[#FAF7F2] border-b border-stone-200">
                           <th className="py-3 px-3 w-12 text-center font-bold text-stone-500">#</th>
@@ -365,19 +365,18 @@ export default function ProcurementRequestForm() {
                           </th>
                           <th className="py-3 px-3 w-28 text-center font-bold text-stone-700">
                             <div>Qty <span className="text-[#9E1A1D]">*</span></div>
-                            <span className="block text-[10px] font-normal text-stone-500 font-sans mt-0.5">Quantity</span>
+                            
                           </th>
                           <th className="py-3 px-3 w-36 text-center font-bold text-stone-700">
                             <div>Unit <span className="text-[#9E1A1D]">*</span></div>
-                            <span className="block text-[10px] font-normal text-stone-500 font-sans mt-0.5">Dropdown</span>
+                            
                           </th>
                           <th className="py-3 px-3 w-36 text-right font-bold text-stone-700">
                             <div>Unit Cost (₱) <span className="text-[#9E1A1D]">*</span></div>
-                            <span className="block text-[10px] font-normal text-stone-500 font-sans mt-0.5">Estimated</span>
+                            
                           </th>
                           <th className="py-3 px-3 w-36 text-right font-bold text-stone-700">
                             <div>Total (₱)</div>
-                            <span className="block text-[10px] font-normal text-stone-500 font-sans mt-0.5">Subtotal</span>
                           </th>
                           <th className="py-3 px-2 w-12 text-center font-bold text-stone-500" />
                         </tr>
@@ -388,7 +387,7 @@ export default function ProcurementRequestForm() {
                             <td className="py-3 px-3 text-center font-semibold text-stone-400">
                               {index + 1}
                             </td>
-                            <td className="py-3 px-3">
+                            <td data-label="Item Description" className="py-3 px-3">
                               <input
                                 type="text"
                                 value={item.description}
@@ -402,7 +401,7 @@ export default function ProcurementRequestForm() {
                                 </p>
                               )}
                             </td>
-                            <td className="py-3 px-3">
+                            <td data-label="Quantity" className="py-3 px-3">
                               <input
                                 type="number"
                                 min="1"
@@ -425,7 +424,7 @@ export default function ProcurementRequestForm() {
                                 className="w-full h-11 px-2 text-center text-sm font-semibold rounded-lg border border-stone-300 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
                               />
                             </td>
-                            <td className="py-3 px-3">
+                            <td data-label="Unit" className="py-3 px-3">
                               <select
                                 value={item.unit}
                                 onChange={(e) => updateItem(index, { unit: e.target.value })}
@@ -441,7 +440,7 @@ export default function ProcurementRequestForm() {
                                 )}
                               </select>
                             </td>
-                            <td className="py-3 px-3">
+                            <td data-label="Unit Cost (₱)" className="py-3 px-3">
                               <input
                                 type="number"
                                 min="0"
@@ -465,7 +464,7 @@ export default function ProcurementRequestForm() {
                                 className="w-full h-11 px-3 text-right text-sm font-mono rounded-lg border border-stone-300 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
                               />
                             </td>
-                            <td className="py-3 px-3 text-right font-mono font-bold text-stone-900 text-sm sm:text-base">
+                            <td data-label="Subtotal (₱)" className="py-3 px-3 text-right font-mono font-bold text-stone-900 text-sm sm:text-base">
                               ₱{((Number(item.qty) || 0) * (Number(item.unit_cost) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
                             <td className="py-3 px-2 text-center">

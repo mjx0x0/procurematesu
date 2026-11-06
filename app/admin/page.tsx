@@ -641,17 +641,8 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                       <AlertCircle className="h-4.5 w-4.5" />
                     </div>
                     <div className="flex-1 text-xs">
-                      <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div>
                         <p className="font-bold text-stone-900 text-xs sm:text-sm">Step 4 Pre-Numbering Pending: {selectedPR.pr_no}</p>
-                        <button
-                          onClick={() => {
-                            setOfficialPrInput("");
-                            setShowOfficialPrModal(true);
-                          }}
-                          className="px-3 py-1.5 bg-stone-900 hover:bg-stone-800 text-white rounded-lg font-semibold text-xs transition-colors shadow-2xs"
-                        >
-                          Input Official PR #
-                        </button>
                       </div>
                       <p className="text-stone-600 mt-1 leading-relaxed">
                         This Purchase Request was created with a temporary number. At <strong>Step 4 (Pre-Numbering and Control of PRs)</strong>, you manually input the official PR number. Once entered, the temporary PR number will update in both the end user&apos;s and admin&apos;s PR data.
@@ -697,7 +688,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
                     <button
                       onClick={() => setDeletePR(selectedPR.pr_no)}
-                      className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg bg-white hover:bg-red-50 text-stone-600 hover:text-red-700 text-xs font-semibold border border-stone-200 hover:border-red-200 shadow-2xs transition-all active:scale-98"
+                      className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg bg-white text-stone-500 hover:bg-red-50 hover:text-red-700 text-xs font-medium border border-stone-200 hover:border-red-200 transition-colors active:scale-98"
                       title={`Permanently delete ${selectedPR.pr_no}`}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
@@ -706,15 +697,6 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                   </div>
                 </div>
               </div>
-
-              {/* Current PMO Stage banner */}
-              {detailStage && (
-                <div className="bg-stone-50 border border-stone-200/80 rounded-xl p-3.5">
-                  <p className="text-[10px] uppercase tracking-wider text-stone-500 font-bold mb-0.5">Current PMO Stage</p>
-                  <p className="text-xs sm:text-sm font-bold text-stone-900">Stage {detailStage.number}: {detailStage.label}</p>
-                  <p className="text-xs text-stone-500 mt-0.5 leading-relaxed">{detailStage.description}</p>
-                </div>
-              )}
 
               {/* Procurement Progress */}
               <div className="bg-white border border-stone-200 rounded-2xl p-4 sm:p-5 shadow-xs">
@@ -770,10 +752,9 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                               </span>
                             </div>
                             <p className={`text-xs font-semibold mt-0.5 ${state === "current" ? "text-stone-900" : "text-stone-700"}`}>{stage.label}</p>
-                            {recorded?.completed_at && (
-                              <p className="text-[9px] text-stone-400 mt-1">Recorded {new Date(recorded.completed_at).toLocaleString("en-PH")}</p>
+                            {isCurrent && detailStage?.description && (
+                              <p className="mt-1 text-[10px] leading-relaxed text-stone-500">{detailStage.description}</p>
                             )}
-                            {recorded?.remarks && <p className="text-[9px] text-stone-500 mt-1">{recorded.remarks}</p>}
                           </div>
                           {state === "current" && <ChevronRight className="h-4 w-4 text-stone-400 shrink-0 mt-1" />}
                         </div>
@@ -789,9 +770,9 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
                 <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">{selectedPR.purpose || "N/A"}</p>
               </div>
 
-              {/* Recorded Activity */}
+              {/* Activity & Remarks */}
               <div className="border border-stone-200 rounded-xl p-4 bg-white">
-                <h4 className="text-xs uppercase tracking-wide text-stone-400 font-semibold mb-3">Recorded Activity</h4>
+                <h4 className="text-xs uppercase tracking-wide text-stone-400 font-semibold mb-3">Activity &amp; Remarks</h4>
                 {history.length ? (
                   <div className="space-y-2">
                     {history.map((h, i) => (
