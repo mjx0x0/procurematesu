@@ -266,10 +266,8 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-stone-100 p-1.5 sm:p-2">
               {/* 1. Total Requests */}
-              <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-600">
-                  <FileText className="h-5 w-5" />
-                </div>
+              <div className="bg-white min-h-[82px] p-3 sm:p-3.5 flex flex-col justify-center">
+                
                 <div className="min-w-0">
                   <div className="text-xl sm:text-2xl font-black text-[#4D002C] font-mono leading-none">
                     {prs.length}
@@ -281,9 +279,7 @@ export default function DashboardPage() {
 
               {/* 2. In Review */}
               <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60">
-                  <Clock className="h-5 w-5" />
-                </div>
+                
                 <div className="min-w-0">
                   <div className="text-xl sm:text-2xl font-black text-amber-700 font-mono leading-none">
                     {stats.pending}
@@ -295,9 +291,7 @@ export default function DashboardPage() {
 
               {/* 3. Completed */}
               <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                  <CheckCircle2 className="h-5 w-5" />
-                </div>
+                
                 <div className="min-w-0">
                   <div className="text-xl sm:text-2xl font-black text-emerald-700 font-mono leading-none">
                     {stats.completed}
@@ -313,9 +307,7 @@ export default function DashboardPage() {
                   href="/dashboard/purchase-requests?stage=draft"
                   className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5 transition-colors hover:bg-amber-50/30"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60">
-                    <AlertCircle className="h-5 w-5" />
-                  </div>
+                  
                   <div className="min-w-0">
                     <div className="text-xl sm:text-2xl font-black text-amber-700 font-mono leading-none">
                       {pendingDraftsCount}
@@ -328,9 +320,7 @@ export default function DashboardPage() {
                 </Link>
               ) : (
                 <div className="bg-white p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3.5">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-600 border border-stone-200/70">
-                    <CheckCircle2 className="h-5 w-5" />
-                  </div>
+                  
                   <div className="min-w-0">
                     <div className="text-xl sm:text-2xl font-black text-[#4D002C] font-mono leading-none">
                       0
@@ -466,7 +456,7 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-1.5 shrink-0">
                           <Link
                             href={`/dashboard/pr/${pr.pr_no}`}
-                            className="inline-flex min-h-9 items-center gap-1 px-3 py-1.5 rounded-xl bg-[#4D002C] text-white text-[11px] sm:text-xs font-bold shadow-xs hover:bg-[#7B0046] transition-colors"
+                            className="inline-flex min-h-9 items-center gap-1 px-3 py-1.5 rounded-xl bg-[#7B0046] text-white text-[11px] sm:text-xs font-bold shadow-xs hover:bg-[#65003A] transition-colors"
                           >
                             <Eye className="h-3.5 w-3.5" />
                             <span>Track</span>
