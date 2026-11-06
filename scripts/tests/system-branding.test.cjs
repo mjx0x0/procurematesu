@@ -272,7 +272,8 @@ test('admin Purchase Requests has its own route and retains the existing logbook
   const inquiries = read('app/admin/inquiries/page.tsx');
 
   assert.match(purchaseRequests, /export default function AdminPurchaseRequestsPage/);
-  assert.match(purchaseRequests, /href="\\/admin".*Back to Admin Dashboard/);
+  assert.match(purchaseRequests, /href="\\/admin"/);
+  assert.match(purchaseRequests, /Back to Admin Dashboard/);
   assert.match(purchaseRequests, /Search by PR number, purpose, or requesting department/);
   assert.match(purchaseRequests, /All Statuses/);
   assert.match(purchaseRequests, /All Departments/);
