@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SYSTEM_NAME } from "@/lib/system-branding";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
@@ -275,14 +274,10 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
-      <SystemPageHeader titlePrimary="ProcureMateSU" titleAccent="" compactOnMobile workspaceLabel="Administrative Workspace" brandLogo brandWordmark backHref={null} roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
+      <SystemPageHeader titlePrimary="ProcureMateSU" titleAccent="" workspaceLabel="Administrative Workspace" brandLogo brandWordmark backHref="/admin" roleLabel="Administrator" containerClassName="max-w-6xl px-4" />
 
       <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-3.5 sm:py-7">
         <div className="mb-4 sm:mb-5">
-          <Link href="/admin" className="mb-2 inline-flex min-h-8 items-center text-xs font-semibold text-[#7B0046] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]">
-            <ChevronRight className="mr-1 h-3.5 w-3.5 rotate-180" />
-            Back to Admin Dashboard
-          </Link>
           <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#4D002C]">Purchase Requests</h1>
           <p className="text-xs sm:text-sm text-stone-600 mt-1">Review, filter, and manage submitted purchase requests through the official PMO procurement workflow.</p>
         </div>
@@ -1038,3 +1033,4 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
     </div>
   );
 }
+
