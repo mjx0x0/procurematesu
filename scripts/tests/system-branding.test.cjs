@@ -336,3 +336,16 @@ test('admin full PR modal keeps vertical scrolling and exposes a touch-friendly 
   assert.ok(modal.includes('min-w-[700px]'));
   assert.match(modal, /Swipe left or right to view the complete form/);
 });
+
+test('admin notification bell is separated from the account control and has no live-status dot', () => {
+  const admin = read('app/admin/page.tsx');
+  const header = read('components/dashboard/SystemPageHeader.tsx');
+  const notifications = read('components/AdminPRNotificationPopover.tsx');
+
+  assert.match(admin, /showControlsDivider/);
+  assert.match(header, /showControlsDivider\?: boolean/);
+  assert.match(header, /role="separator"/);
+  assert.match(header, /aria-orientation="vertical"/);
+  assert.match(header, /bg-white\/25/);
+  assert.doesNotMatch(notifications, /bg-emerald-400/);
+});
