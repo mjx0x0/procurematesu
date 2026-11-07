@@ -274,7 +274,7 @@ if (loading) return <div className="min-h-screen flex items-center justify-cente
 
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
-      <SystemPageHeader titlePrimary="ProcureMateSU" titleAccent="" workspaceLabel="Administrative Workspace" brandLogo brandWordmark backHref="/admin" roleLabel="Administrator" containerClassName="max-w-6xl px-4" />
+      <SystemPageHeader titlePrimary="ProcureMateSU" titleAccent="" workspaceLabel="Administrative Workspace" brandLogo brandWordmark backHref="/admin" roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
 
       <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-3.5 sm:py-7">
         <div className="mb-4 sm:mb-5">
