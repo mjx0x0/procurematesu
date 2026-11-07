@@ -7,5 +7,10 @@
     }
   ],
   "buildCommand": "NODE_ENV=production next build",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "git": {
+    "deploymentEnabled": {
+      "security/nextjs-16-upgrade": false
+    }
+  }
 }

@@ -1,0 +1,89 @@
+name: Next.js 16 dependency and build validation
+
+on:
+  push:
+    branches: [security/nextjs-16-upgrade]
+    paths:
+      - "package.json"
+      - "next.config.js"
+      - "middleware.ts"
+      - "proxy.ts"
+      - ".github/workflows/next16-lock-refresh.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  update-lock-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out upgrade branch
+        uses: actions/checkout@v4
+        with:
+          ref: security/nextjs-16-upgrade
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+
+      - name: Regenerate Bun lockfile
+        run: bun install --lockfile-only
+
+      - name: Verify lockfile and installed security versions
+        run: |
+          bun install --frozen-lockfile
+          node <<'NODE'
+          const fs = require("node:fs");
+          const path = require("node:path");
+          const lock = JSON.parse(fs.readFileSync("bun.lock", "utf8"));
+          const root = lock.workspaces?.[""];
+          const packages = Object.values(lock.packages || {});
+          const sharpEntries = packages
+            .filter((entry) => Array.isArray(entry) && typeof entry[0] === "string" && entry[0].startsWith("sharp@"))
+            .map((entry) => entry[0]);
+
+          if (root?.dependencies?.next !== "16.4.5") throw new Error("bun.lock does not pin Next.js 16.4.5");
+          if (root?.dependencies?.react !== "19.3.1") throw new Error("bun.lock does not pin React 19.3.1");
+          if (root?.dependencies?.sharp !== "0.35.5") throw new Error("bun.lock does not pin sharp 0.35.5");
+          if (!sharpEntries.length || sharpEntries.some((entry) => entry !== "sharp@0.35.5")) {
+            throw new Error("A vulnerable or unexpected sharp version remains in bun.lock: " + sharpEntries.join(", "));
+          }
+
+          const installed = (name) => JSON.parse(fs.readFileSync(require.resolve(name + "/package.json"), "utf8")).version;
+          if (installed("next") !== "16.4.5") throw new Error("Installed Next.js version is not 16.4.5");
+          if (installed("react") !== "19.3.1" || installed("react-dom") !== "19.3.1") throw new Error("Installed React versions do not match");
+          if (installed("sharp") !== "0.35.5") throw new Error("Installed sharp version is not patched");
+          console.log({ next: installed("next"), react: installed("react"), reactDom: installed("react-dom"), sharp: installed("sharp"), sharpEntries });
+          NODE
+
+      - name: Run ESLint
+        run: bun run lint
+
+      - name: Run procurement regression tests
+        run: bun run test:procurement
+
+      - name: Build production application
+        run: bun run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Commit generated Bun lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bun.lock
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: regenerate Bun lockfile for Next.js 16"
+            git push origin security/nextjs-16-upgrade
+          else
+            echo "bun.lock is already current"
+          fi
