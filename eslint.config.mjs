@@ -36,6 +36,7 @@ const eslintConfig = [
       "react-hooks/immutability": "off",
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/refs": "off",
+      "@typescript-eslint/no-require-imports": "off",
     },
   },
 ];
