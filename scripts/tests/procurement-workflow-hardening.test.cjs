@@ -46,7 +46,7 @@ test('PR creation requires an approved active profile and derives item subtotals
 });
 
 test('final Monitoring and Documentation stage can be completed through the admin workflow', () => {
-  const ui = read('app/admin/page.tsx');
+  const ui = read('app/admin/purchase-requests/page.tsx');
   const api = read('app/api/admin/complete-stage/route.ts');
   assert.match(ui, /isFinalWorkflowStage/);
   assert.match(ui, /isFinalWorkflowStage \? "completed"/);

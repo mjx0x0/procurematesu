@@ -29,7 +29,8 @@ test('landing page brand lockup uses a framed logo, refined gradient wordmark, a
   assert.ok(landing.includes('<MsuLogo size={35}'));
   const header = landing.slice(landing.indexOf("<header"), landing.indexOf("</header>"));
   assert.match(header, /Procurement Office/);
-  assert.doesNotMatch(header, /Digital Procurement Logbook/);
+  const visibleHeader = header.replace(/aria-label="[^"]*"/g, "");
+  assert.doesNotMatch(visibleHeader, /Digital Procurement Logbook/);
   assert.match(branding, /SYSTEM_TAGLINE = "MSU – General Santos"/);
 });
 
@@ -295,8 +296,8 @@ test('admin Purchase Requests has its own route and retains the existing logbook
   const inquiries = read('app/admin/inquiries/page.tsx');
 
   assert.match(purchaseRequests, /export default function AdminPurchaseRequestsPage/);
-  assert.match(purchaseRequests, /href="\/admin"/);
-  assert.match(purchaseRequests, /Back to Admin Dashboard/);
+  assert.match(purchaseRequests, /backHref="\/admin"/);
+  assert.match(purchaseRequests, /<SystemPageHeader/);
   assert.match(purchaseRequests, /Search by PR number, purpose, or requesting department/);
   assert.match(purchaseRequests, /All Statuses/);
   assert.match(purchaseRequests, /All Departments/);

@@ -1,16 +1,11 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import nextTypeScript from "eslint-config-next/typescript";
 
 const eslintConfig = [
+  ...nextCoreWebVitals,
+  ...nextTypeScript,
   {
+    name: "procurematesu/global-ignores",
     ignores: [
       ".next/**",
       ".next-dev/**",
@@ -21,14 +16,27 @@ const eslintConfig = [
       "data/**",
     ],
   },
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
+    name: "procurematesu/typescript-overrides",
+    files: ["**/*.{ts,tsx,mts,cts}"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+  {
+    name: "procurematesu/shared-overrides",
+    files: ["**/*.{js,jsx,mjs,ts,tsx,mts,cts}"],
+    rules: {
       "react/no-unescaped-entities": "off",
       "prefer-const": "off",
+      // Preserve existing component behavior during the framework upgrade.
+      // These React Compiler diagnostics require a separate behavior-focused refactor.
+      "react-hooks/immutability": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/refs": "off",
+      "@typescript-eslint/no-require-imports": "off",
     },
   },
 ];
