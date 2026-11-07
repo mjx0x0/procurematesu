@@ -25,6 +25,7 @@ interface SystemPageHeaderProps {
   mobileTitlePrimary?: string;
   mobileTitleAccent?: string;
   children?: ReactNode;
+  showControlsDivider?: boolean;
 }
 
 export function SystemPageHeader({
@@ -45,6 +46,7 @@ export function SystemPageHeader({
   mobileTitlePrimary,
   mobileTitleAccent,
   children,
+  showControlsDivider = false,
 }: SystemPageHeaderProps) {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -193,6 +195,14 @@ export function SystemPageHeader({
         </div>
         <div className={`flex shrink-0 items-center justify-end ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-2 sm:gap-3"}`}>
           {children && <div className={`flex shrink-0 items-center ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-2 sm:gap-3"}`}>{children}</div>}
+          {showControlsDivider && (
+            <span
+              role="separator"
+              aria-orientation="vertical"
+              aria-hidden="true"
+              className="mx-1.5 h-6 w-px shrink-0 bg-white/25 sm:mx-0 sm:h-7"
+            />
+          )}
           <div ref={accountMenuRef} className="relative shrink-0">
             <button
               type="button"
