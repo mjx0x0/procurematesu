@@ -158,6 +158,7 @@ export default function AdminDashboard() {
         backHref={null}
         roleLabel="Administrator"
         containerClassName="max-w-7xl px-3.5 sm:px-6"
+        showControlsDivider
       >
         <AdminPRNotificationPopover />
       </SystemPageHeader>
