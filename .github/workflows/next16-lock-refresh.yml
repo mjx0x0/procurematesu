@@ -19,14 +19,14 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Check out upgrade branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: security/nextjs-16-upgrade
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "22"
 
@@ -38,31 +38,40 @@ jobs:
       - name: Regenerate Bun lockfile
         run: bun install --lockfile-only
 
-      - name: Verify lockfile and installed security versions
+      - name: Verify frozen lockfile and installed security versions
         run: |
           bun install --frozen-lockfile
           node <<'NODE'
           const fs = require("node:fs");
-          const path = require("node:path");
-          const lock = JSON.parse(fs.readFileSync("bun.lock", "utf8"));
-          const root = lock.workspaces?.[""];
-          const packages = Object.values(lock.packages || {});
-          const sharpEntries = packages
-            .filter((entry) => Array.isArray(entry) && typeof entry[0] === "string" && entry[0].startsWith("sharp@"))
-            .map((entry) => entry[0]);
-
-          if (root?.dependencies?.next !== "16.4.5") throw new Error("bun.lock does not pin Next.js 16.4.5");
-          if (root?.dependencies?.react !== "19.3.1") throw new Error("bun.lock does not pin React 19.3.1");
-          if (root?.dependencies?.sharp !== "0.35.5") throw new Error("bun.lock does not pin sharp 0.35.5");
-          if (!sharpEntries.length || sharpEntries.some((entry) => entry !== "sharp@0.35.5")) {
-            throw new Error("A vulnerable or unexpected sharp version remains in bun.lock: " + sharpEntries.join(", "));
+          const { createRequire } = require("node:module");
+          const lockText = fs.readFileSync("bun.lock", "utf8");
+          const allSharpResolutions = [...lockText.matchAll(/sharp@([^"\\s]+)/g)].map((match) => match[1]);
+          if (!lockText.includes('"sharp@0.35.5"')) throw new Error("bun.lock is missing sharp@0.35.5");
+          if (allSharpResolutions.some((version) => version !== "0.35.5")) {
+            throw new Error("Unexpected sharp versions remain in bun.lock: " + allSharpResolutions.join(", "));
           }
 
-          const installed = (name) => JSON.parse(fs.readFileSync(require.resolve(name + "/package.json"), "utf8")).version;
-          if (installed("next") !== "16.4.5") throw new Error("Installed Next.js version is not 16.4.5");
-          if (installed("react") !== "19.3.1" || installed("react-dom") !== "19.3.1") throw new Error("Installed React versions do not match");
-          if (installed("sharp") !== "0.35.5") throw new Error("Installed sharp version is not patched");
-          console.log({ next: installed("next"), react: installed("react"), reactDom: installed("react-dom"), sharp: installed("sharp"), sharpEntries });
+          const readVersion = (name) => {
+            const packageJson = require.resolve(name + "/package.json");
+            return JSON.parse(fs.readFileSync(packageJson, "utf8")).version;
+          };
+          const rootSharp = require("sharp");
+          const transformerRequire = createRequire(require.resolve("@xenova/transformers"));
+          const transformerSharp = transformerRequire("sharp");
+          const versions = {
+            next: readVersion("next"),
+            react: readVersion("react"),
+            reactDom: readVersion("react-dom"),
+            sharp: rootSharp.versions.sharp,
+            transformerSharp: transformerSharp.versions.sharp,
+          };
+
+          if (versions.next !== "16.4.5") throw new Error("Installed Next.js version is not 16.4.5");
+          if (versions.react !== "19.3.1" || versions.reactDom !== "19.3.1") throw new Error("Installed React versions do not match");
+          if (versions.sharp !== "0.35.5" || versions.transformerSharp !== "0.35.5") {
+            throw new Error("The runtime or @xenova/transformers resolves an unpatched Sharp version: " + JSON.stringify(versions));
+          }
+          console.log(versions);
           NODE
 
       - name: Run ESLint
