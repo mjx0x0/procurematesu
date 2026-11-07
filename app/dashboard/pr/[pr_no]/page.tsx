@@ -5,9 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import PRDownloadButton from "@/components/PRDownloadButton";
+import LoadingScreen from "@/components/LoadingScreen";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, getFormDisplayPrNumber } from "@/lib/procurement-process";
-import { AlertCircle, Building2, Calendar, CheckCircle, Clock, FileCheck, Loader2, MessageSquare, Printer, XCircle } from "lucide-react";
+import { AlertCircle, Building2, Calendar, CheckCircle, Clock, FileCheck, MessageSquare, Printer, XCircle } from "lucide-react";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -162,7 +163,7 @@ export default function PRDetailPage() {
     });
   })();
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><Loader2 className="h-9 w-9 animate-spin text-[#7B0046]" /></div>;
+  if (loading) return <LoadingScreen label="Loading purchase request..." />;
   if (error || !pr) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><div className="text-center"><XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" /><h2 className="text-xl font-bold text-stone-900">{error || "PR Not Found"}</h2><Link href="/dashboard/purchase-requests" className="text-[#7B0046] font-semibold mt-3 inline-block">Back to Purchase Requests</Link></div></div>;
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Building2, ClipboardList, ExternalLink, FileText, MapPin, Menu, Phone, Printer, Search, Workflow, X } from "lucide-react";
+import { ArrowRight, Building2, ClipboardList, ExternalLink, FileText, Mail, MapPin, Menu, Phone, Printer, Search, Workflow, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { MsuLogo } from "@/components/msu-logo";
@@ -504,6 +504,13 @@ export default function LandingPage() {
               >
                 <Phone className="h-4 w-4" />
                 +63 908 810 5634
+              </a>
+              <a
+                href="mailto:procurement@msugensan.edu.ph"
+                className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[#4D002C] transition-colors hover:text-[#7B0046] hover:underline"
+              >
+                <Mail className="h-4 w-4" />
+                procurement@msugensan.edu.ph
               </a>
               <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
                 Contact details are listed in the official MSU-GenSan University Directory.

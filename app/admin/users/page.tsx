@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import LoadingScreen from "@/components/LoadingScreen";
 import { CheckCircle, Loader2, User, UserCheck, UserX, Users, RefreshCw, AlertCircle } from "lucide-react";
 import { isStaleRefreshTokenError } from "@/lib/supabase/client";
 
@@ -77,13 +78,7 @@ const loadUsers = useCallback(async () => {
 
   const pendingCount = users.filter((user) => user.status === "pending").length;
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]">
-        <Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" />
-      </div>
-    );
-  }
+  if (loading) return <LoadingScreen label="Loading user accounts..." />;
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">

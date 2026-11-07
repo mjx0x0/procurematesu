@@ -8,6 +8,7 @@ import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-
 import { ActionFeedbackModal, type FeedbackTone } from "@/components/ui/ActionFeedbackModal";
 import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import LoadingScreen from "@/components/LoadingScreen";
 import { Check, CheckCircle, ChevronRight, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Trash2, User, X, XCircle, AlertCircle } from "lucide-react";
 
 interface PR {
@@ -266,7 +267,7 @@ export default function AdminPurchaseRequestsPage() {
       showFeedback("success", "Purchase Request Deleted", `${deleted} and its recorded stage history have been permanently removed.`);
     } catch (e) { console.error(e); showFeedback("error", "Delete Failed", "The purchase request could not be deleted. Please try again."); }
   };
-if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]"><Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" /></div>;
+if (loading) return <LoadingScreen label="Loading purchase requests..." />;
 
   const detailStage = currentStage(selectedPR);
   const detailIndex = currentIndex(selectedPR);

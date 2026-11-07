@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import LoadingScreen from "@/components/LoadingScreen";
 import { ArrowLeft, Loader2, Plus, Save, Trash2, X, CheckCircle2, AlertCircle, Printer } from "lucide-react";
 import { firstValidationError, validatePurchaseRequest } from "@/lib/pr-validation";
 import { MSU_DEPARTMENTS } from "@/lib/procurement-departments";
@@ -183,7 +184,7 @@ export default function ProcurementRequestForm() {
   const confirmReview = () => { if (!validateBeforeReview()) return; setShowReview(false); reviewConfirmedRef.current = true; setTimeout(() => formRef.current?.requestSubmit(), 0); };
   const viewCreatedPR = () => { if (createdPRNo) router.push(`/dashboard/pr/${encodeURIComponent(createdPRNo)}`); };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" /></div>;
+  if (loading) return <LoadingScreen label="Loading requisition form..." />;
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] pb-16">

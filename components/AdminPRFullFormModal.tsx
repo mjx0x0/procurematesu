@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { FileText, Loader2, Printer, X } from "lucide-react";
+import { FileText, Printer, X } from "lucide-react";
 import { motion } from "motion/react";
 import { getFormDisplayPrNumber } from "@/lib/procurement-process";
 
@@ -45,22 +45,19 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.94 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.2 }}
-          className="flex flex-col items-center justify-center rounded-2xl bg-white p-6 shadow-2xl border border-stone-200 text-center max-w-xs w-full"
+      <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4">
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex w-full max-w-xs flex-col items-center justify-center rounded-2xl border border-stone-200 bg-white p-6 text-center shadow-2xl"
         >
-          <div className="relative mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#4D002C]/10">
-            <FileText className="h-6 w-6 text-[#7B0046] animate-pulse" />
-          </div>
+          <span
+            aria-hidden="true"
+            className="mb-3 h-8 w-8 animate-spin rounded-full border-[3px] border-stone-200 border-t-[#7B0046] motion-reduce:animate-none"
+          />
           <p className="text-sm font-bold text-[#4D002C]">Loading Purchase Request</p>
-          <p className="text-xs text-stone-500 mt-0.5">Fetching official record for {prNo}...</p>
-          <div className="mt-4 w-40 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-[#7B0046] via-[#F5AB26] to-[#7B0046] rounded-full animate-progress-indeterminate" />
-          </div>
-        </motion.div>
+          <p className="mt-0.5 text-xs text-stone-500">Fetching official record for {prNo}...</p>
+        </div>
       </div>
     );
   }

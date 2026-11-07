@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 
 import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
-import { User, Loader2, Search, Eye, MessageSquare, Filter, X, Download } from "lucide-react";
+import LoadingScreen from "@/components/LoadingScreen";
+import { User, Search, Eye, MessageSquare, Filter, X, Download } from "lucide-react";
 
 interface Inquiry {
   id: string;
@@ -170,16 +171,7 @@ const formatDate = (date: string) => {
     document.body.removeChild(link);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[#7B0046] mx-auto" />
-          <p className="mt-4 text-stone-600 font-medium">Loading inquiries...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingScreen label="Loading inquiries..." />;
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">

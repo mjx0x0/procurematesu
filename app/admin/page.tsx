@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SYSTEM_NAME } from "@/lib/system-branding";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
-import { CheckCircle, Clock, FileCheck, Loader2, XCircle, ChevronRight } from "lucide-react";
+import LoadingScreen from "@/components/LoadingScreen";
+import { CheckCircle, Clock, FileCheck, XCircle, ChevronRight } from "lucide-react";
 
 interface PRSummary {
   current_stage: string;
@@ -114,13 +115,7 @@ export default function AdminDashboard() {
     rejected: prs.filter((pr) => ["rejected", "cancelled"].includes(pr.current_stage)).length,
   }), [prs]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F9F7F4]">
-        <Loader2 className="h-10 w-10 animate-spin text-[#7B0046]" />
-      </div>
-    );
-  }
+  if (loading) return <LoadingScreen label="Loading admin workspace..." />;
 
   const mainActions = [
     {

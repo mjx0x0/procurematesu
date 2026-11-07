@@ -820,11 +820,9 @@ export default function ChatbotDashboard() {
                     }`}
                   >
                     {msg.isLoading ? (
-                      <div className="flex items-center gap-1.5 py-1">
-                        <span className="w-2 h-2 rounded-full bg-[#7B0046] animate-bounce" />
-                        <span className="w-2 h-2 rounded-full bg-[#C27803] animate-bounce [animation-delay:150ms]" />
-                        <span className="w-2 h-2 rounded-full bg-[#7B0046] animate-bounce [animation-delay:300ms]" />
-                        <span className="text-xs text-stone-500 ml-2">Consulting procurement guidelines...</span>
+                      <div className="flex items-center gap-2 py-1">
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-[#7B0046]" />
+                        <span className="text-xs text-stone-500">Consulting procurement guidelines...</span>
                       </div>
                     ) : (
                       <>

@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertCircle, CheckCircle, Clock, Eye, FileText, Filter, Loader2, PlusCircle, Printer, Search } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, Eye, FileText, Filter, PlusCircle, Printer, Search } from "lucide-react";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import LoadingScreen from "@/components/LoadingScreen";
 import { SYSTEM_NAME } from "@/lib/system-branding";
 
 interface PurchaseRequest {
@@ -143,18 +144,7 @@ export default function PurchaseRequestsPage() {
     });
   }, [prs, stageFilter, query]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-[100svh] items-center justify-center bg-[#F7F5F2] px-6">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-7 w-7 animate-spin text-[#7B0046]" />
-          <span className="text-center text-[10px] font-semibold uppercase tracking-wider text-stone-500">
-            Loading your purchase requests...
-          </span>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingScreen label="Loading your purchase requests..." />;
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#302725]">

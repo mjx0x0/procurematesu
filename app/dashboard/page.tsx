@@ -10,13 +10,13 @@ import {
   Clock,
   Eye,
   FileText,
-  Loader2,
   PlusCircle,
   Printer,
 } from "lucide-react";
 
 import { Chatbot } from "@/components/chatbot/Chatbot";
 import { NotificationPopover } from "@/components/NotificationPopover";
+import LoadingScreen from "@/components/LoadingScreen";
 
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
@@ -128,16 +128,7 @@ export default function DashboardPage() {
   const initials = displayName.slice(0, 2).toUpperCase();
   const pendingDraftsCount = prs.filter((pr) => pr.current_stage === "draft").length;
 
-  if (loading) {
-    return (
-      <div className="app-theme flex min-h-[100svh] items-center justify-center bg-[#F7F5F2] px-6">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-7 w-7 animate-spin text-[#7B0046]" />
-          <span className="text-center text-[9px] font-semibold uppercase tracking-[.16em] text-stone-400">Preparing your workspace</span>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingScreen label="Preparing your workspace..." />;
 
   return (
     <div className="app-theme min-h-[100svh] overflow-x-clip bg-[#F7F5F2] text-[#302725] dashboard-page">
