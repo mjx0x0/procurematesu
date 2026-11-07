@@ -10,6 +10,8 @@ on:
       - "proxy.ts"
       - "eslint.config.mjs"
       - ".github/workflows/next16-lock-refresh.yml"
+      - "scripts/tests/procurement-workflow-hardening.test.cjs"
+      - "scripts/tests/system-branding.test.cjs"
 
 permissions:
   contents: write
