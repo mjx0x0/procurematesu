@@ -185,9 +185,6 @@ export default function AdminPRNotificationPopover() {
             {unread > 9 ? "9+" : unread}
           </span>
         )}
-        {connection === "live" && (
-          <span className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full bg-emerald-400 ring-1 ring-[#4A002A]" />
-        )}
       </button>
 
       {toast && !open && (
