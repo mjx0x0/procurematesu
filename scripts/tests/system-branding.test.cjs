@@ -27,21 +27,30 @@ test('landing page brand lockup uses a framed logo, refined gradient wordmark, a
   assert.ok(landing.includes('px-4 py-2.5 sm:gap-6 sm:px-8'));
   assert.ok(landing.includes('grid h-11 w-11 shrink-0 place-items-center'));
   assert.ok(landing.includes('<MsuLogo size={35}'));
-  assert.match(landing, /Digital Procurement Logbook/);
+  const header = landing.slice(landing.indexOf("<header"), landing.indexOf("</header>"));
+  assert.match(header, /Procurement Office/);
+  assert.doesNotMatch(header, /Digital Procurement Logbook/);
   assert.match(branding, /SYSTEM_TAGLINE = "MSU – General Santos"/);
 });
 
 test('the public landing hero follows the requested Digital Procurement headline hierarchy', () => {
   const source = read('components/LandingPage.tsx');
-  assert.match(source, /MSU – GENERAL SANTOS/);
+  const hero = source.slice(source.indexOf("{/* Hero Section */}"), source.indexOf("{/* About"));
+  assert.doesNotMatch(hero, /MSU – GENERAL SANTOS/);
   assert.match(source, /Digital Procurement/);
   assert.match(source, /Logbook &amp; Inquiry System/);
   assert.match(source, /SYSTEM_DESCRIPTION/);
   assert.match(source, /SYSTEM_TAGLINE/);
-  assert.match(source, /MSU – GENERAL SANTOS/);
   assert.doesNotMatch(source, /MSU – GENERAL SANTOS CITY/);
   assert.doesNotMatch(source, /MSU General Santos City Digital Procurement Logbook/);
   assert.match(source, /SYSTEM_NAME/);
+});
+
+test('landing footer heading omits the repeated university prefix while retaining the official copyright name', () => {
+  const source = read('components/LandingPage.tsx');
+  const footer = source.slice(source.indexOf('{/* Footer */}'));
+  assert.ok(footer.includes('<h2 className="mt-1 max-w-xl text-xl font-extrabold tracking-tight">Digital Procurement Logbook and Inquiry System</h2>'));
+  assert.ok(footer.includes('© {new Date().getFullYear()} {SYSTEM_NAME}'));
 });
 
 test('browser and social metadata use the exact official system name', () => {

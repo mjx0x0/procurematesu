@@ -73,7 +73,7 @@ export default function LandingPage() {
                 <span className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[8px] font-bold uppercase tracking-[0.13em] sm:text-[8.5px]">
                   <span className="text-[#F6D58A]">{SYSTEM_TAGLINE}</span>
                   <span className="h-1 w-1 shrink-0 rounded-full bg-[#E9B957] shadow-[0_0_6px_rgba(233,185,87,0.7)]" />
-                  <span className="text-white/75">Digital Procurement Logbook</span>
+                  <span className="text-white/75">Procurement Office</span>
                 </span>
               </span>
             </Link>
@@ -132,9 +132,6 @@ export default function LandingPage() {
             className="landing-hero-copy flex flex-col items-center text-center lg:items-start lg:text-left w-full"
           >
             <div className="w-full">
-              <p className="landing-hero-kicker mb-5 text-center lg:text-left text-xs sm:text-sm font-extrabold uppercase tracking-[0.24em] text-[#FFD043]">
-                MSU – GENERAL SANTOS
-              </p>
               <h1 className="landing-hero-title w-full text-center lg:text-left font-black tracking-[-0.035em] leading-[1.14]">
                 <span className="block text-[2rem] sm:text-5xl lg:text-[3.5rem] xl:text-[4.05rem] font-black text-[#FFFDF8] pb-1 leading-[1.08]">
                   Digital Procurement
@@ -546,7 +543,7 @@ export default function LandingPage() {
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#F0C83F]">
               Mindanao State University - General Santos
             </p>
-            <h2 className="mt-1 max-w-xl text-xl font-extrabold tracking-tight">{SYSTEM_NAME}</h2>
+            <h2 className="mt-1 max-w-xl text-xl font-extrabold tracking-tight">Digital Procurement Logbook and Inquiry System</h2>
             <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-white/60">
               Centralized platform for Purchase Requests, standardized procurement workflows, transparency disclosures, and Gab AI assistance.
             </p>
