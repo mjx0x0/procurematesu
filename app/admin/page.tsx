@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SYSTEM_NAME } from "@/lib/system-branding";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
 import { CheckCircle, Clock, FileCheck, XCircle, ChevronRight } from "lucide-react";
 
@@ -157,7 +158,10 @@ export default function AdminDashboard() {
         backHref={null}
         roleLabel="Administrator"
         containerClassName="max-w-7xl px-3.5 sm:px-6"
-      />
+        showControlsDivider
+      >
+        <AdminPRNotificationPopover />
+      </SystemPageHeader>
 
       <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-4 sm:py-7">
         <div className="mb-4 sm:mb-5">

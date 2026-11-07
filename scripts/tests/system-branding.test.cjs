@@ -311,3 +311,41 @@ test('admin Purchase Requests has its own route and retains the existing logbook
   assert.match(userApprovals, /export default function AdminUsersPage/);
   assert.match(inquiries, /export default function InquiriesPage/);
 });
+
+
+test('admin dashboard exposes a live, admin-authorized notification control for new Purchase Requests', () => {
+  const admin = read('app/admin/page.tsx');
+  const notifications = read('components/AdminPRNotificationPopover.tsx');
+
+  assert.match(admin, /<AdminPRNotificationPopover \/>/);
+  assert.ok(notifications.includes('event: "INSERT", schema: "public", table: "purchase_requests"'));
+  assert.ok(notifications.includes('profile?.role !== "admin"'));
+  assert.ok(notifications.includes('profile?.status !== "approved"'));
+  assert.ok(notifications.includes('profile?.is_active !== true'));
+  assert.match(notifications, /New PR Notifications/);
+  assert.match(notifications, /New Purchase Request received/);
+  assert.match(notifications, /Open Purchase Requests/);
+});
+
+test('admin full PR modal keeps vertical scrolling and exposes a touch-friendly horizontal form viewport', () => {
+  const modal = read('components/AdminPRFullFormModal.tsx');
+
+  assert.ok(modal.includes('overflow-y-auto overflow-x-hidden overscroll-y-contain'));
+  assert.ok(modal.includes('role="region" aria-label="Scrollable official Purchase Request form"'));
+  assert.ok(modal.includes('overflow-x-auto overflow-y-hidden overscroll-x-contain touch-pan-x'));
+  assert.ok(modal.includes('min-w-[700px]'));
+  assert.match(modal, /Swipe left or right to view the complete form/);
+});
+
+test('admin notification bell is separated from the account control and has no live-status dot', () => {
+  const admin = read('app/admin/page.tsx');
+  const header = read('components/dashboard/SystemPageHeader.tsx');
+  const notifications = read('components/AdminPRNotificationPopover.tsx');
+
+  assert.match(admin, /showControlsDivider/);
+  assert.match(header, /showControlsDivider\?: boolean/);
+  assert.match(header, /role="separator"/);
+  assert.match(header, /aria-orientation="vertical"/);
+  assert.match(header, /bg-white\/25/);
+  assert.doesNotMatch(notifications, /bg-emerald-400/);
+});

@@ -109,7 +109,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
           </button>
         </header>
 
-        <div className="admin-pr-full-form-body min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-6">
+        <div className="admin-pr-full-form-body min-h-0 min-w-0 w-full max-w-full flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain p-2.5 sm:p-6">
           <div className="mx-auto mb-3 max-w-4xl space-y-3 md:hidden print:hidden">
             <section className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
               <div className="flex items-start justify-between gap-3">
@@ -212,9 +212,9 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
             </p>
           </div>
 
-          <div className="admin-pr-official-form-scroll mx-auto w-full max-w-5xl overflow-x-auto overscroll-x-contain pb-2 print:overflow-visible print:pb-0">
-            <p className="mb-2 px-1 text-center text-[11px] font-semibold text-stone-500 md:hidden print:hidden">Official Purchase Request Form · Swipe horizontally to view the complete form.</p>
-            <div id="admin-pr-print" className="admin-pr-official-document mx-auto block w-full min-w-[720px] max-w-5xl bg-white text-black shadow-sm print:block print:border-0 print:shadow-none">
+          <div role="region" aria-label="Scrollable official Purchase Request form" tabIndex={0} style={{ WebkitOverflowScrolling: "touch" }} className="admin-pr-official-form-scroll mx-auto w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain touch-pan-x pb-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] print:overflow-visible print:pb-0">
+            <p className="mb-2 px-1 text-center text-[11px] font-semibold text-stone-500 md:hidden print:hidden">Official Purchase Request Form · Swipe left or right to view the complete form.</p>
+            <div id="admin-pr-print" className="admin-pr-official-document mx-auto block w-full min-w-[700px] max-w-5xl bg-white text-black shadow-sm print:block print:border-0 print:shadow-none">
             <div className="border-2 border-black text-black">
               <div className="border-b-2 border-black px-4 py-3 text-center">
                 <h1 className="font-serif text-xl font-black uppercase tracking-wider">PURCHASE REQUEST</h1>
