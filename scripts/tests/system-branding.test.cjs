@@ -188,6 +188,20 @@ test('official resource links use the approved RA 12009 references and GPPB advi
   assert.match(source, /GPPB Resolution No\. 02-2025/);
 });
 
+test('PMO contact card uses matching text links and omits crossed-out decorative labels', () => {
+  const source = read('components/LandingPage.tsx');
+  const contact = source.slice(source.indexOf('{/* Contact & Support */}'), source.indexOf('{/* Footer */}'));
+  assert.match(contact, /href="tel:\+639088105634"/);
+  assert.match(contact, /href="mailto:procurement@msugensan\.edu\.ph"/);
+  assert.match(contact, /\+63 908 810 5634/);
+  assert.match(contact, /procurement@msugensan\.edu\.ph/);
+  assert.doesNotMatch(contact, /Procurement Management Office<\/p>/);
+  assert.doesNotMatch(contact, /Office Information<\/p>/);
+  assert.doesNotMatch(contact, /<MapPin/);
+  const matchingLinkClass = 'className="inline-flex items-center gap-2 text-sm font-semibold text-[#4D002C] transition-colors hover:text-[#7B0046] hover:underline"';
+  assert.equal(contact.split(matchingLinkClass).length - 1, 2);
+});
+
 test('PMO contact card shows the temporary STTC location without a university directory link', () => {
   const source = read('components/LandingPage.tsx');
   assert.match(source, /Assoc\. Prof\. Nelson P\. Benares, Jr\./);

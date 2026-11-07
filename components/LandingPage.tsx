@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Building2, ClipboardList, ExternalLink, FileText, Mail, MapPin, Menu, Phone, Printer, Search, Workflow, X } from "lucide-react";
+import { ArrowRight, Building2, ClipboardList, ExternalLink, FileText, Mail, Menu, Phone, Printer, Search, Workflow, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { MsuLogo } from "@/components/msu-logo";
@@ -492,26 +492,24 @@ export default function LandingPage() {
               transition={{ duration: 0.42, ease: "easeOut" }}
               className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_6px_22px_rgba(40,20,10,0.035)]"
             >
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E9D9AE] bg-[#FFF6E4] text-[#7B0046]">
-                <Phone className="h-5 w-5" />
-              </span>
-              <p className="mt-4 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#C27803]">Procurement Management Office</p>
-              <h3 className="mt-1 text-lg font-extrabold text-[#4D002C]">Assoc. Prof. Nelson P. Benares, Jr.</h3>
+              <h3 className="mt-0 text-lg font-extrabold text-[#4D002C]">Assoc. Prof. Nelson P. Benares, Jr.</h3>
               <p className="mt-1 text-xs text-stone-500">PMO Director · MSU-General Santos</p>
-              <a
-                href="tel:+639088105634"
-                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#4D002C] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#7B0046]"
-              >
-                <Phone className="h-4 w-4" />
-                +63 908 810 5634
-              </a>
-              <a
-                href="mailto:procurement@msugensan.edu.ph"
-                className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[#4D002C] transition-colors hover:text-[#7B0046] hover:underline"
-              >
-                <Mail className="h-4 w-4" />
-                procurement@msugensan.edu.ph
-              </a>
+              <div className="mt-4 flex flex-col items-start gap-2">
+                <a
+                  href="tel:+639088105634"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-[#4D002C] transition-colors hover:text-[#7B0046] hover:underline"
+                >
+                  <Phone className="h-4 w-4" />
+                  +63 908 810 5634
+                </a>
+                <a
+                  href="mailto:procurement@msugensan.edu.ph"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-[#4D002C] transition-colors hover:text-[#7B0046] hover:underline"
+                >
+                  <Mail className="h-4 w-4" />
+                  procurement@msugensan.edu.ph
+                </a>
+              </div>
               <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
                 Contact details are listed in the official MSU-GenSan University Directory.
               </p>
@@ -524,11 +522,7 @@ export default function LandingPage() {
               transition={{ duration: 0.42, delay: 0.08, ease: "easeOut" }}
               className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_6px_22px_rgba(40,20,10,0.035)]"
             >
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E9D9AE] bg-[#FFF6E4] text-[#7B0046]">
-                <MapPin className="h-5 w-5" />
-              </span>
-              <p className="mt-4 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#C27803]">Office Information</p>
-              <h3 className="mt-1 text-lg font-extrabold text-[#4D002C]">Temporary Office Location</h3>
+              <h3 className="mt-0 text-lg font-extrabold text-[#4D002C]">Temporary Office Location</h3>
               <p className="mt-2 text-xs leading-relaxed text-stone-600">
                 The Procurement Management Office is temporarily located at the <strong className="font-bold text-[#4D002C]">Science and Technology Training Center (STTC)</strong>. Office arrangements may change, so please contact the PMO before visiting to confirm the current location.
               </p>
