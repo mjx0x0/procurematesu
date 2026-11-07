@@ -8,6 +8,7 @@ on:
       - "next.config.js"
       - "middleware.ts"
       - "proxy.ts"
+      - "eslint.config.mjs"
       - ".github/workflows/next16-lock-refresh.yml"
 
 permissions:
