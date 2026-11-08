@@ -327,14 +327,19 @@ test('admin dashboard exposes a live, admin-authorized notification control for 
   assert.match(notifications, /Open Purchase Requests/);
 });
 
-test('admin full PR modal keeps vertical scrolling and exposes a touch-friendly horizontal form viewport', () => {
+test('admin full PR modal shows the official form before supplemental details and keeps phone-friendly scrolling', () => {
   const modal = read('components/AdminPRFullFormModal.tsx');
 
   assert.ok(modal.includes('overflow-y-auto overflow-x-hidden overscroll-y-contain'));
   assert.ok(modal.includes('role="region" aria-label="Scrollable official Purchase Request form"'));
-  assert.ok(modal.includes('overflow-x-auto overflow-y-hidden overscroll-x-contain touch-pan-x'));
+  assert.ok(modal.includes('overflow-x-auto overscroll-x-contain touch-pan-x'));
+  assert.ok(modal.includes('WebkitOverflowScrolling: "touch"'));
   assert.ok(modal.includes('min-w-[700px]'));
   assert.match(modal, /Swipe left or right to view the complete form/);
+  assert.ok(!modal.includes('PR Details'));
+  assert.ok(!modal.includes('Item Details'));
+  assert.ok(modal.indexOf('id="admin-pr-print"') < modal.indexOf('Submitted PR Record'));
+  assert.ok(modal.includes('border-2 border-black text-black'));
 });
 
 test('admin notification bell is separated from the account control and has no live-status dot', () => {
