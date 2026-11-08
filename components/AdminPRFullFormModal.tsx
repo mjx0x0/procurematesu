@@ -114,7 +114,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
             Official Purchase Request Form · Swipe left or right to view the complete form.
           </p>
           <section role="region" aria-label="Scrollable official Purchase Request form" tabIndex={0} style={{ WebkitOverflowScrolling: "touch" }} className="admin-pr-official-form-scroll w-full min-w-0 max-w-full rounded-2xl border border-stone-300 bg-white p-0 shadow-xs overflow-x-auto overscroll-x-contain touch-pan-x focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] print:overflow-visible print:rounded-none print:border-0 print:shadow-none print:p-0">
-            <div id="admin-pr-print" className="admin-pr-official-document min-w-[700px] border-2 border-black bg-white text-black print:w-full print:min-w-0 print:box-border print:border-0">
+            <div id="admin-pr-print" className="admin-pr-official-document min-w-[700px] bg-white text-black print:w-full print:min-w-0 print:box-border">
             <div className="border-2 border-black text-black">
               <div className="border-b-2 border-black px-4 py-3 text-center">
                 <h1 className="font-serif text-xl font-black uppercase tracking-wider">PURCHASE REQUEST</h1>
