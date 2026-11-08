@@ -340,6 +340,14 @@ test('admin full PR modal shows the official form before supplemental details an
   assert.ok(!modal.includes('Item Details'));
   assert.ok(modal.indexOf('id="admin-pr-print"') < modal.indexOf('Submitted PR Record'));
   assert.ok(modal.includes('border-2 border-black text-black'));
+
+  const mobileStyles = read('app/portal-premium.css');
+  const mobileFormRules = mobileStyles.slice(mobileStyles.lastIndexOf('/* Final mobile consistency fixes for admin PR actions and official form viewing. */'));
+  assert.match(mobileFormRules, /\.admin-pr-full-form-body\s*\{\s*display:\s*block !important;/);
+  assert.match(mobileFormRules, /\.admin-pr-official-form-scroll\s*\{[\s\S]*?flex:\s*0 0 auto !important;/);
+  assert.match(mobileFormRules, /min-height:\s*360px/);
+  assert.doesNotMatch(mobileFormRules, /\.admin-pr-full-form-body\s*\{\s*display:\s*flex/);
+  assert.doesNotMatch(mobileFormRules, /order:\s*-1/);
 });
 
 test('admin notification bell is separated from the account control and has no live-status dot', () => {
