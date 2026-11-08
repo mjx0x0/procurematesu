@@ -110,111 +110,11 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
         </header>
 
         <div className="admin-pr-full-form-body min-h-0 min-w-0 w-full max-w-full flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain p-2.5 sm:p-6">
-          <div className="mx-auto mb-3 max-w-4xl space-y-3 md:hidden print:hidden">
-            <section className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h3 className="text-sm font-extrabold text-[#4D002C]">PR Details</h3>
-                  <p className="mt-0.5 break-all font-mono text-xs font-bold text-[#7B0046]">
-                    {getFormDisplayPrNumber(String(pr.pr_no || ""), String(pr.current_stage || "")) || "PR number not assigned"}
-                  </p>
-                </div>
-                {String(pr.pr_no || "").includes("TEMP") && (
-                  <span className="shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-bold text-amber-800">
-                    Temporary No.
-                  </span>
-                )}
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-3">
-                <div className="col-span-2 min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Department</p>
-                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.department || "—")}</p>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Section</p>
-                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(pr.section || "—")}</p>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">PR Date</p>
-                  <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(currentDate)}</p>
-                </div>
-              </div>
-              <div className="mt-3 border-t border-stone-100 pt-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Purpose</p>
-                <p className="mt-1 whitespace-pre-wrap break-words text-xs leading-relaxed text-stone-800">{String(pr.purpose || "—")}</p>
-                <div className="mt-3 flex items-center justify-between border-t border-stone-100 pt-2.5">
-                  <span className="text-xs font-bold text-stone-600">Total Estimated Cost</span>
-                  <span className="font-mono text-sm font-extrabold text-[#4D002C]">₱{money(total)}</span>
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <h3 className="text-sm font-extrabold text-[#4D002C]">Item Details</h3>
-                <span className="rounded-full bg-stone-100 px-2 py-1 text-[10px] font-bold text-stone-600">
-                  {items.length} {items.length === 1 ? "item" : "items"}
-                </span>
-              </div>
-              {items.length > 0 ? (
-                <div className="space-y-2.5">
-                  {items.map((item, idx) => (
-                    <article key={idx} className="rounded-lg border border-stone-200 bg-stone-50/70 p-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Item {idx + 1}</p>
-                          <h4 className="mt-0.5 break-words text-xs font-bold leading-relaxed text-stone-900">{String(item.item_description || "No item description")}</h4>
-                        </div>
-                        <span className="shrink-0 font-mono text-xs font-extrabold text-[#4D002C]">₱{money(item.total_cost)}</span>
-                      </div>
-                      <div className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-2 border-t border-stone-200 pt-2.5">
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Quantity / Unit</p>
-                          <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(item.quantity ?? "—") + " " + String(item.unit || "")}</p>
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Stock No.</p>
-                          <p className="mt-0.5 break-words text-xs font-semibold text-stone-800">{String(item.stock_no || "—")}</p>
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Estimated Unit Cost</p>
-                          <p className="mt-0.5 text-xs font-semibold text-stone-800">{item.unit_cost ? "₱" + money(item.unit_cost) : "—"}</p>
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400">Estimated Cost</p>
-                          <p className="mt-0.5 text-xs font-semibold text-stone-800">{item.total_cost ? "₱" + money(item.total_cost) : "—"}</p>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <p className="rounded-lg border border-dashed border-stone-200 bg-stone-50 p-3 text-xs text-stone-500">No item lines are included in this Purchase Request.</p>
-              )}
-            </section>
-
-            <section className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
-                <h3 className="text-sm font-extrabold text-[#4D002C]">Requested By</h3>
-                <p className="mt-2 break-words text-xs font-bold uppercase text-stone-900">{printedName || "Name not recorded"}</p>
-                <p className="mt-0.5 break-words text-xs text-stone-600">{String(pr.designation || "Designation not recorded")}</p>
-                <p className="mt-2 text-[10px] text-stone-400">Physical signature is on the printed copy.</p>
-              </div>
-              <div className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
-                <h3 className="text-sm font-extrabold text-[#4D002C]">Approved By</h3>
-                <p className="mt-2 break-words text-xs font-bold uppercase text-stone-900">{String(pr.approved_by || "Atty. Shidik T. Abantas, MDM, LLM")}</p>
-                <p className="mt-0.5 break-words text-xs text-stone-600">{String(pr.approved_by_designation || "Chancellor")}</p>
-                <p className="mt-2 text-[10px] text-stone-400">Approval signature is on the printed copy.</p>
-              </div>
-            </section>
-            <p className="px-1 text-center text-[10px] leading-relaxed text-stone-400">
-              Mobile preview of the submitted record. Use Print PR to produce the official university form.
-            </p>
-          </div>
-
-          <div role="region" aria-label="Scrollable official Purchase Request form" tabIndex={0} style={{ WebkitOverflowScrolling: "touch" }} className="admin-pr-official-form-scroll mx-auto w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain touch-pan-x pb-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] print:overflow-visible print:pb-0">
-            <p className="mb-2 px-1 text-center text-[11px] font-semibold text-stone-500 md:hidden print:hidden">Official Purchase Request Form · Swipe left or right to view the complete form.</p>
-            <div id="admin-pr-print" className="admin-pr-official-document mx-auto block w-full min-w-[700px] max-w-5xl bg-white text-black shadow-sm print:block print:border-0 print:shadow-none">
+          <p className="mb-2 px-1 text-center text-[11px] font-semibold text-stone-500 md:hidden print:hidden">
+            Official Purchase Request Form · Swipe left or right to view the complete form.
+          </p>
+          <section role="region" aria-label="Scrollable official Purchase Request form" tabIndex={0} style={{ WebkitOverflowScrolling: "touch" }} className="admin-pr-official-form-scroll w-full min-w-0 max-w-full rounded-2xl border border-stone-300 bg-white p-0 shadow-xs overflow-x-auto overscroll-x-contain touch-pan-x focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] print:overflow-visible print:rounded-none print:border-0 print:shadow-none print:p-0">
+            <div id="admin-pr-print" className="admin-pr-official-document min-w-[700px] border-2 border-black bg-white text-black print:w-full print:min-w-0 print:box-border print:border-0">
             <div className="border-2 border-black text-black">
               <div className="border-b-2 border-black px-4 py-3 text-center">
                 <h1 className="font-serif text-xl font-black uppercase tracking-wider">PURCHASE REQUEST</h1>
