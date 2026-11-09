@@ -186,7 +186,7 @@ export default function AdminReportsPage() {
       label: "Stage " + stage.number + " · " + stage.shortLabel,
       count: filteredPRs.filter((pr) => pr.current_stage === stage.key).length,
     }));
-    for (const terminal of ["completed", "rejected", "cancelled"]) {
+    for (const terminal of ["completed", "rejected", "cancelled"] as const) {
       const count = filteredPRs.filter((pr) => pr.current_stage === terminal).length;
       if (count > 0) {
         rows.push({
@@ -230,7 +230,6 @@ export default function AdminReportsPage() {
   if (loading) return <LoadingScreen label="Loading procurement reports..." />;
 
   const maxMonthly = Math.max(1, ...monthlySubmissions.map((month) => month.count));
-  const maxStage = Math.max(1, ...stageRows.map((stage) => stage.count));
 
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">

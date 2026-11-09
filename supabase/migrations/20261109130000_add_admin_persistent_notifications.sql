@@ -5,7 +5,7 @@ CREATE INDEX IF NOT EXISTS notifications_unread_by_user_created_idx
   ON public.notifications (user_id, created_at DESC)
   WHERE is_read = false;
 
-CREATE OR REPLACE FUNCTION public.notify_admins_of_new_purchase_request()
+CREATE OR REPLACE FUNCTION private.notify_admins_of_new_purchase_request()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -32,7 +32,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.notify_admins_of_new_user_registration()
+CREATE OR REPLACE FUNCTION private.notify_admins_of_new_user_registration()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -60,7 +60,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.notify_admins_of_pr_stage_change()
+CREATE OR REPLACE FUNCTION private.notify_admins_of_pr_stage_change()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -87,7 +87,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.notify_admins_of_official_pr_number()
+CREATE OR REPLACE FUNCTION private.notify_admins_of_official_pr_number()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -115,29 +115,29 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.notify_admins_of_new_purchase_request() FROM PUBLIC, anon, authenticated;
-REVOKE ALL ON FUNCTION public.notify_admins_of_new_user_registration() FROM PUBLIC, anon, authenticated;
-REVOKE ALL ON FUNCTION public.notify_admins_of_pr_stage_change() FROM PUBLIC, anon, authenticated;
-REVOKE ALL ON FUNCTION public.notify_admins_of_official_pr_number() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.notify_admins_of_new_purchase_request() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.notify_admins_of_new_user_registration() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.notify_admins_of_pr_stage_change() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.notify_admins_of_official_pr_number() FROM PUBLIC, anon, authenticated;
 
 DROP TRIGGER IF EXISTS trg_notify_admins_new_purchase_request ON public.purchase_requests;
 CREATE TRIGGER trg_notify_admins_new_purchase_request
   AFTER INSERT ON public.purchase_requests
   FOR EACH ROW
-  EXECUTE FUNCTION public.notify_admins_of_new_purchase_request();
+  EXECUTE FUNCTION private.notify_admins_of_new_purchase_request();
 
 DROP TRIGGER IF EXISTS trg_notify_admins_new_user_registration ON public.users;
 CREATE TRIGGER trg_notify_admins_new_user_registration
   AFTER INSERT ON public.users
   FOR EACH ROW
-  EXECUTE FUNCTION public.notify_admins_of_new_user_registration();
+  EXECUTE FUNCTION private.notify_admins_of_new_user_registration();
 
 DROP TRIGGER IF EXISTS trg_notify_admins_pr_stage_change ON public.purchase_requests;
 CREATE TRIGGER trg_notify_admins_pr_stage_change
   AFTER UPDATE OF current_stage ON public.purchase_requests
   FOR EACH ROW
   WHEN (OLD.current_stage IS DISTINCT FROM NEW.current_stage)
-  EXECUTE FUNCTION public.notify_admins_of_pr_stage_change();
+  EXECUTE FUNCTION private.notify_admins_of_pr_stage_change();
 
 DROP TRIGGER IF EXISTS trg_notify_admins_official_pr_number ON public.purchase_requests;
 CREATE TRIGGER trg_notify_admins_official_pr_number
@@ -148,7 +148,7 @@ CREATE TRIGGER trg_notify_admins_official_pr_number
     AND position('TEMP' IN upper(COALESCE(OLD.pr_no, ''))) > 0
     AND position('TEMP' IN upper(COALESCE(NEW.pr_no, ''))) = 0
   )
-  EXECUTE FUNCTION public.notify_admins_of_official_pr_number();
+  EXECUTE FUNCTION private.notify_admins_of_official_pr_number();
 
 -- Enable Postgres Changes for the existing notifications table so each admin
 -- receives only the notification rows addressed to their own account.

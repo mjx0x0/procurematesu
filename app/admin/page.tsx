@@ -8,7 +8,7 @@ import { SYSTEM_NAME } from "@/lib/system-branding";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
-import { ChevronRight, UserCheck, FileText, Hash, BarChart3, ClipboardCheck } from "lucide-react";
+import { ChevronRight, UserCheck, FileText, Hash } from "lucide-react";
 
 interface ActionCounts {
   pendingApprovals: number;
