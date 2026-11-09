@@ -392,62 +392,6 @@ export default function PurchaseRequestsPage() {
                   </div>
                 );
               })}
-                          </span>
-                        </div>
-
-                        <p className="mt-1 line-clamp-2 sm:truncate text-xs sm:text-sm font-semibold leading-snug text-stone-800">
-                          {pr.purpose || "Official procurement request"}
-                        </p>
-                        <p className="mt-0.5 text-[11px] sm:text-xs text-stone-500 font-medium">
-                          {pr.department || "University Office"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t border-stone-100 sm:border-0">
-                      <div className="text-left sm:text-right">
-                        <p className="text-sm sm:text-base font-bold text-stone-900">
-                          ₱{Number(pr.total || 0).toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </p>
-                        <span
-                          className={`hidden sm:inline-flex mt-1 items-center rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${statusColor(
-                            pr.current_stage
-                          )}`}
-                        >
-                          {stageNum ? `Stage ${stageNum} · ` : ""}
-                          {statusLabel(pr.current_stage)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <Link
-                          href={`/dashboard/pr/${pr.pr_no}`}
-                          className="inline-flex min-h-10 items-center gap-1 px-2.5 sm:px-3 py-2 rounded-xl bg-[#7B0046] text-white text-[11px] sm:text-xs font-bold shadow-xs hover:bg-[#65003A] transition-colors"
-                        >
-                          <Eye className="h-3.5 w-3.5" />
-                          <span>Track PR</span>
-                        </Link>
-                        <Link
-                          href={`/dashboard/pr-print?id=${pr.pr_no}`}
-                          className={`inline-flex min-h-10 items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl border text-xs font-bold transition-colors ${
-                            pr.current_stage === "draft"
-                              ? "border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 shadow-xs"
-                              : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
-                          }`}
-                          title="Print PR Form to physically submit to Procurement Office"
-                          aria-label={`Print purchase request ${pr.pr_no}`}
-                        >
-                          <Printer className="h-3.5 w-3.5" />
-                          <span className="hidden sm:inline">Print PR</span>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
             </div>
           )}
         </section>
