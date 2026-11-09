@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
 import { User, Search, Eye, MessageSquare, Filter, X, Download } from "lucide-react";
 
@@ -176,7 +177,17 @@ const formatDate = (date: string) => {
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">
       {/* Navigation */}
-      <SystemPageHeader titlePrimary="Inquiry" titleAccent="Monitoring" icon={MessageSquare} backHref="/admin" roleLabel="Administrator" containerClassName="max-w-7xl px-4 sm:px-6" />
+      <SystemPageHeader
+        titlePrimary="Inquiry"
+        titleAccent="Monitoring"
+        icon={MessageSquare}
+        backHref="/admin"
+        roleLabel="Administrator"
+        containerClassName="max-w-7xl px-4 sm:px-6"
+        showControlsDivider
+      >
+        <AdminPRNotificationPopover />
+      </SystemPageHeader>
 
       <div className="max-w-7xl mx-auto px-3.5 py-4 sm:px-6 sm:py-7">
         {/* Header */}

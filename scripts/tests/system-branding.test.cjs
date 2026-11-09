@@ -94,7 +94,7 @@ test('sign-in, registration, logo accessibility, loading and workspace labels ar
   assert.match(dashboard, /workspaceLabel="End User Workspace"/);
   assert.match(admin, /brandWordmark/);
   assert.match(admin, /workspaceLabel="Administrative Workspace"/);
-  assert.match(login, /Sign in to the \{SYSTEM_NAME\}/);
+  assert.match(login, /Sign in to the Digital Procurement System\./);
   assert.match(logo, /General Santos/);
   assert.doesNotMatch(logo, /General Santos City/);
 });
@@ -271,7 +271,7 @@ test('dashboard actions and directories avoid unnecessary decorative controls', 
   assert.match(purchaseRequests, /bg-\[#7B0046\].*hover:bg-\[#65003A\]/);
 });
 
-test('admin dashboard contains only the three main actions and PR overview', () => {
+test('admin dashboard keeps operational main actions and replaces PR Overview with Action Required', () => {
   const admin = read('app/admin/page.tsx');
 
   assert.match(admin, /<nav[\s\S]*aria-label="Admin main menu"/);
@@ -279,13 +279,14 @@ test('admin dashboard contains only the three main actions and PR overview', () 
   assert.match(admin, /href: "\/admin\/purchase-requests"/);
   assert.match(admin, /href: "\/admin\/users"/);
   assert.match(admin, /href: "\/admin\/inquiries"/);
-  assert.match(admin, /PR Overview/);
-  assert.match(admin, /Total PRs/);
-  assert.match(admin, /In Progress/);
-  assert.match(admin, /Completed/);
-  assert.match(admin, /Rejected/);
+  assert.match(admin, /href: "\/admin\/reports"/);
+  assert.match(admin, /Action Required/);
+  assert.match(admin, /Pending User Approvals/);
+  assert.match(admin, /Awaiting Physical Receipt/);
+  assert.match(admin, /Official PR Number Assignment/);
+  assert.doesNotMatch(admin, /PR Overview|Total PRs|Rejected/);
 
-  // The dashboard no longer embeds the logbook table, search, filters, or workflow actions.
+  // The dashboard remains an action center rather than embedding the full logbook.
   assert.doesNotMatch(admin, /Search by PR number|Current Status|Complete Stage|Confirm Receipt of Printed PR/);
   assert.doesNotMatch(admin, /<table|filtered\.map/);
 });
@@ -313,18 +314,27 @@ test('admin Purchase Requests has its own route and retains the existing logbook
 });
 
 
-test('admin dashboard exposes a live, admin-authorized notification control for new Purchase Requests', () => {
+test('admin dashboard exposes a persistent, per-admin notification center', () => {
   const admin = read('app/admin/page.tsx');
   const notifications = read('components/AdminPRNotificationPopover.tsx');
+  const migration = read('supabase/migrations/20261109130000_add_admin_persistent_notifications.sql');
 
   assert.match(admin, /<AdminPRNotificationPopover \/>/);
-  assert.ok(notifications.includes('event: "INSERT", schema: "public", table: "purchase_requests"'));
-  assert.ok(notifications.includes('profile?.role !== "admin"'));
-  assert.ok(notifications.includes('profile?.status !== "approved"'));
-  assert.ok(notifications.includes('profile?.is_active !== true'));
-  assert.match(notifications, /New PR Notifications/);
-  assert.match(notifications, /New Purchase Request received/);
-  assert.match(notifications, /Open Purchase Requests/);
+  assert.ok(notifications.includes('.from("notifications")'));
+  assert.ok(notifications.includes('.eq("user_id", adminId)'));
+  assert.ok(notifications.includes('.update({ is_read: true })'));
+  assert.ok(notifications.includes('table: "notifications"'));
+  assert.ok(notifications.includes('filter: "user_id=eq." + user.id'));
+  assert.match(notifications, /profile\?\.role !== "admin"/);
+  assert.match(notifications, /profile\?\.status !== "approved"/);
+  assert.match(notifications, /profile\?\.is_active !== true/);
+  assert.match(notifications, /Notification Center/);
+  assert.match(notifications, /Saved across sessions/);
+  assert.match(notifications, /Mark all read/);
+  assert.match(migration, /trg_notify_admins_new_purchase_request/);
+  assert.match(migration, /trg_notify_admins_new_user_registration/);
+  assert.match(migration, /trg_notify_admins_pr_stage_change/);
+  assert.match(migration, /trg_notify_admins_official_pr_number/);
 });
 
 test('admin full PR modal shows the official form before supplemental details and keeps phone-friendly scrolling', () => {
@@ -364,18 +374,27 @@ test('admin notification bell is separated from the account control and has no l
 });
 
 
-test('purchase requests directory uses the Recent PR Activity row layout without a temporary-number tag', () => {
+test('purchase requests list keeps text status labels and removes decorative row status icons', () => {
   const purchaseRequests = read('app/dashboard/purchase-requests/page.tsx');
+  const adminDashboard = read('app/admin/page.tsx');
 
   assert.equal(purchaseRequests.includes('Temporary No.'), false);
-  assert.ok(purchaseRequests.includes('CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5"'));
-  assert.ok(purchaseRequests.includes('<Clock className="h-4 w-4 sm:h-5 sm:w-5" />'));
   assert.ok(purchaseRequests.includes('statusColor('));
   assert.ok(purchaseRequests.includes('Stage ${stageNum} · '));
   assert.ok(purchaseRequests.includes('<span>Track</span>'));
   assert.ok(purchaseRequests.includes('aria-label={`Print purchase request ${pr.pr_no}`}'));
+  assert.doesNotMatch(purchaseRequests, /CheckCircle2|<Clock/);
   assert.equal(purchaseRequests.includes('Draft · Submit Physically'), false);
   assert.equal(purchaseRequests.includes('hidden sm:inline-flex mt-1 items-center rounded-full'), false);
+
+  const actionPanel = adminDashboard.slice(
+    adminDashboard.indexOf('aria-labelledby="admin-action-required-heading"'),
+    adminDashboard.indexOf('<footer')
+  );
+  assert.doesNotMatch(actionPanel, /<UserCheck|<FileText|<Hash/);
+  assert.match(actionPanel, /Pending User Approvals/);
+  assert.match(actionPanel, /Awaiting Physical Receipt/);
+  assert.match(actionPanel, /Official PR Number Assignment/);
 });
 
 
@@ -408,4 +427,113 @@ test('registration terms open on demand and a single form checkbox gates account
   assert.match(terms, /Data Privacy Act of 2012/);
   assert.match(terms, /procurement@msugensan\.edu\.ph/);
   assert.match(terms, /temporary tracking number/);
+});
+
+
+test('admin dashboard replaces PR Overview with actionable queues and adds reports navigation', () => {
+  const admin = read('app/admin/page.tsx');
+
+  assert.match(admin, /Action Required/);
+  assert.match(admin, /Pending User Approvals/);
+  assert.match(admin, /Awaiting Physical Receipt/);
+  assert.match(admin, /Official PR Number Assignment/);
+  assert.match(admin, /\/admin\/users/);
+  assert.match(admin, /\/admin\/purchase-requests\?status=draft/);
+  assert.match(admin, /\/admin\/purchase-requests\?status=pr_pre_numbering/);
+  assert.match(admin, /Procurement Reports & Analytics/);
+  assert.match(admin, /href: "\/admin\/reports"/);
+  assert.doesNotMatch(admin, /PR Overview/);
+});
+
+test('admin notification center loads, updates, and receives persisted per-admin notifications', () => {
+  const notifications = read('components/AdminPRNotificationPopover.tsx');
+  const migration = read('supabase/migrations/20261109130000_add_admin_persistent_notifications.sql');
+
+  assert.match(notifications, /\.from\("notifications"\)/);
+  assert.match(notifications, /\.eq\("user_id", adminId\)/);
+  assert.match(notifications, /\.update\(\{ is_read: true \}\)/);
+  assert.match(notifications, /postgres_changes/);
+  assert.match(notifications, /table: "notifications"/);
+  assert.match(notifications, /user_id=eq\./);
+  assert.match(notifications, /Saved across sessions/);
+  assert.match(migration, /trg_notify_admins_new_purchase_request/);
+  assert.match(migration, /trg_notify_admins_new_user_registration/);
+  assert.match(migration, /trg_notify_admins_pr_stage_change/);
+  assert.match(migration, /trg_notify_admins_official_pr_number/);
+  assert.match(migration, /ALTER PUBLICATION supabase_realtime ADD TABLE public\.notifications/);
+});
+
+test('admin procurement reports provide date filters, aggregate metrics, department summaries, and CSV export', () => {
+  const reports = read('app/admin/reports/page.tsx');
+
+  assert.match(reports, /Procurement Reports &amp; Analytics/);
+  assert.match(reports, /Last 30 days/);
+  assert.match(reports, /Last 90 days/);
+  assert.match(reports, /Year to date/);
+  assert.match(reports, /Total Estimated Value/);
+  assert.match(reports, /Current Workflow Distribution/);
+  assert.match(reports, /Department Summary/);
+  assert.match(reports, /Purchase Request Register/);
+  assert.match(reports, /Export CSV/);
+  assert.match(reports, /window\.print\(\)/);
+  assert.match(reports, /not actual expenditure/);
+});
+
+test('admin PR directory accepts status and search query parameters from Action Required and notification links', () => {
+  const purchaseRequests = read('app/admin/purchase-requests/page.tsx');
+
+  assert.match(purchaseRequests, /new URLSearchParams\(window\.location\.search\)/);
+  assert.match(purchaseRequests, /setStatusFilter\(requestedStatus\)/);
+  assert.match(purchaseRequests, /setSearchTerm\(requestedSearch\)/);
+});
+
+
+test('dashboard Recent PR Activity rows display text statuses without decorative status icons', () => {
+  const dashboard = read('app/dashboard/page.tsx');
+  const recent = dashboard.slice(
+    dashboard.indexOf('{/* Recent PR Activity */}'),
+    dashboard.indexOf('<footer', dashboard.indexOf('{/* Recent PR Activity */}'))
+  );
+
+  assert.doesNotMatch(recent, /<CheckCircle2|<Clock/);
+  assert.match(recent, /statusColor\(/);
+  assert.match(recent, /statusLabel\(/);
+  assert.match(recent, /<span>Track<\/span>/);
+});
+
+test('Procurement Reports KPI cards show clean text-only metrics', () => {
+  const reports = read('app/admin/reports/page.tsx');
+  const kpis = reports.slice(
+    reports.indexOf('<section className="mb-5 grid grid-cols-2'),
+    reports.indexOf('<section className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-2')
+  );
+
+  assert.doesNotMatch(kpis, /<FileText|<CircleDollarSign|<Layers3|<CheckCircle2|<BarChart3/);
+  assert.match(kpis, /Purchase Requests/);
+  assert.match(kpis, /Total Estimated Value/);
+  assert.match(kpis, /In Progress/);
+  assert.match(kpis, /Completed/);
+  assert.match(kpis, /Completion Rate/);
+});
+
+test('Transparency Board summary cards show their counts and labels without decorative icon tiles', () => {
+  const transparency = read('app/dashboard/transparency/page.tsx');
+  const metrics = transparency.slice(
+    transparency.indexOf('{/* Key Metrics Strip */}'),
+    transparency.indexOf('{/* Filter & Search Bar */}')
+  );
+
+  assert.doesNotMatch(metrics, /<ShieldCheck|<Building2|<Cpu|<Layers/);
+  assert.match(metrics, /Total Notices/);
+  assert.match(metrics, /Infrastructure/);
+  assert.match(metrics, /ICT &amp; Systems/);
+  assert.match(metrics, /Goods &amp; Lab/);
+});
+
+
+test('landing sign-in card uses the concise Digital Procurement System subtitle', () => {
+  const loginCard = read('components/auth/LandingLoginCard.tsx');
+
+  assert.match(loginCard, /Sign in to the Digital Procurement System\./);
+  assert.doesNotMatch(loginCard, /Sign in to the \{SYSTEM_NAME\}/);
 });

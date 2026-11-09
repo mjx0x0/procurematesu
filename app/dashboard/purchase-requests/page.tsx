@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertCircle, CheckCircle2, Clock, Eye, FileText, Filter, PlusCircle, Printer, Search } from "lucide-react";
+import { AlertCircle, Eye, FileText, Filter, PlusCircle, Printer, Search } from "lucide-react";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
@@ -313,23 +313,7 @@ export default function PurchaseRequestsPage() {
                     key={pr.pr_no}
                     className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 hover:bg-stone-50/60 transition-colors"
                   >
-                    <div className="flex items-start gap-3 min-w-0 flex-1">
-                      <div
-                        className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl border shadow-2xs mt-0.5 ${
-                          isDone
-                            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                            : isApproved
-                            ? "border-[#7B0046]/20 bg-[#7B0046]/5 text-[#7B0046]"
-                            : "border-amber-200 bg-amber-50 text-amber-700"
-                        }`}
-                      >
-                        {isDone ? (
-                          <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
-                        ) : (
-                          <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
-                        )}
-                      </div>
-
+                    <div className="min-w-0 flex-1">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                           <span className="font-mono text-xs sm:text-sm font-bold text-[#4D002C]">
