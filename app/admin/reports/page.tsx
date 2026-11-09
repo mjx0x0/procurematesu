@@ -182,7 +182,7 @@ export default function AdminReportsPage() {
   }, [filteredPRs]);
 
   const stageRows = useMemo(() => {
-    const rows = PROCUREMENT_STAGES.map((stage) => ({
+    const rows: Array<{ key: string; label: string; count: number }> = PROCUREMENT_STAGES.map((stage) => ({
       key: stage.key,
       label: "Stage " + stage.number + " · " + stage.shortLabel,
       count: filteredPRs.filter((pr) => pr.current_stage === stage.key).length,

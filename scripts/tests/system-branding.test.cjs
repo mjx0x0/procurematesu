@@ -271,7 +271,7 @@ test('dashboard actions and directories avoid unnecessary decorative controls', 
   assert.match(purchaseRequests, /bg-\[#7B0046\].*hover:bg-\[#65003A\]/);
 });
 
-test('admin dashboard contains only the three main actions and PR overview', () => {
+test('admin dashboard keeps operational main actions and replaces PR Overview with Action Required', () => {
   const admin = read('app/admin/page.tsx');
 
   assert.match(admin, /<nav[\s\S]*aria-label="Admin main menu"/);
@@ -279,13 +279,14 @@ test('admin dashboard contains only the three main actions and PR overview', () 
   assert.match(admin, /href: "\/admin\/purchase-requests"/);
   assert.match(admin, /href: "\/admin\/users"/);
   assert.match(admin, /href: "\/admin\/inquiries"/);
-  assert.match(admin, /PR Overview/);
-  assert.match(admin, /Total PRs/);
-  assert.match(admin, /In Progress/);
-  assert.match(admin, /Completed/);
-  assert.match(admin, /Rejected/);
+  assert.match(admin, /href: "\/admin\/reports"/);
+  assert.match(admin, /Action Required/);
+  assert.match(admin, /Pending User Approvals/);
+  assert.match(admin, /Awaiting Physical Receipt/);
+  assert.match(admin, /Official PR Number Assignment/);
+  assert.doesNotMatch(admin, /PR Overview|Total PRs|Rejected/);
 
-  // The dashboard no longer embeds the logbook table, search, filters, or workflow actions.
+  // The dashboard remains an action center rather than embedding the full logbook.
   assert.doesNotMatch(admin, /Search by PR number|Current Status|Complete Stage|Confirm Receipt of Printed PR/);
   assert.doesNotMatch(admin, /<table|filtered\.map/);
 });
@@ -313,18 +314,27 @@ test('admin Purchase Requests has its own route and retains the existing logbook
 });
 
 
-test('admin dashboard exposes a live, admin-authorized notification control for new Purchase Requests', () => {
+test('admin dashboard exposes a persistent, per-admin notification center', () => {
   const admin = read('app/admin/page.tsx');
   const notifications = read('components/AdminPRNotificationPopover.tsx');
+  const migration = read('supabase/migrations/20261109130000_add_admin_persistent_notifications.sql');
 
   assert.match(admin, /<AdminPRNotificationPopover \/>/);
-  assert.ok(notifications.includes('event: "INSERT", schema: "public", table: "purchase_requests"'));
-  assert.ok(notifications.includes('profile?.role !== "admin"'));
-  assert.ok(notifications.includes('profile?.status !== "approved"'));
-  assert.ok(notifications.includes('profile?.is_active !== true'));
-  assert.match(notifications, /New PR Notifications/);
-  assert.match(notifications, /New Purchase Request received/);
-  assert.match(notifications, /Open Purchase Requests/);
+  assert.ok(notifications.includes('.from("notifications")'));
+  assert.ok(notifications.includes('.eq("user_id", adminId)'));
+  assert.ok(notifications.includes('.update({ is_read: true })'));
+  assert.ok(notifications.includes('table: "notifications"'));
+  assert.ok(notifications.includes('filter: "user_id=eq." + user.id'));
+  assert.match(notifications, /profile\?\.role !== "admin"/);
+  assert.match(notifications, /profile\?\.status !== "approved"/);
+  assert.match(notifications, /profile\?\.is_active !== true/);
+  assert.match(notifications, /Notification Center/);
+  assert.match(notifications, /Saved across sessions/);
+  assert.match(notifications, /Mark all read/);
+  assert.match(migration, /trg_notify_admins_new_purchase_request/);
+  assert.match(migration, /trg_notify_admins_new_user_registration/);
+  assert.match(migration, /trg_notify_admins_pr_stage_change/);
+  assert.match(migration, /trg_notify_admins_official_pr_number/);
 });
 
 test('admin full PR modal shows the official form before supplemental details and keeps phone-friendly scrolling', () => {
