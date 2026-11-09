@@ -94,7 +94,7 @@ test('sign-in, registration, logo accessibility, loading and workspace labels ar
   assert.match(dashboard, /workspaceLabel="End User Workspace"/);
   assert.match(admin, /brandWordmark/);
   assert.match(admin, /workspaceLabel="Administrative Workspace"/);
-  assert.match(login, /Sign in to the \{SYSTEM_NAME\}/);
+  assert.match(login, /Sign in to the Digital Procurement System\./);
   assert.match(logo, /General Santos/);
   assert.doesNotMatch(logo, /General Santos City/);
 });
