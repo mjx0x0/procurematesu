@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
 import { PROCUREMENT_STAGES, TERMINAL_STAGES } from "@/lib/procurement-process";
 import { BarChart3, Download, Printer, RefreshCw, FileText, Layers3, CircleDollarSign, CheckCircle2 } from "lucide-react";
@@ -240,7 +241,10 @@ export default function AdminReportsPage() {
         backHref="/admin"
         roleLabel="Administrator"
         containerClassName="max-w-7xl px-3.5 sm:px-6"
-      />
+        showControlsDivider
+      >
+        <AdminPRNotificationPopover />
+      </SystemPageHeader>
 
       <main className="mx-auto max-w-7xl min-w-0 px-3.5 py-4 sm:px-6 sm:py-7">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

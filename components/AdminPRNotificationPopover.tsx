@@ -121,8 +121,6 @@ export default function AdminPRNotificationPopover() {
         }
 
         adminIdRef.current = user.id;
-        await loadForAdmin(user.id);
-        if (cancelled) return;
 
         channel = supabase
           .channel("admin-persistent-notifications-" + user.id)
@@ -156,6 +154,8 @@ export default function AdminPRNotificationPopover() {
                 : "checking"
             );
           });
+        // Subscribe before loading the saved list so inserts during page startup are not missed.
+        await loadForAdmin(user.id);
       } catch (connectError) {
         console.error("Unable to connect admin notification center:", connectError);
         if (!cancelled) {

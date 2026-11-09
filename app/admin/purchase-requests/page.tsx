@@ -8,6 +8,7 @@ import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-
 import { ActionFeedbackModal, type FeedbackTone } from "@/components/ui/ActionFeedbackModal";
 import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
 import { Check, CheckCircle, ChevronRight, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Trash2, User, X, XCircle, AlertCircle } from "lucide-react";
 
@@ -290,7 +291,19 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
 
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
-      <SystemPageHeader titlePrimary="ProcureMateSU" titleAccent="" workspaceLabel="Administrative Workspace" brandLogo brandWordmark backHref="/admin" roleLabel="Administrator" containerClassName="max-w-7xl px-3.5 sm:px-6" />
+      <SystemPageHeader
+        titlePrimary="ProcureMateSU"
+        titleAccent=""
+        workspaceLabel="Administrative Workspace"
+        brandLogo
+        brandWordmark
+        backHref="/admin"
+        roleLabel="Administrator"
+        containerClassName="max-w-7xl px-3.5 sm:px-6"
+        showControlsDivider
+      >
+        <AdminPRNotificationPopover />
+      </SystemPageHeader>
 
       <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-3.5 sm:py-7">
         <div className="mb-4 sm:mb-5">

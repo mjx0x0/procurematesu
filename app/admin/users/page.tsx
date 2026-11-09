@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
+import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
 import { CheckCircle, Loader2, User, UserCheck, UserX, Users, RefreshCw, AlertCircle } from "lucide-react";
 import { isStaleRefreshTokenError } from "@/lib/supabase/client";
@@ -82,7 +83,17 @@ const loadUsers = useCallback(async () => {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-gray-800">
-      <SystemPageHeader titlePrimary="User" titleAccent="Management" icon={Users} backHref="/admin" roleLabel="Administrator" containerClassName="max-w-6xl px-4" />
+      <SystemPageHeader
+        titlePrimary="User"
+        titleAccent="Management"
+        icon={Users}
+        backHref="/admin"
+        roleLabel="Administrator"
+        containerClassName="max-w-6xl px-4"
+        showControlsDivider
+      >
+        <AdminPRNotificationPopover />
+      </SystemPageHeader>
 
       <main className="max-w-6xl mx-auto px-3.5 py-4 sm:px-6 sm:py-7">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
