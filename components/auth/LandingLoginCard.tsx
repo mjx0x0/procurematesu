@@ -117,7 +117,7 @@ export default function LandingLoginCard() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-2xl font-black tracking-tight text-[#4D002C]">Welcome!</h2>
-              <p className="mt-1 max-w-sm text-xs leading-relaxed text-stone-500">Sign in to the {SYSTEM_NAME}.</p>
+              <p className="mt-1 max-w-sm text-xs leading-relaxed text-stone-500">Sign in to the Digital Procurement System.</p>
             </div>
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7B0046] to-[#4D002C] shadow-sm border border-[#F5AB26]/25">
               <Lock className="h-5 w-5 text-amber-200" />

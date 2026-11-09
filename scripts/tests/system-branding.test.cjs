@@ -529,3 +529,11 @@ test('Transparency Board summary cards show their counts and labels without deco
   assert.match(metrics, /ICT &amp; Systems/);
   assert.match(metrics, /Goods &amp; Lab/);
 });
+
+
+test('landing sign-in card uses the concise Digital Procurement System subtitle', () => {
+  const loginCard = read('components/auth/LandingLoginCard.tsx');
+
+  assert.match(loginCard, /Sign in to the Digital Procurement System\./);
+  assert.doesNotMatch(loginCard, /Sign in to the \{SYSTEM_NAME\}/);
+});
