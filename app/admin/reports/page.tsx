@@ -7,7 +7,7 @@ import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
 import { PROCUREMENT_STAGES, TERMINAL_STAGES } from "@/lib/procurement-process";
-import { BarChart3, Download, Printer, RefreshCw, FileText, Layers3, CircleDollarSign, CheckCircle2 } from "lucide-react";
+import { BarChart3, Download, Printer, RefreshCw } from "lucide-react";
 
 interface ReportPR {
   pr_no: string;
@@ -316,14 +316,13 @@ export default function AdminReportsPage() {
 
         <section className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
           {[
-            { label: "Purchase Requests", value: metrics.total.toLocaleString("en-PH"), Icon: FileText, color: "text-[#7B0046]" },
-            { label: "Total Estimated Value", value: formatMoney(metrics.totalEstimated), Icon: CircleDollarSign, color: "text-amber-700" },
-            { label: "In Progress", value: metrics.inProgress.toLocaleString("en-PH"), Icon: Layers3, color: "text-blue-700" },
-            { label: "Completed", value: metrics.completed.toLocaleString("en-PH"), Icon: CheckCircle2, color: "text-emerald-700" },
-            { label: "Completion Rate", value: metrics.completionRate.toFixed(1) + "%", Icon: BarChart3, color: "text-[#7B0046]" },
-          ].map(({ label, value, Icon, color }) => (
+            { label: "Purchase Requests", value: metrics.total.toLocaleString("en-PH") },
+            { label: "Total Estimated Value", value: formatMoney(metrics.totalEstimated) },
+            { label: "In Progress", value: metrics.inProgress.toLocaleString("en-PH") },
+            { label: "Completed", value: metrics.completed.toLocaleString("en-PH") },
+            { label: "Completion Rate", value: metrics.completionRate.toFixed(1) + "%" },
+          ].map(({ label, value }) => (
             <article key={label} className="min-w-0 rounded-2xl border border-stone-200 bg-white p-3.5 shadow-[0_5px_20px_rgba(45,20,10,0.03)] sm:p-4">
-              <Icon className={"mb-2 h-4 w-4 " + color} />
               <p className="break-words text-lg font-extrabold leading-tight text-stone-900 sm:text-xl">{value}</p>
               <p className="mt-1 text-[10px] font-semibold leading-snug text-stone-500 sm:text-xs">{label}</p>
             </article>

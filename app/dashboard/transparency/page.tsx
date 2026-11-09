@@ -3,13 +3,9 @@
 import { useMemo, useState } from "react";
 import {
   AlertCircle,
-  Building2,
-  Cpu,
   ExternalLink,
   FileText,
-  Layers,
   Search,
-  ShieldCheck,
   X,
 } from "lucide-react";
 import { TRANSPARENCY_PROJECTS, TRANSPARENCY_SOURCE_URL } from "@/lib/transparency-projects";
@@ -111,7 +107,7 @@ export default function TransparencyPage() {
         {/* Key Metrics Strip */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <div className="bg-white border border-stone-200/90 rounded-2xl p-3.5 sm:p-4 shadow-xs">
-            <div className="flex items-center justify-between">
+            <div>
               <div>
                 <div className="text-xl sm:text-2xl font-black text-[#4D002C] font-mono leading-none">
                   {counts.total}
@@ -119,14 +115,11 @@ export default function TransparencyPage() {
                 <div className="text-xs font-bold text-stone-700 mt-1">Total Notices</div>
                 <div className="text-[11px] text-stone-400 font-medium">Public project listings</div>
               </div>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046]">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
             </div>
           </div>
 
           <div className="bg-white border border-stone-200/90 rounded-2xl p-3.5 sm:p-4 shadow-xs">
-            <div className="flex items-center justify-between">
+            <div>
               <div>
                 <div className="text-xl sm:text-2xl font-black text-amber-700 font-mono leading-none">
                   {counts.infrastructure}
@@ -134,14 +127,11 @@ export default function TransparencyPage() {
                 <div className="text-xs font-bold text-stone-700 mt-1">Infrastructure</div>
                 <div className="text-[11px] text-stone-400 font-medium">Campus facilities &amp; works</div>
               </div>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60">
-                <Building2 className="h-5 w-5" />
-              </div>
             </div>
           </div>
 
           <div className="bg-white border border-stone-200/90 rounded-2xl p-3.5 sm:p-4 shadow-xs">
-            <div className="flex items-center justify-between">
+            <div>
               <div>
                 <div className="text-xl sm:text-2xl font-black text-blue-700 font-mono leading-none">
                   {counts.ict}
@@ -149,23 +139,17 @@ export default function TransparencyPage() {
                 <div className="text-xs font-bold text-stone-700 mt-1">ICT &amp; Systems</div>
                 <div className="text-[11px] text-stone-400 font-medium">Digital infrastructure</div>
               </div>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700 border border-blue-200/60">
-                <Cpu className="h-5 w-5" />
-              </div>
             </div>
           </div>
 
           <div className="bg-white border border-stone-200/90 rounded-2xl p-3.5 sm:p-4 shadow-xs">
-            <div className="flex items-center justify-between">
+            <div>
               <div>
                 <div className="text-xl sm:text-2xl font-black text-emerald-700 font-mono leading-none">
                   {counts.research}
                 </div>
                 <div className="text-xs font-bold text-stone-700 mt-1">Goods &amp; Lab</div>
                 <div className="text-[11px] text-stone-400 font-medium">Research &amp; equipment</div>
-              </div>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                <Layers className="h-5 w-5" />
               </div>
             </div>
           </div>

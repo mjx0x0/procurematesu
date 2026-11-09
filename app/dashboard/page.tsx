@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import {
   AlertCircle,
   ArrowRight,
-  CheckCircle2,
-  Clock,
   Eye,
   FileText,
   PlusCircle,
@@ -372,8 +370,6 @@ export default function DashboardPage() {
             ) : (
               <div className="divide-y divide-stone-100">
                 {prs.slice(0, 3).map((pr) => {
-                  const isDone = pr.current_stage === "completed";
-                  const isApproved = isApprovedStage(pr.current_stage);
                   const stageNum = stageNumber(pr.current_stage);
 
                   return (
@@ -381,23 +377,7 @@ export default function DashboardPage() {
                       key={pr.pr_no}
                       className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 hover:bg-stone-50/60 transition-colors"
                     >
-                      <div className="flex items-start gap-3 min-w-0 flex-1">
-                        <div
-                          className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl border shadow-2xs mt-0.5 ${
-                            isDone
-                              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                              : isApproved
-                              ? "border-[#7B0046]/20 bg-[#7B0046]/5 text-[#7B0046]"
-                              : "border-amber-200 bg-amber-50 text-amber-700"
-                          }`}
-                        >
-                          {isDone ? (
-                            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
-                          ) : (
-                            <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
-                          )}
-                        </div>
-
+                      <div className="min-w-0 flex-1">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                             <span className="font-mono text-xs sm:text-sm font-bold text-[#4D002C]">

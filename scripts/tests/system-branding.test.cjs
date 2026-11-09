@@ -486,3 +486,46 @@ test('admin PR directory accepts status and search query parameters from Action 
   assert.match(purchaseRequests, /setStatusFilter\(requestedStatus\)/);
   assert.match(purchaseRequests, /setSearchTerm\(requestedSearch\)/);
 });
+
+
+test('dashboard Recent PR Activity rows display text statuses without decorative status icons', () => {
+  const dashboard = read('app/dashboard/page.tsx');
+  const recent = dashboard.slice(
+    dashboard.indexOf('{/* Recent PR Activity */}'),
+    dashboard.indexOf('<footer', dashboard.indexOf('{/* Recent PR Activity */}'))
+  );
+
+  assert.doesNotMatch(recent, /<CheckCircle2|<Clock/);
+  assert.match(recent, /statusColor\(/);
+  assert.match(recent, /statusLabel\(/);
+  assert.match(recent, /<span>Track<\/span>/);
+});
+
+test('Procurement Reports KPI cards show clean text-only metrics', () => {
+  const reports = read('app/admin/reports/page.tsx');
+  const kpis = reports.slice(
+    reports.indexOf('<section className="mb-5 grid grid-cols-2'),
+    reports.indexOf('<section className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-2')
+  );
+
+  assert.doesNotMatch(kpis, /<FileText|<CircleDollarSign|<Layers3|<CheckCircle2|<BarChart3/);
+  assert.match(kpis, /Purchase Requests/);
+  assert.match(kpis, /Total Estimated Value/);
+  assert.match(kpis, /In Progress/);
+  assert.match(kpis, /Completed/);
+  assert.match(kpis, /Completion Rate/);
+});
+
+test('Transparency Board summary cards show their counts and labels without decorative icon tiles', () => {
+  const transparency = read('app/dashboard/transparency/page.tsx');
+  const metrics = transparency.slice(
+    transparency.indexOf('{/* Key Metrics Strip */}'),
+    transparency.indexOf('{/* Filter & Search Bar */}')
+  );
+
+  assert.doesNotMatch(metrics, /<ShieldCheck|<Building2|<Cpu|<Layers/);
+  assert.match(metrics, /Total Notices/);
+  assert.match(metrics, /Infrastructure/);
+  assert.match(metrics, /ICT &amp; Systems/);
+  assert.match(metrics, /Goods &amp; Lab/);
+});
