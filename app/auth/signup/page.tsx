@@ -5,6 +5,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { MsuLogo } from "@/components/msu-logo";
 import { SYSTEM_NAME } from "@/lib/system-branding";
+import { REGISTRATION_TERMS, REGISTRATION_TERMS_TITLE, REGISTRATION_TERMS_VERSION } from "@/lib/legal/registration-terms";
 import {
   Mail,
   Lock,
@@ -18,6 +19,7 @@ import {
   Building2,
   Clock,
   Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 
 const EMAIL_PATTERN = /^[^\s@]+@msugensan\.edu\.ph$/i;
@@ -41,6 +43,8 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTermsDialog, setShowTermsDialog] = useState(false);
 
   // Live password validation checks
   const hasMinLength = password.length >= 8;
@@ -53,6 +57,10 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!termsAccepted) {
+      setError("Please check the box to agree to the Terms and Conditions and Privacy Notice before registering.");
+      return;
+    }
     const cleanName = fullName.trim();
     const cleanEmail = email.trim().toLowerCase();
 
@@ -83,7 +91,7 @@ export default function SignupPage() {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName: cleanName, email: cleanEmail, password }),
+        body: JSON.stringify({ fullName: cleanName, email: cleanEmail, password, termsAccepted, termsVersion: REGISTRATION_TERMS_VERSION }),
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) {
@@ -146,7 +154,7 @@ export default function SignupPage() {
               </h2>
 
               <p className="mt-2 text-sm text-stone-600 leading-relaxed max-w-md mx-auto">
-                An end-user account for <strong className="text-stone-900 font-bold">{registeredEmail}</strong> has been registered in the {SYSTEM_NAME}.
+                An account for <strong className="text-stone-900 font-bold">{registeredEmail}</strong> has been registered in the {SYSTEM_NAME}.
               </p>
 
               {/* Approval status banner */}
@@ -197,7 +205,7 @@ export default function SignupPage() {
                 <div>
                   <div>
                     <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight tracking-tight">
-                      End-User <span className="text-[#F0C83F]">Registration</span>
+                      User <span className="text-[#F0C83F]">Registration</span>
                     </h1>
                   </div>
 
@@ -418,11 +426,38 @@ export default function SignupPage() {
                       </div>
                     </div>
 
+                    {/* Required terms acknowledgement */}
+                    <div className="rounded-xl border border-stone-200 bg-stone-50/80 p-3.5">
+                      <div className="flex items-start gap-2.5">
+                        <input
+                          id="terms-accepted"
+                          type="checkbox"
+                          checked={termsAccepted}
+                          onChange={(event) => setTermsAccepted(event.target.checked)}
+                          required
+                          aria-required="true"
+                          className="mt-0.5 h-4 w-4 shrink-0 rounded border-stone-300 accent-[#7B0046] focus:ring-[#7B0046]"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <label htmlFor="terms-accepted" className="cursor-pointer text-xs font-semibold leading-relaxed text-stone-700">
+                            I have read and agree to the Terms and Conditions and acknowledge the Privacy Notice.
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setShowTermsDialog(true)}
+                            className="mt-1 block text-xs font-extrabold text-[#7B0046] underline decoration-[#C27803] underline-offset-2 hover:text-[#4D002C]"
+                          >
+                            View Terms and Conditions
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Submit Button */}
                     <button
                       type="submit"
-                      disabled={loading}
-                      className="w-full min-h-[46px] rounded-xl bg-gradient-to-r from-[#7B0046] via-[#8E0052] to-[#4D002C] hover:from-[#610037] hover:to-[#7B0046] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border border-[#F5AB26]/35 disabled:opacity-50 mt-2"
+                      disabled={loading || !termsAccepted}
+                      className="w-full min-h-[46px] rounded-xl bg-gradient-to-r from-[#7B0046] via-[#8E0052] to-[#4D002C] hover:from-[#610037] hover:to-[#7B0046] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border border-[#F5AB26]/35 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
                     >
                       {loading ? (
                         <>
@@ -431,7 +466,7 @@ export default function SignupPage() {
                         </>
                       ) : (
                         <>
-                          <span>Create End-User Account</span>
+                          <span>Create Account</span>
                           <ArrowRight className="h-4 w-4 text-amber-300" />
                         </>
                       )}
@@ -455,6 +490,81 @@ export default function SignupPage() {
           )}
         </AnimatePresence>
       </motion.div>
+
+      <AnimatePresence>
+        {showTermsDialog && (
+          <motion.div
+            key="registration-terms-dialog"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1F1020]/75 p-3 backdrop-blur-sm sm:p-6"
+          >
+            <motion.section
+              initial={{ opacity: 0, y: 18, scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.985 }}
+              transition={{ duration: 0.2 }}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="registration-terms-title"
+              className="flex max-h-[min(92svh,820px)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_28px_90px_rgba(20,0,15,0.35)]"
+            >
+              <div className="h-1.5 shrink-0 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
+              <header className="shrink-0 border-b border-stone-100 bg-[#FFFEFC] px-4 py-4 sm:px-6">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#7B0046]/10 bg-[#7B0046]/5 text-[#7B0046]">
+                    <ShieldCheck className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#9A6700]">
+                      Required before registration
+                    </p>
+                    <h2 id="registration-terms-title" className="mt-1 text-lg font-black leading-tight text-[#4D002C] sm:text-xl">
+                      {REGISTRATION_TERMS_TITLE}
+                    </h2>
+                  </div>
+                </div>
+              </header>
+
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6">
+                <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs leading-relaxed text-amber-950">
+                  Review the terms below. After reading them, close this window and use the checkbox on the registration form to confirm your agreement. Closing this window does not mean you have accepted.
+                </p>
+                <div className="space-y-5">
+                  {REGISTRATION_TERMS.map((section) => (
+                    <section key={section.heading}>
+                      <h3 className="text-sm font-extrabold text-[#4D002C]">{section.heading}</h3>
+                      <div className="mt-1.5 space-y-2">
+                        {section.paragraphs.map((paragraph, index) => (
+                          <p key={index} className="text-xs leading-relaxed text-stone-600">
+                            {paragraph}
+                          </p>
+                        ))}
+                      </div>
+                    </section>
+                  ))}
+                </div>
+                <p className="mt-5 border-t border-stone-100 pt-3 text-[10px] leading-relaxed text-stone-400">
+                  This notice describes the System's intended registration and information-handling practices. The university's approved policies and applicable laws prevail where they differ.
+                </p>
+              </div>
+
+              <footer className="shrink-0 border-t border-stone-200 bg-white px-4 py-4 sm:px-6">
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowTermsDialog(false)}
+                    className="inline-flex min-h-10 items-center justify-center rounded-xl bg-[#7B0046] px-5 py-2 text-xs font-extrabold text-white shadow-sm transition hover:bg-[#610037]"
+                  >
+                    Close
+                  </button>
+                </div>
+              </footer>
+            </motion.section>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

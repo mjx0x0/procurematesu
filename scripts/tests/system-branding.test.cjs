@@ -377,3 +377,35 @@ test('purchase requests directory uses the Recent PR Activity row layout without
   assert.equal(purchaseRequests.includes('Draft · Submit Physically'), false);
   assert.equal(purchaseRequests.includes('hidden sm:inline-flex mt-1 items-center rounded-full'), false);
 });
+
+
+test('registration terms open on demand and a single form checkbox gates account creation', () => {
+  const signup = read('app/auth/signup/page.tsx');
+  const signupApi = read('app/api/auth/signup/route.ts');
+  const terms = read('lib/legal/registration-terms.ts');
+  const agreementCard = signup.slice(
+    signup.indexOf('{/* Required terms acknowledgement */}'),
+    signup.indexOf('{/* Submit Button */}')
+  );
+
+  assert.match(signup, /const \[showTermsDialog, setShowTermsDialog\] = useState\(false\)/);
+  assert.match(signup, /id="terms-accepted"/);
+  assert.match(signup, /checked=\{termsAccepted\}/);
+  assert.match(signup, /disabled=\{loading \|\| !termsAccepted\}/);
+  assert.match(signup, /View Terms and Conditions/);
+  assert.match(signup, /<span>Create Account<\/span>/);
+  assert.match(signup, /User <span className="text-\[#F0C83F\]">Registration<\/span>/);
+  assert.doesNotMatch(signup, /Create End-User Account|End-User <span/);
+  assert.doesNotMatch(signup, /REGISTRATION_TERMS_LAST_UPDATED|Last updated/);
+  assert.doesNotMatch(signup, /termsConfirmation|setTermsConfirmation/);
+  assert.doesNotMatch(agreementCard, /ShieldCheck|CheckCircle2/);
+  assert.match(signup, /Closing this window does not mean you have accepted/);
+  assert.match(signup, /onClick=\{\(\) => setShowTermsDialog\(false\)\}/);
+
+  assert.match(signupApi, /termsVersion !== REGISTRATION_TERMS_VERSION/);
+  assert.match(signupApi, /terms_acceptance: termsAcceptance/);
+  assert.match(signupApi, /accepted_at: new Date\(\)\.toISOString\(\)/);
+  assert.match(terms, /Data Privacy Act of 2012/);
+  assert.match(terms, /procurement@msugensan\.edu\.ph/);
+  assert.match(terms, /temporary tracking number/);
+});
