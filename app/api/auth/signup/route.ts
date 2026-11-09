@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { REGISTRATION_TERMS_VERSION } from "@/lib/legal/registration-terms";
 
 const EMAIL_PATTERN = /^[^\s@]+@msugensan\.edu\.ph$/i;
 
@@ -28,6 +29,12 @@ export async function POST(request: NextRequest) {
     const fullName = typeof body?.fullName === "string" ? body.fullName.trim() : "";
     const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
     const password = typeof body?.password === "string" ? body.password : "";
+    const termsAccepted = body?.termsAccepted === true;
+    const termsVersion = typeof body?.termsVersion === "string" ? body.termsVersion : "";
+
+    if (!termsAccepted || termsVersion !== REGISTRATION_TERMS_VERSION) {
+      return NextResponse.json({ error: "You must accept the current Terms and Conditions and Privacy Notice before registering." }, { status: 400 });
+    }
 
     if (!fullName || !email || !password) {
       return NextResponse.json({ error: "Please fill in all fields." }, { status: 400 });
@@ -47,6 +54,12 @@ export async function POST(request: NextRequest) {
       console.error("[auth/signup] Supabase environment variables are not configured.");
       return NextResponse.json({ error: "Account registration is temporarily unavailable." }, { status: 500 });
     }
+
+    const termsAcceptance = {
+      version: REGISTRATION_TERMS_VERSION,
+      accepted_at: new Date().toISOString(),
+      source: "end_user_registration",
+    };
 
     const { data: profile, error: profileError } = await admin
       .from("users")
@@ -79,6 +92,10 @@ export async function POST(request: NextRequest) {
         password,
         email_confirm: true,
         user_metadata: { full_name: fullName },
+        app_metadata: {
+          ...(existingAuth.user.app_metadata || {}),
+          terms_acceptance: termsAcceptance,
+        },
       });
       if (authUpdateError) {
         console.error("[auth/signup] rejected account reset failed:", authUpdateError);
@@ -116,6 +133,7 @@ export async function POST(request: NextRequest) {
       password,
       email_confirm: true,
       user_metadata: { full_name: fullName },
+      app_metadata: { terms_acceptance: termsAcceptance },
     });
 
     if (createError || !data.user) {
