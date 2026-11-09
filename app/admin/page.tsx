@@ -8,7 +8,7 @@ import { SYSTEM_NAME } from "@/lib/system-branding";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
-import { ChevronRight, UserCheck, FileText, Hash } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 interface ActionCounts {
   pendingApprovals: number;
@@ -220,9 +220,6 @@ export default function AdminDashboard() {
               href="/admin/users"
               className="group flex min-w-0 items-center gap-3 rounded-xl border border-amber-200 bg-amber-50/60 p-3.5 transition hover:border-amber-300 hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
-                <UserCheck className="h-5 w-5" />
-              </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-2xl font-extrabold leading-none text-amber-800 tabular-nums">{actionCounts.pendingApprovals}</span>
                 <span className="mt-1 block text-xs font-bold text-stone-800">Pending User Approvals</span>
@@ -235,9 +232,6 @@ export default function AdminDashboard() {
               href="/admin/purchase-requests?status=draft"
               className="group flex min-w-0 items-center gap-3 rounded-xl border border-[#7B0046]/15 bg-[#7B0046]/[0.035] p-3.5 transition hover:border-[#7B0046]/30 hover:bg-[#7B0046]/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046]">
-                <FileText className="h-5 w-5" />
-              </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-2xl font-extrabold leading-none text-[#7B0046] tabular-nums">{actionCounts.physicalReceipt}</span>
                 <span className="mt-1 block text-xs font-bold text-stone-800">Awaiting Physical Receipt</span>
@@ -250,9 +244,6 @@ export default function AdminDashboard() {
               href="/admin/purchase-requests?status=pr_pre_numbering"
               className="group flex min-w-0 items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50/50 p-3.5 transition hover:border-indigo-300 hover:bg-indigo-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
-                <Hash className="h-5 w-5" />
-              </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-2xl font-extrabold leading-none text-indigo-700 tabular-nums">{actionCounts.officialNumber}</span>
                 <span className="mt-1 block text-xs font-bold text-stone-800">Official PR Number Assignment</span>

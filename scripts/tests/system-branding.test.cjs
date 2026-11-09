@@ -374,18 +374,27 @@ test('admin notification bell is separated from the account control and has no l
 });
 
 
-test('purchase requests directory uses the Recent PR Activity row layout without a temporary-number tag', () => {
+test('purchase requests list keeps text status labels and removes decorative row status icons', () => {
   const purchaseRequests = read('app/dashboard/purchase-requests/page.tsx');
+  const adminDashboard = read('app/admin/page.tsx');
 
   assert.equal(purchaseRequests.includes('Temporary No.'), false);
-  assert.ok(purchaseRequests.includes('CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5"'));
-  assert.ok(purchaseRequests.includes('<Clock className="h-4 w-4 sm:h-5 sm:w-5" />'));
   assert.ok(purchaseRequests.includes('statusColor('));
   assert.ok(purchaseRequests.includes('Stage ${stageNum} · '));
   assert.ok(purchaseRequests.includes('<span>Track</span>'));
   assert.ok(purchaseRequests.includes('aria-label={`Print purchase request ${pr.pr_no}`}'));
+  assert.doesNotMatch(purchaseRequests, /CheckCircle2|<Clock/);
   assert.equal(purchaseRequests.includes('Draft · Submit Physically'), false);
   assert.equal(purchaseRequests.includes('hidden sm:inline-flex mt-1 items-center rounded-full'), false);
+
+  const actionPanel = adminDashboard.slice(
+    adminDashboard.indexOf('aria-labelledby="admin-action-required-heading"'),
+    adminDashboard.indexOf('<footer')
+  );
+  assert.doesNotMatch(actionPanel, /<UserCheck|<FileText|<Hash/);
+  assert.match(actionPanel, /Pending User Approvals/);
+  assert.match(actionPanel, /Awaiting Physical Receipt/);
+  assert.match(actionPanel, /Official PR Number Assignment/);
 });
 
 
