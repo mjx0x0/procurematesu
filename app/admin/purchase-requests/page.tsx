@@ -67,6 +67,21 @@ export default function AdminPurchaseRequestsPage() {
   const [officialPrInput, setOfficialPrInput] = useState("");
   const [showOfficialPrModal, setShowOfficialPrModal] = useState(false);
   const [approvalGroupFilter, setApprovalGroupFilter] = useState<"all" | "approved" | "drafts">("all");
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedStatus = params.get("status");
+    const requestedSearch = params.get("search");
+
+    if (
+      requestedStatus &&
+      (STAGES.some((stage) => stage.key === requestedStatus) ||
+        ["completed", "rejected", "cancelled"].includes(requestedStatus))
+    ) {
+      setStatusFilter(requestedStatus);
+    }
+    if (requestedSearch) setSearchTerm(requestedSearch);
+  }, []);
+
 
   const selectedPRRef = useRef<PR | null>(null);
   selectedPRRef.current = selectedPR;

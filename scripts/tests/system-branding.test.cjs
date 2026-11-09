@@ -409,3 +409,61 @@ test('registration terms open on demand and a single form checkbox gates account
   assert.match(terms, /procurement@msugensan\.edu\.ph/);
   assert.match(terms, /temporary tracking number/);
 });
+
+
+test('admin dashboard replaces PR Overview with actionable queues and adds reports navigation', () => {
+  const admin = read('app/admin/page.tsx');
+
+  assert.match(admin, /Action Required/);
+  assert.match(admin, /Pending User Approvals/);
+  assert.match(admin, /Awaiting Physical Receipt/);
+  assert.match(admin, /Official PR Number Assignment/);
+  assert.match(admin, /\/admin\/users/);
+  assert.match(admin, /\/admin\/purchase-requests\?status=draft/);
+  assert.match(admin, /\/admin\/purchase-requests\?status=pr_pre_numbering/);
+  assert.match(admin, /Procurement Reports & Analytics/);
+  assert.match(admin, /href: "\/admin\/reports"/);
+  assert.doesNotMatch(admin, /PR Overview/);
+});
+
+test('admin notification center loads, updates, and receives persisted per-admin notifications', () => {
+  const notifications = read('components/AdminPRNotificationPopover.tsx');
+  const migration = read('supabase/migrations/20261109130000_add_admin_persistent_notifications.sql');
+
+  assert.match(notifications, /\.from\("notifications"\)/);
+  assert.match(notifications, /\.eq\("user_id", adminId\)/);
+  assert.match(notifications, /\.update\(\{ is_read: true \}\)/);
+  assert.match(notifications, /postgres_changes/);
+  assert.match(notifications, /table: "notifications"/);
+  assert.match(notifications, /user_id=eq\./);
+  assert.match(notifications, /Saved across sessions/);
+  assert.match(migration, /trg_notify_admins_new_purchase_request/);
+  assert.match(migration, /trg_notify_admins_new_user_registration/);
+  assert.match(migration, /trg_notify_admins_pr_stage_change/);
+  assert.match(migration, /trg_notify_admins_official_pr_number/);
+  assert.match(migration, /ALTER PUBLICATION supabase_realtime ADD TABLE public\.notifications/);
+});
+
+test('admin procurement reports provide date filters, aggregate metrics, department summaries, and CSV export', () => {
+  const reports = read('app/admin/reports/page.tsx');
+
+  assert.match(reports, /Procurement Reports &amp; Analytics/);
+  assert.match(reports, /Last 30 days/);
+  assert.match(reports, /Last 90 days/);
+  assert.match(reports, /Year to date/);
+  assert.match(reports, /Total Estimated Value/);
+  assert.match(reports, /Current Workflow Distribution/);
+  assert.match(reports, /Department Summary/);
+  assert.match(reports, /Purchase Request Register/);
+  assert.match(reports, /Export CSV/);
+  assert.match(reports, /window\.print\(\)/);
+  assert.match(reports, /not actual expenditure/);
+});
+
+test('admin PR directory accepts status and search query parameters from Action Required and notification links', () => {
+  const purchaseRequests = read('app/admin/purchase-requests/page.tsx');
+
+  assert.match(purchaseRequests, /new URLSearchParams\(window\.location\.search\)/);
+  assert.match(purchaseRequests, /setStatusFilter\(requestedStatus\)/);
+  assert.match(purchaseRequests, /setSearchTerm\(requestedSearch\)/);
+});
