@@ -197,7 +197,7 @@ export default function AdminReportsPage() {
         });
       }
     }
-    return rows.filter((row) => row.count > 0);
+    return rows.filter((row) => row.count > 0).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
   }, [filteredPRs]);
 
   const exportCSV = () => {
