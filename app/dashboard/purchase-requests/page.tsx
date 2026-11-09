@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertCircle, CheckCircle, Clock, Eye, FileText, Filter, PlusCircle, Printer, Search } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Eye, FileText, Filter, PlusCircle, Printer, Search } from "lucide-react";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
@@ -311,26 +311,20 @@ export default function PurchaseRequestsPage() {
                 return (
                   <div
                     key={pr.pr_no}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-5 hover:bg-stone-50/70 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 hover:bg-stone-50/60 transition-colors"
                   >
-                    <div className="flex items-start gap-2.5 sm:gap-3.5 min-w-0 flex-1">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
                       <div
-                        className={`flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg sm:rounded-xl border shadow-xs ${
+                        className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl border shadow-2xs mt-0.5 ${
                           isDone
                             ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                             : isApproved
-                            ? "border-[#7B0046]/15 bg-[#7B0046]/5 text-[#7B0046]"
-                            : pr.current_stage === "draft"
-                            ? "border-amber-300 bg-amber-50 text-amber-800"
+                            ? "border-[#7B0046]/20 bg-[#7B0046]/5 text-[#7B0046]"
                             : "border-amber-200 bg-amber-50 text-amber-700"
                         }`}
                       >
                         {isDone ? (
-                          <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
-                        ) : isApproved ? (
-                          <CheckCircle className="h-5 w-5" />
-                        ) : pr.current_stage === "draft" ? (
-                          <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-amber-800" />
+                          <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
                         ) : (
                           <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
                         )}
@@ -338,33 +332,66 @@ export default function PurchaseRequestsPage() {
 
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                          <span className="font-mono text-[13px] sm:text-base font-bold text-[#4D002C]">
+                          <span className="font-mono text-xs sm:text-sm font-bold text-[#4D002C]">
                             {pr.pr_no}
                           </span>
-                          {pr.pr_no?.includes("TEMP") && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200/80">
-                              Temporary No.
-                            </span>
-                          )}
                           <span
-                            className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] font-bold border ${
-                              isDone
-                                ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                                : isApproved
-                                ? "bg-stone-100 text-stone-700 border-stone-200"
-                                : pr.current_stage === "draft"
-                                ? "bg-amber-100 text-amber-900 border-amber-300"
-                                : "bg-amber-50 text-amber-800 border-amber-200/70"
-                            }`}
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusColor(
+                              pr.current_stage
+                            )}`}
                           >
-                            {isDone ? "Completed" : isApproved ? "Approved" : pr.current_stage === "draft" ? "Draft · Submit Physically" : "Under Review"}
+                            {stageNum && stageNum > 0 ? `Stage ${stageNum} · ` : ""}
+                            {statusLabel(pr.current_stage)}
                           </span>
-                          <span className="text-[11px] sm:text-xs text-stone-400 font-medium">
+                          <span className="text-[11px] text-stone-400 font-medium">
                             · {new Date(pr.created_at).toLocaleDateString("en-PH", {
                               year: "numeric",
                               month: "short",
                               day: "numeric",
                             })}
+                          </span>
+                        </div>
+
+                        <p className="mt-1 line-clamp-1 text-xs sm:text-sm font-semibold text-stone-800">
+                          {pr.purpose || "Official procurement request"}
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-stone-500 font-medium">
+                          {pr.department || "University Office"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t border-stone-100 sm:border-0">
+                      <div className="text-left sm:text-right">
+                        <p className="text-xs sm:text-sm font-bold text-stone-900 font-mono">
+                          ₱{Number(pr.total || 0).toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <Link
+                          href={`/dashboard/pr/${pr.pr_no}`}
+                          className="inline-flex min-h-9 items-center gap-1 px-3 py-1.5 rounded-xl bg-[#7B0046] text-white text-[11px] sm:text-xs font-bold shadow-xs hover:bg-[#65003A] transition-colors"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          <span>Track</span>
+                        </Link>
+                        <Link
+                          href={`/dashboard/pr-print?id=${pr.pr_no}`}
+                          className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 hover:text-stone-900 text-xs font-bold hover:bg-stone-50 transition-colors"
+                          title="Print PR Form"
+                          aria-label={`Print purchase request ${pr.pr_no}`}
+                        >
+                          <Printer className="h-3.5 w-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
                           </span>
                         </div>
 

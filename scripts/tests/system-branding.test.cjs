@@ -362,3 +362,18 @@ test('admin notification bell is separated from the account control and has no l
   assert.match(header, /bg-white\/25/);
   assert.doesNotMatch(notifications, /bg-emerald-400/);
 });
+
+
+test('purchase requests directory uses the Recent PR Activity row layout without a temporary-number tag', () => {
+  const purchaseRequests = read('app/dashboard/purchase-requests/page.tsx');
+
+  assert.doesNotMatch(purchaseRequests, /Temporary No\\./);
+  assert.match(purchaseRequests, /CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5"/);
+  assert.match(purchaseRequests, /<Clock className="h-4 w-4 sm:h-5 sm:w-5" \/>/);
+  assert.match(purchaseRequests, /statusColor\\(\\s*pr\\.current_stage\\s*\\)/);
+  assert.match(purchaseRequests, /Stage \\\$\\{stageNum\\} · /);
+  assert.match(purchaseRequests, /<span>Track<\\/span>/);
+  assert.match(purchaseRequests, /Print purchase request \\\$\\{pr\\.pr_no\\}/);
+  assert.doesNotMatch(purchaseRequests, /Draft · Submit Physically/);
+  assert.doesNotMatch(purchaseRequests, /hidden sm:inline-flex mt-1 items-center rounded-full/);
+});
