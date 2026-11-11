@@ -825,14 +825,14 @@ export async function POST(req: NextRequest) {
     // Source-sensitive policy questions must bypass slot-filling first. This
     // prevents long legal prompts containing words like "supplier", "price",
     // "budget", or "section" from being mistaken for PR draft-field answers.
-    const scopeDecision = getProcurementScopeDecision(trimmedMsg, {
-      activePRDraft: Boolean(currentState.drafting || currentState.draftReady || isCompletedDraftEdit),
-    });
-    const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg);
     const isCompletedDraftEdit =
       !currentState.drafting &&
       hasCompletePRDetails(currentState.collected?.extracted) &&
       isPRDraftRevisionMessage(trimmedMsg);
+    const scopeDecision = getProcurementScopeDecision(trimmedMsg, {
+      activePRDraft: Boolean(currentState.drafting || currentState.draftReady || isCompletedDraftEdit),
+    });
+    const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg);
     const chatIntent = classifyProcurementIntent(trimmedMsg, {
       activeDraft: Boolean(currentState.drafting),
       draftReady: Boolean(currentState.draftReady || isCompletedDraftEdit),
