@@ -30,6 +30,7 @@ const sessions = new Map([
   ['session-inactive', { id: 'session-inactive', user_id: 'user-inactive', is_active: true, state: {} }],
   ['session-context-follow-up', { id: 'session-context-follow-up', user_id: 'user-a', is_active: true, state: {} }],
   ['session-ppmp-basic-question', { id: 'session-ppmp-basic-question', user_id: 'user-a', is_active: true, state: {} }],
+  ['session-reference-links', { id: 'session-reference-links', user_id: 'user-a', is_active: true, state: {} }],
   ['session-natural-language-create', {
     id: 'session-natural-language-create',
     user_id: 'user-a',
@@ -65,6 +66,8 @@ const sessions = new Map([
 const storedMessages = [
   { session_id: 'session-context-follow-up', sender: 'user', content: 'What is PPMP?' },
   { session_id: 'session-context-follow-up', sender: 'ai', content: "PPMP means Project Procurement Management Plan. It is the end-user unit's plan of procurement needs." },
+  { session_id: 'session-reference-links', sender: 'user', content: 'Is PPMP different from PR?' },
+  { session_id: 'session-reference-links', sender: 'ai', content: 'The PR is verified against PPMP/APP. References • PMO Administrative Manual, IV. PROCESS FLOW (PDF page 12).' },
 ];
 const storedInquiries = [];
 const purchaseRequests = [
@@ -149,6 +152,20 @@ async function handleMockSupabase(request, response) {
     }
     response.statusCode = 204;
     return response.end();
+  }
+
+  if (url.pathname === '/rest/v1/document_chunks' && request.method === 'GET') {
+    return sendJSON(response, 200, [{
+      id: 'manual-chunk-12',
+      document_name: 'PMO Administrative Manual',
+      document_type: 'pmo_manual',
+      chunk_text: 'IV. PROCESS FLOW. The Procurement Office verifies Purchase Requests against the PPMP/APP.',
+      metadata: {
+        section: 'IV. PROCESS FLOW',
+        pdf_page: 12,
+        source_url: 'https://files.example.test/pmo-administrative-manual.pdf',
+      },
+    }]);
   }
 
   if (url.pathname === '/rest/v1/chat_messages' && request.method === 'GET') {
@@ -317,6 +334,22 @@ test('authenticated chatbot API enforces identity, account status, session owner
     });
 
 
+
+
+
+    await t.test('a request for previously cited reference links returns verified clickable URLs', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-reference-links',
+        message: 'can you give links to the references',
+      });
+
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /\[PMO Administrative Manual\]\(https:\/\/files\.example\.test\/pmo-administrative-manual\.pdf\)/);
+      assert.match(result.payload.response, /IV\. PROCESS FLOW/);
+      assert.match(result.payload.response, /PDF page 12/);
+      assert.doesNotMatch(result.payload.response, /Please ask a procurement-related question/i);
+    });
 
     await t.test('a basic PPMP definition question is answered instead of rejected by the domain guard', async () => {
       const result = await postChat({
