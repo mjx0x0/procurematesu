@@ -551,7 +551,7 @@ test('registration confirmation clearly states PMO review is pending and removes
   assert.match(confirmation, /not active yet/);
   assert.match(confirmation, /before you can access the portal or sign in/);
   assert.match(confirmation, /Return to Sign In/);
-  assert.match(confirmation, /Procurement Management Office \\(PMO\\)/);
+  assert.ok(confirmation.includes("Procurement Management Office (PMO)"));
   assert.doesNotMatch(confirmation, /Account Successfully Created|successfully created|Registration Received|Return to Home/);
   assert.doesNotMatch(confirmation, /<MsuLogo|<CheckCircle2|<Sparkles/);
   assert.equal((confirmation.match(/href=/g) || []).length, 1);
