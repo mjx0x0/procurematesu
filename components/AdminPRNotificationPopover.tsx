@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { Bell, BellRing, CheckCheck, Clock, FileText, Hash, UserRoundPlus } from "lucide-react";
+import { Bell, BellRing, CheckCheck, Clock, FileText, Hash, Mail, MailOpen, Trash2, UserRoundPlus } from "lucide-react";
 
 const ADMIN_NOTIFICATION_TYPES = [
   "pr_created",
@@ -56,6 +56,7 @@ export default function AdminPRNotificationPopover() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [connection, setConnection] = useState<"checking" | "live" | "offline">("checking");
+  const [busyIds, setBusyIds] = useState<string[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -186,24 +187,73 @@ export default function AdminPRNotificationPopover() {
 
   const unread = items.filter((item) => !item.is_read).length;
 
-  const markRead = async (item: AdminNotification) => {
+  const updateReadState = async (item: AdminNotification, nextReadState: boolean) => {
     const adminId = adminIdRef.current;
-    if (!adminId || item.is_read) return true;
+    if (!adminId || busyIds.includes(item.id)) return false;
 
+    setBusyIds((current) => [...new Set([...current, item.id])]);
     const { error: updateError } = await supabase
       .from("notifications")
-      .update({ is_read: true })
+      .update({ is_read: nextReadState })
       .eq("id", item.id)
       .eq("user_id", adminId);
 
     if (updateError) {
-      console.error("Unable to mark admin notification as read:", updateError);
+      console.error("Unable to update admin notification read status:", updateError);
       setError("Unable to update notification status. Please try again.");
+      setBusyIds((current) => current.filter((id) => id !== item.id));
       return false;
     }
 
-    setItems((current) => current.map((entry) => entry.id === item.id ? { ...entry, is_read: true } : entry));
+    setItems((current) => current.map((entry) => entry.id === item.id
+      ? { ...entry, is_read: nextReadState }
+      : entry
+    ));
+    setError(null);
+    setBusyIds((current) => current.filter((id) => id !== item.id));
     return true;
+  };
+
+  const markRead = async (item: AdminNotification) => {
+    if (item.is_read) return true;
+    return updateReadState(item, true);
+  };
+
+  const toggleRead = async (item: AdminNotification) => {
+    await updateReadState(item, !item.is_read);
+  };
+
+  const deleteNotification = async (item: AdminNotification) => {
+    const adminId = adminIdRef.current;
+    if (!adminId || busyIds.includes(item.id)) return;
+
+    setBusyIds((current) => [...new Set([...current, item.id])]);
+    const { data: deletedRows, error: deleteError } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("id", item.id)
+      .eq("user_id", adminId)
+      .select("id");
+
+    if (deleteError) {
+      console.error("Unable to delete admin notification:", deleteError);
+      setError("Unable to delete this notification. Please try again.");
+      setBusyIds((current) => current.filter((id) => id !== item.id));
+      return;
+    }
+
+    // RLS may make DELETE affect zero rows without returning a database error.
+    // Only remove the item locally after Postgres confirms a deleted row.
+    if (!deletedRows || deletedRows.length === 0) {
+      setError("This notification was not deleted. Please refresh and try again.");
+      setBusyIds((current) => current.filter((id) => id !== item.id));
+      return;
+    }
+
+    setItems((current) => current.filter((entry) => entry.id !== item.id));
+    setToast((current) => current?.id === item.id ? null : current);
+    setError(null);
+    setBusyIds((current) => current.filter((id) => id !== item.id));
   };
 
   const markAllRead = async () => {
@@ -359,15 +409,18 @@ export default function AdminPRNotificationPopover() {
                 </div>
               ) : (
                 items.map((item) => (
-                  <button
+                  <div
                     key={item.id}
-                    type="button"
-                    onClick={() => void openNotification(item)}
-                    className={"block w-full p-3.5 text-left transition-colors hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#7B0046] " + (
+                    className={"flex items-start gap-2 px-3.5 py-3 transition-colors " + (
                       item.is_read ? "bg-white" : "bg-[#FFFDF7]"
                     )}
                   >
-                    <span className="flex items-start gap-3">
+                    <button
+                      type="button"
+                      onClick={() => void openNotification(item)}
+                      className="flex min-w-0 flex-1 items-start gap-3 rounded-lg py-0.5 text-left transition-colors hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#7B0046]"
+                      aria-label={"Open notification: " + item.title}
+                    >
                       <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#7B0046]/15 bg-[#FDF2F7] text-[#7B0046]">
                         {getIcon(item.type)}
                       </span>
@@ -389,8 +442,31 @@ export default function AdminPRNotificationPopover() {
                           {formatTime(item.created_at)}
                         </span>
                       </span>
-                    </span>
-                  </button>
+                    </button>
+
+                    <div className="mt-0.5 flex shrink-0 items-center gap-1">
+                      <button
+                        type="button"
+                        disabled={busyIds.includes(item.id)}
+                        onClick={() => void toggleRead(item)}
+                        aria-label={item.is_read ? "Mark as unread" : "Mark as read"}
+                        title={item.is_read ? "Mark as unread" : "Mark as read"}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-500 transition hover:border-[#7B0046]/25 hover:bg-[#FDF2F7] hover:text-[#7B0046] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] disabled:cursor-wait disabled:opacity-40"
+                      >
+                        {item.is_read ? <Mail className="h-3.5 w-3.5" /> : <MailOpen className="h-3.5 w-3.5" />}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={busyIds.includes(item.id)}
+                        onClick={() => void deleteNotification(item)}
+                        aria-label={"Delete notification: " + item.title}
+                        title="Delete notification"
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 disabled:cursor-wait disabled:opacity-40"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
                 ))
               )}
             </div>
