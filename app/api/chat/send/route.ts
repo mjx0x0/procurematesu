@@ -5,7 +5,8 @@ import { POST as legacyChatPOST } from '@/app/api/chat/route';
 import { buildProcurementOfficeLocationResponse } from '@/lib/procurement-office-location';
 import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
 import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-extraction';
-import { classifyProcurementIntent, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
+import { classifyProcurementIntent, isContextualFollowUp, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
+import { formatRecentConversationContext, hasRecentProcurementContext } from '@/lib/chat-conversation-context';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
 
 // Treat both standalone cancellation commands ("cancel", "stop") and natural phrases
@@ -112,12 +113,34 @@ export async function POST(request: NextRequest) {
     // A completed draft remains editable in its existing chat session.
     // Reopen only for explicit item corrections or parseable item additions;
     // all other messages continue through the normal procurement scope path.
+    // Load prior turns only from this authenticated, owner-checked chat session.
+    // The client transcript is not trusted for reference resolution.
+    let priorMessages: Array<{ sender: string; content: string }> = [];
+    try {
+      const { data: historyRows, error: historyError } = await clientToUse
+        .from('chat_messages')
+        .select('sender,content,created_at')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (historyError) {
+        console.warn('[chat/send] Could not load recent conversation context:', historyError.message);
+      } else {
+        priorMessages = Array.isArray(historyRows) ? historyRows.reverse() : [];
+      }
+    } catch (historyError) {
+      console.warn('[chat/send] Recent conversation context is unavailable:', historyError);
+    }
+    const conversationContext = formatRecentConversationContext(priorMessages);
+    const recentProcurementContext = hasRecentProcurementContext(priorMessages) && isContextualFollowUp(message);
+
     // Some older completed chat sessions do not store a draftReady flag.
     // Recognize completed drafts from saved, validated PR details plus an explicit item edit.
     const isCompletedDraftEdit = isCompletedPRDraftEdit(draftState, message);
     let messageIntent = classifyProcurementIntent(message, {
       activeDraft: Boolean(draftState.drafting),
       draftReady: Boolean(draftState.draftReady || isCompletedDraftEdit),
+      recentProcurementContext,
     });
 
     if (messageIntent === 'draft_revision' && isCompletedDraftEdit) {
@@ -138,6 +161,7 @@ export async function POST(request: NextRequest) {
 
     const scopeDecision = getProcurementScopeDecision(message, {
       activePRDraft: Boolean(draftState.drafting || draftState.draftReady),
+      recentProcurementContext,
     });
     if (!scopeDecision.allowed) {
       // Do not pass unrelated, prompt-injection, or disclosure requests to
@@ -181,6 +205,7 @@ export async function POST(request: NextRequest) {
     messageIntent = classifyProcurementIntent(message, {
       activeDraft: Boolean(draftState.drafting),
       draftReady: Boolean(draftState.draftReady),
+      recentProcurementContext,
     });
 
     // Only validate a slot when the current message is still part of an active draft.
@@ -304,7 +329,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ response: buildNextStepResponse(latestPR, history?.[0] || null), sources: ['ProcuremateSU procurement process', 'Purchase Request stage history'] });
     }
     if (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message)) return NextResponse.json({ error: 'Access denied. You can only view Purchase Requests associated with your account.' }, { status: 403 });
-    const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: request.headers, body: JSON.stringify({ message, sessionId, userId: user.id }) });
+    const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: request.headers, body: JSON.stringify({ message, sessionId, userId: user.id, conversationContext }) });
     return legacyChatPOST(trustedRequest);
   } catch (error) { console.error('[chat/send] Unexpected error:', error); return NextResponse.json({ error: 'Unable to process the chat request.' }, { status: 500 }); }
 }

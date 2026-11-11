@@ -28,6 +28,7 @@ const sessions = new Map([
   ['session-user-a', { id: 'session-user-a', user_id: 'user-a', is_active: true, state: {} }],
   ['session-user-b', { id: 'session-user-b', user_id: 'user-b', is_active: true, state: {} }],
   ['session-inactive', { id: 'session-inactive', user_id: 'user-inactive', is_active: true, state: {} }],
+  ['session-context-follow-up', { id: 'session-context-follow-up', user_id: 'user-a', is_active: true, state: {} }],
   ['session-natural-language-create', {
     id: 'session-natural-language-create',
     user_id: 'user-a',
@@ -60,7 +61,10 @@ const sessions = new Map([
     },
   }],
 ]);
-const storedMessages = [];
+const storedMessages = [
+  { session_id: 'session-context-follow-up', sender: 'user', content: 'What is PPMP?' },
+  { session_id: 'session-context-follow-up', sender: 'ai', content: "PPMP means Project Procurement Management Plan. It is the end-user unit's plan of procurement needs." },
+];
 const storedInquiries = [];
 const purchaseRequests = [
   {
@@ -144,6 +148,12 @@ async function handleMockSupabase(request, response) {
     }
     response.statusCode = 204;
     return response.end();
+  }
+
+  if (url.pathname === '/rest/v1/chat_messages' && request.method === 'GET') {
+    const sessionId = eqValue(url, 'session_id');
+    const rows = storedMessages.filter((message) => !sessionId || message.session_id === sessionId);
+    return sendJSON(response, 200, rows);
   }
 
   if (url.pathname === '/rest/v1/chat_messages' && request.method === 'POST') {
@@ -303,6 +313,20 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.equal(result.status, 200, JSON.stringify(result.payload));
       assert.match(result.payload.response, /Purchase Request Tracking: PR-2026-0002/i);
       assert.match(result.payload.response, /Draft — awaiting printed-form receipt/i);
+    });
+
+    await t.test('contextual follow-up compares PPMP with PR instead of changing to RFQ/SVP', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-context-follow-up',
+        message: 'Is it different from the PR?',
+      });
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /PPMP/i);
+      assert.match(result.payload.response, /Purchase Request|\bPR\b/i);
+      assert.match(result.payload.response, /planning document|broader plan/i);
+      assert.match(result.payload.response, /specific purchase|individual request/i);
+      assert.doesNotMatch(result.payload.response, /RFQ|Small Value Procurement|SVP/i);
     });
 
     await t.test('an authenticated active user can start a PR draft and persist the chat turn', async () => {
