@@ -556,3 +556,24 @@ test('registration confirmation clearly states PMO review is pending and removes
   assert.doesNotMatch(confirmation, /<MsuLogo|<CheckCircle2|<Sparkles/);
   assert.equal((confirmation.match(/href=/g) || []).length, 1);
 });
+
+
+test('admin notification rows expose independent read/unread and owner-scoped delete actions', () => {
+  const notifications = read('components/AdminPRNotificationPopover.tsx');
+  const migration = read('supabase/migrations/20261111070000_allow_users_to_delete_own_notifications.sql');
+
+  assert.match(notifications, /updateReadState/);
+  assert.match(notifications, /\.update\(\{ is_read: nextReadState \}\)/);
+  assert.match(notifications, /\.delete\(\)/);
+  assert.match(notifications, /\.select\("id"\)/);
+  assert.match(notifications, /!deletedRows \|\| deletedRows\.length === 0/);
+  assert.match(notifications, /\.eq\("id", item\.id\)/);
+  assert.match(notifications, /\.eq\("user_id", adminId\)/);
+  assert.match(notifications, /aria-label=\{item\.is_read \? "Mark as unread" : "Mark as read"\}/);
+  assert.match(notifications, /aria-label=\{"Delete notification: " \+ item\.title\}/);
+  assert.match(notifications, /<Mail className="h-3\.5 w-3\.5" \/>/);
+  assert.match(notifications, /<MailOpen className="h-3\.5 w-3\.5" \/>/);
+  assert.match(notifications, /<Trash2 className="h-3\.5 w-3\.5" \/>/);
+  assert.match(migration, /FOR DELETE/);
+  assert.match(migration, /USING \(user_id = \(SELECT auth\.uid\(\)\)\)/);
+});
