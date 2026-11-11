@@ -482,7 +482,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         section ? `section/article: ${section}` : '',
         page ? `PDF page: ${page}` : '',
       ].filter(Boolean).join(' | ');
-      const rawSourceUrl = metadataField(chunk.metadata, ['source_url', 'official_url', 'source_link']);
+      const rawSourceUrl = metadataField(chunk.metadata, ['source_url', 'official_url', 'source_link', 'document_url', 'file_url', 'public_url', 'download_url', 'pdf_url', 'url']);
       const sourceCitation = /^https?:\/\//i.test(rawSourceUrl) ? ` | official source: ${rawSourceUrl}` : '';
       const docHeader = `[DOCUMENT EXCERPT ${index + 1}: ${chunk.document_name.toUpperCase()} (${chunk.document_type})${location ? ` | ${location}` : ''}${sourceCitation}]`;
       return `${docHeader}\n${chunk.chunk_text}`;
