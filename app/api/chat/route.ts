@@ -413,7 +413,7 @@ async function handleDraftPRFlow(
         if (!extracted.purpose) {
           newState.step = 'purpose';
           const capturedItems = extracted.items.length
-            ? ' I also captured ' + extracted.items.length + ' item(s), including the quantities and prices you provided.'
+            ? ' I also captured ' + extracted.items.length + ' item(s), including the quantities and any prices you provided.'
             : '';
           return {
             response: '✅ I captured the item details you provided.' + capturedItems + ' First, what is the **purpose of this procurement**? After that, I will ask for the requesting department and any remaining item details.',
