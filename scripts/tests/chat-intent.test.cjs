@@ -191,3 +191,17 @@ test('completed draft corrections remain detectable for legacy sessions without 
   assert.equal(Object.prototype.hasOwnProperty.call(legacyCompletedState, 'draftReady'), false);
   assert.equal(isCompletedPRDraftEdit(legacyCompletedState, 'Change the quantity from 50 pcs to 60 pcs.'), true);
 });
+
+
+test('short pronoun follow-ups resolve as procurement questions when recent procurement context exists', () => {
+  for (const message of ['Is it different from the PR?', 'Is it different?', 'What does that mean?', 'Can you explain more about it?']) {
+    assert.equal(classifyProcurementIntent(message, { recentProcurementContext: true }), 'procurement_question', message);
+  }
+  assert.equal(classifyProcurementIntent('Is it different?'), 'general');
+});
+
+test('contextual follow-up detection does not treat a complete new question as a follow-up', () => {
+  assert.equal(isContextualFollowUp('Is it different from the PR?'), true);
+  assert.equal(isContextualFollowUp('What is PPMP?'), false);
+  assert.equal(isContextualFollowUp('Help me prepare a Purchase Request.'), false);
+});
