@@ -10,8 +10,9 @@ import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
 import { normalizeAssistantResponse } from '@/lib/chat-response-format';
 import { buildCommonProcurementDefinitionAnswer } from '@/lib/procurement-definitions';
+import { buildReferenceLinksResponse } from '@/lib/chat-source-references';
 import { createPRDraftHandoffPayload, encodePRDraftHandoff } from '@/lib/pr-draft-handoff';
-import { classifyProcurementIntent, extractPRIdentifier, isContextualFollowUp, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
+import { classifyProcurementIntent, extractPRIdentifier, isContextualFollowUp, isReferenceLinkRequest, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
 import { buildContextualProcurementQuery, hasRecentProcurementContext, isGeneralConceptualFollowUp, buildOfflineConceptualFollowUpAnswer } from '@/lib/chat-conversation-context';
 
 // ============================================================
@@ -850,6 +851,7 @@ export async function POST(req: NextRequest) {
       recentProcurementContext,
     });
     const commonDefinitionAnswer = buildCommonProcurementDefinitionAnswer(trimmedMsg);
+    const referenceLinkRequest = isReferenceLinkRequest(trimmedMsg) && recentProcurementContext;
     if (!scopeDecision.allowed) {
       // Refuse unrelated and security-sensitive requests before retrieval or any
       // model provider is called. Keep an active PR draft intact for the next valid reply.
@@ -870,6 +872,16 @@ export async function POST(req: NextRequest) {
       // document retrieval hit. This branch is limited to the exact PPMP
       // definition phrasings recognized by the deterministic helper.
       responseText = commonDefinitionAnswer;
+      inquiryType = 'procurement_guidance';
+      updatedState = { ...currentState };
+    } else if (referenceLinkRequest) {
+      // Resolve a request for citations against the authenticated session's
+      // prior answer, then expose only HTTP(S) URLs stored in source metadata.
+      // A missing URL is reported explicitly rather than guessed.
+      const referenceQuery = buildContextualProcurementQuery(trimmedMsg, conversationContext);
+      const referenceRetrieval = await retrieveDocumentChunks(referenceQuery, 12);
+      responseText = buildReferenceLinksResponse(referenceRetrieval.chunks, conversationContext);
+      citedSources = referenceRetrieval.sources.map(normalizeSourceLabel);
       inquiryType = 'procurement_guidance';
       updatedState = { ...currentState };
     } else if (deterministicPolicyQuestion) {
