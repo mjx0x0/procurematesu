@@ -212,3 +212,18 @@ test('plain-language PPMP definition questions are classified as procurement que
     assert.equal(classifyProcurementIntent(message), 'procurement_question', message);
   }
 });
+
+test('requests for links to previously cited references are contextual procurement follow-ups', () => {
+  const { isReferenceLinkRequest } = require('../../lib/chat-intent.js');
+  for (const message of [
+    'can you give links to the references',
+    'Can you give me the links to the sources you cited?',
+    'Please share the URLs for the documents you mentioned.',
+    'Show me the links to the citations.',
+  ]) {
+    assert.equal(isReferenceLinkRequest(message), true, message);
+    assert.equal(isContextualFollowUp(message), true, message);
+    assert.equal(classifyProcurementIntent(message, { recentProcurementContext: true }), 'procurement_question', message);
+  }
+  assert.equal(isReferenceLinkRequest('How do I submit a Purchase Request?'), false);
+});
