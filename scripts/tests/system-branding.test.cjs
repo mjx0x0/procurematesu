@@ -537,3 +537,22 @@ test('landing sign-in card uses the concise Digital Procurement System subtitle'
   assert.match(loginCard, /Sign in to the Digital Procurement System\./);
   assert.doesNotMatch(loginCard, /Sign in to the \{SYSTEM_NAME\}/);
 });
+
+
+test('registration confirmation clearly states PMO review is pending and removes misleading success decorations', () => {
+  const signup = read('app/auth/signup/page.tsx');
+  const confirmation = signup.slice(
+    signup.indexOf('/* Registration request pending PMO review */'),
+    signup.indexOf('/* Registration Form with University Split-Hero Card */')
+  );
+
+  assert.match(confirmation, /Registration Request Submitted/);
+  assert.match(confirmation, /Pending PMO Verification/);
+  assert.match(confirmation, /not active yet/);
+  assert.match(confirmation, /before you can access the portal or sign in/);
+  assert.match(confirmation, /Return to Sign In/);
+  assert.match(confirmation, /Procurement Management Office \\(PMO\\)/);
+  assert.doesNotMatch(confirmation, /Account Successfully Created|successfully created|Registration Received|Return to Home/);
+  assert.doesNotMatch(confirmation, /<MsuLogo|<CheckCircle2|<Sparkles/);
+  assert.equal((confirmation.match(/href="\\/"/g) || []).length, 1);
+});

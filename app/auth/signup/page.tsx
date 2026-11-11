@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { MsuLogo } from "@/components/msu-logo";
 import { SYSTEM_NAME } from "@/lib/system-branding";
 import { REGISTRATION_TERMS, REGISTRATION_TERMS_TITLE, REGISTRATION_TERMS_VERSION } from "@/lib/legal/registration-terms";
 import {
@@ -14,11 +13,9 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  CheckCircle2,
   Check,
   Building2,
   Clock,
-  Sparkles,
   ShieldCheck,
 } from "lucide-react";
 
@@ -127,69 +124,57 @@ export default function SignupPage() {
       >
         <AnimatePresence mode="wait">
           {success ? (
-            /* Success confirmation card */
+            /* Registration request pending PMO review */
             <motion.div
-              key="success-card"
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.3 }}
-              className="mx-auto max-w-xl overflow-hidden rounded-3xl border border-[#F5AB26]/35 bg-white p-8 sm:p-10 shadow-[0_24px_60px_rgba(77,0,44,0.12)] text-center relative"
+              key="pending-registration-card"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.25 }}
+              className="relative mx-auto w-full max-w-2xl overflow-hidden rounded-3xl border border-stone-200 bg-white p-6 text-center shadow-[0_24px_60px_rgba(77,0,44,0.10)] sm:p-9"
             >
-              <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046] absolute top-0 left-0 right-0" />
-              <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-50 border border-emerald-200 shadow-sm relative">
-                <MsuLogo size={52} />
-                <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-white shadow-md border-2 border-white">
-                  <CheckCircle2 className="h-4 w-4" />
-                </div>
+              <div className="absolute left-0 right-0 top-0 h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
+
+              <div className="mx-auto max-w-xl pt-2">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#9A6700]">
+                  Registration Status
+                </p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight text-[#4D002C] sm:text-3xl">
+                  Registration Request Submitted
+                </h2>
+                <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-stone-600">
+                  Your registration request for{" "}
+                  <strong className="font-bold text-stone-900">{registeredEmail}</strong>{" "}
+                  has been received by the {SYSTEM_NAME}. It is now awaiting verification and approval by the Procurement Management Office (PMO).
+                </p>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider mb-2">
-                <Sparkles className="h-3 w-3 text-emerald-600" />
-                Registration Received
-              </div>
-
-              <h2 className="text-2xl font-black text-[#4D002C] tracking-tight">
-                Account Successfully Created
-              </h2>
-
-              <p className="mt-2 text-sm text-stone-600 leading-relaxed max-w-md mx-auto">
-                An account for <strong className="text-stone-900 font-bold">{registeredEmail}</strong> has been registered in the {SYSTEM_NAME}.
-              </p>
-
-              {/* Approval status banner */}
-              <div className="mt-6 text-left rounded-2xl border border-amber-200 bg-amber-50/70 p-5">
+              <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-left sm:p-5">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-900 border border-amber-300/60">
-                    <Clock className="h-5 w-5 text-[#9A7205]" />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-amber-300/60 bg-amber-100 text-[#9A7205]">
+                    <Clock className="h-5 w-5" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <h3 className="text-xs font-black uppercase tracking-wider text-[#7B0046]">
-                      Pending Administrative Approval
+                      Pending PMO Verification
                     </h3>
-                    <p className="mt-1 text-xs text-amber-900/90 leading-relaxed">
-                      In accordance with university procurement guidelines, all end-user accounts must be verified and approved by the <strong>Procurement Management Office (PMO)</strong> before accessing the portal.
+                    <p className="mt-1 text-xs leading-relaxed text-amber-950">
+                      Your account is <strong>not active yet</strong>. The PMO must verify and approve your registration before you can access the portal or sign in.
                     </p>
-                    <p className="mt-2 text-[11px] font-semibold text-stone-500">
-                      • No further email verification link is needed.<br />
-                      • You will be able to sign in as soon as an administrator activates your profile.
-                    </p>
+                    <ul className="mt-3 space-y-1 text-[11px] font-medium leading-relaxed text-stone-600">
+                      <li>• No separate email verification link is required.</li>
+                      <li>• You may sign in after an administrator approves and activates your account.</li>
+                    </ul>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+              <div className="mt-6 flex justify-center">
                 <Link
                   href="/"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#7B0046] via-[#8E0052] to-[#4D002C] px-6 py-3 text-sm font-bold text-white shadow-md hover:shadow-lg transition-all border border-[#F5AB26]/40 hover:brightness-105"
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#7B0046] via-[#8E0052] to-[#4D002C] px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:brightness-105 hover:shadow-lg sm:w-auto"
                 >
-                  Return to Landing Page & Sign In <ArrowRight className="h-4 w-4 text-amber-300" />
-                </Link>
-                <Link
-                  href="/"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-stone-200 bg-stone-50 px-5 py-3 text-sm font-bold text-stone-700 hover:bg-stone-100 transition-all"
-                >
-                  Return to Home
+                  Return to Sign In <ArrowRight className="h-4 w-4 text-amber-300" />
                 </Link>
               </div>
             </motion.div>
