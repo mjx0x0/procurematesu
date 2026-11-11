@@ -7,6 +7,7 @@ const {
   extractPRIdentifier,
   isExplicitPRCreationRequest,
   isProcurementInformationQuestion,
+  isContextualFollowUp,
 } = require('../../lib/chat-intent.js');
 
 test('explicit natural-language preparation requests start PR slot filling', () => {
@@ -165,7 +166,7 @@ test('both chat entry points keep a completed PR draft in scope for valid revisi
   const legacyRoute = fs.readFileSync(path.join(__dirname, '../../app/api/chat/route.ts'), 'utf8');
   const sendRoute = fs.readFileSync(path.join(__dirname, '../../app/api/chat/send/route.ts'), 'utf8');
 
-  assert.match(legacyRoute, /activePRDraft: Boolean\(currentState\.drafting \|\| currentState\.draftReady\)/);
+  assert.match(legacyRoute, /activePRDraft: Boolean\(currentState\.drafting \|\| currentState\.draftReady \|\| isCompletedDraftEdit\)/);
   assert.match(sendRoute, /activePRDraft: Boolean\(draftState\.drafting \|\| draftState\.draftReady\)/);
   assert.match(legacyRoute, /chatIntent === 'clarify_pr_intent'/);
   assert.match(sendRoute, /messageIntent === 'clarify_pr_intent'/);
