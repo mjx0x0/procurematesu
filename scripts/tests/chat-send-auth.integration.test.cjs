@@ -28,6 +28,15 @@ const sessions = new Map([
   ['session-user-a', { id: 'session-user-a', user_id: 'user-a', is_active: true, state: {} }],
   ['session-user-b', { id: 'session-user-b', user_id: 'user-b', is_active: true, state: {} }],
   ['session-inactive', { id: 'session-inactive', user_id: 'user-inactive', is_active: true, state: {} }],
+  ['session-context-follow-up', { id: 'session-context-follow-up', user_id: 'user-a', is_active: true, state: {} }],
+  ['session-ppmp-basic-question', { id: 'session-ppmp-basic-question', user_id: 'user-a', is_active: true, state: {} }],
+  ['session-reference-links', { id: 'session-reference-links', user_id: 'user-a', is_active: true, state: {} }],
+  ['session-natural-language-create', {
+    id: 'session-natural-language-create',
+    user_id: 'user-a',
+    is_active: true,
+    state: {},
+  }],
   ['session-completed-draft', {
     id: 'session-completed-draft',
     user_id: 'user-a',
@@ -54,7 +63,12 @@ const sessions = new Map([
     },
   }],
 ]);
-const storedMessages = [];
+const storedMessages = [
+  { session_id: 'session-context-follow-up', sender: 'user', content: 'What is PPMP?' },
+  { session_id: 'session-context-follow-up', sender: 'ai', content: "PPMP means Project Procurement Management Plan. It is the end-user unit's plan of procurement needs." },
+  { session_id: 'session-reference-links', sender: 'user', content: 'Is PPMP different from PR?' },
+  { session_id: 'session-reference-links', sender: 'ai', content: 'The PR is verified against PPMP/APP. References • PMO Administrative Manual, IV. PROCESS FLOW (PDF page 12).' },
+];
 const storedInquiries = [];
 const purchaseRequests = [
   {
@@ -138,6 +152,26 @@ async function handleMockSupabase(request, response) {
     }
     response.statusCode = 204;
     return response.end();
+  }
+
+  if (url.pathname === '/rest/v1/document_chunks' && request.method === 'GET') {
+    return sendJSON(response, 200, [{
+      id: 'manual-chunk-12',
+      document_name: 'PMO Administrative Manual',
+      document_type: 'pmo_manual',
+      chunk_text: 'IV. PROCESS FLOW. The Procurement Office verifies Purchase Requests against the PPMP/APP.',
+      metadata: {
+        section: 'IV. PROCESS FLOW',
+        pdf_page: 12,
+        source_url: 'https://files.example.test/pmo-administrative-manual.pdf',
+      },
+    }]);
+  }
+
+  if (url.pathname === '/rest/v1/chat_messages' && request.method === 'GET') {
+    const sessionId = eqValue(url, 'session_id');
+    const rows = storedMessages.filter((message) => !sessionId || message.session_id === sessionId);
+    return sendJSON(response, 200, rows);
   }
 
   if (url.pathname === '/rest/v1/chat_messages' && request.method === 'POST') {
@@ -299,6 +333,52 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.match(result.payload.response, /Draft — awaiting printed-form receipt/i);
     });
 
+
+
+
+
+    await t.test('a request for previously cited reference links returns verified clickable URLs', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-reference-links',
+        message: 'can you give links to the references',
+      });
+
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /\[PMO Administrative Manual\]\(https:\/\/files\.example\.test\/pmo-administrative-manual\.pdf\)/);
+      assert.match(result.payload.response, /IV\. PROCESS FLOW/);
+      assert.match(result.payload.response, /PDF page 12/);
+      assert.doesNotMatch(result.payload.response, /Please ask a procurement-related question/i);
+    });
+
+    await t.test('a basic PPMP definition question is answered instead of rejected by the domain guard', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-ppmp-basic-question',
+        message: 'what is PPMP',
+      });
+
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /Project Procurement Management Plan/i);
+      assert.match(result.payload.response, /planning document/i);
+      assert.match(result.payload.response, /Purchase Request|\bPR\b/i);
+      assert.doesNotMatch(result.payload.response, /Please ask a procurement-related question/i);
+    });
+
+    await t.test('contextual follow-up compares PPMP with PR instead of changing to RFQ/SVP', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-context-follow-up',
+        message: 'Is it different from the PR?',
+      });
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /PPMP/i);
+      assert.match(result.payload.response, /Purchase Request|\bPR\b/i);
+      assert.match(result.payload.response, /planning document|broader plan/i);
+      assert.match(result.payload.response, /specific purchase|individual request/i);
+      assert.doesNotMatch(result.payload.response, /RFQ|Small Value Procurement|SVP/i);
+    });
+
     await t.test('an authenticated active user can start a PR draft and persist the chat turn', async () => {
       const beforeMessages = storedMessages.length;
       const beforeInquiries = storedInquiries.length;
@@ -320,6 +400,39 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.deepEqual(storedMessages.slice(-2).map((message) => message.sender), ['user', 'ai']);
       assert.equal(storedInquiries.length - beforeInquiries, 1);
       assert.equal(storedInquiries.at(-1).user_id, 'user-a');
+    });
+
+    await t.test('natural-language request to prepare a PR starts slot filling and retains supplied microscope details', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-natural-language-create',
+        message: 'Help me prepare a Purchase Request for 30 laboratory microscopes with an estimated unit cost of ₱8,500.',
+      });
+
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /purpose of this procurement/i);
+      assert.match(result.payload.response, /captured 1 item/i);
+      assert.equal(result.payload.state.drafting, true);
+      assert.equal(result.payload.state.step, 'purpose');
+      const extracted = result.payload.state.collected.extracted;
+      assert.equal(extracted.items.length, 1);
+      assert.equal(extracted.items[0].item_description, 'laboratory microscopes');
+      assert.equal(extracted.items[0].quantity, 30);
+      assert.equal(extracted.items[0].unit, 'units');
+      assert.equal(extracted.items[0].unit_cost, 8500);
+      assert.equal(extracted.items[0].total_cost, 255000);
+      assert.equal(extracted.total_amount, 255000);
+
+      const purposeReply = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-natural-language-create',
+        message: 'To support practical Biology and Chemistry laboratory classes.',
+      });
+      assert.equal(purposeReply.status, 200, JSON.stringify(purposeReply.payload));
+      assert.match(purposeReply.payload.response, /department, college, or office/i);
+      assert.equal(purposeReply.payload.state.collected.extracted.items[0].quantity, 30);
+      assert.equal(purposeReply.payload.state.collected.extracted.items[0].unit_cost, 8500);
+      assert.equal(purposeReply.payload.state.collected.extracted.total_amount, 255000);
     });
 
     await t.test('a completed draft accepts a quantity correction and a new item, then regenerates the final summary', async () => {

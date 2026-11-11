@@ -57,3 +57,34 @@ test('inline emphasis is limited to short leading labels', () => {
     'A broken bold marker should not make the rest bold'
   );
 });
+
+test('source markers from individual paragraphs are consolidated in one references section', () => {
+  const response = normalizeAssistantResponse([
+    '**Life-cycle Assessment:** Entities should use transparent methodologies. 【Source: IRR RA 12009 – Section 13, p. 24】.',
+    '',
+    '•',
+    '',
+    '**Competitive Dialogue:** The BAC evaluates initial proposals before dialogue. 【Source: IRR RA 12009 – Section 29.4, p. 44】.',
+  ].join('\n'));
+
+  const referenceIndex = response.indexOf('**References**');
+  assert.ok(referenceIndex > 0, response);
+  const answerBody = response.slice(0, referenceIndex);
+  const referenceFooter = response.slice(referenceIndex);
+
+  assert.match(answerBody, /Life-cycle Assessment/);
+  assert.match(answerBody, /Competitive Dialogue/);
+  assert.doesNotMatch(answerBody, /【Source:|\[Source:/);
+  assert.doesNotMatch(response, /^\s*•\s*$/m);
+  assert.match(referenceFooter, /Section 13, p\. 24/);
+  assert.match(referenceFooter, /Section 29\.4, p\. 44/);
+  assert.ok(response.endsWith('Section 29.4, p. 44'), response);
+});
+
+test('duplicate source markers are listed only once at the end', () => {
+  const response = normalizeAssistantResponse(
+    'First claim 【Source: IRR RA 12009 – Section 13】. Second claim 【Source: IRR RA 12009 – Section 13】.'
+  );
+  assert.equal((response.match(/Section 13/g) || []).length, 1);
+  assert.ok(response.indexOf('**References**') > response.indexOf('Second claim'));
+});

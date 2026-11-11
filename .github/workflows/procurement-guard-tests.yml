@@ -4,6 +4,14 @@ on:
   push:
     branches: [master]
     paths:
+      - "lib/chat-intent.js"
+      - "lib/chat-conversation-context.js"
+      - "lib/chat-source-references.js"
+      - "lib/procurement-definitions.js"
+      - "scripts/tests/chat-intent.test.cjs"
+      - "scripts/tests/chat-conversation-context.test.cjs"
+      - "scripts/tests/chat-source-references.test.cjs"
+      - "scripts/tests/procurement-definitions.test.cjs"
       - "lib/procurement-answer-guards.js"
       - "lib/procurement-office-location.js"
       - "lib/procurement-answer-guards.d.ts"
@@ -50,6 +58,14 @@ on:
   pull_request:
     branches: [master]
     paths:
+      - "lib/chat-intent.js"
+      - "lib/chat-conversation-context.js"
+      - "lib/chat-source-references.js"
+      - "lib/procurement-definitions.js"
+      - "scripts/tests/chat-intent.test.cjs"
+      - "scripts/tests/chat-conversation-context.test.cjs"
+      - "scripts/tests/chat-source-references.test.cjs"
+      - "scripts/tests/procurement-definitions.test.cjs"
       - "lib/procurement-answer-guards.js"
       - "lib/procurement-answer-guards.d.ts"
       - "lib/procurement-scope-guard.js"
@@ -104,4 +120,4 @@ jobs:
         with:
           node-version: "20"
       - name: Run procurement answer guard regression tests
-        run: node --test scripts/tests/pr-draft-handoff.test.cjs scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs scripts/tests/procurement-scope-guard.test.cjs scripts/tests/chat-response-format.test.cjs scripts/tests/system-branding.test.cjs
+        run: node --test scripts/tests/chat-source-references.test.cjs scripts/tests/procurement-definitions.test.cjs scripts/tests/chat-conversation-context.test.cjs scripts/tests/chat-intent.test.cjs scripts/tests/pr-draft-handoff.test.cjs scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs scripts/tests/procurement-scope-guard.test.cjs scripts/tests/chat-response-format.test.cjs scripts/tests/system-branding.test.cjs

@@ -721,3 +721,33 @@ test('printable PR omits the office footer and places a small System Tracking Co
   assert.ok(trackingLabel > signatureSection, 'The tracking control should appear after the signature section.');
   assert.ok(formBoundary > trackingLabel, 'The tracking control should remain inside the form border.');
 });
+
+
+test('price-only item replies do not become fake quantities', () => {
+  const noQuantity = parsePRItems('laboratory glassware at ₱150 each');
+  assert.equal(noQuantity.length, 1);
+  assert.equal(noQuantity[0].item_description, 'laboratory glassware');
+  assert.equal(noQuantity[0].quantity, 0);
+  assert.equal(noQuantity[0].unit, '');
+  assert.equal(noQuantity[0].unit_cost, 150);
+
+  const priceOnly = parsePRItems('150 pesos each');
+  assert.equal(priceOnly.length, 1);
+  assert.equal(priceOnly[0].item_description, '');
+  assert.equal(priceOnly[0].quantity, 0);
+  assert.equal(priceOnly[0].unit, '');
+  assert.equal(priceOnly[0].unit_cost, 150);
+});
+
+test('price-only replies complete the unit-cost field of one incomplete item', () => {
+  const existing = [
+    { item_description: 'laboratory glassware', quantity: 50, unit: 'pcs', unit_cost: 0, total_cost: 0 },
+  ];
+  const result = applyPRItemMessage(existing, '150 pesos each');
+  assert.equal(result.action, 'updated');
+  assert.equal(result.items.length, 1);
+  assert.equal(result.items[0].item_description, 'laboratory glassware');
+  assert.equal(result.items[0].quantity, 50);
+  assert.equal(result.items[0].unit_cost, 150);
+  assert.equal(result.items[0].total_cost, 7500);
+});
