@@ -29,6 +29,7 @@ const sessions = new Map([
   ['session-user-b', { id: 'session-user-b', user_id: 'user-b', is_active: true, state: {} }],
   ['session-inactive', { id: 'session-inactive', user_id: 'user-inactive', is_active: true, state: {} }],
   ['session-context-follow-up', { id: 'session-context-follow-up', user_id: 'user-a', is_active: true, state: {} }],
+  ['session-ppmp-basic-question', { id: 'session-ppmp-basic-question', user_id: 'user-a', is_active: true, state: {} }],
   ['session-natural-language-create', {
     id: 'session-natural-language-create',
     user_id: 'user-a',
@@ -313,6 +314,22 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.equal(result.status, 200, JSON.stringify(result.payload));
       assert.match(result.payload.response, /Purchase Request Tracking: PR-2026-0002/i);
       assert.match(result.payload.response, /Draft — awaiting printed-form receipt/i);
+    });
+
+
+
+    await t.test('a basic PPMP definition question is answered instead of rejected by the domain guard', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-ppmp-basic-question',
+        message: 'what is PPMP',
+      });
+
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /Project Procurement Management Plan/i);
+      assert.match(result.payload.response, /planning document/i);
+      assert.match(result.payload.response, /Purchase Request|\bPR\b/i);
+      assert.doesNotMatch(result.payload.response, /Please ask a procurement-related question/i);
     });
 
     await t.test('contextual follow-up compares PPMP with PR instead of changing to RFQ/SVP', async () => {
