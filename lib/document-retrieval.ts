@@ -327,7 +327,14 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
 
       for (const result of results) {
         for (const doc of result?.data || []) {
-          const text = String(doc.chunk_text || '').trim();
+          // Suppress a known broken GPPB PDF URL from retrieved text without
+          // modifying the ingested knowledge-base record.
+          const text = String(doc.chunk_text || '')
+            .replaceAll(
+              'https://www.gppb.gov.ph/wp-content/uploads/2026/06/ApprovedGPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf',
+              '[direct public link unavailable — do not link]'
+            )
+            .trim();
           if (!text) continue;
 
           const metadata =
