@@ -10,8 +10,8 @@ import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
 import { normalizeAssistantResponse } from '@/lib/chat-response-format';
 import { createPRDraftHandoffPayload, encodePRDraftHandoff } from '@/lib/pr-draft-handoff';
-import { classifyProcurementIntent, extractPRIdentifier, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
-import { buildContextualProcurementQuery, isGeneralConceptualFollowUp, buildOfflineConceptualFollowUpAnswer } from '@/lib/chat-conversation-context';
+import { classifyProcurementIntent, extractPRIdentifier, isContextualFollowUp, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
+import { buildContextualProcurementQuery, hasRecentProcurementContext, isGeneralConceptualFollowUp, buildOfflineConceptualFollowUpAnswer } from '@/lib/chat-conversation-context';
 
 // ============================================================
 // CONFIGURATION & DATABASE FALLBACKS
@@ -833,13 +833,17 @@ export async function POST(req: NextRequest) {
       !currentState.drafting &&
       hasCompletePRDetails(currentState.collected?.extracted) &&
       isPRDraftRevisionMessage(trimmedMsg);
+    const recentProcurementContext =
+      hasRecentProcurementContext(conversationContext) && isContextualFollowUp(trimmedMsg);
     const scopeDecision = getProcurementScopeDecision(trimmedMsg, {
       activePRDraft: Boolean(currentState.drafting || currentState.draftReady || isCompletedDraftEdit),
+      recentProcurementContext,
     });
     const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg);
     const chatIntent = classifyProcurementIntent(trimmedMsg, {
       activeDraft: Boolean(currentState.drafting),
       draftReady: Boolean(currentState.draftReady || isCompletedDraftEdit),
+      recentProcurementContext,
     });
     if (!scopeDecision.allowed) {
       // Refuse unrelated and security-sensitive requests before retrieval or any
