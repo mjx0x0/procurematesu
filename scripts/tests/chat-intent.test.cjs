@@ -205,3 +205,10 @@ test('contextual follow-up detection does not treat a complete new question as a
   assert.equal(isContextualFollowUp('What is PPMP?'), false);
   assert.equal(isContextualFollowUp('Help me prepare a Purchase Request.'), false);
 });
+
+test('plain-language PPMP definition questions are classified as procurement questions', () => {
+  for (const message of ['what is PPMP', 'What is the PPMP?', "What's PPMP?", 'What does PPMP stand for?']) {
+    assert.equal(isProcurementInformationQuestion(message), true, message);
+    assert.equal(classifyProcurementIntent(message), 'procurement_question', message);
+  }
+});
