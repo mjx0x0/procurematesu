@@ -849,6 +849,7 @@ export async function POST(req: NextRequest) {
       draftReady: Boolean(currentState.draftReady || isCompletedDraftEdit),
       recentProcurementContext,
     });
+    const commonDefinitionAnswer = buildCommonProcurementDefinitionAnswer(trimmedMsg);
     if (!scopeDecision.allowed) {
       // Refuse unrelated and security-sensitive requests before retrieval or any
       // model provider is called. Keep an active PR draft intact for the next valid reply.
@@ -862,6 +863,13 @@ export async function POST(req: NextRequest) {
       updatedState = { ...currentState };
     } else if (chatIntent === 'clarify_pr_intent') {
       responseText = PR_INTENT_CLARIFICATION_RESPONSE;
+      inquiryType = 'procurement_guidance';
+      updatedState = { ...currentState };
+    } else if (commonDefinitionAnswer) {
+      // Common acronym definitions should not depend on an LLM provider or a
+      // document retrieval hit. This branch is limited to the exact PPMP
+      // definition phrasings recognized by the deterministic helper.
+      responseText = commonDefinitionAnswer;
       inquiryType = 'procurement_guidance';
       updatedState = { ...currentState };
     } else if (deterministicPolicyQuestion) {
