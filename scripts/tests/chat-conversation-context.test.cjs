@@ -48,3 +48,14 @@ test('formatted context is bounded and excludes unknown message roles', () => {
   assert.ok(context.length <= 1000);
   assert.doesNotMatch(context, /system/);
 });
+
+test('source-link requests inherit the cited procurement topic for retrieval', () => {
+  const context = formatRecentConversationContext([
+    ...ppmpConversation,
+    { sender: 'ai', content: 'References • PMO Administrative Manual, IV. PROCESS FLOW (PDF page 12).' },
+  ]);
+  const query = buildContextualProcurementQuery('can you give links to the references', context);
+  assert.match(query, /PMO Administrative Manual/);
+  assert.match(query, /Project Procurement Management Plan/);
+  assert.match(query, /can you give links to the references/i);
+});
