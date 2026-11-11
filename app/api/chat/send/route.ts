@@ -112,12 +112,15 @@ export async function POST(request: NextRequest) {
     // A completed draft remains editable in its existing chat session.
     // Reopen only for explicit item corrections or parseable item additions;
     // all other messages continue through the normal procurement scope path.
+    // Some older completed chat sessions do not store a draftReady flag.
+    // Recognize completed drafts from saved, validated PR details plus an explicit item edit.
+    const isCompletedDraftEdit = isCompletedPRDraftEdit(draftState, message);
     let messageIntent = classifyProcurementIntent(message, {
       activeDraft: Boolean(draftState.drafting),
-      draftReady: Boolean(draftState.draftReady),
+      draftReady: Boolean(draftState.draftReady || isCompletedDraftEdit),
     });
 
-    if (messageIntent === 'draft_revision' && isCompletedPRDraftEdit(draftState, message)) {
+    if (messageIntent === 'draft_revision' && isCompletedDraftEdit) {
       draftState = { ...draftState, drafting: true, step: 'items' };
       const { error: reopenError } = await clientToUse
         .from('chat_sessions')

@@ -826,12 +826,16 @@ export async function POST(req: NextRequest) {
     // prevents long legal prompts containing words like "supplier", "price",
     // "budget", or "section" from being mistaken for PR draft-field answers.
     const scopeDecision = getProcurementScopeDecision(trimmedMsg, {
-      activePRDraft: Boolean(currentState.drafting || currentState.draftReady),
+      activePRDraft: Boolean(currentState.drafting || currentState.draftReady || isCompletedDraftEdit),
     });
     const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg);
+    const isCompletedDraftEdit =
+      !currentState.drafting &&
+      hasCompletePRDetails(currentState.collected?.extracted) &&
+      isPRDraftRevisionMessage(trimmedMsg);
     const chatIntent = classifyProcurementIntent(trimmedMsg, {
       activeDraft: Boolean(currentState.drafting),
-      draftReady: Boolean(currentState.draftReady),
+      draftReady: Boolean(currentState.draftReady || isCompletedDraftEdit),
     });
     if (!scopeDecision.allowed) {
       // Refuse unrelated and security-sensitive requests before retrieval or any
@@ -862,11 +866,14 @@ export async function POST(req: NextRequest) {
       // so the user can resume after receiving the information.
       updatedState = { ...currentState };
     } else if (
-      (currentState.drafting || (currentState.draftReady && isPRDraftRevisionMessage(trimmedMsg))) &&
-      !['create_pr_draft', 'procurement_question', 'track_pr', 'list_prs'].includes(chatIntent)
+      (currentState.drafting || isCompletedDraftEdit || (currentState.draftReady && isPRDraftRevisionMessage(trimmedMsg))) &&
+      !['create_pr_draft', 'procurement_question', 'track_pr', 'list_prs', 'clarify_pr_intent'].includes(chatIntent)
     ) {
       inquiryType = 'draft_pr';
-      const result = await handleDraftPRFlow(trimmedMsg, currentState);
+      const stateForDraft = isCompletedDraftEdit
+        ? { ...currentState, draftReady: true }
+        : currentState;
+      const result = await handleDraftPRFlow(trimmedMsg, stateForDraft);
       responseText = result.response;
       updatedState = result.newState;
     } else {

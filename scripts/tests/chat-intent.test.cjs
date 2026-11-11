@@ -170,3 +170,24 @@ test('both chat entry points keep a completed PR draft in scope for valid revisi
   assert.match(legacyRoute, /chatIntent === 'clarify_pr_intent'/);
   assert.match(sendRoute, /messageIntent === 'clarify_pr_intent'/);
 });
+
+
+test('completed draft corrections remain detectable for legacy sessions without a draftReady flag', () => {
+  const { isCompletedPRDraftEdit } = require('../../lib/pr-draft-extraction.js');
+  const legacyCompletedState = {
+    drafting: false,
+    step: null,
+    collected: {
+      purpose: 'Procurement of laboratory glassware for Chemistry classes',
+      department: 'College of Education (CED)',
+      extracted: {
+        purpose: 'Procurement of laboratory glassware for Chemistry classes',
+        department: 'College of Education (CED)',
+        items: [{ item_description: 'laboratory glassware', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 }],
+        total_amount: 7500,
+      },
+    },
+  };
+  assert.equal(Object.prototype.hasOwnProperty.call(legacyCompletedState, 'draftReady'), false);
+  assert.equal(isCompletedPRDraftEdit(legacyCompletedState, 'Change the quantity from 50 pcs to 60 pcs.'), true);
+});
