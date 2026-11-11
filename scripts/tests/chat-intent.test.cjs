@@ -80,3 +80,26 @@ test('natural microscope request extracts quantity and explicit unit cost withou
   assert.equal(extracted.items[0].total_cost, 255000);
   assert.equal(extracted.total_amount, 255000);
 });
+
+
+test('natural microscope request treats item data as item data, not purpose', () => {
+  const { extractPRDetailsRuleBased } = require('../../lib/pr-draft-extraction.js');
+  const priced = extractPRDetailsRuleBased(
+    'Help me prepare a Purchase Request for 30 laboratory microscopes with an estimated unit cost of ₱8,500.'
+  );
+  assert.equal(priced.purpose, null);
+  assert.equal(priced.items.length, 1);
+  assert.equal(priced.items[0].item_description, 'laboratory microscopes');
+  assert.equal(priced.items[0].quantity, 30);
+  assert.equal(priced.items[0].unit, 'units');
+  assert.equal(priced.items[0].unit_cost, 8500);
+  assert.equal(priced.items[0].total_cost, 255000);
+  assert.equal(priced.total_amount, 255000);
+
+  const unpriced = extractPRDetailsRuleBased('Help me prepare a Purchase Request for 30 laboratory microscopes.');
+  assert.equal(unpriced.purpose, null);
+  assert.equal(unpriced.items.length, 1);
+  assert.equal(unpriced.items[0].quantity, 30);
+  assert.equal(unpriced.items[0].unit_cost, 0);
+  assert.equal(unpriced.items[0].total_cost, 0);
+});

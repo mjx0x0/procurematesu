@@ -398,7 +398,8 @@ async function handleDraftPRFlow(
   if (!state.drafting && !(state.draftReady && isPRDraftRevisionMessage(message))) {
     const hasPotentialItemDetails = /\b\d+\s*(?:pcs?|pieces?|units?|sets?|boxes?|reams?|packs?|rolls?|pairs?|bottles?|kits?)\b/i.test(message)
       || /(?:₱|PHP|Php)\s*\d/i.test(message)
-      || /\b(?:at|each|per\s+unit)\s*\d/i.test(message);
+      || /\b(?:at|each|per\s+unit)\s*\d/i.test(message)
+      || /\b\d+\s+[a-z][a-z0-9&/-]*(?:\s+[a-z][a-z0-9&/-]*){0,5}\b/i.test(message);
 
     if (hasPotentialItemDetails) {
       const extracted = await extractPRDetails(message);

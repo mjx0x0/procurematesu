@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
-import { isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
 import { buildProcurementOfficeLocationResponse } from '@/lib/procurement-office-location';
 import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
 import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-extraction';
