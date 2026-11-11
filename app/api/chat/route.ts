@@ -868,8 +868,6 @@ export async function POST(req: NextRequest) {
     } else {
       // Normalize all unicode hyphens (non-breaking \u2011, en-dash \u2013, em-dash \u2014, etc.) to standard ASCII '-'
       const normalizedMsg = trimmedMsg.replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-');
-      const lower = normalizedMsg.toLowerCase();
-
       // Shared deterministic intent routing avoids treating informational
       // questions as PR slot answers and recognizes natural-language create requests.
       const isDraftIntent = chatIntent === 'create_pr_draft';
@@ -884,7 +882,7 @@ export async function POST(req: NextRequest) {
         updatedState = result.newState;
       } else if (isTrackIntent && prMatch) {
         inquiryType = 'track_pr';
-        const formattedPR = normalizePrNumber(prMatch[1]);
+        const formattedPR = normalizePrNumber(prMatch);
         responseText = await handleTrackPR(formattedPR, userId, isAdmin);
       } else if (isListMyPRsIntent) {
         inquiryType = 'track_pr';

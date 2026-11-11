@@ -41,6 +41,7 @@ test('informational questions about PR preparation remain in procurement Q&A', (
 
 test('active draft field replies and completed-draft revisions remain distinct', () => {
   assert.equal(classifyProcurementIntent('College of Education (CED)', { activeDraft: true }), 'draft_continuation');
+  assert.equal(classifyProcurementIntent('What are the PR requirements under RA 12009?', { activeDraft: true }), 'procurement_question');
   assert.equal(classifyProcurementIntent('30 pcs laboratory glassware at ₱150 each', { activeDraft: true }), 'draft_continuation');
   assert.equal(classifyProcurementIntent('Change item 1 quantity to 60 pcs', { draftReady: true }), 'draft_revision');
 });
