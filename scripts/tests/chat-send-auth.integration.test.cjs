@@ -28,6 +28,12 @@ const sessions = new Map([
   ['session-user-a', { id: 'session-user-a', user_id: 'user-a', is_active: true, state: {} }],
   ['session-user-b', { id: 'session-user-b', user_id: 'user-b', is_active: true, state: {} }],
   ['session-inactive', { id: 'session-inactive', user_id: 'user-inactive', is_active: true, state: {} }],
+  ['session-natural-language-create', {
+    id: 'session-natural-language-create',
+    user_id: 'user-a',
+    is_active: true,
+    state: {},
+  }],
   ['session-completed-draft', {
     id: 'session-completed-draft',
     user_id: 'user-a',
@@ -320,6 +326,39 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.deepEqual(storedMessages.slice(-2).map((message) => message.sender), ['user', 'ai']);
       assert.equal(storedInquiries.length - beforeInquiries, 1);
       assert.equal(storedInquiries.at(-1).user_id, 'user-a');
+    });
+
+    await t.test('natural-language request to prepare a PR starts slot filling and retains supplied microscope details', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-natural-language-create',
+        message: 'Help me prepare a Purchase Request for 30 laboratory microscopes with an estimated unit cost of ₱8,500.',
+      });
+
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /purpose of this procurement/i);
+      assert.match(result.payload.response, /captured 1 item/i);
+      assert.equal(result.payload.state.drafting, true);
+      assert.equal(result.payload.state.step, 'purpose');
+      const extracted = result.payload.state.collected.extracted;
+      assert.equal(extracted.items.length, 1);
+      assert.equal(extracted.items[0].item_description, 'laboratory microscopes');
+      assert.equal(extracted.items[0].quantity, 30);
+      assert.equal(extracted.items[0].unit, 'units');
+      assert.equal(extracted.items[0].unit_cost, 8500);
+      assert.equal(extracted.items[0].total_cost, 255000);
+      assert.equal(extracted.total_amount, 255000);
+
+      const purposeReply = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-natural-language-create',
+        message: 'To support practical Biology and Chemistry laboratory classes.',
+      });
+      assert.equal(purposeReply.status, 200, JSON.stringify(purposeReply.payload));
+      assert.match(purposeReply.payload.response, /department, college, or office/i);
+      assert.equal(purposeReply.payload.state.collected.extracted.items[0].quantity, 30);
+      assert.equal(purposeReply.payload.state.collected.extracted.items[0].unit_cost, 8500);
+      assert.equal(purposeReply.payload.state.collected.extracted.total_amount, 255000);
     });
 
     await t.test('a completed draft accepts a quantity correction and a new item, then regenerates the final summary', async () => {

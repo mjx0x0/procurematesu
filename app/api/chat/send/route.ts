@@ -6,10 +6,9 @@ import { isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answ
 import { buildProcurementOfficeLocationResponse } from '@/lib/procurement-office-location';
 import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
 import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-extraction';
+import { classifyProcurementIntent } from '@/lib/chat-intent';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
 
-const NEW_TOPIC_PATTERN = /\b(what is|what are|how does|how do|explain|tell me about|where is|where can|when is|who is|contact|ra\s*12009|ra\s*9184|small value|svp|bidding|procurement flow|procurement office|new purchase request|draft (?:a )?pr|create (?:a )?pr|track my pr|show me my pr)\b/i;
-const DRAFT_CONTINUATION_PATTERN = /\b(purpose|department|office|section|item|items|quantity|unit|price|cost|budget|supplier|description|yes|no|correct|continue|next)\b/i;
 // Treat both standalone cancellation commands ("cancel", "stop") and natural phrases
 // ("cancel drafting", "stop the PR", "never mind") as explicit draft cancellation.
 const STOP_DRAFTING_PATTERN = /^(?:stop|cancel|quit|exit|abort|end|never\s*mind|nevermind)\s*[.!?]*$|^(?:stop|cancel|quit|exit|abort|end)\s+(?:the\s+)?(?:draft|drafting|pr|purchase\s+request|form)\s*[.!?]*$|\b(?:stop|cancel|quit|exit|abort|end|cancel\s+that|don't\s+continue|do\s+not\s+continue)\b.{0,50}\b(?:draft|drafting|pr|purchase\s+request|form)\b|\b(?:never\s*mind|nevermind|forget\s+it|i(?:'|’)\s*(?:don't|do not)\s+(?:want|need)\s+to\s+continue)\b/i;
@@ -23,10 +22,9 @@ const OFFICE_INFO_PATTERN = /\b(?:where(?:'s| is| can I find)|location|address|c
 const NEXT_PATTERN = /\b(what|where|which|how)\s+(happens?|comes?|is)\s+next\b|\bwhat'?s\s+next\b|\bnext\s+(step|stage)\b|\bwhat\s+do\s+i\s+do\s+next\b/i;
 
 function shouldResetDrafting(message: string) {
-  if (STOP_DRAFTING_PATTERN.test(message)) return true;
-  if (OFFICE_INFO_PATTERN.test(message)) return true;
-  if (PROCUREMENT_FLOW_PATTERN.test(message)) return true;
-  return NEW_TOPIC_PATTERN.test(message) && !DRAFT_CONTINUATION_PATTERN.test(message);
+  // Only an explicit request for another PR starts a fresh draft. Information
+  // questions, tracking requests, and workflow questions preserve saved state.
+  return classifyProcurementIntent(message) === 'create_pr_draft';
 }
 
 function extractCurrentUserMessage(message: string): string { const marker = /(?:^|\n)Current user message:\s*/i; const match = message.match(marker); if (!match || match.index === undefined) return message.trim(); return message.slice(match.index + match[0].length).trim(); }
@@ -100,7 +98,7 @@ export async function POST(request: NextRequest) {
     if (sessionError || !session) return NextResponse.json({ error: 'Chat session not found.' }, { status: 404 });
     if (session.is_active === false) return NextResponse.json({ error: 'This conversation is closed. Start a new chat.' }, { status: 409 });
 
-    let draftState = (session.state || {}) as { drafting?: boolean; step?: string | null; collected?: any; cancelledAt?: string };
+    let draftState = (session.state || {}) as { drafting?: boolean; draftReady?: boolean; step?: string | null; collected?: any; cancelledAt?: string };
 
     // Handle stale cancellation state before any PR slot logic.
     if (draftState.cancelledAt) {
@@ -115,7 +113,12 @@ export async function POST(request: NextRequest) {
     // A completed draft remains editable in its existing chat session.
     // Reopen only for explicit item corrections or parseable item additions;
     // all other messages continue through the normal procurement scope path.
-    if (isCompletedPRDraftEdit(draftState, message)) {
+    let messageIntent = classifyProcurementIntent(message, {
+      activeDraft: Boolean(draftState.drafting),
+      draftReady: Boolean(draftState.draftReady),
+    });
+
+    if (messageIntent === 'draft_revision' && isCompletedPRDraftEdit(draftState, message)) {
       draftState = { ...draftState, drafting: true, step: 'items' };
       const { error: reopenError } = await clientToUse
         .from('chat_sessions')
@@ -153,27 +156,30 @@ export async function POST(request: NextRequest) {
     }
 
     if (draftState.drafting) {
-      // Stop and new-topic commands must be handled BEFORE slot validation.
-      // Otherwise a question such as "What is RA 12009?" can be mistaken for
-      // the current PR field and recorded as the purpose.
+      // Cancellation is explicit. New PR commands reset the current draft;
+      // information questions and tracking requests keep it available to resume.
       if (STOP_DRAFTING_PATTERN.test(message.trim())) {
         await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
-        return NextResponse.json({ response: '🛑 **PR drafting stopped.**\n\nI did not create or submit a Purchase Request. Your draft has been cancelled.\n\nWhenever you are ready, you can say **"Help me draft a PR"** to start again.', sources: ['PR drafting session'] });
+        return NextResponse.json({ response: '🛑 **PR drafting stopped.**\n\nI did not create or submit a Purchase Request. Your draft has been cancelled.\n\nWhenever you are ready, you can say **"Help me prepare a Purchase Request"** to start again.', sources: ['PR drafting session'] });
       }
 
-      if (isDeterministicProcurementPolicyQuestion(message.trim())) {
-        // Official policy questions are new topics, not PR slot values. Clear
-        // the active draft so the delegated route can run the source-gated answer.
-        await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
-        draftState = {};
-      } else if (shouldResetDrafting(message)) {
+      if (shouldResetDrafting(message)) {
         await clientToUse.from('chat_sessions').update({ state: {}, updated_at: new Date().toISOString() }).eq('id', sessionId).eq('user_id', user.id);
         draftState = {};
       }
     }
 
+    messageIntent = classifyProcurementIntent(message, {
+      activeDraft: Boolean(draftState.drafting),
+      draftReady: Boolean(draftState.draftReady),
+    });
+
     // Only validate a slot when the current message is still part of an active draft.
-    if (draftState.drafting && draftState.step) {
+    if (
+      draftState.drafting &&
+      draftState.step &&
+      !['procurement_question', 'track_pr', 'list_prs'].includes(messageIntent)
+    ) {
       const validation = validateSlotAnswer(draftState.step, message);
       if (!validation.valid) {
         const prompts: Record<string, string> = {

@@ -10,6 +10,7 @@ import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
 import { normalizeAssistantResponse } from '@/lib/chat-response-format';
 import { createPRDraftHandoffPayload, encodePRDraftHandoff } from '@/lib/pr-draft-handoff';
+import { classifyProcurementIntent, extractPRIdentifier } from '@/lib/chat-intent';
 
 // ============================================================
 // CONFIGURATION & DATABASE FALLBACKS
@@ -408,6 +409,16 @@ async function handleDraftPRFlow(
       if (hasAnyDraftDetails) {
         newState.drafting = true;
         newState.collected = { purpose: extracted.purpose || '', department: extracted.department || undefined, extracted };
+        if (!extracted.purpose) {
+          newState.step = 'purpose';
+          const capturedItems = extracted.items.length
+            ? ' I also captured ' + extracted.items.length + ' item(s), including the quantities and prices you provided.'
+            : '';
+          return {
+            response: '✅ I captured the item details you provided.' + capturedItems + ' First, what is the **purpose of this procurement**? After that, I will ask for the requesting department and any remaining item details.',
+            newState,
+          };
+        }
         if (!extracted.department) {
           newState.step = 'department';
           return {
@@ -444,8 +455,20 @@ async function handleDraftPRFlow(
 
   switch (step) {
     case 'purpose': {
-      const extracted = await extractPRDetails(message);
-      collected.purpose = extracted.purpose || message.trim();
+      const parsed = await extractPRDetails(message);
+      const previouslyCollected = collected.extracted && typeof collected.extracted === 'object'
+        ? collected.extracted
+        : { department: collected.department || null, purpose: null, items: [], total_amount: 0 };
+      const extracted = {
+        ...previouslyCollected,
+        ...parsed,
+        purpose: parsed.purpose || message.trim(),
+        department: parsed.department || previouslyCollected.department || collected.department || null,
+        items: parsed.items.length ? parsed.items : (previouslyCollected.items || []),
+      };
+      extracted.total_amount = extracted.items.reduce((sum: number, item: any) =>
+        sum + (Number(item.quantity) || 0) * (Number(item.unit_cost) || 0), 0);
+      collected.purpose = extracted.purpose || undefined;
       collected.department = extracted.department || undefined;
       collected.extracted = extracted;
       newState.collected = collected;
@@ -687,6 +710,7 @@ function buildDraftCompletionResponse(
   summary += `• 📝 [Open in New PR Form](${newPrUrl})\n`;
   summary += `• 🖨️ [Open Printable PR Form](${printUrl})\n\n`;
   summary += `*(Note: In accordance with RA 12009 and MSU-GenSan guidelines, please ensure this item is reflected in your unit's Project Procurement Management Plan (PPMP) prior to submission).*`;
+  summary += `\n\n**Important:** This is a draft only. It has not been officially submitted or assigned an official university PR number. Review the form, print and sign it, then physically submit it with the required supporting documents to the Procurement Office. The office must confirm receipt before the request advances in the official workflow.`;
 
   return { response: summary, newState };
 }
@@ -804,6 +828,10 @@ export async function POST(req: NextRequest) {
       activePRDraft: Boolean(currentState.drafting),
     });
     const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg);
+    const chatIntent = classifyProcurementIntent(trimmedMsg, {
+      activeDraft: Boolean(currentState.drafting),
+      draftReady: Boolean(currentState.draftReady),
+    });
     if (!scopeDecision.allowed) {
       // Refuse unrelated and security-sensitive requests before retrieval or any
       // model provider is called. Keep an active PR draft intact for the next valid reply.
@@ -825,9 +853,13 @@ export async function POST(req: NextRequest) {
         || 'I could not verify this procurement rule from the official excerpts retrieved. Please consult the relevant GPPB issuance before acting.';
       citedSources = policyRetrieval.sources.map(normalizeSourceLabel);
       inquiryType = 'procurement_guidance';
-      // A policy question is a new topic, not input for the pending PR slot.
-      updatedState = {};
-    } else if (currentState.drafting || (currentState.draftReady && isPRDraftRevisionMessage(trimmedMsg))) {
+      // A procurement question is not a slot answer. Preserve the saved draft
+      // so the user can resume after receiving the information.
+      updatedState = { ...currentState };
+    } else if (
+      (currentState.drafting || (currentState.draftReady && isPRDraftRevisionMessage(trimmedMsg))) &&
+      !['create_pr_draft', 'procurement_question', 'track_pr', 'list_prs'].includes(chatIntent)
+    ) {
       inquiryType = 'draft_pr';
       const result = await handleDraftPRFlow(trimmedMsg, currentState);
       responseText = result.response;
@@ -837,16 +869,16 @@ export async function POST(req: NextRequest) {
       const normalizedMsg = trimmedMsg.replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-');
       const lower = normalizedMsg.toLowerCase();
 
-      // Check Intent
-      const isDraftIntent = /help me draft|create a pr|new purchase request|draft a purchase request|i need to request|i want to request|i need to buy|draft pr/i.test(lower);
-      const prMatch = normalizedMsg.match(/\b(PR[- ]?(?:TEMP[- ]?)?(?:\d{4}[- ]?)?\d{1,6})\b/i);
-      const hasTrackKeywords = /status|track|where is|progress|update|check|info|details|follow|lookup|state|stage/i.test(lower);
-      const isTrackIntent = Boolean(prMatch) && (hasTrackKeywords || !isDraftIntent);
-      const isListMyPRsIntent = /\b(track\s+(my|all|submitted)\s+(pr|prs|purchase\s+requests?)|track\s+my\s+purchase\s+request|show\s+(me\s+)?my\s+(pr|prs|purchase\s+requests?)|my\s+(pr|prs|purchase\s+requests?)\s+(status|tracking|progress))\b/i.test(lower);
+      // Shared deterministic intent routing avoids treating informational
+      // questions as PR slot answers and recognizes natural-language create requests.
+      const isDraftIntent = chatIntent === 'create_pr_draft';
+      const prMatch = extractPRIdentifier(normalizedMsg);
+      const isTrackIntent = chatIntent === 'track_pr';
+      const isListMyPRsIntent = chatIntent === 'list_prs';
 
       if (isDraftIntent) {
         inquiryType = 'draft_pr';
-        const result = await handleDraftPRFlow(trimmedMsg, currentState);
+        const result = await handleDraftPRFlow(trimmedMsg, chatIntent === 'create_pr_draft' ? {} : currentState);
         responseText = result.response;
         updatedState = result.newState;
       } else if (isTrackIntent && prMatch) {

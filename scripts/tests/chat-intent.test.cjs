@@ -63,3 +63,20 @@ test('ordinary procurement statements do not automatically create a PR draft', (
   assert.equal(classifyProcurementIntent('Tell me about RA 12009.'), 'procurement_question');
   assert.equal(classifyProcurementIntent('Help me draft a PR'), 'create_pr_draft');
 });
+
+
+test('natural microscope request extracts quantity and explicit unit cost without inventing its purpose', () => {
+  const { extractPRDetailsRuleBased } = require('../../lib/pr-draft-extraction.js');
+  const extracted = extractPRDetailsRuleBased(
+    'Help me prepare a Purchase Request for 30 laboratory microscopes with an estimated unit cost of ₱8,500.'
+  );
+
+  assert.equal(extracted.purpose, null);
+  assert.equal(extracted.items.length, 1);
+  assert.equal(extracted.items[0].item_description, 'laboratory microscopes');
+  assert.equal(extracted.items[0].quantity, 30);
+  assert.equal(extracted.items[0].unit, 'units');
+  assert.equal(extracted.items[0].unit_cost, 8500);
+  assert.equal(extracted.items[0].total_cost, 255000);
+  assert.equal(extracted.total_amount, 255000);
+});
