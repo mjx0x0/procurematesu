@@ -120,3 +120,53 @@ test('natural quantity and item name take precedence over the price-only fallbac
   assert.equal(extracted.items[0].total_cost, 255000);
   assert.equal(extracted.total_amount, 255000);
 });
+
+
+test('vague requests for help with a PR ask one clarification instead of starting slot filling', () => {
+  for (const message of [
+    'Help me with a PR',
+    'Can you help me with my Purchase Request?',
+    'I need help with a PR.',
+  ]) {
+    assert.equal(classifyProcurementIntent(message), 'clarify_pr_intent', message);
+  }
+});
+
+test('specific requests to prepare or fill a PR still start slot filling', () => {
+  for (const message of [
+    'I need help preparing a PR.',
+    'Help me with preparing a Purchase Request.',
+    'Can you help me fill out a PR?',
+  ]) {
+    assert.equal(classifyProcurementIntent(message), 'create_pr_draft', message);
+  }
+});
+
+test('questions about PR instructions remain informational even when phrased as help requests', () => {
+  for (const message of [
+    'How do I prepare a PR?',
+    'Can you help me understand the PR requirements?',
+    'What documents do I need for a Purchase Request?',
+  ]) {
+    assert.equal(classifyProcurementIntent(message), 'procurement_question', message);
+  }
+});
+
+test('the ambiguity response is explicit about the two supported paths', () => {
+  const { PR_INTENT_CLARIFICATION_RESPONSE } = require('../../lib/chat-intent.js');
+  assert.match(PR_INTENT_CLARIFICATION_RESPONSE, /explain PR requirements and procedures/i);
+  assert.match(PR_INTENT_CLARIFICATION_RESPONSE, /start preparing a Purchase Request draft/i);
+});
+
+
+test('both chat entry points keep a completed PR draft in scope for valid revisions', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const legacyRoute = fs.readFileSync(path.join(__dirname, '../../app/api/chat/route.ts'), 'utf8');
+  const sendRoute = fs.readFileSync(path.join(__dirname, '../../app/api/chat/send/route.ts'), 'utf8');
+
+  assert.match(legacyRoute, /activePRDraft: Boolean\(currentState\.drafting \|\| currentState\.draftReady\)/);
+  assert.match(sendRoute, /activePRDraft: Boolean\(draftState\.drafting \|\| draftState\.draftReady\)/);
+  assert.match(legacyRoute, /chatIntent === 'clarify_pr_intent'/);
+  assert.match(sendRoute, /messageIntent === 'clarify_pr_intent'/);
+});

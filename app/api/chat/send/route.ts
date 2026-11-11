@@ -5,7 +5,7 @@ import { POST as legacyChatPOST } from '@/app/api/chat/route';
 import { buildProcurementOfficeLocationResponse } from '@/lib/procurement-office-location';
 import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
 import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-extraction';
-import { classifyProcurementIntent } from '@/lib/chat-intent';
+import { classifyProcurementIntent, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
 
 // Treat both standalone cancellation commands ("cancel", "stop") and natural phrases
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
     }
 
     const scopeDecision = getProcurementScopeDecision(message, {
-      activePRDraft: Boolean(draftState.drafting),
+      activePRDraft: Boolean(draftState.drafting || draftState.draftReady),
     });
     if (!scopeDecision.allowed) {
       // Do not pass unrelated, prompt-injection, or disclosure requests to
@@ -151,6 +151,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         response: buildProcurementSmallTalkResponse(message),
         sources: ['Gab AI conversational response'],
+      });
+    }
+
+    if (messageIntent === 'clarify_pr_intent') {
+      return NextResponse.json({
+        response: PR_INTENT_CLARIFICATION_RESPONSE,
+        sources: ['PR intent clarification'],
       });
     }
 

@@ -10,7 +10,7 @@ import { PROCUREMENT_STAGE_LABELS } from '@/lib/procurement-process';
 import { callGroq } from '@/lib/groq';
 import { normalizeAssistantResponse } from '@/lib/chat-response-format';
 import { createPRDraftHandoffPayload, encodePRDraftHandoff } from '@/lib/pr-draft-handoff';
-import { classifyProcurementIntent, extractPRIdentifier } from '@/lib/chat-intent';
+import { classifyProcurementIntent, extractPRIdentifier, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
 
 // ============================================================
 // CONFIGURATION & DATABASE FALLBACKS
@@ -826,7 +826,7 @@ export async function POST(req: NextRequest) {
     // prevents long legal prompts containing words like "supplier", "price",
     // "budget", or "section" from being mistaken for PR draft-field answers.
     const scopeDecision = getProcurementScopeDecision(trimmedMsg, {
-      activePRDraft: Boolean(currentState.drafting),
+      activePRDraft: Boolean(currentState.drafting || currentState.draftReady),
     });
     const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg);
     const chatIntent = classifyProcurementIntent(trimmedMsg, {
@@ -843,6 +843,10 @@ export async function POST(req: NextRequest) {
       // Keep the response deterministic and leave an active PR draft unchanged.
       responseText = buildProcurementSmallTalkResponse(trimmedMsg);
       inquiryType = 'conversation';
+      updatedState = { ...currentState };
+    } else if (chatIntent === 'clarify_pr_intent') {
+      responseText = PR_INTENT_CLARIFICATION_RESPONSE;
+      inquiryType = 'procurement_guidance';
       updatedState = { ...currentState };
     } else if (deterministicPolicyQuestion) {
       const policyRetrieval = await retrieveDocumentChunks(trimmedMsg, 6);
