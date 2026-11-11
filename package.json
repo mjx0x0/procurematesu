@@ -5,7 +5,7 @@
     "build": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "eslint .",
-    "test:procurement": "node --test scripts/tests/chat-conversation-context.test.cjs scripts/tests/chat-intent.test.cjs scripts/tests/pr-draft-handoff.test.cjs scripts/tests/chat-response-format.test.cjs scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs scripts/tests/procurement-scope-guard.test.cjs scripts/tests/system-branding.test.cjs scripts/tests/procurement-workflow-hardening.test.cjs",
+    "test:procurement": "node --test scripts/tests/procurement-definitions.test.cjs scripts/tests/chat-conversation-context.test.cjs scripts/tests/chat-intent.test.cjs scripts/tests/pr-draft-handoff.test.cjs scripts/tests/chat-response-format.test.cjs scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs scripts/tests/procurement-scope-guard.test.cjs scripts/tests/system-branding.test.cjs scripts/tests/procurement-workflow-hardening.test.cjs",
     "ingest:gppb-circular-06-2026": "node scripts/ingest-gppb-circular-06-2026.js"
   },
   "dependencies": {
