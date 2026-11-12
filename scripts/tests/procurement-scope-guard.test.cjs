@@ -159,3 +159,14 @@ test('reference-link follow-ups are allowed only with recent procurement context
     { allowed: false, reason: 'security' }
   );
 });
+
+test('greeting includes the signed-in user first name when available', () => {
+  assert.match(buildProcurementSmallTalkResponse('hi', 'Mariel Joyce Villena'), /^Hi, Mariel!/);
+  assert.match(buildProcurementSmallTalkResponse('hello', 'Mariel'), /^Hi, Mariel!/);
+});
+
+test('greeting safely falls back when no usable profile name is available', () => {
+  assert.match(buildProcurementSmallTalkResponse('hi'), /^Hi there!/);
+  assert.match(buildProcurementSmallTalkResponse('hello', '   '), /^Hi there!/);
+  assert.doesNotMatch(buildProcurementSmallTalkResponse('hi', 'mariel@example.com'), /mariel@example\.com/i);
+});
