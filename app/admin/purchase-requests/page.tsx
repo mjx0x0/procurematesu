@@ -207,8 +207,8 @@ export default function AdminPurchaseRequestsPage() {
     if (!selectedPR || busy) return;
     const isTemporary = selectedPR.pr_no.includes("TEMP");
     const cleanNo = officialPrInput.trim();
-    if (isTemporary && !cleanNo) {
-      showFeedback("warning", "PR Number Required", "Please enter the official PR number.");
+    if (!cleanNo || cleanNo.includes("TEMP")) {
+      showFeedback("warning", "Official PR Number Required", "Enter the official PR control number before advancing to Step 5.");
       return;
     }
     setBusy(true);
@@ -671,12 +671,12 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                         className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-stone-900 active:scale-98"
                       >
                         <FileCheck className="h-4 w-4 text-white" />
-                        <span>{selectedPR.pr_no.includes("TEMP") ? "Assign Official PR #" : "Continue to Step 5"}</span>
+                        <span>Assign Official PR Number &amp; Advance to Step 5</span>
                       </button>
                     )}
 
-                    {/* Stage Advancement */}
-                    {nextStage(selectedPR) ? (
+                    {/* Stage Advancement. Step 4 is completed only through the official-number assignment modal. */}
+                    {selectedPR.current_stage !== "pr_pre_numbering" && nextStage(selectedPR) ? (
                       <button
                         onClick={() => openAction("complete")}
                         title={selectedPR.current_stage === "draft" ? "Confirm physical receipt of printed PR form and advance to Stage 1" : `Advance to Stage ${nextStage(selectedPR)?.number}: ${nextStage(selectedPR)?.label}`}
@@ -1035,7 +1035,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
               )}
               <div>
                 <label className="block text-xs font-black uppercase tracking-wide text-stone-700 mb-1.5">
-                  Official PR Number {selectedPR.pr_no.includes("TEMP") && <span className="text-red-500">*</span>}
+                  Official PR Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1074,11 +1074,11 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
               <button
                 type="button"
                 onClick={() => void submitOfficialPrAssignment()}
-                disabled={busy || (selectedPR.pr_no.includes("TEMP") && !officialPrInput.trim())}
+                disabled={busy || !officialPrInput.trim() || officialPrInput.trim().toUpperCase().includes("TEMP")}
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] text-white text-xs font-black flex items-center gap-2 hover:opacity-95 disabled:opacity-50 cursor-pointer shadow-sm"
               >
                 {busy && <Loader2 className="h-4 w-4 animate-spin text-amber-300" />}
-                <span>{selectedPR.pr_no.includes("TEMP") ? "Assign Number & Advance to Step 5" : "Confirm & Advance to Step 5"}</span>
+                <span>Assign Official PR Number &amp; Advance to Step 5</span>
               </button>
             </div>
           </div>
