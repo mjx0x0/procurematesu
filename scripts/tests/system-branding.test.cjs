@@ -304,7 +304,7 @@ test('admin Purchase Requests has its own route and retains the existing logbook
   assert.match(purchaseRequests, /All Departments/);
   assert.match(purchaseRequests, /Refresh purchase requests/);
   assert.match(purchaseRequests, /\/api\/admin\/complete-stage/);
-  assert.match(purchaseRequests, /\/api\/admin\/assign-official-pr/);
+  assert.match(purchaseRequests, /update-temporary-pr/);
   assert.match(purchaseRequests, /Confirm Receipt of Printed PR/);
   assert.match(purchaseRequests, /Permanently delete/);
 
