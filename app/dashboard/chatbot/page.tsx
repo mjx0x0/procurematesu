@@ -149,13 +149,16 @@ export default function ChatbotDashboard() {
         }
         if (cancelled) return;
         setUserId(user.id);
+        const fullName = String(user.user_metadata?.full_name || user.user_metadata?.name || "").trim();
+        const displayName = fullName && !fullName.includes("@") ? fullName : "";
+        setUserName(displayName);
         const list = await loadSessions(user.id);
         const active = list.find((s) => s.is_active) || (list.length > 0 ? list[0] : null);
         if (active) {
           setSessionId(active.id);
           await loadMessages(active.id);
         } else {
-          setMessages([createWelcomeMessage(userName)]);
+          setMessages([createWelcomeMessage(displayName)]);
         }
       } catch (e) {
         console.error("Chat initialization failed:", e);
@@ -438,7 +441,7 @@ export default function ChatbotDashboard() {
         .update({ title: "New conversation", state: {}, updated_at: new Date().toISOString(), is_active: true })
         .eq("id", sessionId)
         .eq("user_id", userId);
-      setMessages([{ ...WELCOME, timestamp: new Date() }]);
+      setMessages([createWelcomeMessage(displayName)]);
       if (userId) await loadSessions(userId);
     } catch (e) {
       console.error(e);
