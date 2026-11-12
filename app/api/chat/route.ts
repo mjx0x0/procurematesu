@@ -743,16 +743,22 @@ export async function POST(req: NextRequest) {
     // This route is also imported by /api/chat/send, but it remains a public
     // HTTP endpoint. Authenticate here as well so callers cannot bypass the
     // newer route's authorization checks by posting directly.
-    let authenticatedUser: { id: string } | null = null;
+    let authenticatedUser: { id: string; name?: string } | null = null;
     const authorization = req.headers.get('authorization');
     if (authorization?.startsWith('Bearer ') && supabase) {
       const { data, error } = await supabase.auth.getUser(authorization.slice(7).trim());
-      if (!error && data.user) authenticatedUser = { id: data.user.id };
+      if (!error && data.user) authenticatedUser = {
+        id: data.user.id,
+        name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || undefined,
+      };
     }
     if (!authenticatedUser) {
       const authClient = await createServerClient();
       const { data, error } = await authClient.auth.getUser();
-      if (!error && data.user) authenticatedUser = { id: data.user.id };
+      if (!error && data.user) authenticatedUser = {
+          id: data.user.id,
+          name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || undefined,
+        };
     }
     if (!authenticatedUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -860,7 +866,7 @@ export async function POST(req: NextRequest) {
       updatedState = { ...currentState };
     } else if (scopeDecision.reason === 'small_talk') {
       // Keep the response deterministic and leave an active PR draft unchanged.
-      responseText = buildProcurementSmallTalkResponse(trimmedMsg);
+      responseText = buildProcurementSmallTalkResponse(trimmedMsg, authenticatedUser.name);
       inquiryType = 'conversation';
       updatedState = { ...currentState };
     } else if (chatIntent === 'clarify_pr_intent') {
