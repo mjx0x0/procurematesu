@@ -47,7 +47,7 @@ const SUGGESTIONS = [
 const createWelcomeMessage = (name?: string): Message => ({
   id: "welcome",
   role: "assistant",
-  content: `👋 **Hi${name ? `, ${name.split(/\\s+/)[0]}` : ""}! I’m Gab AI.**
+  content: `👋 **Hi${name ? `, ${name.split(" ")[0]}` : ""}! I’m Gab AI.**
 
 I’m here to help with MSU-General Santos procurement. I can explain procurement rules, guide you through Purchase Request drafting, help track submitted PRs, and answer questions about the Procurement Office and its procedures.
 
