@@ -1040,7 +1040,6 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                   type="text"
                   value={officialPrInput}
                   onChange={(e) => setOfficialPrInput(e.target.value.toUpperCase())}
-                  readOnly={!selectedPR.pr_no.includes("TEMP")}
                   placeholder="e.g. PR-2026-0001"
                   className="w-full h-11 px-3.5 rounded-xl border border-stone-300 bg-white font-mono text-sm font-black text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
                   autoFocus
