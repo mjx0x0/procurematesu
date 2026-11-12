@@ -158,7 +158,7 @@ export default function ChatbotDashboard() {
           setSessionId(active.id);
           await loadMessages(active.id);
         } else {
-          setMessages([createWelcomeMessage(userName)]);
+          setMessages([createWelcomeMessage(displayName)]);
         }
       } catch (e) {
         console.error("Chat initialization failed:", e);
@@ -441,7 +441,7 @@ export default function ChatbotDashboard() {
         .update({ title: "New conversation", state: {}, updated_at: new Date().toISOString(), is_active: true })
         .eq("id", sessionId)
         .eq("user_id", userId);
-      setMessages([createWelcomeMessage(displayName)]);
+      setMessages([createWelcomeMessage(userName)]);
       if (userId) await loadSessions(userId);
     } catch (e) {
       console.error(e);
