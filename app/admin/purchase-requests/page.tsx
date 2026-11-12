@@ -66,6 +66,7 @@ export default function AdminPurchaseRequestsPage() {
   const [deletePR, setDeletePR] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ open: boolean; tone: FeedbackTone; title: string; message: string }>({ open: false, tone: "success", title: "", message: "" });
   const [officialPrInput, setOfficialPrInput] = useState("");
+  const [temporaryPrInput, setTemporaryPrInput] = useState("");
   const [showOfficialPrModal, setShowOfficialPrModal] = useState(false);
   const [approvalGroupFilter, setApprovalGroupFilter] = useState<"all" | "approved" | "drafts">("all");
   useEffect(() => {
@@ -172,42 +173,69 @@ export default function AdminPurchaseRequestsPage() {
     setOfficialPrInput("");
   };
 
+  const saveTemporaryPrNumber = async () => {
+    if (!selectedPR || busy || !selectedPR.pr_no.includes("TEMP")) return;
+    const cleanNo = temporaryPrInput.trim().toUpperCase();
+    if (!cleanNo || cleanNo === selectedPR.pr_no) {
+      showFeedback("warning", "Temporary PR Number Required", "Enter a different temporary tracking number before saving.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const response = await fetch("/api/admin/update-temporary-pr", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPrNo: selectedPR.pr_no, newTemporaryPrNo: cleanNo }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Failed to update temporary PR number");
+      const oldNo = selectedPR.pr_no;
+      if (result.updatedPR) {
+        setSelectedPR(result.updatedPR);
+        setPrs((prev) => prev.map((p) => p.pr_no === oldNo ? result.updatedPR : p));
+        setTemporaryPrInput(result.updatedPR.pr_no);
+      }
+      if (result.stageHistory) setHistory(result.stageHistory);
+      void loadData();
+      showFeedback("success", "Temporary PR Number Updated", "The temporary tracking number has been updated.");
+    } catch (e: any) {
+      console.error(e);
+      showFeedback("error", "Temporary Number Update Failed", e.message || "Unable to update the temporary PR number.");
+    } finally { setBusy(false); }
+  };
+
   const submitOfficialPrAssignment = async () => {
     if (!selectedPR || busy) return;
+    const isTemporary = selectedPR.pr_no.includes("TEMP");
     const cleanNo = officialPrInput.trim();
-    if (!cleanNo) {
+    if (isTemporary && !cleanNo) {
       showFeedback("warning", "PR Number Required", "Please enter the official PR number.");
       return;
     }
     setBusy(true);
     try {
-      const response = await fetch("/api/admin/assign-official-pr", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch("/api/admin/complete-stage", {
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          currentPrNo: selectedPR.pr_no,
-          officialPrNo: cleanNo,
-          remarks: remarks.trim(),
+          prNo: selectedPR.pr_no, action: "complete", newStatus: "budget_endorsement",
+          officialPrNo: isTemporary ? cleanNo : undefined, remarks: remarks.trim(),
         }),
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Failed to assign official PR number");
+      if (!response.ok) throw new Error(result.error || "Failed to complete Step 4");
+      const oldNo = selectedPR.pr_no;
       setShowOfficialPrModal(false);
-      setOfficialPrInput("");
-      setRemarks("");
+      setOfficialPrInput(""); setTemporaryPrInput(""); setRemarks("");
       if (result.updatedPR) {
         setSelectedPR(result.updatedPR);
-        setPrs((prev) => prev.map((p) => p.pr_no === result.oldPrNo ? result.updatedPR : p));
+        setPrs((prev) => prev.map((p) => p.pr_no === oldNo ? result.updatedPR : p));
       }
       if (result.stageHistory) setHistory(result.stageHistory);
       void loadData();
-      showFeedback("success", "Official PR Number Assigned", `Successfully updated ${result.oldPrNo} to official number ${result.officialPrNo}. Data is synchronized across both end-user and admin portals.`);
+      showFeedback("success", "Step 4 Completed", `${result.updatedPR?.pr_no || oldNo} has advanced to Step 5: Endorsement to Budget Management Office.`);
     } catch (e: any) {
       console.error(e);
-      showFeedback("error", "Assignment Failed", e.message || "Unable to assign official PR number.");
-    } finally {
-      setBusy(false);
-    }
+      showFeedback("error", "PR Number Assignment Failed", e.message || "Unable to complete Step 4.");
+    } finally { setBusy(false); }
   };
 
   const submitAction = async () => {
@@ -636,13 +664,14 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                       <button
                         onClick={() => {
                           setOfficialPrInput(selectedPR.pr_no.includes("TEMP") ? "" : selectedPR.pr_no);
+                          setTemporaryPrInput(selectedPR.pr_no.includes("TEMP") ? selectedPR.pr_no : "");
                           setShowOfficialPrModal(true);
                         }}
                         title="Manually input official university PR control number"
                         className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-stone-900 active:scale-98"
                       >
                         <FileCheck className="h-4 w-4 text-white" />
-                        <span>{selectedPR.pr_no.includes("TEMP") ? "Input Official PR #" : "Edit Official PR #"}</span>
+                        <span>{selectedPR.pr_no.includes("TEMP") ? "Assign Official PR #" : "Continue to Step 5"}</span>
                       </button>
                     )}
 
@@ -903,7 +932,8 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                     type="text"
                     value={officialPrInput}
                     onChange={(e) => setOfficialPrInput(e.target.value.toUpperCase())}
-                    placeholder="e.g. PR-2026-0001"
+                    readOnly={!selectedPR.pr_no.includes("TEMP")}
+                  placeholder="e.g. PR-2026-0001"
                     className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white font-mono text-xs font-bold text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[#7B0046] focus:ring-1 focus:ring-[#7B0046]"
                   />
                 </div>
@@ -993,9 +1023,19 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                 )}
               </div>
 
+              {selectedPR.pr_no.includes("TEMP") && (
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-wide text-stone-700 mb-1.5">Edit Temporary Tracking Number</label>
+                  <div className="flex gap-2">
+                    <input type="text" value={temporaryPrInput} onChange={(e) => setTemporaryPrInput(e.target.value.toUpperCase())} placeholder="PR-TEMP-2026-0001" className="min-w-0 flex-1 h-11 px-3 rounded-xl border border-stone-300 bg-white font-mono text-xs font-bold text-stone-900" />
+                    <button type="button" onClick={() => void saveTemporaryPrNumber()} disabled={busy || !temporaryPrInput.trim() || temporaryPrInput.trim() === selectedPR.pr_no} className="shrink-0 px-3 rounded-xl bg-stone-800 text-white text-xs font-bold disabled:opacity-50">Save</button>
+                  </div>
+                  <p className="mt-1 text-[11px] text-stone-500">Correct the temporary tracking number before assigning the official number.</p>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-black uppercase tracking-wide text-stone-700 mb-1.5">
-                  Official PR Number <span className="text-red-500">*</span>
+                  Official PR Number {selectedPR.pr_no.includes("TEMP") && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="text"
@@ -1033,11 +1073,11 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
               <button
                 type="button"
                 onClick={() => void submitOfficialPrAssignment()}
-                disabled={busy || !officialPrInput.trim()}
+                disabled={busy || (selectedPR.pr_no.includes("TEMP") && !officialPrInput.trim())}
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] text-white text-xs font-black flex items-center gap-2 hover:opacity-95 disabled:opacity-50 cursor-pointer shadow-sm"
               >
                 {busy && <Loader2 className="h-4 w-4 animate-spin text-amber-300" />}
-                <span>Assign &amp; Update PR Number</span>
+                <span>{selectedPR.pr_no.includes("TEMP") ? "Assign Number & Advance to Step 5" : "Confirm & Advance to Step 5"}</span>
               </button>
             </div>
           </div>
