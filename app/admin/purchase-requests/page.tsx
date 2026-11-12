@@ -217,7 +217,7 @@ export default function AdminPurchaseRequestsPage() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prNo: selectedPR.pr_no, action: "complete", newStatus: "budget_endorsement",
-          officialPrNo: isTemporary ? cleanNo : undefined, remarks: remarks.trim(),
+          officialPrNo: cleanNo !== selectedPR.pr_no ? cleanNo : undefined, remarks: remarks.trim(),
         }),
       });
       const result = await response.json();
@@ -671,7 +671,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                         className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-stone-900 active:scale-98"
                       >
                         <FileCheck className="h-4 w-4 text-white" />
-                        <span>Assign Official PR Number &amp; Advance to Step 5</span>
+                        <span>Assign PR # &amp; Continue</span>
                       </button>
                     )}
 
@@ -932,8 +932,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                     type="text"
                     value={officialPrInput}
                     onChange={(e) => setOfficialPrInput(e.target.value.toUpperCase())}
-                    readOnly={!selectedPR.pr_no.includes("TEMP")}
-                  placeholder="e.g. PR-2026-0001"
+                    placeholder="e.g. PR-2026-0001"
                     className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white font-mono text-xs font-bold text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[#7B0046] focus:ring-1 focus:ring-[#7B0046]"
                   />
                 </div>
@@ -1078,7 +1077,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] text-white text-xs font-black flex items-center gap-2 hover:opacity-95 disabled:opacity-50 cursor-pointer shadow-sm"
               >
                 {busy && <Loader2 className="h-4 w-4 animate-spin text-amber-300" />}
-                <span>Assign Official PR Number &amp; Advance to Step 5</span>
+                <span>Assign &amp; Continue</span>
               </button>
             </div>
           </div>
