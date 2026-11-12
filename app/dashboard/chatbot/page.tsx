@@ -477,7 +477,7 @@ export default function ChatbotDashboard() {
           await loadMessages(next.id);
         } else {
           setSessionId(null);
-          setMessages([{ ...WELCOME, timestamp: new Date() }]);
+          setMessages([createWelcomeMessage(userName)]);
         }
       }
       setDeleteId(null);
