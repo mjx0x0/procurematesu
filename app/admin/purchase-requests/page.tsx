@@ -668,10 +668,10 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                           setShowOfficialPrModal(true);
                         }}
                         title="Manually input official university PR control number"
-                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors border border-stone-900 active:scale-98"
+                        className="inline-flex items-center justify-center gap-2 h-9 px-3 sm:px-3.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-xs transition-colors border border-stone-900 active:scale-98 whitespace-nowrap"
                       >
                         <FileCheck className="h-4 w-4 text-white" />
-                        <span>Assign PR # &amp; Continue</span>
+                        <span>Assign &amp; Continue</span>
                       </button>
                     )}
 
