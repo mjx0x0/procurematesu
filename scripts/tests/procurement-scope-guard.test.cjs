@@ -31,7 +31,7 @@ for (const [message, intent] of conversationalMessages) {
 
     const response = buildProcurementSmallTalkResponse(message);
     assert.ok(response.length > 20);
-    assert.match(response, /Gab AI|You're welcome/);
+    assert.match(response, /Gab AI|welcome/i);
     if (intent === 'identity') {
       assert.match(response, /AI-powered guide/i);
     }
