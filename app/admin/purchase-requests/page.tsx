@@ -664,7 +664,6 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                       <button
                         onClick={() => {
                           setOfficialPrInput(selectedPR.pr_no.includes("TEMP") ? "" : selectedPR.pr_no);
-                          setTemporaryPrInput(selectedPR.pr_no.includes("TEMP") ? selectedPR.pr_no : "");
                           setShowOfficialPrModal(true);
                         }}
                         title="Manually input official university PR control number"
@@ -992,80 +991,76 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
         </div>
       )}
 
-      {/* Standalone Step 4: Official PR Number Assignment Modal */}
+      {/* Step 4 Official PR Assignment Modal — aligned with the standard Advance Stage modal */}
       {showOfficialPrModal && selectedPR && (
-        <div className="admin-pr-official-overlay fixed inset-0 z-[75] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-stone-200">
-            <div className="flex items-start justify-between gap-3 mb-4 pb-3 border-b border-stone-100">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2.5 rounded-xl bg-amber-100 text-[#7B0046]">
-                  <FileCheck className="h-5 w-5" />
+        <div className="admin-pr-official-overlay fixed inset-0 z-[75] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="step4-official-pr-title">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-5 border border-stone-200">
+            <div className="flex items-center justify-between gap-3 pb-3 mb-3.5 border-b border-stone-100">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[#7B0046]/10 text-[#7B0046]">
+                  <FileCheck className="h-4.5 w-4.5" />
                 </div>
-                <div>
-                  <h3 className="text-base font-extrabold text-[#4D002C]">Step 4: PR Pre-Numbering &amp; Control</h3>
-                  <p className="text-xs text-stone-500">Assign official university PR control number</p>
+                <div className="min-w-0">
+                  <h3 id="step4-official-pr-title" className="text-sm font-bold text-stone-900 truncate">Step 4: PR Pre-Numbering &amp; Control</h3>
+                  <p className="text-[11px] text-stone-500 truncate font-mono">{selectedPR.pr_no}</p>
                 </div>
               </div>
-              <button onClick={() => setShowOfficialPrModal(false)} className="p-1 text-stone-400 hover:text-stone-600">
-                <X className="h-5 w-5" />
+              <button
+                onClick={() => setShowOfficialPrModal(false)}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div className="bg-stone-50 rounded-xl p-3 border border-stone-200 text-xs">
-                <span className="text-stone-500 block font-semibold">Current PR Tracking Number:</span>
-                <span className="font-mono font-black text-sm text-[#7B0046]">{selectedPR.pr_no}</span>
-                {selectedPR.pr_no.includes("TEMP") && (
-                  <span className="ml-2 inline-flex text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
-                    Temporary
-                  </span>
-                )}
+            <div className="space-y-3">
+              <div className="bg-stone-50 border border-stone-200/80 rounded-xl p-3">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-stone-800">
+                  <span className="text-stone-400 font-normal">Next:</span>
+                  <span className="text-[#7B0046] font-bold">Stage 5:</span>
+                  <span>Endorsement to Budget Management Office</span>
+                </div>
+                <p className="text-[11px] text-stone-500 mt-1 leading-snug">After assigning the official PR control number, this request will advance to Stage 5.</p>
               </div>
 
-              {selectedPR.pr_no.includes("TEMP") && (
-                <div>
-                  <label className="block text-xs font-black uppercase tracking-wide text-stone-700 mb-1.5">Edit Temporary Tracking Number</label>
-                  <div className="flex gap-2">
-                    <input type="text" value={temporaryPrInput} onChange={(e) => setTemporaryPrInput(e.target.value.toUpperCase())} placeholder="PR-TEMP-2026-0001" className="min-w-0 flex-1 h-11 px-3 rounded-xl border border-stone-300 bg-white font-mono text-xs font-bold text-stone-900" />
-                    <button type="button" onClick={() => void saveTemporaryPrNumber()} disabled={busy || !temporaryPrInput.trim() || temporaryPrInput.trim() === selectedPR.pr_no} className="shrink-0 px-3 rounded-xl bg-stone-800 text-white text-xs font-bold disabled:opacity-50">Save</button>
-                  </div>
-                  <p className="mt-1 text-[11px] text-stone-500">Correct the temporary tracking number before assigning the official number.</p>
-                </div>
-              )}
               <div>
-                <label className="block text-xs font-black uppercase tracking-wide text-stone-700 mb-1.5">
-                  Official PR Number <span className="text-red-500">*</span>
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5" htmlFor="step4-official-pr-number">
+                  Official PR Control Number <span className="text-red-500">*Required</span>
                 </label>
                 <input
+                  id="step4-official-pr-number"
                   type="text"
                   value={officialPrInput}
                   onChange={(e) => setOfficialPrInput(e.target.value.toUpperCase())}
                   placeholder="e.g. PR-2026-0001"
-                  className="w-full h-11 px-3.5 rounded-xl border border-stone-300 bg-white font-mono text-sm font-black text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
+                  autoComplete="off"
+                  className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white font-mono text-xs font-bold text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[#7B0046] focus:ring-1 focus:ring-[#7B0046]"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wide text-stone-600 mb-1.5">
-                  Logbook / Control Remarks <span className="text-stone-400 font-normal">(Optional)</span>
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5" htmlFor="step4-official-pr-remarks">
+                  Remarks / completion note <span className="text-stone-400 font-normal text-[11px]">(Optional)</span>
                 </label>
                 <textarea
+                  id="step4-official-pr-remarks"
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
-                  placeholder="e.g. Recorded in PMO PR control logbook Vol. 3, page 15..."
+                  placeholder="Add a note for this stage (optional)..."
                   rows={2}
-                  className="w-full p-3 rounded-xl border border-stone-300 bg-white text-xs text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#7B0046]/20 focus:border-[#7B0046]"
+                  className="w-full min-h-[76px] rounded-lg border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 p-2.5 text-xs outline-none focus:border-[#7B0046] focus:ring-1 focus:ring-[#7B0046] resize-none"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-2.5 mt-6 pt-3 border-t border-stone-100">
+            <div className="flex items-center justify-end gap-2 pt-3 mt-4 border-t border-stone-100">
               <button
                 type="button"
-                onClick={() => { setShowOfficialPrModal(false); setOfficialPrInput(""); }}
+                onClick={() => { setShowOfficialPrModal(false); setOfficialPrInput(""); setRemarks(""); }}
                 disabled={busy}
-                className="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-700 text-xs font-bold hover:bg-stone-200 cursor-pointer"
+                className="px-3.5 py-2 rounded-lg text-xs font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors"
               >
                 Cancel
               </button>
@@ -1073,9 +1068,9 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                 type="button"
                 onClick={() => void submitOfficialPrAssignment()}
                 disabled={busy || !officialPrInput.trim() || officialPrInput.trim().toUpperCase().includes("TEMP")}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#4D002C] text-white text-xs font-black flex items-center gap-2 hover:opacity-95 disabled:opacity-50 cursor-pointer shadow-sm"
+                className="px-4 py-2 rounded-lg bg-[#7B0046] hover:bg-[#630038] text-white text-xs font-semibold flex items-center gap-2 disabled:opacity-50 transition-colors"
               >
-                {busy && <Loader2 className="h-4 w-4 animate-spin text-amber-300" />}
+                {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                 <span>Assign &amp; Continue</span>
               </button>
             </div>
