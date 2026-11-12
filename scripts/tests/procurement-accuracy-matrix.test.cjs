@@ -300,7 +300,7 @@ test('procurement-only guard blocks general coding prompts shown in the chat UI'
     assert.equal(decision.allowed, false, prompt);
     assert.equal(decision.reason, 'off_topic', prompt);
   }
-  assert.match(PROCUREMENT_SCOPE_RESPONSE, /procurement assistant/i);
+  assert.match(PROCUREMENT_SCOPE_RESPONSE, /Gab AI/i);
   assert.match(PROCUREMENT_SCOPE_RESPONSE, /unrelated topics/i);
 });
 
