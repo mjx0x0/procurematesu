@@ -304,7 +304,7 @@ test('admin Purchase Requests has its own route and retains the existing logbook
   assert.match(purchaseRequests, /All Departments/);
   assert.match(purchaseRequests, /Refresh purchase requests/);
   assert.match(purchaseRequests, /\/api\/admin\/complete-stage/);
-  assert.match(purchaseRequests, /\/api\/admin\/assign-official-pr/);
+  assert.match(purchaseRequests, /update-temporary-pr/);
   assert.match(purchaseRequests, /Confirm Receipt of Printed PR/);
   assert.match(purchaseRequests, /Permanently delete/);
 
@@ -576,4 +576,24 @@ test('admin notification rows expose independent read/unread and owner-scoped de
   assert.match(notifications, /<Trash2 className="h-3\.5 w-3\.5" \/>/);
   assert.match(migration, /FOR DELETE/);
   assert.match(migration, /USING \(user_id = \(SELECT auth\.uid\(\)\)\)/);
+});
+
+
+test('Step 4 requires only an official PR number and uses the standard stage modal layout', () => {
+  const adminPage = read('app/admin/purchase-requests/page.tsx');
+  const correctionMigration = read('supabase/migrations/20261112150000_allow_step4_pr_number_correction.sql');
+
+  assert.match(adminPage, /newStatus: "budget_endorsement"/);
+  assert.match(adminPage, /officialPrNo: cleanNo !== selectedPR\.pr_no \? cleanNo : undefined/);
+  assert.match(adminPage, /selectedPR\.current_stage !== "pr_pre_numbering" && nextStage\(selectedPR\)/);
+  assert.match(adminPage, /Official PR Control Number/);
+  assert.match(adminPage, /Stage 5:/);
+  assert.match(adminPage, /Assign &amp; Continue/);
+  const officialNumberModal = adminPage.slice(adminPage.indexOf('/* Step 4 Official PR Assignment Modal'), adminPage.indexOf('{deletePR &&'));
+  assert.doesNotMatch(officialNumberModal, /Edit Temporary Tracking Number|temporaryPrInput|saveTemporaryPrNumber/);
+  assert.doesNotMatch(officialNumberModal, /readOnly/);
+  assert.match(officialNumberModal, /max-w-md p-5/);
+  assert.match(officialNumberModal, /Advance Stage|Step 4: PR Pre-Numbering/);
+  assert.match(correctionMigration, /Administrators may correct an already-entered PR number at Step 4/);
+  assert.doesNotMatch(correctionMigration, /This Purchase Request already has an official PR number/);
 });
