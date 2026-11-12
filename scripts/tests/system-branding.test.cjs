@@ -587,7 +587,7 @@ test('Step 4 PR numbering supports temporary-number correction and atomically ad
   assert.match(adminPage, /update-temporary-pr/);
   assert.match(adminPage, /newStatus: "budget_endorsement"/);
   assert.match(adminPage, /officialPrNo: isTemporary \? cleanNo : undefined/);
-  assert.match(adminPage, /Confirm &amp; Advance to Step 5/);
+  assert.match(adminPage, /Confirm & Advance to Step 5/);
   assert.match(temporaryRoute, /role !== 'admin'/);
   assert.match(temporaryRoute, /update_temporary_purchase_request_number/);
   assert.match(migration, /current_stage <> 'pr_pre_numbering'/);
