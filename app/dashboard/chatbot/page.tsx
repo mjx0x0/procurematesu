@@ -60,7 +60,8 @@ export default function ChatbotDashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);\n  const [userName, setUserName] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userName, setUserName] = useState("");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
@@ -154,7 +155,7 @@ export default function ChatbotDashboard() {
           setSessionId(active.id);
           await loadMessages(active.id);
         } else {
-          setMessages([{ ...WELCOME, timestamp: new Date() }]);
+          setMessages([createWelcomeMessage(userName)]);
         }
       } catch (e) {
         console.error("Chat initialization failed:", e);
@@ -550,7 +551,7 @@ export default function ChatbotDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
         <div className="text-center">
           <Loader2 className="h-10 w-10 animate-spin text-[#7B0046] mx-auto mb-3" />
-          <p className="text-xs font-semibold text-stone-600">Connecting to MSU-GenSan Procurement Assistant...</p>
+          <p className="text-xs font-semibold text-stone-600">Connecting to Gab AI...</p>
         </div>
       </div>
     );
@@ -563,7 +564,7 @@ export default function ChatbotDashboard() {
       {/* Top Navbar */}
       <SystemPageHeader
         headerTitle="Gab AI"
-        subtitle="Procurement Assistant"
+        subtitle="Gab AI Support"
         hideSystemSuffix
         compactOnMobile
         backHref="/dashboard"
@@ -897,7 +898,7 @@ export default function ChatbotDashboard() {
                 <div className="flex justify-start">
                   <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl rounded-tl-sm p-3 text-xs text-stone-500 flex items-center gap-2">
                     <Loader2 className="h-3.5 w-3.5 animate-spin text-[#7B0046]" />
-                    <span>Procurement Assistant is analyzing...</span>
+                    <span>Gab AI is thinking...</span>
                   </div>
                 </div>
               )}
