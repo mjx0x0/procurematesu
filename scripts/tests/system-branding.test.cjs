@@ -584,8 +584,8 @@ test('Step 4 requires only an official PR number and uses the standard stage mod
   const correctionMigration = read('supabase/migrations/20261112150000_allow_step4_pr_number_correction.sql');
 
   assert.match(adminPage, /newStatus: "budget_endorsement"/);
-  assert.match(adminPage, /officialPrNo: cleanNo !== selectedPR\\.pr_no \\? cleanNo : undefined/);
-  assert.match(adminPage, /selectedPR\\.current_stage !== "pr_pre_numbering" && nextStage\\(selectedPR\\)/);
+  assert.match(adminPage, /officialPrNo: cleanNo !== selectedPR\.pr_no \? cleanNo : undefined/);
+  assert.match(adminPage, /selectedPR\.current_stage !== "pr_pre_numbering" && nextStage\(selectedPR\)/);
   assert.match(adminPage, /Official PR Control Number/);
   assert.match(adminPage, /Stage 5:/);
   assert.match(adminPage, /Assign &amp; Continue/);
