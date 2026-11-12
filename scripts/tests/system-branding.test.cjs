@@ -579,27 +579,21 @@ test('admin notification rows expose independent read/unread and owner-scoped de
 });
 
 
-test('Step 4 PR numbering supports temporary-number correction and atomically advances after official assignment', () => {
+test('Step 4 requires only an official PR number and uses the standard stage modal layout', () => {
   const adminPage = read('app/admin/purchase-requests/page.tsx');
-  const temporaryRoute = read('app/api/admin/update-temporary-pr/route.ts');
-  const migration = read('supabase/migrations/20261112130000_add_temporary_pr_number_edit.sql');
   const correctionMigration = read('supabase/migrations/20261112150000_allow_step4_pr_number_correction.sql');
 
-  assert.match(adminPage, /update-temporary-pr/);
   assert.match(adminPage, /newStatus: "budget_endorsement"/);
-  assert.match(adminPage, /officialPrNo: isTemporary \? cleanNo : undefined/);
-  assert.match(adminPage, /Assign PR # &amp; Continue/);
-  assert.match(adminPage, /selectedPR\.current_stage !== "pr_pre_numbering" && nextStage\(selectedPR\)/);
-  assert.match(adminPage, /!cleanNo \|\| cleanNo\.includes\("TEMP"\)/);
-  assert.match(adminPage, /disabled=\{busy \|\| !officialPrInput\.trim\(\) \|\| officialPrInput\.trim\(\)\.toUpperCase\(\)\.includes\("TEMP"\)\}/);
-  assert.match(temporaryRoute, /role !== 'admin'/);
-  assert.match(temporaryRoute, /update_temporary_purchase_request_number/);
-  assert.match(migration, /current_stage <> 'pr_pre_numbering'/);
-  assert.match(migration, /PR-TEMP-/);
-  assert.match(migration, /ON UPDATE CASCADE/);
-  assert.match(adminPage, /placeholder="e\.g\. PR-2026-0001"/);
-  const officialNumberModal = adminPage.slice(adminPage.indexOf('/* Standalone Step 4'), adminPage.indexOf('{deletePR &&'));
+  assert.match(adminPage, /officialPrNo: cleanNo !== selectedPR\\.pr_no \\? cleanNo : undefined/);
+  assert.match(adminPage, /selectedPR\\.current_stage !== "pr_pre_numbering" && nextStage\\(selectedPR\\)/);
+  assert.match(adminPage, /Official PR Control Number/);
+  assert.match(adminPage, /Stage 5:/);
+  assert.match(adminPage, /Assign &amp; Continue/);
+  const officialNumberModal = adminPage.slice(adminPage.indexOf('/* Step 4 Official PR Assignment Modal'), adminPage.indexOf('{deletePR &&'));
+  assert.doesNotMatch(officialNumberModal, /Edit Temporary Tracking Number|temporaryPrInput|saveTemporaryPrNumber/);
   assert.doesNotMatch(officialNumberModal, /readOnly/);
+  assert.match(officialNumberModal, /max-w-md p-5/);
+  assert.match(officialNumberModal, /Advance Stage|Step 4: PR Pre-Numbering/);
   assert.match(correctionMigration, /Administrators may correct an already-entered PR number at Step 4/);
   assert.doesNotMatch(correctionMigration, /This Purchase Request already has an official PR number/);
 });
