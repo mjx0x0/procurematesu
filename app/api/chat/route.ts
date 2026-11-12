@@ -866,7 +866,7 @@ export async function POST(req: NextRequest) {
       updatedState = { ...currentState };
     } else if (scopeDecision.reason === 'small_talk') {
       // Keep the response deterministic and leave an active PR draft unchanged.
-      responseText = buildProcurementSmallTalkResponse(trimmedMsg, authenticatedUser.name);
+      responseText = (buildProcurementSmallTalkResponse as (query: string, userName?: string) => string)(trimmedMsg, authenticatedUser.name);
       inquiryType = 'conversation';
       updatedState = { ...currentState };
     } else if (chatIntent === 'clarify_pr_intent') {
