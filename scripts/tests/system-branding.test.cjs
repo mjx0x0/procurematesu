@@ -598,7 +598,8 @@ test('Step 4 PR numbering supports temporary-number correction and atomically ad
   assert.match(migration, /PR-TEMP-/);
   assert.match(migration, /ON UPDATE CASCADE/);
   assert.match(adminPage, /placeholder="e\.g\. PR-2026-0001"/);
-  assert.doesNotMatch(adminPage.slice(adminPage.indexOf('Official PR Number <span'), adminPage.indexOf('Logbook \/ Control Remarks')), /readOnly/);
+  const officialNumberModal = adminPage.slice(adminPage.indexOf('/* Standalone Step 4'), adminPage.indexOf('{deletePR &&'));
+  assert.doesNotMatch(officialNumberModal, /readOnly/);
   assert.match(correctionMigration, /Administrators may correct an already-entered PR number at Step 4/);
   assert.doesNotMatch(correctionMigration, /This Purchase Request already has an official PR number/);
 });
