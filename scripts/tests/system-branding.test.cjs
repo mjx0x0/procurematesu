@@ -577,3 +577,20 @@ test('admin notification rows expose independent read/unread and owner-scoped de
   assert.match(migration, /FOR DELETE/);
   assert.match(migration, /USING \(user_id = \(SELECT auth\.uid\(\)\)\)/);
 });
+
+
+test('Step 4 PR numbering supports temporary-number correction and atomically advances after official assignment', () => {
+  const adminPage = read('app/admin/purchase-requests/page.tsx');
+  const temporaryRoute = read('app/api/admin/update-temporary-pr/route.ts');
+  const migration = read('supabase/migrations/20261112130000_add_temporary_pr_number_edit.sql');
+
+  assert.match(adminPage, /update-temporary-pr/);
+  assert.match(adminPage, /newStatus: "budget_endorsement"/);
+  assert.match(adminPage, /officialPrNo: isTemporary \? cleanNo : undefined/);
+  assert.match(adminPage, /Confirm &amp; Advance to Step 5/);
+  assert.match(temporaryRoute, /role !== 'admin'/);
+  assert.match(temporaryRoute, /update_temporary_purchase_request_number/);
+  assert.match(migration, /current_stage <> 'pr_pre_numbering'/);
+  assert.match(migration, /PR-TEMP-/);
+  assert.match(migration, /ON UPDATE CASCADE/);
+});
