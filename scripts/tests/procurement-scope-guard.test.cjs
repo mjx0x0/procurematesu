@@ -33,7 +33,7 @@ for (const [message, intent] of conversationalMessages) {
     assert.ok(response.length > 20);
     assert.match(response, /Gab AI|You're welcome/);
     if (intent === 'identity') {
-      assert.match(response, /AI-powered procurement assistant/i);
+      assert.match(response, /AI-powered guide/i);
     }
     if (intent === 'capabilities') {
       assert.match(response, /Purchase Request drafting/i);
