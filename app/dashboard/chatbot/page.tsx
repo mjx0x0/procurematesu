@@ -44,20 +44,23 @@ const SUGGESTIONS = [
   "Where is the Procurement Office?",
 ];
 
-const WELCOME: Message = {
+const createWelcomeMessage = (name?: string): Message => ({
   id: "welcome",
   role: "assistant",
-  content:
-    "👋 **Kumusta! I’m Gab AI**, your procurement assistant for MSU-General Santos.\n\nI can help explain procurement rules, guide you through Purchase Request drafting, track submitted PRs, and answer questions about the Procurement Office and procurement procedures.\n\nAsk me anything. I’ll keep responses clear, practical, friendly, and grounded in the university’s procurement references.",
+  content: `👋 **Hi${name ? `, ${name.split(/\\s+/)[0]}` : ""}! I’m Gab AI.**
+
+I’m here to help with MSU-General Santos procurement. I can explain procurement rules, guide you through Purchase Request drafting, help track submitted PRs, and answer questions about the Procurement Office and its procedures.
+
+Feel free to ask—I’ll do my best to make each answer clear, helpful, and easy to follow.`,
   timestamp: new Date(),
-};
+});
 
 export default function ChatbotDashboard() {
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);\n  const [userName, setUserName] = useState("");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
@@ -106,7 +109,7 @@ export default function ChatbotDashboard() {
       sources: Array.isArray(m.metadata?.sources) ? m.metadata.sources : undefined,
       prOptions: Array.isArray(m.metadata?.prOptions) ? m.metadata.prOptions : undefined,
     })) as Message[];
-    setMessages(restored.length ? restored : [{ ...WELCOME, timestamp: new Date() }]);
+    setMessages(restored.length ? restored : [createWelcomeMessage(userName)]);
   };
 
   const createSession = async (uid: string) => {
@@ -125,7 +128,7 @@ export default function ChatbotDashboard() {
     });
     if (error) throw error;
     setSessionId(id);
-    setMessages([{ ...WELCOME, timestamp: new Date() }]);
+    setMessages([createWelcomeMessage(userName)]);
     await loadSessions(uid);
     return id;
   };
