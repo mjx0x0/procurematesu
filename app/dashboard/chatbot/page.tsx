@@ -44,13 +44,16 @@ const SUGGESTIONS = [
   "Where is the Procurement Office?",
 ];
 
-const WELCOME: Message = {
+const createWelcomeMessage = (name?: string): Message => ({
   id: "welcome",
   role: "assistant",
-  content:
-    "👋 **Kumusta! I’m Gab AI**, your procurement assistant for MSU-General Santos.\n\nI can help explain procurement rules, guide you through Purchase Request drafting, track submitted PRs, and answer questions about the Procurement Office and procurement procedures.\n\nAsk me anything. I’ll keep responses clear, practical, friendly, and grounded in the university’s procurement references.",
+  content: `👋 **Hi${name ? `, ${name.split(" ")[0]}` : ""}! I’m Gab AI.**
+
+I’m here to help with MSU-General Santos procurement. I can explain procurement rules, guide you through Purchase Request drafting, help track submitted PRs, and answer questions about the Procurement Office and its procedures.
+
+Feel free to ask—I’ll do my best to make each answer clear, helpful, and easy to follow.`,
   timestamp: new Date(),
-};
+});
 
 export default function ChatbotDashboard() {
   const router = useRouter();
@@ -58,6 +61,7 @@ export default function ChatbotDashboard() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [userName, setUserName] = useState("");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
@@ -106,7 +110,7 @@ export default function ChatbotDashboard() {
       sources: Array.isArray(m.metadata?.sources) ? m.metadata.sources : undefined,
       prOptions: Array.isArray(m.metadata?.prOptions) ? m.metadata.prOptions : undefined,
     })) as Message[];
-    setMessages(restored.length ? restored : [{ ...WELCOME, timestamp: new Date() }]);
+    setMessages(restored.length ? restored : [createWelcomeMessage(userName)]);
   };
 
   const createSession = async (uid: string) => {
@@ -125,7 +129,7 @@ export default function ChatbotDashboard() {
     });
     if (error) throw error;
     setSessionId(id);
-    setMessages([{ ...WELCOME, timestamp: new Date() }]);
+    setMessages([createWelcomeMessage(userName)]);
     await loadSessions(uid);
     return id;
   };
@@ -145,13 +149,16 @@ export default function ChatbotDashboard() {
         }
         if (cancelled) return;
         setUserId(user.id);
+        const fullName = String(user.user_metadata?.full_name || user.user_metadata?.name || "").trim();
+        const displayName = fullName && !fullName.includes("@") ? fullName : "";
+        setUserName(displayName);
         const list = await loadSessions(user.id);
         const active = list.find((s) => s.is_active) || (list.length > 0 ? list[0] : null);
         if (active) {
           setSessionId(active.id);
           await loadMessages(active.id);
         } else {
-          setMessages([{ ...WELCOME, timestamp: new Date() }]);
+          setMessages([createWelcomeMessage(displayName)]);
         }
       } catch (e) {
         console.error("Chat initialization failed:", e);
@@ -434,7 +441,7 @@ export default function ChatbotDashboard() {
         .update({ title: "New conversation", state: {}, updated_at: new Date().toISOString(), is_active: true })
         .eq("id", sessionId)
         .eq("user_id", userId);
-      setMessages([{ ...WELCOME, timestamp: new Date() }]);
+      setMessages([createWelcomeMessage(userName)]);
       if (userId) await loadSessions(userId);
     } catch (e) {
       console.error(e);
@@ -470,7 +477,7 @@ export default function ChatbotDashboard() {
           await loadMessages(next.id);
         } else {
           setSessionId(null);
-          setMessages([{ ...WELCOME, timestamp: new Date() }]);
+          setMessages([createWelcomeMessage(userName)]);
         }
       }
       setDeleteId(null);
@@ -547,7 +554,7 @@ export default function ChatbotDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
         <div className="text-center">
           <Loader2 className="h-10 w-10 animate-spin text-[#7B0046] mx-auto mb-3" />
-          <p className="text-xs font-semibold text-stone-600">Connecting to MSU-GenSan Procurement Assistant...</p>
+          <p className="text-xs font-semibold text-stone-600">Connecting to Gab AI...</p>
         </div>
       </div>
     );
@@ -560,7 +567,7 @@ export default function ChatbotDashboard() {
       {/* Top Navbar */}
       <SystemPageHeader
         headerTitle="Gab AI"
-        subtitle="Procurement Assistant"
+        subtitle="Gab AI Support"
         hideSystemSuffix
         compactOnMobile
         backHref="/dashboard"
@@ -894,7 +901,7 @@ export default function ChatbotDashboard() {
                 <div className="flex justify-start">
                   <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl rounded-tl-sm p-3 text-xs text-stone-500 flex items-center gap-2">
                     <Loader2 className="h-3.5 w-3.5 animate-spin text-[#7B0046]" />
-                    <span>Procurement Assistant is analyzing...</span>
+                    <span>Gab AI is thinking...</span>
                   </div>
                 </div>
               )}
