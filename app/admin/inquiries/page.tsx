@@ -20,6 +20,14 @@ interface Inquiry {
   inquiry_type: string;
   created_at: string;
   updated_at: string;
+  session_id?: string | null;
+}
+
+interface ConversationTurn {
+  id: string;
+  sender: "user" | "ai" | "assistant";
+  content: string;
+  created_at: string;
 }
 
 export default function InquiriesPage() {
@@ -32,6 +40,8 @@ export default function InquiriesPage() {
   const [dateFilter, setDateFilter] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [conversationTurns, setConversationTurns] = useState<ConversationTurn[]>([]);
+  const [conversationLoading, setConversationLoading] = useState(false);
 
   // Check admin and load data
   useEffect(() => {
@@ -82,6 +92,30 @@ export default function InquiriesPage() {
       setFilteredInquiries(data || []);
     } catch (err) {
       console.error("Error loading inquiries:", err);
+    }
+  };
+
+  const openConversation = async (inquiry: Inquiry) => {
+    setSelectedInquiry(inquiry);
+    setShowDetailModal(true);
+    setConversationTurns([]);
+    if (!inquiry.session_id) return;
+
+    setConversationLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("chat_messages")
+        .select("id,sender,content,created_at")
+        .eq("session_id", inquiry.session_id)
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      setConversationTurns((data || []) as ConversationTurn[]);
+    } catch (err) {
+      console.error("Error loading complete conversation:", err);
+      setConversationTurns([]);
+    } finally {
+      setConversationLoading(false);
     }
   };
 
@@ -279,10 +313,7 @@ const formatDate = (date: string) => {
                       </td>
                       <td className="px-5 py-4 text-right whitespace-nowrap">
                         <button
-                          onClick={() => {
-                            setSelectedInquiry(inquiry);
-                            setShowDetailModal(true);
-                          }}
+                          onClick={() => void openConversation(inquiry)}
                           className="inline-flex items-center gap-1 text-xs font-bold text-[#7B0046] hover:text-[#4D002C] px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
                         >
                           <Eye className="h-3.5 w-3.5" />
@@ -342,17 +373,43 @@ const formatDate = (date: string) => {
               </div>
 
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1.5">User Messages</p>
-                <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs sm:text-sm text-stone-800 whitespace-pre-wrap font-medium">
-                  {selectedInquiry.user_message}
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[11px] uppercase tracking-wider text-stone-500 font-bold">Full Conversation</p>
+                  {conversationTurns.length > 0 && (
+                    <span className="text-[10px] text-stone-400">{Math.ceil(conversationTurns.filter((turn) => turn.sender === "user").length)} user messages</span>
+                  )}
                 </div>
-              </div>
-
-              <div>
-                <p className="text-[11px] uppercase tracking-wider text-[#C27803] font-bold mb-1.5">Gab AI Replies</p>
-                <div className="p-3 bg-amber-50/40 rounded-xl border border-amber-200/80 text-xs sm:text-sm text-stone-900 whitespace-pre-wrap leading-relaxed">
-                  {selectedInquiry.bot_response || "No response recorded"}
-                </div>
+                {conversationLoading ? (
+                  <div className="p-6 text-center text-xs text-stone-500">Loading complete conversation...</div>
+                ) : conversationTurns.length > 0 ? (
+                  <div className="space-y-3 max-h-[48vh] overflow-y-auto pr-1">
+                    {conversationTurns.map((turn) => {
+                      const isUser = turn.sender === "user";
+                      return (
+                        <div key={turn.id} className={isUser ? "flex justify-end" : "flex justify-start"}>
+                          <div className={`max-w-[92%] rounded-xl border p-3 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed ${isUser ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-amber-50/40 border-amber-200/80 text-stone-900"}`}>
+                            <p className={`text-[10px] uppercase tracking-wider font-bold mb-1.5 ${isUser ? "text-stone-500" : "text-[#C27803]"}`}>
+                              {isUser ? "User" : "Gab AI"}
+                            </p>
+                            {turn.content}
+                            <p className="text-[10px] text-stone-400 mt-2 text-right">{formatDate(turn.created_at)}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1.5">User Message</p>
+                      <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs sm:text-sm text-stone-800 whitespace-pre-wrap font-medium">{selectedInquiry.user_message}</div>
+                    </div>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider text-[#C27803] font-bold mb-1.5">Gab AI Reply</p>
+                      <div className="p-3 bg-amber-50/40 rounded-xl border border-amber-200/80 text-xs sm:text-sm text-stone-900 whitespace-pre-wrap leading-relaxed">{selectedInquiry.bot_response || "No response recorded"}</div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-stone-200 flex justify-end">
