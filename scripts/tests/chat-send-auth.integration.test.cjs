@@ -424,7 +424,7 @@ test('authenticated chatbot API enforces identity, account status, session owner
       });
       assert.equal(followUp.status, 200, JSON.stringify(followUp.payload));
       assert.equal(storedInquiries.length - beforeInquiries, 1, 'A second prompt in the same chat must update the existing session log.');
-      assert.match(storedInquiries.at(-1).user_message, /Help me draft a PR[\\s\\S]*Thanks/);
+      assert.match(storedInquiries.at(-1).user_message, /Help me draft a PR[\s\S]*Thanks/);
       assert.equal(storedInquiries.at(-1).metadata.message_count, 2);
     });
 
