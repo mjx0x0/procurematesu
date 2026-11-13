@@ -612,3 +612,20 @@ test('admin conversation detail loads and renders every saved turn for a chat se
   assert.match(inquiries, /turn\.sender === "user"/);
   assert.match(inquiries, /Gab AI/);
 });
+
+
+test('admin can delete a helpdesk log through an admin-authorized endpoint with confirmation', () => {
+  const inquiries = read('app/admin/inquiries/page.tsx');
+  const deleteRoute = read('app/api/admin/inquiries/delete/route.ts');
+
+  assert.match(inquiries, /Delete Log/);
+  assert.match(inquiries, /Delete conversation log\?/);
+  assert.match(inquiries, /setInquiryToDelete\(inquiry\)/);
+  assert.match(inquiries, /method: "DELETE"/);
+  assert.match(inquiries, /\/api\/admin\/inquiries\/delete/);
+  assert.match(inquiries, /setInquiries\(\(current\) => current\.filter/);
+  assert.match(deleteRoute, /profile\?\.role !== "admin"/);
+  assert.match(deleteRoute, /from\("monitor_inquiries"\)/);
+  assert.match(deleteRoute, /\.delete\(\)/);
+  assert.match(deleteRoute, /\.eq\("id", inquiryId\)/);
+});
