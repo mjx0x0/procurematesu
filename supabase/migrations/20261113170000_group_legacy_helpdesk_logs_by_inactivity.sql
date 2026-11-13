@@ -60,12 +60,9 @@ flattened AS (
     all_user_messages,
     all_bot_replies,
     (
-      SELECT jsonb_agg(turn ORDER BY turn_order)
-      FROM (
-        SELECT value AS turn, (row_number() OVER ()) AS turn_order
-        FROM jsonb_array_elements(paired_turns) AS pair,
-             LATERAL jsonb_array_elements(pair) AS value
-      ) ordered_turns
+      SELECT jsonb_agg(turn.value ORDER BY pair.pair_order, turn.turn_order)
+      FROM jsonb_array_elements(paired_turns) WITH ORDINALITY AS pair(turns, pair_order),
+           LATERAL jsonb_array_elements(pair.turns) WITH ORDINALITY AS turn(value, turn_order)
     ) AS conversation_history
   FROM grouped_rows
 )
