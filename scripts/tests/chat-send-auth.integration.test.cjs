@@ -416,6 +416,16 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.deepEqual(storedMessages.slice(-2).map((message) => message.sender), ['user', 'ai']);
       assert.equal(storedInquiries.length - beforeInquiries, 1);
       assert.equal(storedInquiries.at(-1).user_id, 'user-a');
+
+      const followUp = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-user-a',
+        message: 'Thanks',
+      });
+      assert.equal(followUp.status, 200, JSON.stringify(followUp.payload));
+      assert.equal(storedInquiries.length - beforeInquiries, 1, 'A second prompt in the same chat must update the existing session log.');
+      assert.match(storedInquiries.at(-1).user_message, /Help me draft a PR[\\s\\S]*Thanks/);
+      assert.equal(storedInquiries.at(-1).metadata.message_count, 2);
     });
 
     await t.test('natural-language request to prepare a PR starts slot filling and retains supplied microscope details', async () => {
