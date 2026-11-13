@@ -106,14 +106,18 @@ export default function InquiriesPage() {
 
     setConversationLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("chat_messages")
-        .select("id,sender,content,created_at")
-        .eq("session_id", inquiry.session_id)
-        .order("created_at", { ascending: true });
-
-      if (error) throw error;
-      setConversationTurns((data || []) as ConversationTurn[]);
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = {};
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+      const response = await fetch(`/api/admin/inquiries/conversation?sessionId=${encodeURIComponent(inquiry.session_id)}`, {
+        method: "GET",
+        headers,
+        credentials: "include",
+        cache: "no-store",
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(result?.error || "Unable to load this conversation.");
+      setConversationTurns((result?.turns || []) as ConversationTurn[]);
     } catch (err) {
       console.error("Error loading complete conversation:", err);
       setConversationTurns([]);
