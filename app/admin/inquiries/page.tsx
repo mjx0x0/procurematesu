@@ -7,7 +7,7 @@ import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
-import { User, Search, Eye, MessageSquare, Filter, X } from "lucide-react";
+import { User, Search, Eye, MessageSquare, Filter, X, Trash2 } from "lucide-react";
 
 interface Inquiry {
   id: string;
@@ -42,6 +42,9 @@ export default function InquiriesPage() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [conversationTurns, setConversationTurns] = useState<ConversationTurn[]>([]);
   const [conversationLoading, setConversationLoading] = useState(false);
+  const [inquiryToDelete, setInquiryToDelete] = useState<Inquiry | null>(null);
+  const [deletingInquiry, setDeletingInquiry] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   // Check admin and load data
   useEffect(() => {
@@ -116,6 +119,36 @@ export default function InquiriesPage() {
       setConversationTurns([]);
     } finally {
       setConversationLoading(false);
+    }
+  };
+
+  const deleteInquiryLog = async () => {
+    if (!inquiryToDelete || deletingInquiry) return;
+    setDeletingInquiry(true);
+    setDeleteError("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+      const response = await fetch("/api/admin/inquiries/delete", {
+        method: "DELETE",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({ id: inquiryToDelete.id }),
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(result?.error || "Unable to delete this log.");
+
+      setInquiries((current) => current.filter((item) => item.id !== inquiryToDelete.id));
+      if (selectedInquiry?.id === inquiryToDelete.id) {
+        setSelectedInquiry(null);
+        setShowDetailModal(false);
+      }
+      setInquiryToDelete(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Unable to delete this log.");
+    } finally {
+      setDeletingInquiry(false);
     }
   };
 
@@ -312,13 +345,23 @@ const formatDate = (date: string) => {
                         {formatDate(inquiry.created_at)}
                       </td>
                       <td className="px-5 py-4 text-right whitespace-nowrap">
-                        <button
-                          onClick={() => void openConversation(inquiry)}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-[#7B0046] hover:text-[#4D002C] px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
-                        >
-                          <Eye className="h-3.5 w-3.5" />
-                          View Log
-                        </button>
+                        <div className="inline-flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => void openConversation(inquiry)}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-[#7B0046] hover:text-[#4D002C] px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                            View Log
+                          </button>
+                          <button
+                            onClick={() => { setDeleteError(""); setInquiryToDelete(inquiry); }}
+                            aria-label={`Delete log for ${inquiry.user_name || "user"}`}
+                            title="Delete log"
+                            className="inline-flex items-center justify-center h-8 w-8 text-red-600 hover:text-red-700 rounded-lg hover:bg-red-50 transition-colors"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -328,6 +371,30 @@ const formatDate = (date: string) => {
           )}
         </div>
       </div>
+
+      {/* Delete Log Confirmation */}
+      {inquiryToDelete && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" role="dialog" aria-modal="true" aria-labelledby="delete-log-title">
+          <div className="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-5 shadow-2xl">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <h3 id="delete-log-title" className="text-base font-bold text-stone-900">Delete conversation log?</h3>
+                <p className="mt-1 text-xs leading-relaxed text-stone-600">This will permanently remove this entry from the admin Helpdesk Logs list. The user's chat history will remain unchanged.</p>
+              </div>
+            </div>
+            {deleteError && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{deleteError}</p>}
+            <div className="mt-5 flex justify-end gap-2 border-t border-stone-100 pt-3">
+              <button type="button" onClick={() => setInquiryToDelete(null)} disabled={deletingInquiry} className="rounded-lg px-3.5 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 disabled:opacity-50">Cancel</button>
+              <button type="button" onClick={() => void deleteInquiryLog()} disabled={deletingInquiry} className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50">
+                {deletingInquiry ? "Deleting..." : "Delete Log"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Detail Modal */}
       {showDetailModal && selectedInquiry && (
