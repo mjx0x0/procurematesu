@@ -175,8 +175,32 @@ export async function POST(request: NextRequest) {
     // Answer brief social/identity messages deterministically and preserve any
     // active PR draft; never pass these messages to slot validation or an LLM.
     if (scopeDecision.reason === 'small_talk') {
+      const response = buildProcurementSmallTalkResponse(message);
+      // Deterministic early replies must still be recorded so the admin log
+      // contains every turn in the conversation, not only LLM-backed answers.
+      try {
+        await clientToUse.from('chat_messages').insert([
+          { session_id: sessionId, sender: 'user', content: message },
+          { session_id: sessionId, sender: 'ai', content: response },
+        ]);
+        if (db) {
+          const { error: logError } = await db.rpc('append_monitor_inquiry_session', {
+            p_session_id: sessionId,
+            p_user_id: user.id,
+            p_user_name: user.user_metadata?.full_name || user.user_metadata?.name || 'ProcuremateSU User',
+            p_user_department: 'MSU-GenSan',
+            p_pr_no: null,
+            p_user_message: message,
+            p_bot_response: response,
+            p_inquiry_type: 'general',
+          });
+          if (logError) console.warn('[chat/send] Small-talk session log update failed:', logError.message);
+        }
+      } catch (persistError) {
+        console.warn('[chat/send] Could not persist small-talk turn:', persistError);
+      }
       return NextResponse.json({
-        response: buildProcurementSmallTalkResponse(message),
+        response,
         sources: ['Gab AI conversational response'],
       });
     }
