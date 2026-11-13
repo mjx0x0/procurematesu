@@ -457,13 +457,13 @@ const formatDate = (date: string) => {
                     {conversationTurns.map((turn) => {
                       const isUser = turn.sender === "user";
                       return (
-                        <div key={turn.id} className={isUser ? "flex justify-end" : "flex justify-start"}>
-                          <div className={`max-w-[92%] rounded-xl border p-3 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed ${isUser ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-amber-50/40 border-amber-200/80 text-stone-900"}`}>
-                            <p className={`text-[10px] uppercase tracking-wider font-bold mb-1.5 ${isUser ? "text-stone-500" : "text-[#C27803]"}`}>
-                              {isUser ? "User" : "Gab AI"}
+                        <div key={turn.id} className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}>
+                          <div className={`w-fit max-w-[88%] rounded-2xl px-3.5 py-3 text-xs sm:max-w-[82%] sm:px-4 sm:py-3.5 sm:text-sm whitespace-pre-wrap leading-relaxed shadow-sm ${isUser ? "rounded-tr-sm bg-gradient-to-r from-[#7B0046] to-[#8E0052] text-white" : "rounded-tl-sm border border-stone-200 bg-white text-stone-800"}`}>
+                            <p className={`text-[10px] uppercase tracking-wider font-bold mb-1.5 ${isUser ? "text-amber-200" : "text-[#7B0046]"}`}>
+                              {isUser ? "You" : "Gab AI"}
                             </p>
                             {turn.content}
-                            <p className="text-[10px] text-stone-400 mt-2 text-right">{formatDate(turn.created_at)}</p>
+                            <p className={`text-[10px] mt-2 text-right ${isUser ? "text-white/60" : "text-stone-400"}`}>{formatDate(turn.created_at)}</p>
                           </div>
                         </div>
                       );
