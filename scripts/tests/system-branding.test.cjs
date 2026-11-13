@@ -660,3 +660,15 @@ test('historical legacy helpdesk logs are grouped and retain ordered conversatio
   assert.match(anonymousFix, /IS NOT DISTINCT FROM/);
   assert.match(anonymousFix, /COALESCE\(user_id::text, 'anonymous'\)/);
 });
+
+
+test('admin conversation bubbles mirror the end-user Gab AI chat and expand legacy paragraphs', () => {
+  const inquiries = read('app/admin/inquiries/page.tsx');
+  const conversationRoute = read('app/api/admin/inquiries/conversation/route.ts');
+
+  assert.match(inquiries, /bg-gradient-to-r from-\[#7B0046\] to-\[#8E0052\]/);
+  assert.match(inquiries, /rounded-tl-sm border border-stone-200 bg-white/);
+  assert.match(inquiries, /conversationTurns\.map\(\(turn\)/);
+  assert.match(conversationRoute, /split\(\/\\r\?\\n\\s\*\\r\?\\n\//);
+  assert.match(conversationRoute, /paragraphs\.map\(\(content: string, partIndex: number\)/);
+});
