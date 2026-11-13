@@ -2,6 +2,8 @@
 -- Since exact chat_messages matches are unavailable for many older records,
 -- group only same-user prompts separated by no more than 30 minutes. Keep a
 -- structured transcript in metadata so the detail modal can render each turn.
+DROP INDEX IF EXISTS public.monitor_inquiries_session_id_uidx;
+
 WITH ordered AS (
   SELECT
     id, user_id, created_at,
@@ -89,3 +91,7 @@ WITH ranked AS (
 DELETE FROM public.monitor_inquiries mi
 USING ranked r
 WHERE mi.id = r.id AND r.row_rank > 1;
+
+CREATE UNIQUE INDEX IF NOT EXISTS monitor_inquiries_session_id_uidx
+  ON public.monitor_inquiries (session_id)
+  WHERE session_id IS NOT NULL;
