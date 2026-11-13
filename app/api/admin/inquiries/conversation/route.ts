@@ -31,6 +31,28 @@ export async function GET(request: NextRequest) {
     const sessionId = request.nextUrl.searchParams.get("sessionId")?.trim();
     if (!sessionId) return NextResponse.json({ error: "A conversation session ID is required." }, { status: 400 });
 
+    if (sessionId.startsWith("legacy-")) {
+      const { data: legacyLog, error: legacyError } = await adminClient
+        .from("monitor_inquiries")
+        .select("metadata")
+        .eq("session_id", sessionId)
+        .maybeSingle();
+      if (legacyError) {
+        console.error("[admin/inquiries/conversation] Legacy read failed:", legacyError);
+        return NextResponse.json({ error: "Unable to load this conversation." }, { status: 500 });
+      }
+      const history = Array.isArray(legacyLog?.metadata?.conversation_history)
+        ? legacyLog.metadata.conversation_history
+        : [];
+      const turns = history.map((turn: any, index: number) => ({
+        id: `legacy-${sessionId}-${index}`,
+        sender: turn?.sender === "user" ? "user" : "ai",
+        content: typeof turn?.content === "string" ? turn.content : "",
+        created_at: turn?.created_at || new Date().toISOString(),
+      }));
+      return NextResponse.json({ turns });
+    }
+
     const { data: turns, error } = await adminClient
       .from("chat_messages")
       .select("id,sender,content,created_at")
