@@ -7,7 +7,7 @@ import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
-import { User, Search, Eye, MessageSquare, Filter, X, Download } from "lucide-react";
+import { User, Search, Eye, MessageSquare, Filter, X } from "lucide-react";
 
 interface Inquiry {
   id: string;
@@ -139,39 +139,6 @@ const formatDate = (date: string) => {
     return colors[type] || "bg-stone-100 text-stone-600";
   };
 
-  const exportCSV = () => {
-    const headers = [
-      "User",
-      "Department",
-      "PR No.",
-      "Question",
-      "Response",
-      "Type",
-      "Date",
-    ];
-    const rows = filteredInquiries.map((i) => [
-      i.user_name || "N/A",
-      i.user_department || "N/A",
-      i.pr_no || "N/A",
-      i.user_message,
-      i.bot_response,
-      i.inquiry_type || "general",
-      formatDate(i.created_at),
-    ]);
-
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `inquiries_${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   if (loading) return <LoadingScreen label="Loading inquiries..." />;
 
   return (
@@ -195,17 +162,10 @@ const formatDate = (date: string) => {
           <div>
             <h1 className="text-xl sm:text-3xl font-black tracking-tight text-[#4D002C]">Chatbot & Helpdesk Logs</h1>
             <p className="text-xs sm:text-sm text-stone-600 mt-1">
-              <b>{filteredInquiries.length}</b> logged inquiries across user sessions.
+              <b>{filteredInquiries.length}</b> conversation sessions recorded.
             </p>
           </div>
-          <button
-            onClick={exportCSV}
-            className="ui-button w-full sm:w-auto justify-center bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 text-xs py-2 px-3.5 shadow-xs"
-            disabled={filteredInquiries.length === 0}
-          >
-            <Download className="h-4 w-4 text-[#7B0046]" />
-            Export CSV
-          </button>
+
         </div>
 
         {/* Filters */}
