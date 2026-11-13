@@ -629,3 +629,20 @@ test('admin can delete a helpdesk log through an admin-authorized endpoint with 
   assert.match(deleteRoute, /\.delete\(\)/);
   assert.match(deleteRoute, /\.eq\("id", inquiryId\)/);
 });
+
+
+test('admin conversation history is loaded through the authorized server endpoint', () => {
+  const inquiries = read('app/admin/inquiries/page.tsx');
+  const conversationRoute = read('app/api/admin/inquiries/conversation/route.ts');
+  const backfill = read('supabase/migrations/20261113160000_backfill_and_consolidate_historical_inquiry_sessions.sql');
+
+  assert.match(inquiries, /\/api\/admin\/inquiries\/conversation\?sessionId=/);
+  assert.doesNotMatch(inquiries, /\.from\("chat_messages"\)/);
+  assert.match(conversationRoute, /profile\?\.role !== "admin"/);
+  assert.match(conversationRoute, /from\("chat_messages"\)/);
+  assert.match(conversationRoute, /\.eq\("session_id", sessionId\)/);
+  assert.match(backfill, /AT TIME ZONE 'Asia\/Manila'/);
+  assert.match(backfill, /consolidated_log_rows/);
+  assert.match(backfill, /DELETE FROM public\.monitor_inquiries/);
+  assert.match(backfill, /Chat message history itself is never deleted/);
+});
