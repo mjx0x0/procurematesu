@@ -182,12 +182,28 @@ async function handleMockSupabase(request, response) {
     return response.end('[]');
   }
 
-  if (url.pathname === '/rest/v1/monitor_inquiries' && request.method === 'POST') {
-    const body = await readJSON(request);
-    storedInquiries.push(body);
-    response.statusCode = 201;
-    response.setHeader('content-type', 'application/json');
-    return response.end('[]');
+  if (url.pathname === '/rest/v1/rpc/append_monitor_inquiry_session' && request.method === 'POST') {
+    const args = await readJSON(request);
+    const existing = storedInquiries.find((entry) => entry.session_id === args.p_session_id);
+    if (existing) {
+      existing.user_message += '\\n\\n' + args.p_user_message;
+      existing.bot_response += '\\n\\n' + args.p_bot_response;
+      existing.pr_no = args.p_pr_no || existing.pr_no;
+      existing.metadata.message_count += 1;
+    } else {
+      storedInquiries.push({
+        session_id: args.p_session_id,
+        user_id: args.p_user_id,
+        user_name: args.p_user_name,
+        user_department: args.p_user_department,
+        pr_no: args.p_pr_no || 'N/A',
+        user_message: args.p_user_message,
+        bot_response: args.p_bot_response,
+        inquiry_type: args.p_inquiry_type,
+        metadata: { message_count: 1 },
+      });
+    }
+    return sendJSON(response, 200, null);
   }
 
   return sendJSON(response, 404, {
@@ -400,6 +416,16 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.deepEqual(storedMessages.slice(-2).map((message) => message.sender), ['user', 'ai']);
       assert.equal(storedInquiries.length - beforeInquiries, 1);
       assert.equal(storedInquiries.at(-1).user_id, 'user-a');
+
+      const followUp = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-user-a',
+        message: 'Thanks',
+      });
+      assert.equal(followUp.status, 200, JSON.stringify(followUp.payload));
+      assert.equal(storedInquiries.length - beforeInquiries, 1, 'A second prompt in the same chat must update the existing session log.');
+      assert.match(storedInquiries.at(-1).user_message, /Help me draft a PR[\s\S]*Thanks/);
+      assert.equal(storedInquiries.at(-1).metadata.message_count, 2);
     });
 
     await t.test('natural-language request to prepare a PR starts slot filling and retains supplied microscope details', async () => {

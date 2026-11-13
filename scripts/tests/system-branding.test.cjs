@@ -597,3 +597,78 @@ test('Step 4 requires only an official PR number and uses the standard stage mod
   assert.match(correctionMigration, /Administrators may correct an already-entered PR number at Step 4/);
   assert.doesNotMatch(correctionMigration, /This Purchase Request already has an official PR number/);
 });
+
+
+test('admin conversation detail loads and renders every saved turn for a chat session', () => {
+  const inquiries = read('app/admin/inquiries/page.tsx');
+
+  assert.match(inquiries, /interface ConversationTurn/);
+  assert.match(inquiries, /openConversation = async \(inquiry: Inquiry\)/);
+  assert.match(inquiries, /\/api\/admin\/inquiries\/conversation\?sessionId=/);
+  assert.doesNotMatch(inquiries, /\.from\("chat_messages"\)/);
+  assert.match(inquiries, /conversationTurns\.map\(\(turn\)/);
+  assert.match(inquiries, /Full Conversation/);
+  assert.match(inquiries, /turn\.sender === "user"/);
+  assert.match(inquiries, /Gab AI/);
+});
+
+
+test('admin can delete a helpdesk log through an admin-authorized endpoint with confirmation', () => {
+  const inquiries = read('app/admin/inquiries/page.tsx');
+  const deleteRoute = read('app/api/admin/inquiries/delete/route.ts');
+
+  assert.match(inquiries, /Delete Log/);
+  assert.match(inquiries, /Delete conversation log\?/);
+  assert.match(inquiries, /setInquiryToDelete\(inquiry\)/);
+  assert.match(inquiries, /method: "DELETE"/);
+  assert.match(inquiries, /\/api\/admin\/inquiries\/delete/);
+  assert.match(inquiries, /setInquiries\(\(current\) => current\.filter/);
+  assert.match(deleteRoute, /profile\?\.role !== "admin"/);
+  assert.match(deleteRoute, /from\("monitor_inquiries"\)/);
+  assert.match(deleteRoute, /\.delete\(\)/);
+  assert.match(deleteRoute, /\.eq\("id", inquiryId\)/);
+});
+
+
+test('admin conversation history is loaded through the authorized server endpoint', () => {
+  const inquiries = read('app/admin/inquiries/page.tsx');
+  const conversationRoute = read('app/api/admin/inquiries/conversation/route.ts');
+  const backfill = read('supabase/migrations/20261113160000_backfill_and_consolidate_historical_inquiry_sessions.sql');
+
+  assert.match(inquiries, /\/api\/admin\/inquiries\/conversation\?sessionId=/);
+  assert.doesNotMatch(inquiries, /\.from\("chat_messages"\)/);
+  assert.match(conversationRoute, /profile\?\.role !== "admin"/);
+  assert.match(conversationRoute, /from\("chat_messages"\)/);
+  assert.match(conversationRoute, /\.eq\("session_id", sessionId\)/);
+  assert.match(backfill, /AT TIME ZONE 'Asia\/Manila'/);
+  assert.match(backfill, /consolidated_log_rows/);
+  assert.match(backfill, /DELETE FROM public\.monitor_inquiries/);
+  assert.match(backfill, /Chat message history itself is never deleted/);
+});
+
+
+test('historical legacy helpdesk logs are grouped and retain ordered conversation transcripts', () => {
+  const conversationRoute = read('app/api/admin/inquiries/conversation/route.ts');
+  const legacyGrouping = read('supabase/migrations/20261113170000_group_legacy_helpdesk_logs_by_inactivity.sql');
+  const anonymousFix = read('supabase/migrations/20261113190000_fix_anonymous_log_grouping.sql');
+
+  assert.match(conversationRoute, /sessionId\.startsWith\("legacy-"\)/);
+  assert.match(conversationRoute, /conversation_history/);
+  assert.match(legacyGrouping, /interval '30 minutes'/);
+  assert.match(legacyGrouping, /jsonb_agg/);
+  assert.match(legacyGrouping, /conversation_history/);
+  assert.match(anonymousFix, /IS NOT DISTINCT FROM/);
+  assert.match(anonymousFix, /COALESCE\(user_id::text, 'anonymous'\)/);
+});
+
+
+test('admin conversation bubbles mirror the end-user Gab AI chat and expand legacy paragraphs', () => {
+  const inquiries = read('app/admin/inquiries/page.tsx');
+  const conversationRoute = read('app/api/admin/inquiries/conversation/route.ts');
+
+  assert.match(inquiries, /bg-gradient-to-r from-\[#7B0046\] to-\[#8E0052\]/);
+  assert.match(inquiries, /rounded-tl-sm border border-stone-200 bg-white/);
+  assert.match(inquiries, /conversationTurns\.map\(\(turn\)/);
+  assert.match(conversationRoute, /split\(\/\\r\?\\n\\s\*\\r\?\\n\//);
+  assert.match(conversationRoute, /paragraphs\.map\(\(content: string, partIndex: number\)/);
+});

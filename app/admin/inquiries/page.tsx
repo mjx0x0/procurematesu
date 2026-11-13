@@ -7,7 +7,7 @@ import { supabase, isStaleRefreshTokenError } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
-import { User, Search, Eye, MessageSquare, Filter, X, Download } from "lucide-react";
+import { User, Search, Eye, MessageSquare, Filter, X, Trash2 } from "lucide-react";
 
 interface Inquiry {
   id: string;
@@ -20,6 +20,14 @@ interface Inquiry {
   inquiry_type: string;
   created_at: string;
   updated_at: string;
+  session_id?: string | null;
+}
+
+interface ConversationTurn {
+  id: string;
+  sender: "user" | "ai" | "assistant";
+  content: string;
+  created_at: string;
 }
 
 export default function InquiriesPage() {
@@ -32,6 +40,11 @@ export default function InquiriesPage() {
   const [dateFilter, setDateFilter] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [conversationTurns, setConversationTurns] = useState<ConversationTurn[]>([]);
+  const [conversationLoading, setConversationLoading] = useState(false);
+  const [inquiryToDelete, setInquiryToDelete] = useState<Inquiry | null>(null);
+  const [deletingInquiry, setDeletingInquiry] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   // Check admin and load data
   useEffect(() => {
@@ -82,6 +95,64 @@ export default function InquiriesPage() {
       setFilteredInquiries(data || []);
     } catch (err) {
       console.error("Error loading inquiries:", err);
+    }
+  };
+
+  const openConversation = async (inquiry: Inquiry) => {
+    setSelectedInquiry(inquiry);
+    setShowDetailModal(true);
+    setConversationTurns([]);
+    if (!inquiry.session_id) return;
+
+    setConversationLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = {};
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+      const response = await fetch(`/api/admin/inquiries/conversation?sessionId=${encodeURIComponent(inquiry.session_id)}`, {
+        method: "GET",
+        headers,
+        credentials: "include",
+        cache: "no-store",
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(result?.error || "Unable to load this conversation.");
+      setConversationTurns((result?.turns || []) as ConversationTurn[]);
+    } catch (err) {
+      console.error("Error loading complete conversation:", err);
+      setConversationTurns([]);
+    } finally {
+      setConversationLoading(false);
+    }
+  };
+
+  const deleteInquiryLog = async () => {
+    if (!inquiryToDelete || deletingInquiry) return;
+    setDeletingInquiry(true);
+    setDeleteError("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+      const response = await fetch("/api/admin/inquiries/delete", {
+        method: "DELETE",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({ id: inquiryToDelete.id }),
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(result?.error || "Unable to delete this log.");
+
+      setInquiries((current) => current.filter((item) => item.id !== inquiryToDelete.id));
+      if (selectedInquiry?.id === inquiryToDelete.id) {
+        setSelectedInquiry(null);
+        setShowDetailModal(false);
+      }
+      setInquiryToDelete(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Unable to delete this log.");
+    } finally {
+      setDeletingInquiry(false);
     }
   };
 
@@ -139,39 +210,6 @@ const formatDate = (date: string) => {
     return colors[type] || "bg-stone-100 text-stone-600";
   };
 
-  const exportCSV = () => {
-    const headers = [
-      "User",
-      "Department",
-      "PR No.",
-      "Question",
-      "Response",
-      "Type",
-      "Date",
-    ];
-    const rows = filteredInquiries.map((i) => [
-      i.user_name || "N/A",
-      i.user_department || "N/A",
-      i.pr_no || "N/A",
-      i.user_message,
-      i.bot_response,
-      i.inquiry_type || "general",
-      formatDate(i.created_at),
-    ]);
-
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `inquiries_${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   if (loading) return <LoadingScreen label="Loading inquiries..." />;
 
   return (
@@ -195,17 +233,10 @@ const formatDate = (date: string) => {
           <div>
             <h1 className="text-xl sm:text-3xl font-black tracking-tight text-[#4D002C]">Chatbot & Helpdesk Logs</h1>
             <p className="text-xs sm:text-sm text-stone-600 mt-1">
-              <b>{filteredInquiries.length}</b> logged inquiries across user sessions.
+              <b>{filteredInquiries.length}</b> conversation sessions recorded.
             </p>
           </div>
-          <button
-            onClick={exportCSV}
-            className="ui-button w-full sm:w-auto justify-center bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 text-xs py-2 px-3.5 shadow-xs"
-            disabled={filteredInquiries.length === 0}
-          >
-            <Download className="h-4 w-4 text-[#7B0046]" />
-            Export CSV
-          </button>
+
         </div>
 
         {/* Filters */}
@@ -272,7 +303,7 @@ const formatDate = (date: string) => {
                       Requester
                     </th>
                     <th className="px-5 py-3.5 text-left text-[11px] uppercase tracking-wider text-stone-500 font-bold">
-                      User Question
+                      Conversation Preview
                     </th>
                     <th className="px-5 py-3.5 text-left text-[11px] uppercase tracking-wider text-stone-500 font-bold">
                       Category
@@ -318,16 +349,23 @@ const formatDate = (date: string) => {
                         {formatDate(inquiry.created_at)}
                       </td>
                       <td className="px-5 py-4 text-right whitespace-nowrap">
-                        <button
-                          onClick={() => {
-                            setSelectedInquiry(inquiry);
-                            setShowDetailModal(true);
-                          }}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-[#7B0046] hover:text-[#4D002C] px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
-                        >
-                          <Eye className="h-3.5 w-3.5" />
-                          View Log
-                        </button>
+                        <div className="inline-flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => void openConversation(inquiry)}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-[#7B0046] hover:text-[#4D002C] px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                            View Log
+                          </button>
+                          <button
+                            onClick={() => { setDeleteError(""); setInquiryToDelete(inquiry); }}
+                            aria-label={`Delete log for ${inquiry.user_name || "user"}`}
+                            title="Delete log"
+                            className="inline-flex items-center justify-center h-8 w-8 text-red-600 hover:text-red-700 rounded-lg hover:bg-red-50 transition-colors"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -338,13 +376,37 @@ const formatDate = (date: string) => {
         </div>
       </div>
 
+      {/* Delete Log Confirmation */}
+      {inquiryToDelete && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" role="dialog" aria-modal="true" aria-labelledby="delete-log-title">
+          <div className="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-5 shadow-2xl">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <h3 id="delete-log-title" className="text-base font-bold text-stone-900">Delete conversation log?</h3>
+                <p className="mt-1 text-xs leading-relaxed text-stone-600">This will permanently remove this entry from the admin Helpdesk Logs list. The user's chat history will remain unchanged.</p>
+              </div>
+            </div>
+            {deleteError && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{deleteError}</p>}
+            <div className="mt-5 flex justify-end gap-2 border-t border-stone-100 pt-3">
+              <button type="button" onClick={() => setInquiryToDelete(null)} disabled={deletingInquiry} className="rounded-lg px-3.5 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 disabled:opacity-50">Cancel</button>
+              <button type="button" onClick={() => void deleteInquiryLog()} disabled={deletingInquiry} className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50">
+                {deletingInquiry ? "Deleting..." : "Delete Log"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Detail Modal */}
       {showDetailModal && selectedInquiry && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-3.5 sm:p-6 border border-stone-200 animate-in zoom-in-95 duration-150">
             <div className="flex justify-between items-center mb-5 pb-3 border-b border-stone-100">
               <div className="flex items-center gap-2">
-                <h3 className="text-lg sm:text-xl font-bold text-[#4D002C]">Inquiry Detail</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-[#4D002C]">Conversation Details</h3>
                 <span
                   className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${getTypeBadge(
                     selectedInquiry.inquiry_type || "general"
@@ -382,17 +444,43 @@ const formatDate = (date: string) => {
               </div>
 
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1.5">User Prompt</p>
-                <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs sm:text-sm text-stone-800 whitespace-pre-wrap font-medium">
-                  {selectedInquiry.user_message}
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[11px] uppercase tracking-wider text-stone-500 font-bold">Full Conversation</p>
+                  {conversationTurns.length > 0 && (
+                    <span className="text-[10px] text-stone-400">{Math.ceil(conversationTurns.filter((turn) => turn.sender === "user").length)} user messages</span>
+                  )}
                 </div>
-              </div>
-
-              <div>
-                <p className="text-[11px] uppercase tracking-wider text-[#C27803] font-bold mb-1.5">Gab AI Response</p>
-                <div className="p-3 bg-amber-50/40 rounded-xl border border-amber-200/80 text-xs sm:text-sm text-stone-900 whitespace-pre-wrap leading-relaxed">
-                  {selectedInquiry.bot_response || "No response recorded"}
-                </div>
+                {conversationLoading ? (
+                  <div className="p-6 text-center text-xs text-stone-500">Loading complete conversation...</div>
+                ) : conversationTurns.length > 0 ? (
+                  <div className="space-y-3 max-h-[48vh] overflow-y-auto pr-1">
+                    {conversationTurns.map((turn) => {
+                      const isUser = turn.sender === "user";
+                      return (
+                        <div key={turn.id} className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}>
+                          <div className={`w-fit max-w-[88%] rounded-2xl px-3.5 py-3 text-xs sm:max-w-[82%] sm:px-4 sm:py-3.5 sm:text-sm whitespace-pre-wrap leading-relaxed shadow-sm ${isUser ? "rounded-tr-sm bg-gradient-to-r from-[#7B0046] to-[#8E0052] text-white" : "rounded-tl-sm border border-stone-200 bg-white text-stone-800"}`}>
+                            <p className={`text-[10px] uppercase tracking-wider font-bold mb-1.5 ${isUser ? "text-amber-200" : "text-[#7B0046]"}`}>
+                              {isUser ? "You" : "Gab AI"}
+                            </p>
+                            {turn.content}
+                            <p className={`text-[10px] mt-2 text-right ${isUser ? "text-white/60" : "text-stone-400"}`}>{formatDate(turn.created_at)}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1.5">User Message</p>
+                      <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs sm:text-sm text-stone-800 whitespace-pre-wrap font-medium">{selectedInquiry.user_message}</div>
+                    </div>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider text-[#C27803] font-bold mb-1.5">Gab AI Reply</p>
+                      <div className="p-3 bg-amber-50/40 rounded-xl border border-amber-200/80 text-xs sm:text-sm text-stone-900 whitespace-pre-wrap leading-relaxed">{selectedInquiry.bot_response || "No response recorded"}</div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-stone-200 flex justify-end">
