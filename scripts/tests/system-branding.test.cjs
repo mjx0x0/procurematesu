@@ -604,9 +604,8 @@ test('admin conversation detail loads and renders every saved turn for a chat se
 
   assert.match(inquiries, /interface ConversationTurn/);
   assert.match(inquiries, /openConversation = async \(inquiry: Inquiry\)/);
-  assert.match(inquiries, /\.from\("chat_messages"\)/);
-  assert.match(inquiries, /\.eq\("session_id", inquiry\.session_id\)/);
-  assert.match(inquiries, /\.order\("created_at", \{ ascending: true \}\)/);
+  assert.match(inquiries, /\/api\/admin\/inquiries\/conversation\?sessionId=/);
+  assert.doesNotMatch(inquiries, /\.from\("chat_messages"\)/);
   assert.match(inquiries, /conversationTurns\.map\(\(turn\)/);
   assert.match(inquiries, /Full Conversation/);
   assert.match(inquiries, /turn\.sender === "user"/);
