@@ -1105,17 +1105,22 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
           { session_id: currentSessionId, sender: 'ai', content: responseText },
         ]);
 
-        // Also log to monitor_inquiries for admin visibility
-        const loggedPrNo = trimmedMsg.replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').match(/\b(PR[- ]?(?:TEMP[- ]?)?(?:\d{4}[- ]?)?\d{1,6})\b/i)?.[0];
-        await supabase.from('monitor_inquiries').insert({
-          user_id: userId || 'anonymous',
-          user_name: 'ProcuremateSU User',
-          user_department: 'MSU-GenSan',
-          pr_no: loggedPrNo ? normalizePrNumber(loggedPrNo) : 'N/A',
-          user_message: trimmedMsg,
-          bot_response: responseText.slice(0, 1000),
-          inquiry_type: inquiryType,
+        // Maintain one helpdesk log per chat session. Each prompt/response pair
+        // is appended to that session's existing log instead of creating a row.
+        const loggedPrNo = trimmedMsg.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-').match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
+        const { error: inquiryLogError } = await supabase.rpc('append_monitor_inquiry_session', {
+          p_session_id: currentSessionId,
+          p_user_id: userId,
+          p_user_name: 'ProcuremateSU User',
+          p_user_department: 'MSU-GenSan',
+          p_pr_no: loggedPrNo ? normalizePrNumber(loggedPrNo) : null,
+          p_user_message: trimmedMsg,
+          p_bot_response: responseText,
+          p_inquiry_type: inquiryType,
         });
+        if (inquiryLogError) {
+          console.warn('[chat] Session inquiry log update failed:', inquiryLogError.message);
+        }
       } catch (dbErr) {
         console.warn('Non-blocking database log notice:', dbErr);
       }
