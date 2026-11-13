@@ -646,3 +646,18 @@ test('admin conversation history is loaded through the authorized server endpoin
   assert.match(backfill, /DELETE FROM public\.monitor_inquiries/);
   assert.match(backfill, /Chat message history itself is never deleted/);
 });
+
+
+test('historical legacy helpdesk logs are grouped and retain ordered conversation transcripts', () => {
+  const conversationRoute = read('app/api/admin/inquiries/conversation/route.ts');
+  const legacyGrouping = read('supabase/migrations/20261113170000_group_legacy_helpdesk_logs_by_inactivity.sql');
+  const anonymousFix = read('supabase/migrations/20261113190000_fix_anonymous_log_grouping.sql');
+
+  assert.match(conversationRoute, /sessionId\.startsWith\("legacy-"\)/);
+  assert.match(conversationRoute, /conversation_history/);
+  assert.match(legacyGrouping, /interval '30 minutes'/);
+  assert.match(legacyGrouping, /jsonb_agg/);
+  assert.match(legacyGrouping, /conversation_history/);
+  assert.match(anonymousFix, /IS NOT DISTINCT FROM/);
+  assert.match(anonymousFix, /COALESCE\(user_id::text, 'anonymous'\)/);
+});
