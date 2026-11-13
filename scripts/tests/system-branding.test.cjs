@@ -597,3 +597,18 @@ test('Step 4 requires only an official PR number and uses the standard stage mod
   assert.match(correctionMigration, /Administrators may correct an already-entered PR number at Step 4/);
   assert.doesNotMatch(correctionMigration, /This Purchase Request already has an official PR number/);
 });
+
+
+test('admin conversation detail loads and renders every saved turn for a chat session', () => {
+  const inquiries = read('app/admin/inquiries/page.tsx');
+
+  assert.match(inquiries, /interface ConversationTurn/);
+  assert.match(inquiries, /openConversation = async \(inquiry: Inquiry\)/);
+  assert.match(inquiries, /\.from\("chat_messages"\)/);
+  assert.match(inquiries, /\.eq\("session_id", inquiry\.session_id\)/);
+  assert.match(inquiries, /\.order\("created_at", \{ ascending: true \}\)/);
+  assert.match(inquiries, /conversationTurns\.map\(\(turn\)/);
+  assert.match(inquiries, /Full Conversation/);
+  assert.match(inquiries, /turn\.sender === "user"/);
+  assert.match(inquiries, /Gab AI/);
+});
