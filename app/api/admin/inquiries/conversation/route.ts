@@ -44,12 +44,30 @@ export async function GET(request: NextRequest) {
       const history = Array.isArray(legacyLog?.metadata?.conversation_history)
         ? legacyLog.metadata.conversation_history
         : [];
-      const turns = history.map((turn: any, index: number) => ({
+      let turns = history.map((turn: any, index: number) => ({
         id: `legacy-${sessionId}-${index}`,
         sender: turn?.sender === "user" ? "user" : "ai",
         content: typeof turn?.content === "string" ? turn.content : "",
         created_at: turn?.created_at || new Date().toISOString(),
       }));
+
+      // Older records sometimes contain several prompts/replies joined into a
+      // single text field. Their exact turn boundaries were not stored, so
+      // split only on explicit blank-line paragraph boundaries as a best effort.
+      if (turns.length <= 2) {
+        turns = turns.flatMap((turn: any) => {
+          const paragraphs = turn.content
+            .split(/\\r?\\n\\s*\\r?\\n/)
+            .map((part: string) => part.trim())
+            .filter(Boolean);
+          if (paragraphs.length <= 1) return [turn];
+          return paragraphs.map((content: string, partIndex: number) => ({
+            ...turn,
+            id: `${turn.id}-part-${partIndex}`,
+            content,
+          }));
+        });
+      }
       return NextResponse.json({ turns });
     }
 
