@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       if (turns.length <= 2) {
         turns = turns.flatMap((turn: any) => {
           const paragraphs = turn.content
-            .split(/\\r?\\n\\s*\\r?\\n/)
+            .split(/\r?\n\s*\r?\n/)
             .map((part: string) => part.trim())
             .filter(Boolean);
           if (paragraphs.length <= 1) return [turn];
