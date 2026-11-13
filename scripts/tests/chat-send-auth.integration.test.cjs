@@ -182,12 +182,28 @@ async function handleMockSupabase(request, response) {
     return response.end('[]');
   }
 
-  if (url.pathname === '/rest/v1/monitor_inquiries' && request.method === 'POST') {
-    const body = await readJSON(request);
-    storedInquiries.push(body);
-    response.statusCode = 201;
-    response.setHeader('content-type', 'application/json');
-    return response.end('[]');
+  if (url.pathname === '/rest/v1/rpc/append_monitor_inquiry_session' && request.method === 'POST') {
+    const args = await readJSON(request);
+    const existing = storedInquiries.find((entry) => entry.session_id === args.p_session_id);
+    if (existing) {
+      existing.user_message += '\\n\\n' + args.p_user_message;
+      existing.bot_response += '\\n\\n' + args.p_bot_response;
+      existing.pr_no = args.p_pr_no || existing.pr_no;
+      existing.metadata.message_count += 1;
+    } else {
+      storedInquiries.push({
+        session_id: args.p_session_id,
+        user_id: args.p_user_id,
+        user_name: args.p_user_name,
+        user_department: args.p_user_department,
+        pr_no: args.p_pr_no || 'N/A',
+        user_message: args.p_user_message,
+        bot_response: args.p_bot_response,
+        inquiry_type: args.p_inquiry_type,
+        metadata: { message_count: 1 },
+      });
+    }
+    return sendJSON(response, 200, null);
   }
 
   return sendJSON(response, 404, {
