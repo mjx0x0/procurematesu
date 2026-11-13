@@ -232,7 +232,7 @@ const formatDate = (date: string) => {
                       Requester
                     </th>
                     <th className="px-5 py-3.5 text-left text-[11px] uppercase tracking-wider text-stone-500 font-bold">
-                      User Question
+                      Conversation Preview
                     </th>
                     <th className="px-5 py-3.5 text-left text-[11px] uppercase tracking-wider text-stone-500 font-bold">
                       Category
@@ -304,7 +304,7 @@ const formatDate = (date: string) => {
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-3.5 sm:p-6 border border-stone-200 animate-in zoom-in-95 duration-150">
             <div className="flex justify-between items-center mb-5 pb-3 border-b border-stone-100">
               <div className="flex items-center gap-2">
-                <h3 className="text-lg sm:text-xl font-bold text-[#4D002C]">Inquiry Detail</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-[#4D002C]">Conversation Details</h3>
                 <span
                   className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${getTypeBadge(
                     selectedInquiry.inquiry_type || "general"
@@ -342,14 +342,14 @@ const formatDate = (date: string) => {
               </div>
 
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1.5">User Prompt</p>
+                <p className="text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1.5">User Messages</p>
                 <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs sm:text-sm text-stone-800 whitespace-pre-wrap font-medium">
                   {selectedInquiry.user_message}
                 </div>
               </div>
 
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-[#C27803] font-bold mb-1.5">Gab AI Response</p>
+                <p className="text-[11px] uppercase tracking-wider text-[#C27803] font-bold mb-1.5">Gab AI Replies</p>
                 <div className="p-3 bg-amber-50/40 rounded-xl border border-amber-200/80 text-xs sm:text-sm text-stone-900 whitespace-pre-wrap leading-relaxed">
                   {selectedInquiry.bot_response || "No response recorded"}
                 </div>
