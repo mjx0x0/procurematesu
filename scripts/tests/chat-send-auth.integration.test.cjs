@@ -373,7 +373,7 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.match(result.payload.response, /PR-2026-0001/);
       assert.match(result.payload.response, /network laboratory equipment/i);
       assert.doesNotMatch(result.payload.response, /\\n/);
-      assert.match(result.payload.response, /\n- \\*\\*Purpose:\\*\\*/);
+      assert.match(result.payload.response, /\n- \*\*Purpose:\*\*/);
     });
 
     await t.test('users can track a PR while identifying themselves by their profile name', async () => {
