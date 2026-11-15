@@ -17,6 +17,7 @@ const STOP_DRAFTING_PATTERN = /^(?:stop|cancel|quit|exit|abort|end|never\s*mind|
 const PR_IDENTIFIER_PATTERN = /\bPR\s*-\s*[A-Z0-9]+(?:\s*-\s*[A-Z0-9]+)*\b|\bPR\s+\d{4}(?:[\s-]+\d{1,})?\b|\bPR(?=\d)\d{4,12}\b/i;
 const PR_ACCESS_PATTERN = /\b(track(?:ing)?|show|view|see|open|display|details?|status|progress|update|history|timeline|next|check|find|locate|lookup|look\s+up)\b/i;
 const OTHER_USER_PR_PATTERN = /\b(another|other|someone\s+else|somebody\s+else|different)\s+(user|person|account|requester)|\b(?:someone\s+else'?s|another\s+user'?s|other\s+user'?s)\b/i;
+const NAMED_PERSON_PR_REQUEST_PATTERN = /\b(?:pr|purchase\s+request)\s+(?:of|for|under|belonging\s+to|submitted\s+by)\s+(?!me\b|my\b|mine\b|our\b|us\b|the\b)[\p{L}][\p{L}\p{M}'’.-]*(?:\s+[\p{L}][\p{L}\p{M}'’.-]*){0,3}\b|\b[\p{L}][\p{L}\p{M}'’.-]*(?:\s+[\p{L}][\p{L}\p{M}'’.-]*){0,3}['’]s\s+(?:pr|purchase\s+request)\b/iu;
 const PROCUREMENT_FLOW_PATTERN = /\b(?:MSU(?:[- ]?GenSan)?|Mindanao\s+State\s+University(?:\s*[-–—]\s*General\s+Santos)?|General\s+Santos)\b.{0,80}\b(?:procurement|purchas(?:e|ing)|PR|process|flow|procedure|steps?|stages?)\b|\b(?:procurement|purchasing|PR)\s+(?:flow|process|procedure|steps?|stages?)\b/i;
 const OFFICE_INFO_PATTERN = /\b(?:where(?:'s| is| can I find)|location|address|contact|contacts|phone|telephone|email|e-mail|how can I contact|how do I reach)\b.{0,50}\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO|BAC|procurement)\b|\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO)\b.{0,50}\b(?:where|location|address|contact|phone|telephone|email|reach)\b/i;
 const NEXT_PATTERN = /\b(what|where|which|how)\s+(happens?|comes?|is)\s+next\b|\bwhat'?s\s+next\b|\bnext\s+(step|stage)\b|\bwhat\s+do\s+i\s+do\s+next\b/i;
@@ -280,6 +281,10 @@ export async function POST(request: NextRequest) {
     const prIdentifier = searchableMessage.match(PR_IDENTIFIER_PATTERN)?.[0] || '';
     const normalized = prIdentifier ? normalizePRIdentifier(prIdentifier) : '';
     const isPRAccessRequest = Boolean(prIdentifier) && PR_ACCESS_PATTERN.test(message);
+    // Deny named-person PR requests before any database lookup, even when no PR number is supplied.
+    if (NAMED_PERSON_PR_REQUEST_PATTERN.test(message) || (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message))) {
+      return NextResponse.json({ error: 'Access denied. For privacy and security, you can only view Purchase Requests associated with your own account.' }, { status: 403 });
+    }
     if (isPRAccessRequest) {
       // Keep the existing ownership boundary, but apply it to every PR numbering scheme.
       if (profile.role !== 'admin') {
@@ -361,7 +366,6 @@ export async function POST(request: NextRequest) {
       const { data: history } = await clientToUse.from('pr_stages_completed').select('stage_key,stage_name,completed_at,remarks,notes').eq('pr_no', latestPR.pr_no).neq('status', 'remark').order('completed_at', { ascending: false }).limit(1);
       return NextResponse.json({ response: buildNextStepResponse(latestPR, history?.[0] || null), sources: ['ProcuremateSU procurement process', 'Purchase Request stage history'] });
     }
-    if (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message)) return NextResponse.json({ error: 'Access denied. You can only view Purchase Requests associated with your account.' }, { status: 403 });
     const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: request.headers, body: JSON.stringify({ message, sessionId, userId: user.id, conversationContext }) });
     return legacyChatPOST(trustedRequest);
   } catch (error) { console.error('[chat/send] Unexpected error:', error); return NextResponse.json({ error: 'Unable to process the chat request.' }, { status: 500 }); }
