@@ -402,7 +402,34 @@ export async function POST(request: NextRequest) {
       const { data: history } = await clientToUse.from('pr_stages_completed').select('stage_key,stage_name,completed_at,remarks,notes').eq('pr_no', latestPR.pr_no).neq('status', 'remark').order('completed_at', { ascending: false }).limit(1);
       return NextResponse.json({ response: buildNextStepResponse(latestPR, history?.[0] || null), sources: ['ProcuremateSU procurement process', 'Purchase Request stage history'] });
     }
-    const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: request.headers, body: JSON.stringify({ message, sessionId, userId: user.id, conversationContext }) });
-    return legacyChatPOST(trustedRequest);
+    // The authenticated wrapper owns inquiry logging for delegated responses.
+    // This avoids relying on the legacy route's internal persistence path and keeps
+    // exactly one session-level log entry for this user turn.
+    const trustedHeaders = new Headers(request.headers);
+    trustedHeaders.set('x-chat-send-delegated', '1');
+    const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: trustedHeaders, body: JSON.stringify({ message, sessionId, userId: user.id, conversationContext }) });
+    const legacyResponse = await legacyChatPOST(trustedRequest);
+    if (legacyResponse.ok && db) {
+      try {
+        const payload = await legacyResponse.clone().json();
+        if (typeof payload?.response === 'string' && payload.response.trim()) {
+          const loggedPrNo = message.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-').match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
+          const { error: inquiryLogError } = await db.rpc('append_monitor_inquiry_session', {
+            p_session_id: sessionId,
+            p_user_id: user.id,
+            p_user_name: authenticatedUserName || user.user_metadata?.name || 'ProcuremateSU User',
+            p_user_department: 'MSU-GenSan',
+            p_pr_no: loggedPrNo ? normalizePRIdentifier(loggedPrNo) : null,
+            p_user_message: message,
+            p_bot_response: payload.response,
+            p_inquiry_type: 'general',
+          });
+          if (inquiryLogError) console.warn('[chat/send] Delegated session inquiry log update failed:', inquiryLogError.message);
+        }
+      } catch (logError) {
+        console.warn('[chat/send] Could not record delegated session inquiry:', logError);
+      }
+    }
+    return legacyResponse;
   } catch (error) { console.error('[chat/send] Unexpected error:', error); return NextResponse.json({ error: 'Unable to process the chat request.' }, { status: 500 }); }
 }
