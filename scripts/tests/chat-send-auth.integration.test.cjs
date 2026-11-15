@@ -338,6 +338,22 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.match(result.payload.error, /not associated with your account/i);
     });
 
+    await t.test('users cannot request another person’s PR by name', async () => {
+      for (const message of [
+        'Show me the PR of John Doe',
+        "Show me John Doe's PR",
+        'Can you track the Purchase Request belonging to Jane Smith?',
+      ]) {
+        const result = await postChat({
+          token: 'user-a-token',
+          sessionId: 'session-user-a',
+          message,
+        });
+        assert.equal(result.status, 403, message);
+        assert.match(result.payload.error, /access denied.*privacy and security/i, message);
+      }
+    });
+
     await t.test('an authenticated owner can track their own Purchase Request', async () => {
       const result = await postChat({
         token: 'user-b-token',
