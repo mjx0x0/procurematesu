@@ -91,8 +91,9 @@ export async function POST(request: NextRequest) {
     const authClient = await createServerClient(); if (!user) { const { data } = await authClient.auth.getUser(); user = data.user || null; }
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const clientToUse = db || authClient;
-    const { data: profile, error: profileError } = await clientToUse.from('users').select('is_active, role').eq('id', user.id).maybeSingle();
-    const authenticatedUserName = String(user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.display_name || '').trim();
+    const { data: profile, error: profileError } = await clientToUse.from('users').select('is_active, role, full_name').eq('id', user.id).maybeSingle();
+    // The public.users profile is the application's canonical display-name source.
+    const authenticatedUserName = String(profile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.display_name || '').trim();
     if (profileError || !profile || profile.is_active === false) return NextResponse.json({ error: 'Account is not authorized.' }, { status: 403 });
     const body = await request.json(); const rawMessage = typeof body?.message === 'string' ? body.message.trim() : ''; const message = extractCurrentUserMessage(rawMessage); const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : '';
     if (!message || message.length > 12000 || !sessionId) return NextResponse.json({ error: 'Message and session are required.' }, { status: 400 });
@@ -282,13 +283,18 @@ export async function POST(request: NextRequest) {
     const prIdentifier = searchableMessage.match(PR_IDENTIFIER_PATTERN)?.[0] || '';
     const normalized = prIdentifier ? normalizePRIdentifier(prIdentifier) : '';
     const isPRAccessRequest = Boolean(prIdentifier) && PR_ACCESS_PATTERN.test(message);
-    // Deny named-person PR requests before any database lookup, even when no PR number is supplied.
-    const normalizePersonName = (value: string) => value.normalize('NFKD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    // Match the authenticated user's canonical profile name directly in the user's wording.
+    // Do not parse arbitrary name tokens: punctuation, middle initials, and suffixes made that brittle.
+    const normalizePersonName = (value: string) => value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
     const ownName = normalizePersonName(authenticatedUserName);
-    const namedRequestMatch = message.match(/\\b(?:pr|purchase\\s+request)\\s+(?:of|for|under|belonging\\s+to|submitted\\s+by)\\s+([\\p{L}][\\p{L}\\p{M}'’.-]*(?:\\s+[\\p{L}][\\p{L}\\p{M}'’.-]*){0,3})\\b|\\b([\\p{L}][\\p{L}\\p{M}'’.-]*(?:\\s+[\\p{L}][\\p{L}\\p{M}'’.-]*){0,3})['’]s\\s+(?:pr|purchase\\s+request)\\b/iu);
-    const requestedPersonName = normalizePersonName(namedRequestMatch?.[1] || namedRequestMatch?.[2] || '');
-    const isOwnNamedPRRequest = Boolean(ownName && requestedPersonName && (requestedPersonName === ownName || ownName.startsWith(requestedPersonName + ' ') || requestedPersonName.startsWith(ownName + ' ')));
-    if (isOwnNamedPRRequest) {
+    const normalizedMessage = normalizePersonName(message);
+    const mentionsOwnName = Boolean(ownName && normalizedMessage.includes(ownName));
+    const isNamedPRRequest = NAMED_PERSON_PR_REQUEST_PATTERN.test(message) ||
+      (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message));
+
+    // If the named person is the authenticated user, let the normal owner-scoped PR
+    // lookup run. For a list request, query only rows whose user_id equals this session.
+    if (mentionsOwnName && PR_ACCESS_PATTERN.test(message) && !prIdentifier) {
       const { data: ownPRs, error: ownPRsError } = await clientToUse
         .from('purchase_requests')
         .select('pr_no,purpose,total,current_stage,created_at,department')
@@ -304,7 +310,9 @@ export async function POST(request: NextRequest) {
       const response = ownPRs.map((pr: any) => `📋 **${pr.pr_no}**\\n• **Purpose:** ${pr.purpose || 'N/A'}\\n• **Status:** ${pr.current_stage === 'draft' ? 'Draft — awaiting printed-form receipt' : String(pr.current_stage || 'Status unavailable').replace(/_/g, ' ')}\\n• **Department:** ${pr.department || 'N/A'}\\n• **Total:** ₱${(Number(pr.total) || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`).join('\\n\\n');
       return NextResponse.json({ response: `Here are the Purchase Requests associated with your account:\\n\\n${response}`, sources: ['Your Purchase Request records'] });
     }
-    if (NAMED_PERSON_PR_REQUEST_PATTERN.test(message) || (OTHER_USER_PR_PATTERN.test(message) && /\\b(pr|prs|purchase\\s+request|procurement)\\b/i.test(message))) {
+
+    // Deny third-party requests unless the named person is the authenticated user.
+    if (isNamedPRRequest && !mentionsOwnName) {
       return NextResponse.json({ error: 'Access denied. For privacy and security, you can only view Purchase Requests associated with your own account.' }, { status: 403 });
     }
     if (isPRAccessRequest) {
