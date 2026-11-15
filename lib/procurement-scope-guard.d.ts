@@ -13,4 +13,4 @@ export function getProcurementScopeDecision(
 ): ProcurementScopeDecision;
 
 
-export function buildProcurementSmallTalkResponse(query: string): string;
+export function buildProcurementSmallTalkResponse(query: string, userName?: string): string;
