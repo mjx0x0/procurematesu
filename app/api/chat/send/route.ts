@@ -308,12 +308,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ response: 'I couldn’t find any Purchase Requests associated with your account yet.', sources: ['Your Purchase Request records'] });
       }
       const response = ownPRs.map((pr: any, index: number) => [
-        `**${index + 1}. ${pr.pr_no}**`,
-        `- **Purpose:** ${pr.purpose || 'N/A'}`,
-        `- **Status:** ${pr.current_stage === 'draft' ? 'Draft — awaiting printed-form receipt' : String(pr.current_stage || 'Status unavailable').replace(/_/g, ' ')}`,
-        `- **Department:** ${pr.department || 'N/A'}`,
-        `- **Total:** ₱${(Number(pr.total) || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      ].join('\\n')).join('\\n\\n');
+        \`**\${index + 1}. \${pr.pr_no}**\`,
+        \`- **Purpose:** \${pr.purpose || 'N/A'}\`,
+        \`- **Status:** \${pr.current_stage === 'draft' ? 'Draft — awaiting printed-form receipt' : String(pr.current_stage || 'Status unavailable').replace(/_/g, ' ')}\`,
+        \`- **Department:** \${pr.department || 'N/A'}\`,
+        \`- **Total:** ₱\${(Number(pr.total) || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`,
+      ].join('\n')).join('\n\n');
       return NextResponse.json({ response: \`Here are the Purchase Requests associated with your account:\n\n\${response}\`, sources: ['Your Purchase Request records'] });
     }
 
