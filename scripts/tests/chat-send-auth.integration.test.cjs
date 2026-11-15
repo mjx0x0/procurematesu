@@ -10,7 +10,7 @@ const { readPRDraftHandoff } = require('../../lib/pr-draft-handoff.js');
 
 const ROOT = path.resolve(__dirname, '../..');
 const users = new Map([
-  ['user-a', { id: 'user-a', aud: 'authenticated', role: 'authenticated', email: 'user-a@example.test', app_metadata: {}, user_metadata: {} }],
+  ['user-a', { id: 'user-a', aud: 'authenticated', role: 'authenticated', email: 'user-a@example.test', app_metadata: {}, user_metadata: { full_name: 'Mariel Joyce P. Villena' } }],
   ['user-b', { id: 'user-b', aud: 'authenticated', role: 'authenticated', email: 'user-b@example.test', app_metadata: {}, user_metadata: {} }],
   ['user-inactive', { id: 'user-inactive', aud: 'authenticated', role: 'authenticated', email: 'inactive@example.test', app_metadata: {}, user_metadata: {} }],
 ]);
@@ -71,6 +71,15 @@ const storedMessages = [
 ];
 const storedInquiries = [];
 const purchaseRequests = [
+  {
+    pr_no: 'PR-2026-0001',
+    user_id: 'user-a',
+    purpose: 'Procurement of network laboratory equipment',
+    total: 25000,
+    current_stage: 'draft',
+    created_at: '2026-10-02T00:00:00.000Z',
+    department: 'College of Information Technology',
+  },
   {
     pr_no: 'PR-2026-0002',
     user_id: 'user-b',
@@ -352,6 +361,27 @@ test('authenticated chatbot API enforces identity, account status, session owner
         assert.equal(result.status, 403, message);
         assert.match(result.payload.error, /access denied.*privacy and security/i, message);
       }
+    });
+
+    await t.test('users can request their own PRs by their authenticated name', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-user-a',
+        message: 'Show me the PR of Mariel Joyce P. Villena',
+      });
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /PR-2026-0001/);
+      assert.match(result.payload.response, /network laboratory equipment/i);
+    });
+
+    await t.test('small-talk greetings use the authenticated user name', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-user-a',
+        message: 'hi',
+      });
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /Hi, Mariel!/);
     });
 
     await t.test('an authenticated owner can track their own Purchase Request', async () => {
