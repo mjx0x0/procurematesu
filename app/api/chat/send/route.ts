@@ -92,6 +92,7 @@ export async function POST(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const clientToUse = db || authClient;
     const { data: profile, error: profileError } = await clientToUse.from('users').select('is_active, role').eq('id', user.id).maybeSingle();
+    const authenticatedUserName = String(user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.display_name || '').trim();
     if (profileError || !profile || profile.is_active === false) return NextResponse.json({ error: 'Account is not authorized.' }, { status: 403 });
     const body = await request.json(); const rawMessage = typeof body?.message === 'string' ? body.message.trim() : ''; const message = extractCurrentUserMessage(rawMessage); const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : '';
     if (!message || message.length > 12000 || !sessionId) return NextResponse.json({ error: 'Message and session are required.' }, { status: 400 });
@@ -185,7 +186,7 @@ export async function POST(request: NextRequest) {
     // Answer brief social/identity messages deterministically and preserve any
     // active PR draft; never pass these messages to slot validation or an LLM.
     if (scopeDecision.reason === 'small_talk') {
-      const response = buildProcurementSmallTalkResponse(message);
+      const response = buildProcurementSmallTalkResponse(message, authenticatedUserName);
       // Deterministic early replies must still be recorded so the admin log
       // contains every turn in the conversation, not only LLM-backed answers.
       try {
@@ -282,7 +283,28 @@ export async function POST(request: NextRequest) {
     const normalized = prIdentifier ? normalizePRIdentifier(prIdentifier) : '';
     const isPRAccessRequest = Boolean(prIdentifier) && PR_ACCESS_PATTERN.test(message);
     // Deny named-person PR requests before any database lookup, even when no PR number is supplied.
-    if (NAMED_PERSON_PR_REQUEST_PATTERN.test(message) || (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message))) {
+    const normalizePersonName = (value: string) => value.normalize('NFKD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const ownName = normalizePersonName(authenticatedUserName);
+    const namedRequestMatch = message.match(/\\b(?:pr|purchase\\s+request)\\s+(?:of|for|under|belonging\\s+to|submitted\\s+by)\\s+([\\p{L}][\\p{L}\\p{M}'’.-]*(?:\\s+[\\p{L}][\\p{L}\\p{M}'’.-]*){0,3})\\b|\\b([\\p{L}][\\p{L}\\p{M}'’.-]*(?:\\s+[\\p{L}][\\p{L}\\p{M}'’.-]*){0,3})['’]s\\s+(?:pr|purchase\\s+request)\\b/iu);
+    const requestedPersonName = normalizePersonName(namedRequestMatch?.[1] || namedRequestMatch?.[2] || '');
+    const isOwnNamedPRRequest = Boolean(ownName && requestedPersonName && (requestedPersonName === ownName || ownName.startsWith(requestedPersonName + ' ') || requestedPersonName.startsWith(ownName + ' ')));
+    if (isOwnNamedPRRequest) {
+      const { data: ownPRs, error: ownPRsError } = await clientToUse
+        .from('purchase_requests')
+        .select('pr_no,purpose,total,current_stage,created_at,department')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (ownPRsError) {
+        return NextResponse.json({ error: 'Unable to retrieve Purchase Requests associated with your account.' }, { status: 500 });
+      }
+      if (!ownPRs || ownPRs.length === 0) {
+        return NextResponse.json({ response: 'I couldn’t find any Purchase Requests associated with your account yet.', sources: ['Your Purchase Request records'] });
+      }
+      const response = ownPRs.map((pr: any) => `📋 **${pr.pr_no}**\\n• **Purpose:** ${pr.purpose || 'N/A'}\\n• **Status:** ${pr.current_stage === 'draft' ? 'Draft — awaiting printed-form receipt' : String(pr.current_stage || 'Status unavailable').replace(/_/g, ' ')}\\n• **Department:** ${pr.department || 'N/A'}\\n• **Total:** ₱${(Number(pr.total) || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`).join('\\n\\n');
+      return NextResponse.json({ response: `Here are the Purchase Requests associated with your account:\\n\\n${response}`, sources: ['Your Purchase Request records'] });
+    }
+    if (NAMED_PERSON_PR_REQUEST_PATTERN.test(message) || (OTHER_USER_PR_PATTERN.test(message) && /\\b(pr|prs|purchase\\s+request|procurement)\\b/i.test(message))) {
       return NextResponse.json({ error: 'Access denied. For privacy and security, you can only view Purchase Requests associated with your own account.' }, { status: 403 });
     }
     if (isPRAccessRequest) {
