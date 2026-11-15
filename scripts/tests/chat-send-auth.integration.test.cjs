@@ -384,6 +384,16 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.match(result.payload.response, /Hi, Mariel!/);
     });
 
+    await t.test('thank-you replies use the authenticated user name', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-user-a',
+        message: 'thank you',
+      });
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /You’re very welcome, Mariel!/);
+    });
+
     await t.test('an authenticated owner can track their own Purchase Request', async () => {
       const result = await postChat({
         token: 'user-b-token',
