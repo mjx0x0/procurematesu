@@ -1,4 +1,6 @@
 export const PROCUREMENT_SCOPE_RESPONSE: string;
+export const UNSUPPORTED_LAW_REFERENCE_RESPONSE: string;
+export function hasUnsupportedLawReference(query: string): boolean;
 
 export interface ProcurementScopeDecision {
   allowed: boolean;
@@ -11,4 +13,4 @@ export function getProcurementScopeDecision(
 ): ProcurementScopeDecision;
 
 
-export function buildProcurementSmallTalkResponse(query: string): string;
+export function buildProcurementSmallTalkResponse(query: string, userName?: string): string;

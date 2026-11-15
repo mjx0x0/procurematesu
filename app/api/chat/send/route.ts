@@ -3,7 +3,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
 import { buildProcurementOfficeLocationResponse } from '@/lib/procurement-office-location';
-import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
+import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE, UNSUPPORTED_LAW_REFERENCE_RESPONSE, hasUnsupportedLawReference } from '@/lib/procurement-scope-guard';
 import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-extraction';
 import { classifyProcurementIntent, isContextualFollowUp, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
 import { formatRecentConversationContext, hasRecentProcurementContext } from '@/lib/chat-conversation-context';
@@ -17,6 +17,7 @@ const STOP_DRAFTING_PATTERN = /^(?:stop|cancel|quit|exit|abort|end|never\s*mind|
 const PR_IDENTIFIER_PATTERN = /\bPR\s*-\s*[A-Z0-9]+(?:\s*-\s*[A-Z0-9]+)*\b|\bPR\s+\d{4}(?:[\s-]+\d{1,})?\b|\bPR(?=\d)\d{4,12}\b/i;
 const PR_ACCESS_PATTERN = /\b(track(?:ing)?|show|view|see|open|display|details?|status|progress|update|history|timeline|next|check|find|locate|lookup|look\s+up)\b/i;
 const OTHER_USER_PR_PATTERN = /\b(another|other|someone\s+else|somebody\s+else|different)\s+(user|person|account|requester)|\b(?:someone\s+else'?s|another\s+user'?s|other\s+user'?s)\b/i;
+const NAMED_PERSON_PR_REQUEST_PATTERN = /\b(?:pr|purchase\s+request)\s+(?:of|for|under|belonging\s+to|submitted\s+by)\s+(?!me\b|my\b|mine\b|our\b|us\b|the\b)[\p{L}][\p{L}\p{M}'’.-]*(?:\s+[\p{L}][\p{L}\p{M}'’.-]*){0,3}\b|\b[\p{L}][\p{L}\p{M}'’.-]*(?:\s+[\p{L}][\p{L}\p{M}'’.-]*){0,3}['’]s\s+(?:pr|purchase\s+request)\b/iu;
 const PROCUREMENT_FLOW_PATTERN = /\b(?:MSU(?:[- ]?GenSan)?|Mindanao\s+State\s+University(?:\s*[-–—]\s*General\s+Santos)?|General\s+Santos)\b.{0,80}\b(?:procurement|purchas(?:e|ing)|PR|process|flow|procedure|steps?|stages?)\b|\b(?:procurement|purchasing|PR)\s+(?:flow|process|procedure|steps?|stages?)\b/i;
 const OFFICE_INFO_PATTERN = /\b(?:where(?:'s| is| can I find)|location|address|contact|contacts|phone|telephone|email|e-mail|how can I contact|how do I reach)\b.{0,50}\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO|BAC|procurement)\b|\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO)\b.{0,50}\b(?:where|location|address|contact|phone|telephone|email|reach)\b/i;
 const NEXT_PATTERN = /\b(what|where|which|how)\s+(happens?|comes?|is)\s+next\b|\bwhat'?s\s+next\b|\bnext\s+(step|stage)\b|\bwhat\s+do\s+i\s+do\s+next\b/i;
@@ -77,7 +78,7 @@ function buildProcurementFlowResponse() {
     'The stages above reflect ProcureMateSU’s configured workflow. Confirm office-specific instructions with the Procurement Management Office (PMO), and use PR tracking for the status of an individual request.',
     '',
     '**Official sources:** [GPPB-approved IRR of RA No. 12009, Section 34](https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf); [GPPB Circular No. 06-2026 / Resolution No. 10-2026](https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf).',
-  ].join('\n');
+    ].join('\n');
 }
 function buildNextStepResponse(pr: any, latestStage: any) { const currentIndex = PROCUREMENT_STAGES.findIndex(s => s.key === pr.current_stage); const current = currentIndex >= 0 ? PROCUREMENT_STAGES[currentIndex] : null; const next = currentIndex >= 0 && currentIndex < PROCUREMENT_STAGES.length - 1 ? PROCUREMENT_STAGES[currentIndex + 1] : null; if (pr.current_stage === 'completed' || !next) return `✅ **${pr.pr_no} has reached the final procurement stage.**\n\nThere is no next workflow stage recorded in ProcuremateSU. The PR has successfully completed the entire procurement workflow.\n\nFor the official transaction outcome or any remaining documentary requirement, coordinate with the Procurement Management Office.`; const age = latestStage?.completed_at ? Math.max(0, (Date.now() - new Date(latestStage.completed_at).getTime()) / 86400000) : null; return `📍 **What happens next for ${pr.pr_no}?**\n\n**Current stage:** Step ${current?.number || '?'} — ${current?.label || pr.current_stage}\n${latestStage?.completed_at ? `**Current stage recorded:** ${new Date(latestStage.completed_at).toLocaleString()}${age !== null ? ` (${age.toFixed(1)} days ago)` : ''}\n` : ''}\n**Next stage:** Step ${next.number} — ${next.label}\n\n**What this means:** ${next.description}\n\nThe next step is based on ProcuremateSU's centralized procurement workflow. Processing time can vary by transaction, office action, documentary requirements, and applicable procurement rules; the system does not treat the monitoring heuristic as an official SLA.`; }
 
@@ -90,7 +91,9 @@ export async function POST(request: NextRequest) {
     const authClient = await createServerClient(); if (!user) { const { data } = await authClient.auth.getUser(); user = data.user || null; }
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const clientToUse = db || authClient;
-    const { data: profile, error: profileError } = await clientToUse.from('users').select('is_active, role').eq('id', user.id).maybeSingle();
+    const { data: profile, error: profileError } = await clientToUse.from('users').select('is_active, role, full_name').eq('id', user.id).maybeSingle();
+    // The public.users profile is the application's canonical display-name source.
+    const authenticatedUserName = String(profile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.display_name || '').trim();
     if (profileError || !profile || profile.is_active === false) return NextResponse.json({ error: 'Account is not authorized.' }, { status: 403 });
     const body = await request.json(); const rawMessage = typeof body?.message === 'string' ? body.message.trim() : ''; const message = extractCurrentUserMessage(rawMessage); const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : '';
     if (!message || message.length > 12000 || !sessionId) return NextResponse.json({ error: 'Message and session are required.' }, { status: 400 });
@@ -159,6 +162,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Do not guess about Republic Act numbers outside the procurement-law
+    // references supported by the knowledge base (RA 9184 and RA 12009).
+    if (hasUnsupportedLawReference(message)) {
+      return NextResponse.json({
+        response: UNSUPPORTED_LAW_REFERENCE_RESPONSE,
+        sources: ['Gab AI supported procurement-law scope'],
+      });
+    }
+
     const scopeDecision = getProcurementScopeDecision(message, {
       activePRDraft: Boolean(draftState.drafting || draftState.draftReady),
       recentProcurementContext,
@@ -175,7 +187,7 @@ export async function POST(request: NextRequest) {
     // Answer brief social/identity messages deterministically and preserve any
     // active PR draft; never pass these messages to slot validation or an LLM.
     if (scopeDecision.reason === 'small_talk') {
-      const response = buildProcurementSmallTalkResponse(message);
+      const response = buildProcurementSmallTalkResponse(message, authenticatedUserName);
       // Deterministic early replies must still be recorded so the admin log
       // contains every turn in the conversation, not only LLM-backed answers.
       try {
@@ -271,6 +283,44 @@ export async function POST(request: NextRequest) {
     const prIdentifier = searchableMessage.match(PR_IDENTIFIER_PATTERN)?.[0] || '';
     const normalized = prIdentifier ? normalizePRIdentifier(prIdentifier) : '';
     const isPRAccessRequest = Boolean(prIdentifier) && PR_ACCESS_PATTERN.test(message);
+    // Match the authenticated user's canonical profile name directly in the user's wording.
+    // Do not parse arbitrary name tokens: punctuation, middle initials, and suffixes made that brittle.
+    const normalizePersonName = (value: string) => value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const ownName = normalizePersonName(authenticatedUserName);
+    const normalizedMessage = normalizePersonName(message);
+    const mentionsOwnName = Boolean(ownName && normalizedMessage.includes(ownName));
+    const isNamedPRRequest = NAMED_PERSON_PR_REQUEST_PATTERN.test(message) ||
+      (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message));
+
+    // If the named person is the authenticated user, let the normal owner-scoped PR
+    // lookup run. For a list request, query only rows whose user_id equals this session.
+    if (mentionsOwnName && PR_ACCESS_PATTERN.test(message) && !prIdentifier) {
+      const { data: ownPRs, error: ownPRsError } = await clientToUse
+        .from('purchase_requests')
+        .select('pr_no,purpose,total,current_stage,created_at,department')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (ownPRsError) {
+        return NextResponse.json({ error: 'Unable to retrieve Purchase Requests associated with your account.' }, { status: 500 });
+      }
+      if (!ownPRs || ownPRs.length === 0) {
+        return NextResponse.json({ response: 'I couldn’t find any Purchase Requests associated with your account yet.', sources: ['Your Purchase Request records'] });
+      }
+      const response = ownPRs.map((pr: any, index: number) => [
+        `**${index + 1}. ${pr.pr_no}**`,
+        `- **Purpose:** ${pr.purpose || 'N/A'}`,
+        `- **Status:** ${pr.current_stage === 'draft' ? 'Draft — awaiting printed-form receipt' : String(pr.current_stage || 'Status unavailable').replace(/_/g, ' ')}`,
+        `- **Department:** ${pr.department || 'N/A'}`,
+        `- **Total:** ₱${(Number(pr.total) || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      ].join('\n')).join('\n\n');
+      return NextResponse.json({ response: `Here are the Purchase Requests associated with your account:\n\n${response}`, sources: ['Your Purchase Request records'] });
+    }
+
+    // Deny third-party requests unless the named person is the authenticated user.
+    if (isNamedPRRequest && !mentionsOwnName) {
+      return NextResponse.json({ error: 'Access denied. For privacy and security, you can only view Purchase Requests associated with your own account.' }, { status: 403 });
+    }
     if (isPRAccessRequest) {
       // Keep the existing ownership boundary, but apply it to every PR numbering scheme.
       if (profile.role !== 'admin') {
@@ -352,8 +402,45 @@ export async function POST(request: NextRequest) {
       const { data: history } = await clientToUse.from('pr_stages_completed').select('stage_key,stage_name,completed_at,remarks,notes').eq('pr_no', latestPR.pr_no).neq('status', 'remark').order('completed_at', { ascending: false }).limit(1);
       return NextResponse.json({ response: buildNextStepResponse(latestPR, history?.[0] || null), sources: ['ProcuremateSU procurement process', 'Purchase Request stage history'] });
     }
-    if (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message)) return NextResponse.json({ error: 'Access denied. You can only view Purchase Requests associated with your account.' }, { status: 403 });
-    const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: request.headers, body: JSON.stringify({ message, sessionId, userId: user.id, conversationContext }) });
-    return legacyChatPOST(trustedRequest);
+    // The authenticated wrapper owns inquiry logging for delegated responses.
+    // This avoids relying on the legacy route's internal persistence path and keeps
+    // exactly one session-level log entry for this user turn.
+    const trustedHeaders = new Headers(request.headers);
+    trustedHeaders.set('x-chat-send-delegated', '1');
+    const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: trustedHeaders, body: JSON.stringify({ message, sessionId, userId: user.id, conversationContext }) });
+    const legacyResponse = await legacyChatPOST(trustedRequest);
+    // Persist the delegated response through the authenticated service-role client.
+    // Parse the cloned body as text first so logging is not skipped by a response
+    // content-type/JSON parsing edge case.
+    if (db) {
+      let responseText = '';
+      try {
+        const rawBody = await legacyResponse.clone().text();
+        const payload = JSON.parse(rawBody);
+        responseText = typeof payload?.response === 'string' ? payload.response.trim() : '';
+      } catch (logError) {
+        console.warn('[chat/send] Could not parse delegated response for inquiry logging:', logError);
+      }
+      if (responseText) {
+        const loggedPrNo = message.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-').match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
+        const { error: inquiryLogError } = await db.rpc('append_monitor_inquiry_session', {
+          p_session_id: sessionId,
+          p_user_id: user.id,
+          p_user_name: authenticatedUserName || user.user_metadata?.name || 'ProcuremateSU User',
+          p_user_department: 'MSU-GenSan',
+          p_pr_no: loggedPrNo ? normalizePRIdentifier(loggedPrNo) : null,
+          p_user_message: message,
+          p_bot_response: responseText,
+          p_inquiry_type: 'general',
+        });
+        if (inquiryLogError) {
+          console.error('[chat/send] Delegated session inquiry log update failed:', inquiryLogError.message);
+          // Keep the chat response available, but make the persistence failure visible in CI logs.
+        }
+      } else {
+        console.warn('[chat/send] Delegated response had no response text; inquiry log was not updated.');
+      }
+    }
+    return legacyResponse;
   } catch (error) { console.error('[chat/send] Unexpected error:', error); return NextResponse.json({ error: 'Unable to process the chat request.' }, { status: 500 }); }
 }

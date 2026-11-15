@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const {
   buildProcurementSmallTalkResponse,
   getProcurementScopeDecision,
+  hasUnsupportedLawReference,
 } = require('../../lib/procurement-scope-guard.js');
 
 const conversationalMessages = [
@@ -169,4 +170,31 @@ test('greeting safely falls back when no usable profile name is available', () =
   assert.match(buildProcurementSmallTalkResponse('hi'), /^Hi there!/);
   assert.match(buildProcurementSmallTalkResponse('hello', '   '), /^Hi there!/);
   assert.doesNotMatch(buildProcurementSmallTalkResponse('hi', 'mariel@example.com'), /mariel@example\.com/i);
+});
+
+
+test('only supported procurement Republic Act references are accepted as known law numbers', () => {
+  for (const message of ['RA 9184', 'RA No. 12009', 'Republic Act No. 9184', 'Republic Act 12009']) {
+    assert.equal(hasUnsupportedLawReference(message), false, message);
+  }
+  for (const message of ['RA 12599', 'RA No. 12090', 'Republic Act No. 11032', 'R.A. 12345']) {
+    assert.equal(hasUnsupportedLawReference(message), true, message);
+  }
+});
+
+
+test('common procurement-role questions are recognized in English and Taglish', () => {
+  for (const message of [
+    'What is an end user?',
+    'Who is the end-user in procurement?',
+    'ano ang end user',
+    'sino ang end-user sa procurement?',
+    'What does requesting unit mean?',
+  ]) {
+    assert.deepEqual(
+      getProcurementScopeDecision(message),
+      { allowed: true, reason: 'procurement' },
+      message
+    );
+  }
 });

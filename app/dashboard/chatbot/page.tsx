@@ -567,7 +567,7 @@ export default function ChatbotDashboard() {
       {/* Top Navbar */}
       <SystemPageHeader
         headerTitle="Gab AI"
-        subtitle="Gab AI Support"
+        subtitle="Procurement Assistant"
         hideSystemSuffix
         compactOnMobile
         backHref="/dashboard"
@@ -948,6 +948,9 @@ export default function ChatbotDashboard() {
                 {loading ? <Square className="h-3.5 w-3.5 text-amber-200 fill-current" /> : <Send className="h-3.5 w-3.5 text-amber-200" />}
               </button>
             </div>
+            <p className="mx-auto mt-2 w-full max-w-4xl px-1 text-center text-[10px] leading-relaxed text-stone-400 sm:text-[11px]">
+              Gab AI can make mistakes. Please verify important information with official procurement references.
+            </p>
           </div>
         </section>
       </main>

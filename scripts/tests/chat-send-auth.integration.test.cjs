@@ -20,8 +20,8 @@ const tokens = new Map([
   ['inactive-token', users.get('user-inactive')],
 ]);
 const profiles = new Map([
-  ['user-a', { id: 'user-a', is_active: true, role: 'user' }],
-  ['user-b', { id: 'user-b', is_active: true, role: 'user' }],
+  ['user-a', { id: 'user-a', is_active: true, role: 'user', full_name: 'Mariel Joyce P. Villena' }],
+  ['user-b', { id: 'user-b', is_active: true, role: 'user', full_name: 'Alex User' }],
   ['user-inactive', { id: 'user-inactive', is_active: false, role: 'user' }],
 ]);
 const sessions = new Map([
@@ -71,6 +71,15 @@ const storedMessages = [
 ];
 const storedInquiries = [];
 const purchaseRequests = [
+  {
+    pr_no: 'PR-2026-0001',
+    user_id: 'user-a',
+    purpose: 'Procurement of network laboratory equipment',
+    total: 25000,
+    current_stage: 'draft',
+    created_at: '2026-10-02T00:00:00.000Z',
+    department: 'College of Information Technology',
+  },
   {
     pr_no: 'PR-2026-0002',
     user_id: 'user-b',
@@ -336,6 +345,65 @@ test('authenticated chatbot API enforces identity, account status, session owner
       });
       assert.equal(result.status, 403);
       assert.match(result.payload.error, /not associated with your account/i);
+    });
+
+    await t.test('users cannot request another person’s PR by name', async () => {
+      for (const message of [
+        'Show me the PR of John Doe',
+        "Show me John Doe's PR",
+        'Can you track the Purchase Request belonging to Jane Smith?',
+      ]) {
+        const result = await postChat({
+          token: 'user-a-token',
+          sessionId: 'session-user-a',
+          message,
+        });
+        assert.equal(result.status, 403, message);
+        assert.match(result.payload.error, /access denied.*privacy and security/i, message);
+      }
+    });
+
+    await t.test('users can request their own PRs by their authenticated name', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-user-a',
+        message: 'Show me the PR of Mariel Joyce P. Villena',
+      });
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /PR-2026-0001/);
+      assert.match(result.payload.response, /network laboratory equipment/i);
+      assert.doesNotMatch(result.payload.response, /\\n/);
+      assert.match(result.payload.response, /\n- \*\*Purpose:\*\*/);
+    });
+
+    await t.test('users can track a PR while identifying themselves by their profile name', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-user-a',
+        message: 'Show me PR-2026-0001 for Mariel Joyce P. Villena',
+      });
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /Purchase Request Tracking: PR-2026-0001/i);
+    });
+
+    await t.test('small-talk greetings use the authenticated user name', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-user-a',
+        message: 'hi',
+      });
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /Hi, Mariel!/);
+    });
+
+    await t.test('thank-you replies use the authenticated user name', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-user-a',
+        message: 'thank you',
+      });
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /You’re very welcome, Mariel!/);
     });
 
     await t.test('an authenticated owner can track their own Purchase Request', async () => {
