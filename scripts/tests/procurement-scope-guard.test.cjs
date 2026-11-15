@@ -181,3 +181,20 @@ test('only supported procurement Republic Act references are accepted as known l
     assert.equal(hasUnsupportedLawReference(message), true, message);
   }
 });
+
+
+test('common procurement-role questions are recognized in English and Taglish', () => {
+  for (const message of [
+    'What is an end user?',
+    'Who is the end-user in procurement?',
+    'ano ang end user',
+    'sino ang end-user sa procurement?',
+    'What does requesting unit mean?',
+  ]) {
+    assert.deepEqual(
+      getProcurementScopeDecision(message),
+      { allowed: true, reason: 'procurement' },
+      message
+    );
+  }
+});
