@@ -78,7 +78,7 @@ function buildProcurementFlowResponse() {
     'The stages above reflect ProcureMateSU’s configured workflow. Confirm office-specific instructions with the Procurement Management Office (PMO), and use PR tracking for the status of an individual request.',
     '',
     '**Official sources:** [GPPB-approved IRR of RA No. 12009, Section 34](https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf); [GPPB Circular No. 06-2026 / Resolution No. 10-2026](https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf).',
-  ].join('\n');
+      ].join('\n')).join('\n\n');
 }
 function buildNextStepResponse(pr: any, latestStage: any) { const currentIndex = PROCUREMENT_STAGES.findIndex(s => s.key === pr.current_stage); const current = currentIndex >= 0 ? PROCUREMENT_STAGES[currentIndex] : null; const next = currentIndex >= 0 && currentIndex < PROCUREMENT_STAGES.length - 1 ? PROCUREMENT_STAGES[currentIndex + 1] : null; if (pr.current_stage === 'completed' || !next) return `✅ **${pr.pr_no} has reached the final procurement stage.**\n\nThere is no next workflow stage recorded in ProcuremateSU. The PR has successfully completed the entire procurement workflow.\n\nFor the official transaction outcome or any remaining documentary requirement, coordinate with the Procurement Management Office.`; const age = latestStage?.completed_at ? Math.max(0, (Date.now() - new Date(latestStage.completed_at).getTime()) / 86400000) : null; return `📍 **What happens next for ${pr.pr_no}?**\n\n**Current stage:** Step ${current?.number || '?'} — ${current?.label || pr.current_stage}\n${latestStage?.completed_at ? `**Current stage recorded:** ${new Date(latestStage.completed_at).toLocaleString()}${age !== null ? ` (${age.toFixed(1)} days ago)` : ''}\n` : ''}\n**Next stage:** Step ${next.number} — ${next.label}\n\n**What this means:** ${next.description}\n\nThe next step is based on ProcuremateSU's centralized procurement workflow. Processing time can vary by transaction, office action, documentary requirements, and applicable procurement rules; the system does not treat the monitoring heuristic as an official SLA.`; }
 
@@ -314,7 +314,7 @@ export async function POST(request: NextRequest) {
         `- **Department:** ${pr.department || 'N/A'}`,
         `- **Total:** ₱${(Number(pr.total) || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       ].join('\\n')).join('\\n\\n');
-      return NextResponse.json({ response: `Here are the Purchase Requests associated with your account:\\n\\n${response}`, sources: ['Your Purchase Request records'] });
+      return NextResponse.json({ response: \`Here are the Purchase Requests associated with your account:\n\n\${response}\`, sources: ['Your Purchase Request records'] });
     }
 
     // Deny third-party requests unless the named person is the authenticated user.
