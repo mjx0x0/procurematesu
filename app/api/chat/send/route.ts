@@ -3,7 +3,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
 import { POST as legacyChatPOST } from '@/app/api/chat/route';
 import { buildProcurementOfficeLocationResponse } from '@/lib/procurement-office-location';
-import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE } from '@/lib/procurement-scope-guard';
+import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE, UNSUPPORTED_LAW_REFERENCE_RESPONSE, hasUnsupportedLawReference } from '@/lib/procurement-scope-guard';
 import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-extraction';
 import { classifyProcurementIntent, isContextualFollowUp, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
 import { formatRecentConversationContext, hasRecentProcurementContext } from '@/lib/chat-conversation-context';
@@ -157,6 +157,15 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         );
       }
+    }
+
+    // Do not guess about Republic Act numbers outside the procurement-law
+    // references supported by the knowledge base (RA 9184 and RA 12009).
+    if (hasUnsupportedLawReference(message)) {
+      return NextResponse.json({
+        response: UNSUPPORTED_LAW_REFERENCE_RESPONSE,
+        sources: ['Gab AI supported procurement-law scope'],
+      });
     }
 
     const scopeDecision = getProcurementScopeDecision(message, {
