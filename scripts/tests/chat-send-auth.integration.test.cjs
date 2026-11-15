@@ -10,7 +10,7 @@ const { readPRDraftHandoff } = require('../../lib/pr-draft-handoff.js');
 
 const ROOT = path.resolve(__dirname, '../..');
 const users = new Map([
-  ['user-a', { id: 'user-a', aud: 'authenticated', role: 'authenticated', email: 'user-a@example.test', app_metadata: {}, user_metadata: { full_name: 'Mariel Joyce P. Villena' } }],
+  ['user-a', { id: 'user-a', aud: 'authenticated', role: 'authenticated', email: 'user-a@example.test', app_metadata: {}, user_metadata: {} }],
   ['user-b', { id: 'user-b', aud: 'authenticated', role: 'authenticated', email: 'user-b@example.test', app_metadata: {}, user_metadata: {} }],
   ['user-inactive', { id: 'user-inactive', aud: 'authenticated', role: 'authenticated', email: 'inactive@example.test', app_metadata: {}, user_metadata: {} }],
 ]);
@@ -20,8 +20,8 @@ const tokens = new Map([
   ['inactive-token', users.get('user-inactive')],
 ]);
 const profiles = new Map([
-  ['user-a', { id: 'user-a', is_active: true, role: 'user' }],
-  ['user-b', { id: 'user-b', is_active: true, role: 'user' }],
+  ['user-a', { id: 'user-a', is_active: true, role: 'user', full_name: 'Mariel Joyce P. Villena' }],
+  ['user-b', { id: 'user-b', is_active: true, role: 'user', full_name: 'Alex User' }],
   ['user-inactive', { id: 'user-inactive', is_active: false, role: 'user' }],
 ]);
 const sessions = new Map([
@@ -372,6 +372,16 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.equal(result.status, 200, JSON.stringify(result.payload));
       assert.match(result.payload.response, /PR-2026-0001/);
       assert.match(result.payload.response, /network laboratory equipment/i);
+    });
+
+    await t.test('users can track a PR while identifying themselves by their profile name', async () => {
+      const result = await postChat({
+        token: 'user-a-token',
+        sessionId: 'session-user-a',
+        message: 'Show me PR-2026-0001 for Mariel Joyce P. Villena',
+      });
+      assert.equal(result.status, 200, JSON.stringify(result.payload));
+      assert.match(result.payload.response, /Purchase Request Tracking: PR-2026-0001/i);
     });
 
     await t.test('small-talk greetings use the authenticated user name', async () => {
