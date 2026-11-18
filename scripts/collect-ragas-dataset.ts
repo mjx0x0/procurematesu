@@ -1,10 +1,10 @@
 import { config as loadEnv } from 'dotenv';
-loadEnv({ path: '.env.local' });
-loadEnv();
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { mkdir } from 'node:fs/promises';
 import { retrieveDocumentChunks } from '../lib/document-retrieval';
+loadEnv({ path: '.env.local' });
+loadEnv();
 type DatasetRow = Record<string, string>;
 const { parseCsv, serializeCsv } = require('./lib/ragas-csv.cjs') as {
   parseCsv: (text: string) => unknown[];
