@@ -1,4 +1,6 @@
-import { config as loadEnv } from 'dotenv';\nloadEnv({ path: '.env.local' });\nloadEnv();
+import { config as loadEnv } from 'dotenv';
+loadEnv({ path: '.env.local' });
+loadEnv();
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { mkdir } from 'node:fs/promises';
