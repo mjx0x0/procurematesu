@@ -3,7 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { mkdir } from 'node:fs/promises';
 import { retrieveDocumentChunks } from '../lib/document-retrieval';
-import { parseCsv, serializeCsv } from './lib/ragas-csv.cjs';
+const { parseCsv, serializeCsv } = require('./lib/ragas-csv.cjs') as {\n  parseCsv: (text: string) => unknown[];\n  serializeCsv: (rows: DatasetRow[], headers: string[]) => string;\n};
 
 type DatasetRow = Record<string, string>;
 const DEFAULT_INPUT = 'evaluation/datasets/gab_ai_ragas_starter_dataset.csv';
@@ -79,7 +79,7 @@ async function main() {
       Object.assign(row, {
         retrieved_contexts: JSON.stringify(contexts),
         retrieved_sources: JSON.stringify(sources),
-        retrieval_status: contexts.length ? 'collected' : 'no_contexts_returned',
+        retrieval_status: contexts.length\n          ? (sources.length > 0 && sources.every((source) => source.source_type === 'local_fallback') ? 'local_fallback_only' : 'collected')\n          : 'no_contexts_returned',
         retrieval_error: '',
       });
       if (contexts.length) withContexts += 1;
