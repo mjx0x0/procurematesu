@@ -16,15 +16,7 @@ Existing response, reference, and reference_contexts columns are preserved and a
 
 - Bun and installed project dependencies (bun install).
 - A local .env.local with the Supabase environment variables used by the project. Prefer a read-only Supabase key. Never commit service-role credentials.
-- The starter file previously provided: gab_ai_ragas_starter_dataset.csv.
-
-Place the starter CSV at:
-
-```text
-evaluation/datasets/gab_ai_ragas_starter_dataset.csv
-```
-
-Or pass its location using --input.
+- The starter CSV is included at `evaluation/datasets/gab_ai_ragas_starter_dataset.csv` in this branch. You do not need to download or copy it separately.
 
 ## Run
 
