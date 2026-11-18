@@ -3,7 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { mkdir } from 'node:fs/promises';
 import { retrieveDocumentChunks } from '../lib/document-retrieval';
-const { parseCsv, serializeCsv } = require('./lib/ragas-csv.cjs') as {\n  parseCsv: (text: string) => unknown[];\n  serializeCsv: (rows: DatasetRow[], headers: string[]) => string;\n};
+type DatasetRow = Record<string, string>;\nconst { parseCsv, serializeCsv } = require('./lib/ragas-csv.cjs') as {\n  parseCsv: (text: string) => unknown[];\n  serializeCsv: (rows: DatasetRow[], headers: string[]) => string;\n};
 
 type DatasetRow = Record<string, string>;
 const DEFAULT_INPUT = 'evaluation/datasets/gab_ai_ragas_starter_dataset.csv';
