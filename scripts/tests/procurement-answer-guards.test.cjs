@@ -642,3 +642,90 @@ test('Circular No. 09-2026 answer fails closed rather than asserting a blanket b
   assert.match(answer, /can(?:not|.?t) verify/i);
   assert.match(answer, /project category/i);
 });
+
+
+test('SVP questions route to concise intent-specific answers', () => {
+  const supplierCount = buildVerifiedProcurementAnswer(
+    'How many suppliers should be requested to submit quotations for SVP?',
+    completeSvpProcedureChunks,
+  );
+  assert.match(supplierCount, /at least \\*\\*three \\(3\\) suppliers/i);
+  assert.match(supplierCount, /one quotation is received/i);
+  assert.doesNotMatch(supplierCount, /₱2,000,000|three \\(3\\) calendar days|posting/i);
+
+  const definition = buildVerifiedProcurementAnswer(
+    'What is Small Value Procurement (SVP)?',
+    completeSvpProcedureChunks,
+  );
+  assert.match(definition, /procurement method/i);
+  assert.match(definition, /eligible Goods|Infrastructure Projects|Consulting Services/i);
+  assert.doesNotMatch(definition, /₱2,000,000|three \\(3\\) calendar days|documentary requirements/i);
+
+  const threshold = buildVerifiedProcurementAnswer(
+    'What is the current threshold for Small Value Procurement?',
+    completeSvpProcedureChunks,
+  );
+  assert.match(threshold, /₱2,000,000/);
+  assert.match(threshold, /Section 34\\.1/);
+  assert.doesNotMatch(threshold, /three \\(3\\) calendar days|posting|Omnibus Sworn Statement/i);
+
+  const quotationCount = buildVerifiedProcurementAnswer(
+    'How many quotations must the BAC request?',
+    completeSvpProcedureChunks,
+  );
+  assert.match(quotationCount, /at least \\*\\*three \\(3\\)/i);
+  assert.doesNotMatch(quotationCount, /₱2,000,000|three \\(3\\) calendar days/i);
+
+  const posting = buildVerifiedProcurementAnswer(
+    'Is posting required for SVP?',
+    completeSvpProcedureChunks,
+  );
+  assert.match(posting, /three \\(3\\) calendar days/i);
+  assert.match(posting, /₱200,000\\.00 or below/i);
+  assert.doesNotMatch(posting, /₱2,000,000|at least three suppliers|documentary requirements/i);
+
+  const oneQuotation = buildVerifiedProcurementAnswer(
+    'What happens if only one supplier submits a quotation for SVP?',
+    completeSvpProcedureChunks,
+  );
+  assert.match(oneQuotation, /sufficient to proceed with evaluation/i);
+  assert.match(oneQuotation, /not.*automatic award/i);
+  assert.doesNotMatch(oneQuotation, /three \\(3\\) calendar days|₱2,000,000/i);
+
+  const noQuotations = buildVerifiedProcurementAnswer(
+    'What happens if no quotations are received for SVP?',
+    completeSvpProcedureChunks,
+  );
+  assert.match(noQuotations, /Section 34\\.3\\(d\\)/);
+  assert.match(noQuotations, /may extend the deadline/i);
+
+  const documentary = buildVerifiedProcurementAnswer(
+    'What are the documentary requirements for SVP?',
+    [...circularChunks, ...completeSvpProcedureChunks],
+  );
+  assert.match(documentary, /Circular No\\. 06-2026/);
+  assert.match(documentary, /Professional License\\/CV.*clarification required/i);
+
+  const comprehensive = buildVerifiedProcurementAnswer(
+    'Explain the complete SVP procedure under RA No. 12009.',
+    completeSvpProcedureChunks,
+  );
+  assert.match(comprehensive, /Threshold — Section 34\\.1/);
+  assert.match(comprehensive, /Posting — Section 34\\.3\\(b\\)/);
+  assert.match(comprehensive, /Supplementary supplier-document rules/i);
+});
+
+test('SVP specific handlers fail closed when authoritative IRR evidence is missing', () => {
+  for (const query of [
+    'How many suppliers should be requested to submit quotations for SVP?',
+    'What is Small Value Procurement (SVP)?',
+    'What is the current threshold for Small Value Procurement?',
+    'Is posting required for SVP?',
+  ]) {
+    const answer = buildVerifiedProcurementAnswer(query, [
+      { document_name: 'Historical IRR 2016', chunk_text: 'Old procurement rules.' },
+    ]);
+    assert.match(answer, /can’t verify this procurement rule/i, query);
+    assert.match(answer, /IRR-of-RA-No\\.-12009\\.pdf/, query);
+  }
+});
