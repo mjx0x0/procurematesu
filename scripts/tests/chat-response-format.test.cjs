@@ -40,11 +40,9 @@ test('ordinary prose containing a pipe character is not stripped or treated as a
 
 test('escaped newline sequences are converted into real paragraph breaks', () => {
   const response = 'First paragraph.\\n\\nSecond paragraph.';
-  assert.equal(
-    normalizeAssistantResponse(response),
-    'First paragraph.\\n\\nSecond paragraph.'
-  );
-  assert.doesNotMatch(normalizeAssistantResponse(response), /\\\\n/);
+  const normalized = normalizeAssistantResponse(response);
+  assert.equal(normalized, 'First paragraph.\n\nSecond paragraph.');
+  assert.doesNotMatch(normalized, /\\n/);
 });
 
 test('HTML line breaks are converted and block tags do not concatenate paragraphs', () => {
