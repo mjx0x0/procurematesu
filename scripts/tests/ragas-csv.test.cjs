@@ -9,7 +9,7 @@ test('CSV parser handles commas, quotes, and multiline cells', () => {
   assert.deepEqual(rows, [{ question: 'What, exactly?', answer: 'She said "yes".\nNext line' }]);
 });
 
-test('CSV serializer escapes values and round-trips rows', () => {
+test('CSV parser strips a UTF-8 BOM from the first header', () => {\n  assert.deepEqual(parseCsv('\\uFEFFcategory,user_input\\nTest,Question\\n'), [{ category: 'Test', user_input: 'Question' }]);\n});\n\ntest('CSV serializer escapes values and round-trips rows', () => {
   const input = [{ question: 'What, exactly?', answer: 'A "quoted" answer\ncontinued' }];
   assert.deepEqual(parseCsv(serializeCsv(input, ['question', 'answer'])), input);
 });
