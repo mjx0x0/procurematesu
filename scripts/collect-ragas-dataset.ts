@@ -3,9 +3,11 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { mkdir } from 'node:fs/promises';
 import { retrieveDocumentChunks } from '../lib/document-retrieval';
-type DatasetRow = Record<string, string>;\nconst { parseCsv, serializeCsv } = require('./lib/ragas-csv.cjs') as {\n  parseCsv: (text: string) => unknown[];\n  serializeCsv: (rows: DatasetRow[], headers: string[]) => string;\n};
-
 type DatasetRow = Record<string, string>;
+const { parseCsv, serializeCsv } = require('./lib/ragas-csv.cjs') as {
+  parseCsv: (text: string) => unknown[];
+  serializeCsv: (rows: DatasetRow[], headers: string[]) => string;
+};
 const DEFAULT_INPUT = 'evaluation/datasets/gab_ai_ragas_starter_dataset.csv';
 const DEFAULT_OUTPUT = 'evaluation/datasets/gab_ai_ragas_collected.csv';
 const REQUIRED_COLUMNS = ['user_input', 'response', 'reference', 'reference_contexts'];
@@ -79,7 +81,9 @@ async function main() {
       Object.assign(row, {
         retrieved_contexts: JSON.stringify(contexts),
         retrieved_sources: JSON.stringify(sources),
-        retrieval_status: contexts.length\n          ? (sources.length > 0 && sources.every((source) => source.source_type === 'local_fallback') ? 'local_fallback_only' : 'collected')\n          : 'no_contexts_returned',
+        retrieval_status: contexts.length
+          ? (sources.length > 0 && sources.every((source) => source.source_type === 'local_fallback') ? 'local_fallback_only' : 'collected')
+          : 'no_contexts_returned',
         retrieval_error: '',
       });
       if (contexts.length) withContexts += 1;
