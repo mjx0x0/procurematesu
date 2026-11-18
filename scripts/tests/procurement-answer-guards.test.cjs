@@ -689,7 +689,7 @@ test('SVP questions route to concise intent-specific answers', () => {
     completeSvpProcedureChunks,
   );
   assert.match(oneQuotation, /sufficient to proceed with evaluation/i);
-  assert.match(oneQuotation, /not.*automatic award/i);
+  assert.match(oneQuotation, /not mean.*automatically awarded/i);
   assert.doesNotMatch(oneQuotation, /three \\(3\\) calendar days|₱2,000,000/i);
 
   const noQuotations = buildVerifiedProcurementAnswer(
