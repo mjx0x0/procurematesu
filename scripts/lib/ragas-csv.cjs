@@ -25,7 +25,7 @@ function parseCsv(text) {
     if (row.some((cell) => cell.length)) rows.push(row);
   }
   if (!rows.length) return [];
-  const headers = rows[0].map((header) => header.trim());
+  const headers = rows[0].map((header) => header.replace(/^\uFEFF/, '').trim());
   if (headers.some((header) => !header)) throw new Error('Invalid CSV: every column must have a header.');
   if (new Set(headers).size !== headers.length) throw new Error('Invalid CSV: duplicate column headers.');
   return rows.slice(1).map((values, index) => {
