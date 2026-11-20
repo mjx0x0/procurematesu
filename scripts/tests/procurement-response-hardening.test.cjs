@@ -12,8 +12,8 @@ test('RA 12009 title is the New Government Procurement Act, not the former law t
   const chunks = [ra('Section 1. Short Title. This Act shall be known as the “New Government Procurement Act”.')];
   const answer = buildHighRiskProcurementResponse(q, chunks);
   assert.match(answer, /New Government Procurement Act/);
-  assert.match(answer, /Government Procurement Reform Act.*RA No\\. 9184/);
-  assert.doesNotMatch(answer, /RA No\\. 12009 is the Government Procurement Reform Act/i);
+  assert.match(answer, /Government Procurement Reform Act.*RA No\. 9184/);
+  assert.doesNotMatch(answer, /RA No\. 12009 is the Government Procurement Reform Act/i);
 });
 
 test('RA 12009 title question abstains without Section 1 evidence', () => {
@@ -25,7 +25,7 @@ test('BAC answer separates BAC functions from Secretariat support duties', () =>
   const q = 'What are the responsibilities of the Bids and Awards Committee (BAC) during procurement under RA 12009?';
   const chunks = [irr('Section 42. Functions of the BAC. 42.1 The BAC shall have the following functions: Recommend to the HoPE; Publish or post the Invitation to Bid; Conduct pre-procurement and pre-bid conferences; Determine the eligibility of prospective bidders; Receive and open bids; Conduct the evaluation of bids; Undertake post-qualification proceedings; Resolve requests for reconsideration; Recommend award of contracts to the HoPE; Recommend sanctions; Prepare a procurement monitoring report.')];
   const answer = buildHighRiskProcurementResponse(q, chunks);
-  assert.match(answer, /Section 42\\.1/);
+  assert.match(answer, /Section 42\.1/);
   assert.match(answer, /BAC Secretariat is a separate support unit/);
   assert.doesNotMatch(answer, /BAC is responsible for overseeing the entire procurement cycle from convening meetings and handling bidding documents/i);
 });
@@ -34,7 +34,7 @@ test('PPMP and APP comparison uses current IRR planning sections only', () => {
   const q = 'What is the difference between a PPMP and an Annual Procurement Plan (APP)?';
   const chunks = [irr('7.7.1 End-User or Implementing Units shall formulate respective Project Procurement Management Plans (PPMPs). 7.7.2 Approved Indicative PPMPs shall be forwarded to the BAC Secretariat for consolidation into an Indicative APP. 7.7.5 finalized PPMPs shall be submitted to the BAC Secretariat for consolidation into the final APP.')];
   const answer = buildHighRiskProcurementResponse(q, chunks);
-  assert.match(answer, /PPMP = unit\\/project-level procurement plan/);
+  assert.match(answer, /PPMP = unit\/project-level procurement plan/);
   assert.match(answer, /APP = consolidated Procuring Entity-wide annual procurement plan/);
   assert.doesNotMatch(answer, /Local Government Units Procurement Manual/i);
 });
@@ -45,8 +45,8 @@ test('SVP and Competitive Bidding comparison keeps SUC threshold distinct from L
   const answer = buildHighRiskProcurementResponse(q, chunks);
   assert.match(answer, /SUC/);
   assert.match(answer, /₱2,000,000/);
-  assert.match(answer, /Section 27\\.1/);
-  assert.doesNotMatch(answer, /at least three \\(3\\) qualified bidders to submit bids/i);
+  assert.match(answer, /Section 27\.1/);
+  assert.doesNotMatch(answer, /at least three \(3\) qualified bidders to submit bids/i);
 });
 
 test('Tagalog follow-up retains the SVP versus Competitive Bidding comparison', () => {
@@ -69,7 +69,7 @@ test('PR approval time-limit question does not substitute a workflow for a missi
   const q = 'What is the exact internal approval time limit for every PR at MSU-Gensan?';
   const answer = buildHighRiskProcurementResponse(q, [pmo('Section IV Process Flow. The PMO receives PR, validates it, then sends to Budget Management Office.')]);
   assert.match(answer, /do \*\*not establish an exact, universal internal approval time limit/i);
-  assert.doesNotMatch(answer, /1\\. \\*\\*Receipt/);
+  assert.doesNotMatch(answer, /1\. \*\*Receipt/);
 });
 
 test('PR workflow excludes legacy RIS and Shopping steps', () => {
@@ -127,5 +127,5 @@ test('generic current-law question identifies RA 12009 and preserves the limited
   assert.match(answer, /New Government Procurement Act/);
   assert.match(answer, /limited transition rule/i);
   assert.match(answer, /25 February 2025/);
-  assert.doesNotMatch(answer, /RA No\\. 12009 is the Government Procurement Reform Act/i);
+  assert.doesNotMatch(answer, /RA No\. 12009 is the Government Procurement Reform Act/i);
 });
