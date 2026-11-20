@@ -55,6 +55,7 @@ on:
       - "app/dashboard/purchase-requests/page.tsx"
       - "app/loading.tsx"
       - "scripts/tests/system-branding.test.cjs"
+      - "scripts/tests/procurement-workflow-hardening.test.cjs"
   pull_request:
     branches: [master]
     paths:
