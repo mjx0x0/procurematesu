@@ -91,6 +91,10 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:current|currently|still|in force|governing|applicable|applies|apply|procurement law|which law|what law)\b/i.test(query) &&
     !(/\b(?:before|prior to|previous(?:ly)?|historical(?:ly)?|history|old law|former|under the former|used to apply|applied under)\b/i.test(query) &&
       (/\b12009\b/i.test(query) || /\bhistorical(?:ly)?\b|\bprevious(?:ly)?\b|\bformer\b/i.test(query)));
+  const asksCurrentGoverningProcurementLaw =
+    /\b(?:what|which)\s+(?:is\s+)?(?:the\s+)?(?:current|currently applicable|governing|applicable)?\s*procurement law\b/i.test(query)
+    || /\bwhat law currently governs\b/i.test(query)
+    || /\bwhich law governs (?:government )?procurement\b/i.test(query);
   const asksRa12009Title =
     /\b(?:what is|what does|identify|give me)\b/i.test(query) &&
     /\b(?:RA\s*\.?\s*(?:No\.?\s*)?12009|Republic Act\s+No\.?\s*12009|New Government Procurement Act)\b/i.test(query) &&
@@ -218,6 +222,24 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           supabase.from('document_chunks').select(selectedColumns)
             .eq('document_name', 'GPPB Circular No. 01-2025')
             .limit(10)
+        );
+      }
+      if (asksCurrentGoverningProcurementLaw) {
+        for (const documentName of ['RA 12009 (New)', 'RA 12009']) {
+          searches.push(
+            supabase.from('document_chunks').select(selectedColumns)
+              .eq('document_name', documentName)
+              .ilike('chunk_text', '%New Government Procurement Act%')
+              .limit(6)
+          );
+        }
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'GPPB Circular No. 01-2025')
+            .limit(12),
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'Implementing Rules and Regulations of RA 12009')
+            .limit(8)
         );
       }
       if (asksRa12009Title) {
@@ -579,7 +601,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // The documentary answer is intentionally cross-source: retain the six
   // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
   // quotations, posting, and the no-quotation exception independently.
-  const resultLimit = (asksBacFunctions || asksPpmpApp || asksRa12009Title || asksPmoDefinition || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
+  const resultLimit = (asksBacFunctions || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
     ? Math.max(limit, 12)
     : asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
