@@ -728,7 +728,7 @@ test('SVP questions route to concise intent-specific answers', () => {
     [...circularChunks, ...completeSvpProcedureChunks],
   );
   assert.match(documentary, /Circular No\\. 06-2026/);
-  assert.match(documentary, /Professional License\\/CV.*clarification required/i);
+  assert.match(documentary, /Professional License\/CV.*clarification required/i);
 
   const comprehensive = buildVerifiedProcurementAnswer(
     'Explain the complete SVP procedure under RA No. 12009.',
