@@ -443,20 +443,24 @@ export async function POST(request: NextRequest) {
         // Call the PostgREST RPC endpoint explicitly. This keeps the authenticated
         // service-role write independent of the Supabase client's RPC transport
         // and makes HTTP failures observable instead of silently losing a log row.
-        const inquiryLogResponse = await fetch(`${supabaseUrl}/rest/v1/rpc/append_monitor_inquiry_session`, {
-          method: 'POST',
-          headers: {
-            apikey: serviceRoleKey,
-            Authorization: `Bearer ${serviceRoleKey}`,
-            'Content-Type': 'application/json',
-            Prefer: 'return=minimal',
-          },
-          body: JSON.stringify(inquiryLogPayload),
-          cache: 'no-store',
-        });
-        if (!inquiryLogResponse.ok) {
-          const errorBody = await inquiryLogResponse.text().catch(() => '');
-          console.error('[chat/send] Delegated session inquiry log update failed:', inquiryLogResponse.status, errorBody.slice(0, 1000));
+        if (!serviceRoleKey || !supabaseUrl) {
+          console.error('[chat/send] Delegated inquiry logging skipped: Supabase service-role credentials are unavailable.');
+        } else {
+          const inquiryLogResponse = await fetch(`${supabaseUrl}/rest/v1/rpc/append_monitor_inquiry_session`, {
+            method: 'POST',
+            headers: {
+              apikey: serviceRoleKey,
+              Authorization: `Bearer ${serviceRoleKey}`,
+              'Content-Type': 'application/json',
+              Prefer: 'return=minimal',
+            },
+            body: JSON.stringify(inquiryLogPayload),
+            cache: 'no-store',
+          });
+          if (!inquiryLogResponse.ok) {
+            const errorBody = await inquiryLogResponse.text().catch(() => '');
+            console.error('[chat/send] Delegated session inquiry log update failed:', inquiryLogResponse.status, errorBody.slice(0, 1000));
+          }
         }
       }
     }
