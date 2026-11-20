@@ -409,6 +409,42 @@ export async function POST(request: NextRequest) {
     trustedHeaders.set('x-chat-send-delegated', '1');
     const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: trustedHeaders, body: JSON.stringify({ message, sessionId, userId: user.id, conversationContext }) });
     const legacyResponse = await legacyChatPOST(trustedRequest);
+
+    // Log only successful delegated turns, after the legacy handler has produced
+    // the final answer. Use the same authenticated client that verified the user
+    // and session; do not issue a separate raw PostgREST fetch.
+    if (legacyResponse.ok) {
+      try {
+        const result = await legacyResponse.clone().json();
+        const botResponse = typeof result?.response === 'string' ? result.response : '';
+        if (botResponse) {
+          const normalizedForPR = message.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-');
+          const prMatch = normalizedForPR.match(/\\bPR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6}\\b/i)?.[0] || null;
+          const inquiryType = messageIntent === 'create_pr_draft' || messageIntent === 'draft_revision'
+            ? 'draft_pr'
+            : messageIntent === 'track_pr' || messageIntent === 'list_prs'
+              ? 'track_pr'
+              : 'procurement_guidance';
+          const { error: inquiryLogError } = await clientToUse.rpc('append_monitor_inquiry_session', {
+            p_session_id: sessionId,
+            p_user_id: user.id,
+            p_user_name: authenticatedUserName || 'ProcuremateSU User',
+            p_user_department: 'MSU-GenSan',
+            p_pr_no: prMatch ? normalizePRIdentifier(prMatch) : null,
+            p_user_message: message,
+            p_bot_response: botResponse,
+            p_inquiry_type: inquiryType,
+          });
+          if (inquiryLogError) {
+            console.error('[chat/send] Inquiry session logging failed:', inquiryLogError.message);
+          }
+        }
+      } catch (logError) {
+        // Inquiry logging must not replace a valid chatbot response.
+        console.error('[chat/send] Could not persist inquiry session:', logError);
+      }
+    }
+
     return legacyResponse;
   } catch (error) { console.error('[chat/send] Unexpected error:', error); return NextResponse.json({ error: 'Unable to process the chat request.' }, { status: 500 }); }
 }
