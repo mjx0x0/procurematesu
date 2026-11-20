@@ -418,8 +418,8 @@ export async function POST(request: NextRequest) {
         const result = await legacyResponse.clone().json();
         const botResponse = typeof result?.response === 'string' ? result.response : '';
         if (botResponse) {
-          const normalizedForPR = message.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-');
-          const prMatch = normalizedForPR.match(/\\bPR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6}\\b/i)?.[0] || null;
+          const normalizedForPR = message.replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-');
+          const prMatch = normalizedForPR.match(/\bPR[- ]?(?:TEMP[- ]?)?(?:\d{4}[- ]?)?\d{1,6}\b/i)?.[0] || null;
           const inquiryType = messageIntent === 'create_pr_draft' || messageIntent === 'draft_revision'
             ? 'draft_pr'
             : messageIntent === 'track_pr' || messageIntent === 'list_prs'
