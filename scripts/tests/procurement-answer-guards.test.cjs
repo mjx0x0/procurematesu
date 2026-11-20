@@ -644,6 +644,30 @@ test('Circular No. 09-2026 answer fails closed rather than asserting a blanket b
 });
 
 
+test('SVP Abstract of Quotations questions receive a focused answer', () => {
+  const answer = buildVerifiedProcurementAnswer(
+    'What is the purpose of the Abstract of Quotations in Small Value Procurement?',
+    completeSvpProcedureChunks,
+  );
+
+  assert.match(answer, /Section 34\\.3\\(f\\)/);
+  assert.match(answer, /formal record of the quotations or ratings received/i);
+  assert.match(answer, /documented basis.*BAC/i);
+  assert.match(answer, /Section 34\\.3\\(g\\)/);
+  assert.match(answer, /not itself the Notice of Award/i);
+  assert.doesNotMatch(answer, /Small Value Procurement \\(SVP\\) is a procurement method|₱2,000,000|three \\(3\\) calendar days/i);
+});
+
+test('SVP Abstract of Quotations answer fails closed without Section 34.3(f) evidence', () => {
+  const answer = buildVerifiedProcurementAnswer(
+    'What is the purpose of the Abstract of Quotations in Small Value Procurement?',
+    completeSvpProcedureChunks.slice(0, -1),
+  );
+
+  assert.match(answer, /can’t verify this procurement rule/i);
+  assert.match(answer, /Section 34\\.3\\(f\\)–\\(g\\)/);
+});
+
 test('SVP questions route to concise intent-specific answers', () => {
   const supplierCount = buildVerifiedProcurementAnswer(
     'How many suppliers should be requested to submit quotations for SVP?',
