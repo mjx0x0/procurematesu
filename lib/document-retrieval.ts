@@ -101,6 +101,14 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     !/\b(?:threshold|section|posting|quotation|amendment|penalty|procedure|requirement|specific provision)\b/i.test(query);
   const asksBacFunctions = /\b(?:BAC|Bids and Awards Committee)\b/i.test(query) && /\b(?:function|responsibilit|role|dut(?:y|ies)|what does)\b/i.test(query);
   const asksPpmpApp = /\bPPMP\b/i.test(query) && /\bAPP\b|Annual Procurement Plan/i.test(query) && /\b(?:difference|differ|compare|versus|vs\.?|between|distinguish)\b/i.test(query);
+  const asksPrPpmpComparison =
+    /\b(?:PR|Purchase Request)\b/i.test(query) &&
+    /\bPPMP\b/i.test(query) &&
+    /\b(?:difference|differ|compare|versus|vs\\.?|between|distinguish)\b/i.test(query);
+  const asksPrRequirements =
+    /\b(?:PR|Purchase Request)\b/i.test(query) &&
+    /\b(?:requirement|requirements|documents?|what.*need|needed|must.*include|should.*include|checklist|prepare|preparation)\b/i.test(query) &&
+    !asksPrPpmpComparison;
   const asksPmoDefinition = /\b(?:what is|define|definition|meaning)\b/i.test(query) && /\b(?:Purchase Request|Purchase Order|PR|PO)\b/i.test(query);
   const asksPmoPrWorkflow = /\b(?:Purchase Request|PR)\b/i.test(query) &&
     /\b(?:after|once|when|sequence|workflow|process|steps|what happens|prepared|prepares|receives|received)\b/i.test(query);
@@ -256,6 +264,34 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch('Implementing Rules and Regulations of RA 12009', 'Section 42. Functions of the BAC'),
           scopedPhraseSearch('Implementing Rules and Regulations of RA 12009', '42.1 The BAC shall have the following functions'),
           scopedPhraseSearch('Implementing Rules and Regulations of RA 12009', 'Recommend award of contracts to the HoPE')
+        );
+      }
+      if (asksPrPpmpComparison) {
+        const currentIrr = 'Implementing Rules and Regulations of RA 12009';
+        const pmoManual = 'PMO Administrative Manual';
+        // Legal planning framework: retrieve the current IRR's PPMP/APP clauses.
+        searches.push(
+          scopedPhraseSearch(currentIrr, 'Project Procurement Management Plan'),
+          scopedPhraseSearch(currentIrr, 'PPMP'),
+          scopedPhraseSearch(currentIrr, 'Annual Procurement Plan'),
+          scopedPhraseSearch(currentIrr, 'Section 7. Procurement Planning and Budgeting Linkage'),
+          // Institutional implementation: retrieve the MSU manual's PPMP-to-PR checks.
+          scopedPhraseSearch(pmoManual, 'Review and validate the Purchase Request'),
+          scopedPhraseSearch(pmoManual, 'Verification Against PPMP/APP'),
+          scopedPhraseSearch(pmoManual, 'approved Project Procurement Management Plan')
+        );
+      }
+      if (asksPrRequirements) {
+        const pmoManual = 'PMO Administrative Manual';
+        // The MSU manual is the source for local PR review and workflow;
+        // do not substitute generic or LGU-specific checklists.
+        searches.push(
+          scopedPhraseSearch(pmoManual, 'Review and validate the Purchase Request'),
+          scopedPhraseSearch(pmoManual, 'accuracy and completeness of entries'),
+          scopedPhraseSearch(pmoManual, 'required specifications and other pertinent details'),
+          scopedPhraseSearch(pmoManual, 'Verification of Signatories and Dates'),
+          scopedPhraseSearch(pmoManual, 'approved Purchase Requests signed by the Chancellor'),
+          scopedPhraseSearch(pmoManual, 'Endorsement to Budget Management Office')
         );
       }
       if (asksPpmpApp) {
@@ -568,6 +604,17 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const asksInstitutional = /\b(msu|gensan|university|pmo|pro|procurement office|department|chancellor|budget office|purchase request|pr|workflow|process|approval|logbook|director|contact|office)\b/i.test(query);
           if (asksLegal && isCurrentProcurementLawSource(identity)) score += 24;
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
+          if (asksPrPpmpComparison) {
+            if (documentName === 'Implementing Rules and Regulations of RA 12009' &&
+              /PPMP|Project Procurement Management Plan|Annual Procurement Plan|procurement planning/i.test(text)) score += 180;
+            if (documentName === 'PMO Administrative Manual' &&
+              /review and validate the Purchase Request|against the approved Project Procurement Management Plan|consolidat(?:e|ion).*PPMP.*APP/i.test(text)) score += 160;
+            // Never let the 2014 LGU manual or 2016 RA 9184 IRR answer a current comparison.
+            if (isLegacy) score -= 1000;
+          }
+          if (asksPrRequirements && documentName === 'PMO Administrative Manual' &&
+            /Purchase Request|PRs|signator|specification|completeness|Budget Management Office|Chancellor/i.test(text)) score += 220;
+          if ((asksPrRequirements || asksPrPpmpComparison) && isLegacy) score -= 1000;
           const issuanceTarget = officialIssuanceTargets.find((target) => target.documentName === documentName);
           if (issuanceTarget) score += issuanceTarget.priorityBoost || 1000;
           if (asksUniversityChancellor && documentName === 'MSU-GenSan University Directory') score += 1000;
@@ -610,7 +657,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // The documentary answer is intentionally cross-source: retain the six
   // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
   // quotations, posting, and the no-quotation exception independently.
-  const resultLimit = (asksBacFunctions || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
+  const resultLimit = (asksBacFunctions || asksPrPpmpComparison || asksPrRequirements || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
     ? Math.max(limit, 12)
     : asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
