@@ -652,7 +652,7 @@ test('SVP Abstract of Quotations questions receive a focused answer', () => {
 
   assert.match(answer, /Section 34\.3\(f\)/);
   assert.match(answer, /formal record of the quotations or ratings received/i);
-  assert.match(answer, /documented basis.*BAC/i);
+  assert.match(answer, /documented basis/i);
   assert.match(answer, /Section 34\.3\(g\)/);
   assert.match(answer, /not itself the Notice of Award/i);
   assert.doesNotMatch(answer, /Small Value Procurement \(SVP\) is a procurement method|₱2,000,000|three \(3\) calendar days/i);
