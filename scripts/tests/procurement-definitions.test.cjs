@@ -18,7 +18,7 @@ test('common PPMP definition phrasings receive a concise answer', () => {
     assert.ok(answer, message);
     assert.match(answer, /Project Procurement Management Plan/);
     assert.match(answer, /planning document/);
-    assert.match(answer, /Purchase Request|\\bPR\\b/);
+    assert.match(answer, /Purchase Request|\bPR\b/);
   }
 });
 
