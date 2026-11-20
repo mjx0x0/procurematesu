@@ -482,7 +482,7 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.equal(savedSession.state.step, 'purpose');
       assert.equal(storedMessages.length - beforeMessages, 2);
       assert.deepEqual(storedMessages.slice(-2).map((message) => message.sender), ['user', 'ai']);
-      assert.equal(storedInquiries.length - beforeInquiries, 1);
+      assert.equal(storedInquiries.length - beforeInquiries, 1, 'Expected exactly one authenticated inquiry-log RPC. Server output:\n' + nextOutput);
       assert.equal(storedInquiries.at(-1).user_id, 'user-a');
 
       const followUp = await postChat({
