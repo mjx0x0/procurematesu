@@ -753,3 +753,42 @@ test('SVP specific handlers fail closed when authoritative IRR evidence is missi
     assert.match(answer, /IRR-of-RA-No\\.-12009\\.pdf/, query);
   }
 });
+
+
+test('SVP Abstract answer accepts official IRR title variants and split subsection excerpts', () => {
+  const answer = buildVerifiedProcurementAnswer(
+    'What is the purpose of the Abstract of Quotations in Small Value Procurement?',
+    [
+      {
+        document_name: 'Implementing Rules and Regulations of RA No. 12009',
+        chunk_text: 'Section 34.3(f): After the deadline for submission of quotations, an Abstract of',
+        metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
+      },
+      {
+        document_name: 'Implementing Rules and Regulations of RA No. 12009',
+        chunk_text: 'Quotations or Ratings shall be prepared. Under Section 34.3(g), the BAC recommends award to the HoPE.',
+        metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
+      },
+    ],
+  );
+
+  assert.match(answer, /formal record of the quotations or ratings received/i);
+  assert.match(answer, /Section 34\.3\(f\)/);
+  assert.match(answer, /Section 34\.3\(g\)/);
+  assert.match(answer, /not itself the Notice of Award/i);
+  assert.doesNotMatch(answer, /can’t verify this procurement rule/i);
+  assert.doesNotMatch(answer, /\\\\n/);
+});
+
+test('SVP Abstract evidence rejects an IRR title with an unverified source URL', () => {
+  const answer = buildVerifiedProcurementAnswer(
+    'What is the purpose of the Abstract of Quotations in Small Value Procurement?',
+    [{
+      document_name: 'Implementing Rules and Regulations of RA No. 12009',
+      chunk_text: 'Section 34.3(f): Abstract of Quotations or Ratings shall be prepared.',
+      metadata: { source_url: 'https://example.com/unverified-irr.pdf' },
+    }],
+  );
+
+  assert.match(answer, /can’t verify this procurement rule/i);
+});
