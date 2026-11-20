@@ -1048,8 +1048,13 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
         // with current requirements for SVP and historical RA 9184 questions.
         const verifiedAnswer = buildHighRiskProcurementResponse(trimmedMsg, retrieval.chunks, conversationContext)
           || buildVerifiedProcurementAnswer(trimmedMsg, retrieval.chunks);
+        const conceptualFollowUpAnswer = buildOfflineConceptualFollowUpAnswer(trimmedMsg, conversationContext);
         if (verifiedAnswer) {
           responseText = verifiedAnswer;
+        } else if (conceptualFollowUpAnswer) {
+          // Resolve short conceptual follow-ups deterministically so a model cannot
+          // drift to a different procurement topic or omit the core comparison.
+          responseText = conceptualFollowUpAnswer;
         } else {
           const aiResponse = (!retrievedDocs.trim() && requiresVerifiedEvidence)
             ? ''
@@ -1113,6 +1118,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
         ]);
 
         // Maintain one helpdesk log per chat session for direct and delegated turns.
+        if (req.headers.get('x-chat-send-delegated') !== '1') {
         // The authenticated wrapper has already verified session ownership.
         const loggedPrNo = trimmedMsg.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-').match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
         const { error: inquiryLogError } = await supabase.rpc('append_monitor_inquiry_session', {
@@ -1127,6 +1133,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
         });
         if (inquiryLogError) {
           console.warn('[chat] Session inquiry log update failed:', inquiryLogError.message);
+        }
         }
       } catch (dbErr) {
         console.warn('Non-blocking database log notice:', dbErr);
