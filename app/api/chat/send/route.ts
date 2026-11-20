@@ -409,9 +409,35 @@ export async function POST(request: NextRequest) {
     trustedHeaders.set('x-chat-send-delegated', '1');
     const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: trustedHeaders, body: JSON.stringify({ message, sessionId, userId: user.id, conversationContext }) });
     const legacyResponse = await legacyChatPOST(trustedRequest);
-    // The delegated /api/chat handler persists the response and appends the
-    // session inquiry log in one path. Do not append here too: the RPC updates
-    // one row per session, and a second call would duplicate the same turn.
+    // This authenticated wrapper owns inquiry logging for delegated turns.
+    // The legacy route skips its own RPC when this trusted internal header is set.
+    if (db && legacyResponse.ok) {
+      let responseText = '';
+      try {
+        const payload = await legacyResponse.clone().json();
+        responseText = typeof payload?.response === 'string' ? payload.response.trim() : '';
+      } catch (logError) {
+        console.warn('[chat/send] Could not parse delegated response for inquiry logging:', logError);
+      }
+      if (responseText) {
+        const loggedPrNo = message.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-').match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
+        const { error: inquiryLogError } = await db.rpc('append_monitor_inquiry_session', {
+          p_session_id: sessionId,
+          p_user_id: user.id,
+          p_user_name: authenticatedUserName || 'ProcuremateSU User',
+          p_user_department: 'MSU-GenSan',
+          p_pr_no: loggedPrNo ? normalizePRIdentifier(loggedPrNo) : null,
+          p_user_message: message,
+          p_bot_response: responseText,
+          p_inquiry_type: 'general',
+        });
+        if (inquiryLogError) {
+          console.error('[chat/send] Delegated session inquiry log update failed:', inquiryLogError.message);
+        }
+      } else {
+        console.warn('[chat/send] Delegated response had no response text; inquiry log was not updated.');
+      }
+    }
     return legacyResponse;
   } catch (error) { console.error('[chat/send] Unexpected error:', error); return NextResponse.json({ error: 'Unable to process the chat request.' }, { status: 500 }); }
 }
