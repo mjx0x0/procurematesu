@@ -1117,9 +1117,10 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
           { session_id: currentSessionId, sender: 'ai', content: responseText },
         ]);
 
-        // Maintain one helpdesk log per chat session for direct and delegated turns.
-        if (req.headers.get('x-chat-send-delegated') !== '1') {
-        // The authenticated wrapper has already verified session ownership.
+        // Persist the helpdesk inquiry through the same authenticated Supabase
+        // client used for the chat session and message writes. The /api/chat/send
+        // wrapper delegates here, so logging here avoids a second transport/client
+        // and guarantees one RPC for both direct and delegated chat turns.
         const loggedPrNo = trimmedMsg.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-').match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
         const { error: inquiryLogError } = await supabase.rpc('append_monitor_inquiry_session', {
           p_session_id: currentSessionId,
@@ -1132,8 +1133,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
           p_inquiry_type: inquiryType,
         });
         if (inquiryLogError) {
-          console.warn('[chat] Session inquiry log update failed:', inquiryLogError.message);
-        }
+          console.error('[chat] Session inquiry log update failed:', inquiryLogError.message);
         }
       } catch (dbErr) {
         console.warn('Non-blocking database log notice:', dbErr);
