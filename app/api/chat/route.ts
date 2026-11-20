@@ -1117,23 +1117,22 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
           { session_id: currentSessionId, sender: 'ai', content: responseText },
         ]);
 
-        // Persist the helpdesk inquiry through the same authenticated Supabase
-        // client used for the chat session and message writes. The /api/chat/send
-        // wrapper delegates here, so logging here avoids a second transport/client
-        // and guarantees one RPC for both direct and delegated chat turns.
-        const loggedPrNo = trimmedMsg.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-').match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
-        const { error: inquiryLogError } = await supabase.rpc('append_monitor_inquiry_session', {
-          p_session_id: currentSessionId,
-          p_user_id: userId,
-          p_user_name: 'ProcuremateSU User',
-          p_user_department: 'MSU-GenSan',
-          p_pr_no: loggedPrNo ? normalizePrNumber(loggedPrNo) : null,
-          p_user_message: trimmedMsg,
-          p_bot_response: responseText,
-          p_inquiry_type: inquiryType,
-        });
-        if (inquiryLogError) {
-          console.error('[chat] Session inquiry log update failed:', inquiryLogError.message);
+        // /api/chat/send owns inquiry logging because it has already authenticated
+        // the caller and verified session ownership. Direct /api/chat requests still
+        // log here. This prevents delegated requests from writing the same turn twice.
+        if (req.headers.get('x-chat-send-delegated') !== '1') {
+          const loggedPrNo = trimmedMsg.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-').match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
+          const { error: inquiryLogError } = await supabase.rpc('append_monitor_inquiry_session', {
+            p_session_id: currentSessionId,
+            p_user_id: userId,
+            p_user_name: authenticatedUser.name || 'ProcuremateSU User',
+            p_user_department: 'MSU-GenSan',
+            p_pr_no: loggedPrNo ? normalizePrNumber(loggedPrNo) : null,
+            p_user_message: trimmedMsg,
+            p_bot_response: responseText,
+            p_inquiry_type: inquiryType,
+          });
+          if (inquiryLogError) console.error('[chat] Session inquiry log update failed:', inquiryLogError.message);
         }
       } catch (dbErr) {
         console.warn('Non-blocking database log notice:', dbErr);
