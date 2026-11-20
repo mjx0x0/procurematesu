@@ -60,3 +60,21 @@ test('generic legacy IRR source is classified as historical and retrieved for ex
   assert.match(retrieval, /'IRR 2016', 'IRR'/);
   assert.match(retrieval, /\.eq\('document_name', 'IRR'\)/);
 });
+
+
+test('SVP Abstract questions source-scope and prioritize IRR Section 34.3(f) excerpts', () => {
+  const retrieval = read('lib/document-retrieval.ts');
+  assert.match(retrieval, /asksSvpAbstractOfQuotations/);
+  assert.match(retrieval, /scopedPhraseSearch\(currentIrr, '34\.3\(f\)'\)/);
+  assert.match(retrieval, /scopedPhraseSearch\(currentIrr, 'Abstract of Quotations'\)/);
+  assert.match(retrieval, /scopedPhraseSearch\(currentIrr, 'Quotations or Ratings'\)/);
+  assert.match(retrieval, /score \+= 1000/);
+  assert.match(retrieval, /asksSvpAbstractOfQuotations \|\| asksCurrentLawStatus/);
+
+  const guards = read('lib/procurement-answer-guards.js');
+  assert.match(guards, /function isCurrentApprovedIrrChunk/);
+  assert.match(guards, /sourceUrl === CURRENT_IRR_URL/);
+  assert.match(guards, /function hasVerifiedSvpAbstractEvidence/);
+  assert.match(guards, /function answerSvpAbstractOfQuotations/);
+  assert.match(guards, /\]\.join\('\\\\n'\)/);
+});
