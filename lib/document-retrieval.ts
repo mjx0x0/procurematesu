@@ -104,7 +104,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   const asksPrPpmpComparison =
     /\b(?:PR|Purchase Request)\b/i.test(query) &&
     /\bPPMP\b/i.test(query) &&
-    /\b(?:difference|differ|compare|versus|vs\\.?|between|distinguish)\b/i.test(query);
+    /\b(?:difference|differ|compare|versus|vs\.?|between|distinguish)\b/i.test(query);
   const asksPrRequirements =
     /\b(?:PR|Purchase Request)\b/i.test(query) &&
     /\b(?:requirement|requirements|documents?|what.*need|needed|must.*include|should.*include|checklist|prepare|preparation)\b/i.test(query) &&
