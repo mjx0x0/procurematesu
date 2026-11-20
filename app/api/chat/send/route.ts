@@ -402,68 +402,13 @@ export async function POST(request: NextRequest) {
       const { data: history } = await clientToUse.from('pr_stages_completed').select('stage_key,stage_name,completed_at,remarks,notes').eq('pr_no', latestPR.pr_no).neq('status', 'remark').order('completed_at', { ascending: false }).limit(1);
       return NextResponse.json({ response: buildNextStepResponse(latestPR, history?.[0] || null), sources: ['ProcuremateSU procurement process', 'Purchase Request stage history'] });
     }
-    // The authenticated wrapper owns inquiry logging for delegated responses.
-    // This avoids relying on the legacy route's internal persistence path and keeps
-    // exactly one session-level log entry for this user turn.
+    // The wrapper authenticates the user and verifies session ownership.
+    // The delegated chat route persists both chat messages and the inquiry log
+    // through its authenticated Supabase client in one place.
     const trustedHeaders = new Headers(request.headers);
     trustedHeaders.set('x-chat-send-delegated', '1');
     const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: trustedHeaders, body: JSON.stringify({ message, sessionId, userId: user.id, conversationContext }) });
     const legacyResponse = await legacyChatPOST(trustedRequest);
-    // This authenticated wrapper owns inquiry logging for delegated turns.
-    // The legacy route skips its own RPC when this trusted internal header is set.
-    if (!db) {
-      console.error('[chat/send] Inquiry logging is unavailable: Supabase service-role client is not configured.');
-    } else if (!legacyResponse.ok) {
-      console.error('[chat/send] Inquiry logging skipped because delegated chat returned HTTP', legacyResponse.status);
-    } else {
-      let responseText = '';
-      try {
-        const responseBody = await legacyResponse.clone().text();
-        const payload = JSON.parse(responseBody);
-        responseText = typeof payload?.response === 'string' ? payload.response.trim() : '';
-        if (!responseText) {
-          console.error('[chat/send] Delegated response JSON did not contain a non-empty response field.');
-        }
-      } catch (logError) {
-        console.error('[chat/send] Could not decode delegated response for inquiry logging:', logError);
-      }
-      if (responseText) {
-        const normalizedMessage = message.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-');
-        const loggedPrNo = normalizedMessage.match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
-        const inquiryLogPayload = {
-          p_session_id: sessionId,
-          p_user_id: user.id,
-          p_user_name: authenticatedUserName || 'ProcuremateSU User',
-          p_user_department: 'MSU-GenSan',
-          p_pr_no: loggedPrNo ? normalizePRIdentifier(loggedPrNo) : null,
-          p_user_message: message,
-          p_bot_response: responseText,
-          p_inquiry_type: 'general',
-        };
-        // Call the PostgREST RPC endpoint explicitly. This keeps the authenticated
-        // service-role write independent of the Supabase client's RPC transport
-        // and makes HTTP failures observable instead of silently losing a log row.
-        if (!serviceRoleKey || !supabaseUrl) {
-          console.error('[chat/send] Delegated inquiry logging skipped: Supabase service-role credentials are unavailable.');
-        } else {
-          const inquiryLogResponse = await fetch(`${supabaseUrl}/rest/v1/rpc/append_monitor_inquiry_session`, {
-            method: 'POST',
-            headers: {
-              apikey: serviceRoleKey,
-              Authorization: `Bearer ${serviceRoleKey}`,
-              'Content-Type': 'application/json',
-              Prefer: 'return=minimal',
-            },
-            body: JSON.stringify(inquiryLogPayload),
-            cache: 'no-store',
-          });
-          if (!inquiryLogResponse.ok) {
-            const errorBody = await inquiryLogResponse.text().catch(() => '');
-            console.error('[chat/send] Delegated session inquiry log update failed:', inquiryLogResponse.status, errorBody.slice(0, 1000));
-          }
-        }
-      }
-    }
     return legacyResponse;
   } catch (error) { console.error('[chat/send] Unexpected error:', error); return NextResponse.json({ error: 'Unable to process the chat request.' }, { status: 500 }); }
 }
