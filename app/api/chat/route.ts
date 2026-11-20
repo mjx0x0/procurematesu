@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
+import { buildHighRiskProcurementResponse, isHighRiskProcurementQuestion } from '@/lib/procurement-response-hardening';
 import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE, UNSUPPORTED_LAW_REFERENCE_RESPONSE, hasUnsupportedLawReference } from '@/lib/procurement-scope-guard';
 import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails, mergePRDetailsFromDepartmentReply, applyPRItemMessage, getMissingItemFields, isPRDraftRevisionMessage } from '@/lib/pr-draft-extraction';
 import { GoogleGenAI } from '@google/genai';
@@ -853,7 +854,7 @@ export async function POST(req: NextRequest) {
       activePRDraft: Boolean(currentState.drafting || currentState.draftReady || isCompletedDraftEdit),
       recentProcurementContext,
     });
-    const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg);
+    const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg) || isHighRiskProcurementQuestion(trimmedMsg, conversationContext);
     const chatIntent = classifyProcurementIntent(trimmedMsg, {
       activeDraft: Boolean(currentState.drafting),
       draftReady: Boolean(currentState.draftReady || isCompletedDraftEdit),
@@ -894,11 +895,13 @@ export async function POST(req: NextRequest) {
       inquiryType = 'procurement_guidance';
       updatedState = { ...currentState };
     } else if (deterministicPolicyQuestion) {
-      const policyRetrieval = await retrieveDocumentChunks(trimmedMsg, 6);
-      const verifiedPolicyAnswer = buildVerifiedProcurementAnswer(trimmedMsg, policyRetrieval.chunks);
+      const policyRetrieval = await retrieveDocumentChunks(buildContextualProcurementQuery(trimmedMsg, conversationContext), 12);
+      const verifiedPolicyAnswer = buildHighRiskProcurementResponse(trimmedMsg, policyRetrieval.chunks, conversationContext)
+        || buildVerifiedProcurementAnswer(trimmedMsg, policyRetrieval.chunks);
       // The guard returns a source-linked evidence-gap answer when current excerpts
       // are missing. Keep that behavior rather than falling through to free-form guessing.
-      const policyEvidenceGapAnswer = buildVerifiedProcurementAnswer(trimmedMsg, []);
+      const policyEvidenceGapAnswer = buildHighRiskProcurementResponse(trimmedMsg, [], conversationContext)
+        || buildVerifiedProcurementAnswer(trimmedMsg, []);
       responseText = verifiedPolicyAnswer || policyEvidenceGapAnswer
         || 'I could not verify this procurement rule from the official excerpts retrieved. Please consult the relevant GPPB issuance before acting.';
       citedSources = policyRetrieval.sources.map(normalizeSourceLabel);
@@ -995,7 +998,7 @@ CRITICAL DIRECTIVES:\n0A. LANGUAGE MATCHING: Understand and respond naturally in
 4. Treat specific institutional questions as high-precision questions. Use the retrieved institutional source that directly names the office, person, role, or contact information.
 5. Never invent an institutional email, office hours, temporary location, title, or person's name.
 6. Any institutional fact (person, contact number, office location, or relocation notice) must be supported by excerpts retrieved for the current request. Do not treat these instructions as evidence or reuse a hard-coded institutional fact when the current excerpts do not support it.
-7. For current legal procurement questions, prioritize RA No. 12009, its currently applicable IRR, and current official GPPB issuances. Treat RA No. 9184, its 2016 IRR, and the 2014 Local Government Units Procurement Manual as historical/transition sources only; do not present them as current law except for explicit historical, comparative, or transition questions. Treat the PMO Administrative Manual as internal guidance, not legislation; its approval/version status has not been verified. If internal guidance conflicts with current law or official GPPB issuances, state the conflict and prioritize the official legal source.
+7. For current legal procurement questions, prioritize RA No. 12009, its currently applicable IRR, and current official GPPB issuances. RA No. 12009's short title under Section 1 is the “New Government Procurement Act”; “Government Procurement Reform Act” is the title of RA No. 9184 referenced in RA No. 12009's long title. Never label RA No. 12009 itself as the Government Procurement Reform Act. For BAC functions, use IRR Section 42.1 and keep the BAC Secretariat's support duties separate from BAC functions. For PPMP/APP definitions, use current IRR Sections 7.7.1–7.7.5; never use the 2014 LGU Procurement Manual as current APP authority. For SVP versus Competitive Bidding, apply the general Section 34.1 threshold to SUCs and keep LGU-specific Section 34.2 thresholds separate. Do not invent an internal PR approval SLA or a current temporary office location without a current official MSU notice. Treat RA No. 9184, its 2016 IRR, and the 2014 Local Government Units Procurement Manual as historical/transition sources only; do not present them as current law except for explicit historical, comparative, or transition questions. Treat the PMO Administrative Manual as internal guidance, not legislation; its approval/version status has not been verified. If internal guidance conflicts with current law or official GPPB issuances, state the conflict and prioritize the official legal source.
 8. Prefer the most specific retrieved source over generic law/manual excerpts. If sources conflict, explicitly state the conflict rather than silently choosing one.
 9. Distinguish general procurement knowledge from MSU-GenSan-specific facts. For common general terms and concepts (for example, RFQ means Request for Quotation), answer from reliable general procurement knowledge when the retrieved excerpts omit the definition. Do not say a common term is undefined merely because it is absent from the excerpts.
 10. Use retrieved evidence as the source of truth for MSU-specific workflow, contacts, internal rules, and institutional claims. If the evidence does not establish an MSU-specific detail, say it is not verified rather than guessing.
@@ -1043,7 +1046,8 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
         // the expected authoritative source material is present in the retrieved chunks.
         // This prevents the model from inventing subsection citations or mixing old law
         // with current requirements for SVP and historical RA 9184 questions.
-        const verifiedAnswer = buildVerifiedProcurementAnswer(trimmedMsg, retrieval.chunks);
+        const verifiedAnswer = buildHighRiskProcurementResponse(trimmedMsg, retrieval.chunks, conversationContext)
+          || buildVerifiedProcurementAnswer(trimmedMsg, retrieval.chunks);
         if (verifiedAnswer) {
           responseText = verifiedAnswer;
         } else {
