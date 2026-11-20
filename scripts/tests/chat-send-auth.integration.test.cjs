@@ -70,6 +70,7 @@ const storedMessages = [
   { session_id: 'session-reference-links', sender: 'ai', content: 'The PR is verified against PPMP/APP. References • PMO Administrative Manual, IV. PROCESS FLOW (PDF page 12).' },
 ];
 const storedInquiries = [];
+const inquiryRpcRequests = [];
 const purchaseRequests = [
   {
     pr_no: 'PR-2026-0001',
@@ -193,6 +194,7 @@ async function handleMockSupabase(request, response) {
 
   if (url.pathname === '/rest/v1/rpc/append_monitor_inquiry_session' && request.method === 'POST') {
     const args = await readJSON(request);
+    inquiryRpcRequests.push({ args, authorization: request.headers.authorization || null, apikey: request.headers.apikey || null });
     const existing = storedInquiries.find((entry) => entry.session_id === args.p_session_id);
     if (existing) {
       existing.user_message += '\\n\\n' + args.p_user_message;
@@ -482,8 +484,11 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.equal(savedSession.state.step, 'purpose');
       assert.equal(storedMessages.length - beforeMessages, 2);
       assert.deepEqual(storedMessages.slice(-2).map((message) => message.sender), ['user', 'ai']);
-      assert.equal(storedInquiries.length - beforeInquiries, 1, 'Expected exactly one authenticated inquiry-log RPC. Server output:\n' + nextOutput);
+      assert.equal(storedInquiries.length - beforeInquiries, 1, 'Expected exactly one authenticated inquiry-log RPC. Captured RPC requests: ' + JSON.stringify(inquiryRpcRequests) + '\nServer output:\n' + nextOutput);
       assert.equal(storedInquiries.at(-1).user_id, 'user-a');
+      assert.equal(inquiryRpcRequests.length, 1, 'The mock must receive exactly one RPC request for the first draft turn.');
+      assert.equal(inquiryRpcRequests[0].args.p_session_id, 'session-user-a');
+      assert.equal(inquiryRpcRequests[0].args.p_user_id, 'user-a');
 
       const followUp = await postChat({
         token: 'user-a-token',
@@ -494,6 +499,7 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.equal(storedInquiries.length - beforeInquiries, 1, 'A second prompt in the same chat must update the existing session log.');
       assert.match(storedInquiries.at(-1).user_message, /Help me draft a PR[\s\S]*Thanks/);
       assert.equal(storedInquiries.at(-1).metadata.message_count, 2);
+      assert.equal(inquiryRpcRequests.length, 2, 'The follow-up must issue one additional RPC to update the existing inquiry session.');
     });
 
     await t.test('natural-language request to prepare a PR starts slot filling and retains supplied microscope details', async () => {
