@@ -110,9 +110,9 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:requirement|requirements|documents?|what.*need|needed|must.*include|should.*include|checklist|prepare|preparation)\b/i.test(query) &&
     !asksPrPpmpComparison;
   const asksPrValidationFailure =
-    /\\b(?:PR|Purchase Request)\\b/i.test(query) &&
-    /\\b(?:fail(?:s|ed|ure)?|not pass|does not pass|doesn't pass|reject(?:ed|ion)?|return(?:ed)?|hold|validation|validate|discrepanc(?:y|ies)|mismatch|inconsisten(?:t|cy)|not match|does not match|doesn't match|incomplete|incorrect)\\b/i.test(query) &&
-    /\\b(?:PPMP|APP|validat|review|requirement|process|happen|next step|what happens)\\b/i.test(query);
+    /\b(?:PR|Purchase Request)\b/i.test(query) &&
+    /\b(?:fail(?:s|ed|ure)?|not pass|does not pass|doesn't pass|reject(?:ed|ion)?|return(?:ed)?|hold|validation|validate|discrepanc(?:y|ies)|mismatch|inconsisten(?:t|cy)|not match|does not match|doesn't match|incomplete|incorrect)\b/i.test(query) &&
+    /\b(?:PPMP|APP|validat|review|requirement|process|happen|next step|what happens)\b/i.test(query);
   const asksPmoDefinition = /\b(?:what is|define|definition|meaning)\b/i.test(query) && /\b(?:Purchase Request|Purchase Order|PR|PO)\b/i.test(query);
   const asksPmoPrWorkflow = /\b(?:Purchase Request|PR)\b/i.test(query) &&
     /\b(?:after|once|when|sequence|workflow|process|steps|what happens|prepared|prepares|receives|received)\b/i.test(query);
@@ -640,7 +640,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
             /Purchase Request|PRs|signator|specification|completeness|Budget Management Office|Chancellor/i.test(text)) score += 220;
           if (asksPrValidationFailure) {
             if (documentName === 'PMO Administrative Manual' &&
-              /Verification Against PPMP\\/APP|Validation by the PMO Director|Pre-Numbering and Control of PRs|Endorsement to Budget Management Office|Incomplete or Incorrect Documentation|may lead to reprocessing|Regular Review and Validation of Documents/i.test(text)) score += 420;
+              /Verification Against PPMP\/APP|Validation by the PMO Director|Pre-Numbering and Control of PRs|Endorsement to Budget Management Office|Incomplete or Incorrect Documentation|may lead to reprocessing|Regular Review and Validation of Documents/i.test(text)) score += 420;
             else score -= 180;
           }
           if ((asksPrRequirements || asksPrPpmpComparison) && isLegacy) score -= 1000;
