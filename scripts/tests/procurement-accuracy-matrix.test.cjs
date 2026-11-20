@@ -700,7 +700,7 @@ test('printable PR omits the office footer and places a small System Tracking Co
   const printSource = fs.readFileSync(
     path.join(__dirname, '../../app/dashboard/pr-print/PRPrintContent.tsx'),
     'utf8'
-  );
+  ).replace(/\r\n/g, '\n');
   assert.doesNotMatch(printSource, /Mindanao State University - General Santos City Procurement Office/);
   assert.ok(printSource.includes('System Tracking Control:'));
   assert.ok(printSource.includes('text-[8px] leading-tight text-stone-600 print:text-[7px]'));
