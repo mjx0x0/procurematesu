@@ -91,6 +91,25 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:current|currently|still|in force|governing|applicable|applies|apply|procurement law|which law|what law)\b/i.test(query) &&
     !(/\b(?:before|prior to|previous(?:ly)?|historical(?:ly)?|history|old law|former|under the former|used to apply|applied under)\b/i.test(query) &&
       (/\b12009\b/i.test(query) || /\bhistorical(?:ly)?\b|\bprevious(?:ly)?\b|\bformer\b/i.test(query)));
+  const asksRa12009Title =
+    /\b(?:what is|what does|identify|give me)\b/i.test(query) &&
+    /\b(?:RA\s*\.?\s*(?:No\.?\s*)?12009|Republic Act\s+No\.?\s*12009|New Government Procurement Act)\b/i.test(query) &&
+    !/\b(?:threshold|section|posting|quotation|amendment|penalty|procedure|requirement|specific provision)\b/i.test(query);
+  const asksBacFunctions = /\b(?:BAC|Bids and Awards Committee)\b/i.test(query) && /\b(?:function|responsibilit|role|dut(?:y|ies)|what does)\b/i.test(query);
+  const asksPpmpApp = /\bPPMP\b/i.test(query) && /\bAPP\b|Annual Procurement Plan/i.test(query) && /\b(?:difference|differ|compare|versus|vs\.?|between|distinguish)\b/i.test(query);
+  const asksPmoDefinition = /\b(?:what is|define|definition|meaning)\b/i.test(query) && /\b(?:Purchase Request|Purchase Order|PR|PO)\b/i.test(query);
+  const asksPmoPrWorkflow = /\b(?:Purchase Request|PR)\b/i.test(query) &&
+    /\b(?:after|once|when|sequence|workflow|process|steps|what happens|prepared|prepares|receives|received)\b/i.test(query);
+  const asksPmoPrNumber = /\b(?:who|which office|what office)\b/i.test(query) &&
+    /\b(?:assign|records?|issues?)\b/i.test(query) && /\b(?:official )?PR (?:number|no\.?)\b/i.test(query);
+  const asksPmoApprovalTimeLimit = /\b(?:approval|processing|turnaround)\s*(?:time|period|deadline|limit|duration|days?)\b/i.test(query) && /\b(?:PR|purchase request)\b/i.test(query);
+  const asksTemporaryPmoLocation = /\b(?:where|location|located|address)\b/i.test(query) &&
+    /\b(?:procurement office|procurement management office|PMO)\b/i.test(query) &&
+    /\b(?:temporary|temporarily|current|currently)\b/i.test(query);
+  const asksSvpCompetitiveComparison = /\b(?:SVP|Small Value Procurement)\b/i.test(query) && /\bCompetitive Bidding\b/i.test(query);
+  const asksLowestQuotationAward = /\b(?:lowest|cheapest|lowest[- ]priced)\b/i.test(query) &&
+    /\b(?:quotation|quote|supplier|bid)\b/i.test(query) && /\b(?:win|award|awarded|guarantee|definitely|automatic|automatically)\b/i.test(query);
+  const asksCircular06Coverage = /\b(?:what does|what is covered by|coverage|cover)\b/i.test(query) && /\b(?:GPPB\s+)?Circular\s+No\.?\s*06[-–]2026\b/i.test(query);
   const asksDraftToStepOne =
     /\bdraft\b/i.test(query) &&
     /\bstep\s*1\b/i.test(query) &&
@@ -201,6 +220,101 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
             .limit(10)
         );
       }
+      if (asksRa12009Title) {
+        for (const documentName of ['RA 12009 (New)', 'RA 12009']) {
+          searches.push(
+            supabase.from('document_chunks').select(selectedColumns)
+              .eq('document_name', documentName)
+              .ilike('chunk_text', '%New Government Procurement Act%')
+              .limit(6)
+          );
+        }
+      }
+      if (asksBacFunctions) {
+        searches.push(
+          scopedPhraseSearch('Implementing Rules and Regulations of RA 12009', 'Section 42. Functions of the BAC'),
+          scopedPhraseSearch('Implementing Rules and Regulations of RA 12009', '42.1 The BAC shall have the following functions'),
+          scopedPhraseSearch('Implementing Rules and Regulations of RA 12009', 'Recommend award of contracts to the HoPE')
+        );
+      }
+      if (asksPpmpApp) {
+        const currentIrr = 'Implementing Rules and Regulations of RA 12009';
+        searches.push(
+          scopedPhraseSearch(currentIrr, '7.7.1'),
+          scopedPhraseSearch(currentIrr, 'Project Procurement Management Plans'),
+          scopedPhraseSearch(currentIrr, '7.7.2'),
+          scopedPhraseSearch(currentIrr, 'consolidation into an Indicative APP'),
+          scopedPhraseSearch(currentIrr, '7.7.5'),
+          scopedPhraseSearch(currentIrr, 'consolidation into the final APP')
+        );
+      }
+      if (asksPmoDefinition) {
+        const pmoManual = 'PMO Administrative Manual';
+        searches.push(
+          scopedPhraseSearch(pmoManual, 'Purchase Request'),
+          scopedPhraseSearch(pmoManual, 'Purchase Order'),
+          scopedPhraseSearch(pmoManual, 'awarded supplier'),
+          scopedPhraseSearch(pmoManual, 'Definition of Terms')
+        );
+      }
+      if (asksPmoPrWorkflow) {
+        const pmoManual = 'PMO Administrative Manual';
+        searches.push(
+          scopedPhraseSearch(pmoManual, 'IV. PROCESS FLOW'),
+          scopedPhraseSearch(pmoManual, 'Receipt of Purchase Request'),
+          scopedPhraseSearch(pmoManual, 'Procurement Management Monitoring Section'),
+          scopedPhraseSearch(pmoManual, 'Budget Management Office'),
+          scopedPhraseSearch(pmoManual, 'approved Purchase Requests signed by the Chancellor')
+        );
+      }
+      if (asksPmoPrNumber) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'ProcureMateSU System Workflow')
+            .ilike('chunk_text', '%Step 4%')
+            .limit(6),
+          scopedPhraseSearch('PMO Administrative Manual', 'Procurement Management Monitoring Section'),
+          scopedPhraseSearch('PMO Administrative Manual', 'formally assign a control or reference number')
+        );
+      }
+      if (asksTemporaryPmoLocation) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .ilike('chunk_text', '%STTC%')
+            .limit(6),
+          supabase.from('document_chunks').select(selectedColumns)
+            .ilike('chunk_text', '%temporary office location%')
+            .limit(6)
+        );
+      }
+      if (asksSvpCompetitiveComparison) {
+        const currentIrr = 'Implementing Rules and Regulations of RA 12009';
+        searches.push(
+          scopedPhraseSearch(currentIrr, 'Section 27. Competitive Bidding'),
+          scopedPhraseSearch(currentIrr, 'open to participation by any eligible bidder'),
+          scopedPhraseSearch(currentIrr, 'Section 34. Small Value Procurement'),
+          scopedPhraseSearch(currentIrr, '34.1'),
+          scopedPhraseSearch(currentIrr, '34.2 In case of LGUs'),
+          scopedPhraseSearch(currentIrr, '34.3(b)')
+        );
+      }
+      if (asksLowestQuotationAward) {
+        const currentIrr = 'Implementing Rules and Regulations of RA 12009';
+        searches.push(
+          scopedPhraseSearch(currentIrr, '34.3(f)'),
+          scopedPhraseSearch(currentIrr, 'Abstract of Quotations or Ratings'),
+          scopedPhraseSearch(currentIrr, '34.3(g)'),
+          scopedPhraseSearch(currentIrr, 'LCRB, MEARB, MARB or HRRB')
+        );
+      }
+      if (asksCircular06Coverage) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'GPPB Circular No. 06-2026')
+            .limit(20)
+        );
+      }
+
 
       if (asksDraftToStepOne) {
         searches.push(
@@ -380,6 +494,11 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           // the user explicitly asks for history, comparison, or transition.
           if (isLegacy && !asksAboutLegacyRules(query)) continue;
 
+          // A historical LGU manual may be mislabelled with an RA 12009 ingestion name.
+          // Detect the source's own title/content as a second provenance check.
+          const is2014LguManualContent = /Local Government Units Procurement Manual|Manual of Procedures for the Procurement of Goods and Services under RA No\.?\s*9184/i.test(text);
+          if (is2014LguManualContent && !asksAboutLegacyRules(query)) continue;
+
           // SVP questions should not be diluted with negotiated-procurement or
           // unrelated chunks that happen to mention suppliers/quotations.
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009') {
@@ -460,7 +579,9 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // The documentary answer is intentionally cross-source: retain the six
   // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
   // quotations, posting, and the no-quotation exception independently.
-  const resultLimit = asksSvpDocumentaryRequirements
+  const resultLimit = (asksBacFunctions || asksPpmpApp || asksRa12009Title || asksPmoDefinition || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
+    ? Math.max(limit, 12)
+    : asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
     : officialIssuanceTargets.length > 0
       ? Math.max(limit, Math.min(18, 4 + officialIssuanceTargets.length * 2))
