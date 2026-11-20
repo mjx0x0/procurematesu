@@ -751,3 +751,30 @@ test('price-only replies complete the unit-cost field of one incomplete item', (
   assert.equal(result.items[0].unit_cost, 150);
   assert.equal(result.items[0].total_cost, 7500);
 });
+
+test('PR and PPMP comparison prompts retrieve both the current IRR and MSU PMO manual', () => {
+  const retrieval = fs.readFileSync(
+    path.join(__dirname, '../../lib/document-retrieval.ts'),
+    'utf8'
+  );
+  assert.match(retrieval, /const asksPrPpmpComparison[\s\S]*?PPMP[\s\S]*?difference\|differ\|compare/);
+  assert.match(retrieval, /if \(asksPrPpmpComparison\)[\s\S]*?Implementing Rules and Regulations of RA 12009[\s\S]*?PMO Administrative Manual/);
+  assert.match(retrieval, /asksPrPpmpComparison[\s\S]*?score \+= 180[\s\S]*?score \+= 160/);
+});
+
+test('PR requirements and preparation prioritize the MSU manual without inventing a checklist', () => {
+  const retrieval = fs.readFileSync(
+    path.join(__dirname, '../../lib/document-retrieval.ts'),
+    'utf8'
+  );
+  const route = fs.readFileSync(
+    path.join(__dirname, '../../app/api/chat/route.ts'),
+    'utf8'
+  );
+  assert.match(retrieval, /const asksPrRequirements[\s\S]*?requirement\|requirements/);
+  assert.match(retrieval, /if \(asksPrRequirements\)[\s\S]*?PMO Administrative Manual[\s\S]*?Verification of Signatories and Dates/);
+  assert.match(route, /SOURCE CLASSIFICATION/);
+  assert.match(route, /do not turn them into an exhaustive end-user attachment checklist/);
+  assert.match(route, /Mark general advice as nonbinding guidance/);
+  assert.match(route, /Do not abstain from an entire answer merely because one detail is missing/);
+});
