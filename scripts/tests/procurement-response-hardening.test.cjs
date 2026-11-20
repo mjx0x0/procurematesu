@@ -52,7 +52,7 @@ test('SVP and Competitive Bidding comparison keeps SUC threshold distinct from L
 test('Tagalog follow-up retains the SVP versus Competitive Bidding comparison', () => {
   const q = 'Can you explain that in simpler Tagalog?';
   const context = 'Previous question: How does Small Value Procurement (SVP) differ from Competitive Bidding?';
-  const chunks = [irr('Section 27. Competitive Bidding. 27.1 open to any eligible bidder; Publication; Pre-bid conference; Eligibility screening; Receipt and opening of bids; Evaluation; Post-qualification; Award. Section 34.1 SVP threshold Two Million Pesos ₱2,000,000. Section 34.2 In case of LGUs separate thresholds. Section 34.3(b) three calendar days posting exception ABC ₱200,000 and below.')];
+  const chunks = [irr('Section 27. Competitive Bidding. 27.1 Competitive Bidding is open to participation by any eligible bidder and consists of Publication, Pre-bid conference, Eligibility screening, Receipt and opening of bids, Evaluation of bids, Post-qualification, and Award of contract. Section 34.1 Small Value Procurement: threshold does not exceed Two Million Pesos (₱2,000,000). Section 34.2 In case of LGUs, separate thresholds apply. Section 34.3(b) RFQ/RFP posting for three calendar days except ABC ₱200,000 and below.')];
   const answer = buildHighRiskProcurementResponse(q, chunks, context);
   assert.match(answer, /Pagkakaiba ng SVP at Competitive Bidding/);
   assert.match(answer, /hindi dapat gamitin ang LGU-specific thresholds/i);
