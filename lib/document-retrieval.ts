@@ -289,6 +289,16 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch(pmoManual, 'approved Purchase Requests signed by the Chancellor')
         );
       }
+      if (asksPmoApprovalTimeLimit) {
+        const pmoManual = 'PMO Administrative Manual';
+        searches.push(
+          scopedPhraseSearch(pmoManual, 'approval time'),
+          scopedPhraseSearch(pmoManual, 'processing time'),
+          scopedPhraseSearch(pmoManual, 'working days'),
+          scopedPhraseSearch(pmoManual, 'calendar days'),
+          scopedPhraseSearch(pmoManual, 'within')
+        );
+      }
       if (asksPmoPrNumber) {
         searches.push(
           supabase.from('document_chunks').select(selectedColumns)
@@ -601,7 +611,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // The documentary answer is intentionally cross-source: retain the six
   // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
   // quotations, posting, and the no-quotation exception independently.
-  const resultLimit = (asksBacFunctions || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
+  const resultLimit = (asksBacFunctions || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
     ? Math.max(limit, 12)
     : asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
