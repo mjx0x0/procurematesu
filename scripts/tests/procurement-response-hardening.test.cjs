@@ -111,3 +111,21 @@ test('isHighRiskProcurementQuestion routes identified failure topics to determin
     'Can you confirm the lowest quotation guarantees an award?'
   ]) assert.equal(isHighRiskProcurementQuestion(q), true, q);
 });
+
+
+test('generic current-law question identifies RA 12009 and preserves the limited transition rule', () => {
+  const q = 'What procurement law currently governs government procurement in the Philippines?';
+  const chunks = [
+    ra('Section 1. Short Title. This Act shall be known as the “New Government Procurement Act”.'),
+    {
+      document_name: 'GPPB Circular No. 01-2025',
+      metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/10/GPPB-Resolution-No.-05-2025.pdf' },
+      chunk_text: 'Section 4.2 RA No. 12009 expressly repealed RA No. 9184. Section 5.1 RA No. 9184 and its 2016 IRR remain applicable to procurement projects published before the effectivity of the IRR of RA No. 12009 on 25 February 2025.'
+    }
+  ];
+  const answer = buildHighRiskProcurementResponse(q, chunks);
+  assert.match(answer, /New Government Procurement Act/);
+  assert.match(answer, /limited transition rule/i);
+  assert.match(answer, /25 February 2025/);
+  assert.doesNotMatch(answer, /RA No\\. 12009 is the Government Procurement Reform Act/i);
+});
