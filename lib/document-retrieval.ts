@@ -234,7 +234,6 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch(currentIrr, 'Quotations or Ratings'),
           scopedPhraseSearch(currentIrr, 'after the deadline')
         );
-        );
       }
 
       if (asksNoSvpQuotation) {
