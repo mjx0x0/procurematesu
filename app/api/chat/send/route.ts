@@ -413,10 +413,12 @@ export async function POST(request: NextRequest) {
     // Log only successful delegated turns, after the legacy handler has produced
     // the final answer. Use the same authenticated client that verified the user
     // and session; do not issue a separate raw PostgREST fetch.
+    console.info('[chat/send] Delegated response completed:', { status: legacyResponse.status, ok: legacyResponse.ok, hasServiceClient: Boolean(db) });
     if (legacyResponse.ok) {
       try {
         const result = await legacyResponse.clone().json();
         const botResponse = typeof result?.response === 'string' ? result.response : '';
+        console.info('[chat/send] Delegated response parsed for inquiry logging:', { hasResponseText: Boolean(botResponse), responseType: typeof result?.response });
         if (botResponse) {
           const normalizedForPR = message.replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-');
           const prMatch = normalizedForPR.match(/\bPR[- ]?(?:TEMP[- ]?)?(?:\d{4}[- ]?)?\d{1,6}\b/i)?.[0] || null;
@@ -425,6 +427,7 @@ export async function POST(request: NextRequest) {
             : messageIntent === 'track_pr' || messageIntent === 'list_prs'
               ? 'track_pr'
               : 'procurement_guidance';
+          console.info('[chat/send] Sending inquiry-log RPC:', { sessionId, userId: user.id, inquiryType });
           const { error: inquiryLogError } = await clientToUse.rpc('append_monitor_inquiry_session', {
             p_session_id: sessionId,
             p_user_id: user.id,
@@ -437,6 +440,8 @@ export async function POST(request: NextRequest) {
           });
           if (inquiryLogError) {
             console.error('[chat/send] Inquiry session logging failed:', inquiryLogError.message);
+          } else {
+            console.info('[chat/send] Inquiry session logging succeeded:', { sessionId });
           }
         }
       } catch (logError) {
