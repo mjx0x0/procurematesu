@@ -103,6 +103,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
 
   const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
     || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query));
+  const asksSvpAbstractOfQuotations = asksSvpDetails
+    && /\babstract\s+of\s+(?:quotations?|ratings?)\b/i.test(query);
   const asksSvpDocumentaryRequirements = asksSvpDetails
     && /\b(?:documentary requirements?|eligibility documents?|supplier documents?|documents? (?:to check|to submit|required|should be checked)|document checklist)\b/i.test(query);
   const asksCircularResubmission =
@@ -218,6 +220,20 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch(currentIrr, 'The BAC shall prepare and send the RFQs or RFPs'),
           scopedPhraseSearch(currentIrr, 'Abstract of Quotations or Ratings'),
           scopedPhraseSearch(currentIrr, 'in case no price quotation is received')
+        );
+      }
+
+      // Abstract questions need the exact post-deadline evaluation record clause.
+      // Search several short fragments because PDF extraction may split the
+      // phrase across lines or paragraph-sized chunks.
+      if (asksSvpAbstractOfQuotations) {
+        const currentIrr = 'Implementing Rules and Regulations of RA 12009';
+        searches.push(
+          scopedPhraseSearch(currentIrr, '34.3(f)'),
+          scopedPhraseSearch(currentIrr, 'Abstract of Quotations'),
+          scopedPhraseSearch(currentIrr, 'Quotations or Ratings'),
+          scopedPhraseSearch(currentIrr, 'after the deadline')
+        );
         );
       }
 
@@ -410,6 +426,9 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           if (asksDraftToStepOne && documentName === 'ProcureMateSU System Workflow') score += 1000;
           if (asksPurchaseRequestWorkflow && documentName === 'PMO Administrative Manual' && /IV\. PROCESS FLOW|Receipt of Purchase Request/i.test(text)) score += 1000;
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
+          if (asksSvpAbstractOfQuotations
+            && documentName === 'Implementing Rules and Regulations of RA 12009'
+            && /34\.3\s*\(\s*f\s*\)|abstract of quotations|quotations or ratings|after the deadline/i.test(text)) score += 1000;
           else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\. 06-2026/i.test(identity)) score += 12;
           if ((asksSvpDocumentaryRequirements || asksCircularResubmission || asksCircularLicenseCvAmbiguity)
             && documentName === 'GPPB Circular No. 06-2026') score += 1000;
@@ -446,7 +465,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     ? Math.max(limit, 16)
     : officialIssuanceTargets.length > 0
       ? Math.max(limit, Math.min(18, 4 + officialIssuanceTargets.length * 2))
-      : (asksUniversityChancellor || asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation || asksCurrentLawStatus || asksPmoReceiptQuestion)
+      : (asksUniversityChancellor || asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation || asksSvpAbstractOfQuotations || asksCurrentLawStatus || asksPmoReceiptQuestion)
         ? Math.max(limit, 8)
         : asksDraftToStepOne
           ? Math.max(limit, 4)
