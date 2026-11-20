@@ -109,6 +109,10 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:PR|Purchase Request)\b/i.test(query) &&
     /\b(?:requirement|requirements|documents?|what.*need|needed|must.*include|should.*include|checklist|prepare|preparation)\b/i.test(query) &&
     !asksPrPpmpComparison;
+  const asksPrValidationFailure =
+    /\\b(?:PR|Purchase Request)\\b/i.test(query) &&
+    /\\b(?:fail(?:s|ed|ure)?|not pass|does not pass|doesn't pass|reject(?:ed|ion)?|return(?:ed)?|hold|validation|validate|discrepanc(?:y|ies)|mismatch|inconsisten(?:t|cy)|not match|does not match|doesn't match|incomplete|incorrect)\\b/i.test(query) &&
+    /\\b(?:PPMP|APP|validat|review|requirement|process|happen|next step|what happens)\\b/i.test(query);
   const asksPmoDefinition = /\b(?:what is|define|definition|meaning)\b/i.test(query) && /\b(?:Purchase Request|Purchase Order|PR|PO)\b/i.test(query);
   const asksPmoPrWorkflow = /\b(?:Purchase Request|PR)\b/i.test(query) &&
     /\b(?:after|once|when|sequence|workflow|process|steps|what happens|prepared|prepares|receives|received)\b/i.test(query);
@@ -308,6 +312,21 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch(currentIrr, 'consolidation into an Indicative APP'),
           scopedPhraseSearch(currentIrr, '7.7.5'),
           scopedPhraseSearch(currentIrr, 'consolidation into the final APP')
+        );
+      }
+      if (asksPrValidationFailure) {
+        const pmoManual = 'PMO Administrative Manual';
+        // Retrieve the documented validation sequence and the risk statement.
+        // Neither excerpt defines a formal rejection/return disposition.
+        searches.push(
+          scopedPhraseSearch(pmoManual, 'Verification Against PPMP/APP'),
+          scopedPhraseSearch(pmoManual, 'Validation by the PMO Director'),
+          scopedPhraseSearch(pmoManual, 'Pre-Numbering and Control of PRs'),
+          scopedPhraseSearch(pmoManual, 'Endorsement to Budget Management Office'),
+          scopedPhraseSearch(pmoManual, 'Incomplete or Incorrect Documentation'),
+          scopedPhraseSearch(pmoManual, 'may lead to reprocessing'),
+          scopedPhraseSearch(pmoManual, 'Regular Review and Validation of Documents'),
+          scopedPhraseSearch(pmoManual, 'completeness, accuracy, and consistency prior to endorsement or approval')
         );
       }
       if (asksPmoDefinition) {
@@ -619,6 +638,11 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           }
           if (asksPrRequirements && documentName === 'PMO Administrative Manual' &&
             /Purchase Request|PRs|signator|specification|completeness|Budget Management Office|Chancellor/i.test(text)) score += 220;
+          if (asksPrValidationFailure) {
+            if (documentName === 'PMO Administrative Manual' &&
+              /Verification Against PPMP\\/APP|Validation by the PMO Director|Pre-Numbering and Control of PRs|Endorsement to Budget Management Office|Incomplete or Incorrect Documentation|may lead to reprocessing|Regular Review and Validation of Documents/i.test(text)) score += 420;
+            else score -= 180;
+          }
           if ((asksPrRequirements || asksPrPpmpComparison) && isLegacy) score -= 1000;
           const issuanceTarget = officialIssuanceTargets.find((target) => target.documentName === documentName);
           if (issuanceTarget) score += issuanceTarget.priorityBoost || 1000;
@@ -662,7 +686,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // The documentary answer is intentionally cross-source: retain the six
   // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
   // quotations, posting, and the no-quotation exception independently.
-  const resultLimit = (asksBacFunctions || asksPrPpmpComparison || asksPrRequirements || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
+  const resultLimit = (asksBacFunctions || asksPrPpmpComparison || asksPrRequirements || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
     ? Math.max(limit, 12)
     : asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
