@@ -274,6 +274,11 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch(currentIrr, 'Project Procurement Management Plan'),
           scopedPhraseSearch(currentIrr, 'PPMP'),
           scopedPhraseSearch(currentIrr, 'Annual Procurement Plan'),
+          scopedPhraseSearch(currentIrr, '7.7.1'),
+          scopedPhraseSearch(currentIrr, '7.7.2'),
+          scopedPhraseSearch(currentIrr, '7.7.5'),
+          scopedPhraseSearch(currentIrr, 'consolidation into an Indicative APP'),
+          scopedPhraseSearch(currentIrr, 'consolidation into the final APP'),
           scopedPhraseSearch(currentIrr, 'Section 7. Procurement Planning and Budgeting Linkage'),
           // Institutional implementation: retrieve the MSU manual's PPMP-to-PR checks.
           scopedPhraseSearch(pmoManual, 'Review and validate the Purchase Request'),
