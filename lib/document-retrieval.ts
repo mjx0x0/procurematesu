@@ -108,8 +108,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:assign|records?|issues?)\b/i.test(query) && /\b(?:official )?PR (?:number|no\.?)\b/i.test(query);
   const asksPmoApprovalTimeLimit = /\b(?:approval|processing|turnaround)\s*(?:time|period|deadline|limit|duration|days?)\b/i.test(query) && /\b(?:PR|purchase request)\b/i.test(query);
   const asksTemporaryPmoLocation = /\b(?:where|location|located|address)\b/i.test(query) &&
-    /\b(?:procurement office|procurement management office|PMO)\b/i.test(query) &&
-    /\b(?:temporary|temporarily|current|currently)\b/i.test(query);
+    /\b(?:procurement office|procurement management office|PMO)\b/i.test(query);
   const asksSvpCompetitiveComparison = /\b(?:SVP|Small Value Procurement)\b/i.test(query) && /\bCompetitive Bidding\b/i.test(query);
   const asksLowestQuotationAward = /\b(?:lowest|cheapest|lowest[- ]priced)\b/i.test(query) &&
     /\b(?:quotation|quote|supplier|bid)\b/i.test(query) && /\b(?:win|award|awarded|guarantee|definitely|automatic|automatically)\b/i.test(query);
