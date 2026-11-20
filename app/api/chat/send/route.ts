@@ -430,7 +430,7 @@ export async function POST(request: NextRequest) {
       if (responseText) {
         const normalizedMessage = message.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-');
         const loggedPrNo = normalizedMessage.match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
-        const { error: inquiryLogError } = await db.rpc('append_monitor_inquiry_session', {
+        const inquiryLogPayload = {
           p_session_id: sessionId,
           p_user_id: user.id,
           p_user_name: authenticatedUserName || 'ProcuremateSU User',
@@ -439,9 +439,24 @@ export async function POST(request: NextRequest) {
           p_user_message: message,
           p_bot_response: responseText,
           p_inquiry_type: 'general',
+        };
+        // Call the PostgREST RPC endpoint explicitly. This keeps the authenticated
+        // service-role write independent of the Supabase client's RPC transport
+        // and makes HTTP failures observable instead of silently losing a log row.
+        const inquiryLogResponse = await fetch(`${supabaseUrl}/rest/v1/rpc/append_monitor_inquiry_session`, {
+          method: 'POST',
+          headers: {
+            apikey: serviceRoleKey,
+            Authorization: `Bearer ${serviceRoleKey}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal',
+          },
+          body: JSON.stringify(inquiryLogPayload),
+          cache: 'no-store',
         });
-        if (inquiryLogError) {
-          console.error('[chat/send] Delegated session inquiry log update failed:', inquiryLogError.message);
+        if (!inquiryLogResponse.ok) {
+          const errorBody = await inquiryLogResponse.text().catch(() => '');
+          console.error('[chat/send] Delegated session inquiry log update failed:', inquiryLogResponse.status, errorBody.slice(0, 1000));
         }
       }
     }
