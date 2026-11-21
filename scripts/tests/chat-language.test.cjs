@@ -29,14 +29,28 @@ test('recognizes natural English and Filipino translation requests', () => {
   }
 });
 
-test('recognizes simple Tagalog explanation requests', () => {
+test('recognizes explicit requests to explain the previous answer in Tagalog', () => {
   for (const phrase of [
-    'Can you explain Section 34.3(d) in simple Tagalog?',
     'Paki-explain in simple Tagalog',
     'Ipaliwanag mo ito sa Filipino',
     'Explain that in Tagalog',
+    'Explain your previous answer in simple Tagalog',
+    'Can you simplify that in Filipino?',
   ]) {
     assert.equal(getTagalogFollowUpMode(phrase), 'explain', phrase);
+  }
+});
+
+test('routes new topic-specific Tagalog questions through procurement retrieval', () => {
+  for (const phrase of [
+    'Explain Section 34.3(d) in simple Tagalog.',
+    'Explain SVP in simple Tagalog.',
+    'Explain RA 12009 in simple Tagalog.',
+    'Can you explain Section 34.3(d) in Tagalog?',
+    'Ipaliwanag ang RA 12009 sa simpleng Tagalog.',
+    'Translate Section 34.3(d) to Tagalog.',
+  ]) {
+    assert.equal(getTagalogFollowUpMode(phrase), null, phrase);
   }
 });
 
