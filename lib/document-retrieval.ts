@@ -104,6 +104,15 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:mobile|phone|telephone|contact number|number to call)\b/i.test(query) &&
     /\b(?:director|head|person in charge)\b/i.test(query) &&
     /\b(?:procurement|pmo|pro)\b/i.test(query);
+  const asksPmoDirectorIdentity =
+    /\b(?:who|name|current|head|director|person in charge)\b/i.test(query) &&
+    /\b(?:procurement|pmo|pro)\b/i.test(query) &&
+    !/\b(?:phone|telephone|mobile|contact number|number to call)\b/i.test(query);
+  const asksPmoDirectorDirectory = asksPmoDirectorContact || asksPmoDirectorIdentity;
+  const asksRa9184Definition =
+    /\b(?:what is|what was|define|definition|meaning of|ano ang|ano ba ang|ano itong)\b/i.test(query) &&
+    /\b(?:RA\s*\.?\s*(?:No\.?\s*)?9184|Republic Act\s+No\.?\s*9184)\b/i.test(query) &&
+    !/\b(?:section|article|threshold|posting|quotation|procedure|requirement|penalty|amendment|current|currently|still|in force|governing|applicable)\b/i.test(query);
   const asksUniversityChancellor =
     /\bchancellor\b/i.test(query) &&
     /\b(?:who|name|current|msu|gensan|university|pr|purchase request|approving authority|approver|approved by|form)\b/i.test(query);
@@ -249,8 +258,9 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         const identity = sourceIdentity(documentName, String(doc.document_type || ''), metadata);
         const isLegacy = isLegacyProcurementSource(identity);
 
-        if (asksPmoDirectorContact && documentName !== 'MSU-GenSan University Directory') continue;
+        if (asksPmoDirectorDirectory && documentName !== 'MSU-GenSan University Directory') continue;
         if (asksHistoricalVectorQuestion && !['RA 9184', 'IRR 2016', 'IRR'].includes(documentName)) continue;
+        if (asksRa9184Definition && !['RA 9184', 'GPPB Circular No. 01-2025'].includes(documentName)) continue;
         if ((asksCurrentLawStatus || asksCurrentGoverningProcurementLaw) && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
         if (isLegacy && !asksAboutLegacyRules(query)) continue;
         const is2014LguManualContent = /Local Government Units Procurement Manual|Manual of Procedures for the Procurement of Goods and Services under RA No.?\s*9184/i.test(text);
@@ -611,6 +621,20 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         );
       }
 
+      // A plain "What is RA 9184?" question needs the Act's own title plus
+      // the official transition circular, not a current-law excerpt that merely
+      // mentions the repealed statute.
+      if (asksRa9184Definition) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'RA 9184')
+            .ilike('chunk_text', '%Government Procurement Reform Act%').limit(6),
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'GPPB Circular No. 01-2025')
+            .ilike('chunk_text', '%Section 115%').limit(6)
+        );
+      }
+
       if (asksPurchaseRequestWorkflow) {
         const pmoManual = 'PMO Administrative Manual';
         searches.push(
@@ -624,12 +648,11 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
 
       // A current PMO director phone-number question must be sourced from the
       // official university directory only, not the operational manual or law.
-      if (asksPmoDirectorContact) {
+      if (asksPmoDirectorDirectory) {
         searches.push(
           supabase.from('document_chunks').select(selectedColumns)
             .eq('document_name', 'MSU-GenSan University Directory')
-            .ilike('chunk_text', '%Director:%')
-            .ilike('chunk_text', '%Contact Number:%')
+            .ilike('chunk_text', '%Nelson P. Benares%')
             .limit(4)
         );
       }
@@ -707,6 +730,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           // 2016 IRR can support the answer. Current RA 12009 excerpts are excluded
           // even when they mention the predecessor law.
           if (asksHistoricalRa9184 && !['RA 9184', 'IRR 2016', 'IRR'].includes(documentName)) continue;
+          if (asksRa9184Definition && !['RA 9184', 'GPPB Circular No. 01-2025'].includes(documentName)) continue;
 
           // A current-law status question must be anchored in the official 2025
           // transition circular, not diluted by the historical RA 9184/2016 IRR chunks.
