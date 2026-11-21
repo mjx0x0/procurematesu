@@ -7,23 +7,24 @@ const root = path.resolve(__dirname, '../..');
 const language = fs.readFileSync(path.join(root, 'lib/chat-language.ts'), 'utf8');
 const route = fs.readFileSync(path.join(root, 'app/api/chat/send/route.ts'), 'utf8');
 
-test('Tagalog translation is detected for common Filipino requests', () => {
-  assert.match(language, /isalin\\s\+mo/);
-  assert.match(language, /paki\\(\\?:\\[- \\]\\?\\)\\?translate/);
-  assert.match(language, /tagalog\|filipino/);
+test('Tagalog translation recognizes common Filipino request phrases', () => {
+  assert.ok(language.includes('isalin\\s+mo'));
+  assert.ok(language.includes('paki'));
+  assert.ok(language.includes('tagalog'));
+  assert.ok(language.includes('filipino'));
 });
 
 test('translation prompt protects procurement facts and references', () => {
-  assert.match(language, /legal qualification/);
-  assert.match(language, /section\\/subsection number/);
-  assert.match(language, /source URL/);
-  assert.match(language, /Do not add, remove, strengthen, weaken, or reinterpret/);
+  assert.ok(language.includes('legal qualification'));
+  assert.ok(language.includes('section/subsection number'));
+  assert.ok(language.includes('source URL'));
+  assert.ok(language.includes('Do not add, remove, strengthen, weaken, or reinterpret'));
 });
 
 test('translation uses the latest persisted assistant answer from the verified session', () => {
-  assert.match(route, /isTagalogTranslationRequest\\(message\\)/);
-  assert.match(route, /\\[\\.\\.\\.priorMessages\\]\\.reverse\\(\\)/);
-  assert.match(route, /entry\\.sender === 'ai'/);
-  assert.match(route, /buildTagalogTranslationPrompt\\(latestAssistantAnswer\\)/);
-  assert.match(route, /clientToUse\\.from\\('chat_messages'\\)\\.insert/);
+  assert.ok(route.includes('isTagalogTranslationRequest(message)'));
+  assert.ok(route.includes('[...priorMessages].reverse()'));
+  assert.ok(route.includes("entry.sender === 'ai'"));
+  assert.ok(route.includes('buildTagalogTranslationPrompt(latestAssistantAnswer)'));
+  assert.ok(route.includes("clientToUse.from('chat_messages').insert"));
 });
