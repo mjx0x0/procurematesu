@@ -158,3 +158,19 @@ test('generic current-law question identifies RA 12009 and preserves the limited
   assert.match(answer, /25 February 2025/);
   assert.doesNotMatch(answer, /RA No\. 12009 is the Government Procurement Reform Act/i);
 });
+
+
+test('least-expensive supplier submission question is routed to SVP Section 34, not Section 35.9.3', () => {
+  const q = 'What happens when the least expensive supplier submits a quotation?';
+  const chunks = [{
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
+    chunk_text: 'c) The BAC shall prepare and send the RFQs or RFPs to at least three (3) suppliers, contractors or consultants of known qualifications, as the case may be. Receipt of at least one (1) quotation is sufficient to proceed with the evaluation thereof. f) After the deadline for submission of quotations or proposals, an Abstract of Quotations or Ratings shall be prepared setting forth the names of those who responded to the RFQ or RFP, and their corresponding price quotations or ratings. g) The BAC shall recommend to the HoPE the award of a contract in favor of the supplier, contractor, or consultant with the LCRB, MEARB, MARB or HRRB.',
+  }];
+  assert.equal(isHighRiskProcurementQuestion(q), true);
+  const answer = buildHighRiskProcurementResponse(q, chunks);
+  assert.match(answer, /Section 34\.3\(c\)/);
+  assert.match(answer, /Abstract of Quotations or Ratings/i);
+  assert.match(answer, /LCRB, MEARB, MARB, or HRRB/i);
+  assert.doesNotMatch(answer, /Section 35\.9\.3|Lowest Calculated Quotation \(LCQ\)/i);
+});
