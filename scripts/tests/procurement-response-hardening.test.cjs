@@ -87,6 +87,35 @@ test('lowest quotation is not treated as an automatic award', () => {
   assert.match(answer, /LCRB, MEARB, MARB, or HRRB/);
 });
 
+test('lowest quotation guard accepts the actual PDF-extracted Section 34.3(f)-(g) paragraphs', () => {
+  const q = 'Is the cheapest quotation automatically awarded?';
+  const chunks = [{
+    document_name: 'Implementing Rules and Regulations of RA 12009',
+    metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
+    chunk_text: 'Section 34. Small Value Procurement. f) After the deadline for submission of quotations or proposals, an Abstract of Quotations or Ratings shall be prepared setting forth the names of those who responded to the RFQ or RFP, and their corresponding price quotations or ratings. g) The BAC shall recommend to the HoPE the award of a contract in favor of the supplier, contractor, or consultant with the LCRB, MEARB, MARB or HRRB. Section 35. Negotiated Procurement.',
+  }];
+  const answer = buildHighRiskProcurementResponse(q, chunks);
+  assert.match(answer, /lowest-priced quotation does not automatically guarantee an award/i);
+  assert.match(answer, /LCRB, MEARB, MARB, or HRRB/i);
+  assert.doesNotMatch(answer, /can’t verify this detail/i);
+});
+
+test('current-law handler accepts the actual repeal wording in the official transition circular', () => {
+  const q = 'What is the current procurement law in the Philippines?';
+  const chunks = [
+    ra('SECTION 1. Short Title. — This Act shall be known as the “New Government Procurement Act”.'),
+    {
+      document_name: 'GPPB Circular No. 01-2025',
+      metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/10/GPPB-Resolution-No.-05-2025.pdf' },
+      chunk_text: 'GPPB CIRCULAR NO. 01-2025. Section 2.1 applies to State Universities and Colleges (SUCs). Section 4.2: RA No. 12009 Section 115 expressly repeals RA No. 9184. Section 5.1: RA No. 9184 and its IRR remain applicable to procurement projects published before the effectivity of the IRR of RA No. 12009, namely before 25 February 2025.',
+    },
+  ];
+  const answer = buildHighRiskProcurementResponse(q, chunks);
+  assert.match(answer, /Republic Act No. 12009, the New Government Procurement Act/i);
+  assert.match(answer, /limited transition rule/i);
+  assert.doesNotMatch(answer, /can’t verify this detail/i);
+});
+
 test('Circular No. 06-2026 coverage does not attribute SVP threshold and posting rules to the Circular', () => {
   const q = 'What does GPPB Circular No. 06-2026 cover?';
   const chunks = [{
