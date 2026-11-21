@@ -105,8 +105,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:director|head|person in charge)\b/i.test(query) &&
     /\b(?:procurement|pmo|pro)\b/i.test(query);
   const asksPmoDirectorIdentity =
-    /\b(?:who|name|current|head|director|person in charge)\b/i.test(query) &&
-    /\b(?:procurement|pmo|pro)\b/i.test(query) &&
+    /\b(?:who|sino|name|head|pinuno|namumuno|director|person in charge)\b/i.test(query) &&
+    /\b(?:procurement|pmo|pro|opisina ng pagkuha)\b/i.test(query) &&
     !/\b(?:phone|telephone|mobile|contact number|number to call)\b/i.test(query);
   const asksPmoDirectorDirectory = asksPmoDirectorContact || asksPmoDirectorIdentity;
   const asksRa9184Definition =
