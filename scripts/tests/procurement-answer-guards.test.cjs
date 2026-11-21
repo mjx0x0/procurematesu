@@ -766,7 +766,7 @@ test('SVP Abstract answer accepts official IRR title variants and split subsecti
       },
       {
         document_name: 'Implementing Rules and Regulations of RA No. 12009',
-        chunk_text: 'Quotations or Ratings shall be prepared. Under Section 34.3(g), the BAC recommends award to the HoPE.',
+        chunk_text: 'Quotations or Ratings shall be prepared. g) The BAC shall recommend to the HoPE the award of a contract in favor of the supplier, contractor, or consultant with the LCRB, MEARB, MARB or HRRB.',
         metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
       },
     ],
@@ -798,7 +798,7 @@ test('Current procurement law question without explicitly naming RA 9184 is answ
   const currentLawChunks = [
     {
       document_name: 'GPPB Circular No. 01-2025',
-      chunk_text: 'This Circular applies to State Universities and Colleges. Section 115 expressly repeals RA No. 9184. Section 5.1 covers projects published before the effectivity of the IRR of RA No. 12009. Section 5.2.1 allows continued use until the necessary guidelines, forms, and requirements are issued. Section 5.4 identifies 15 May 2028.',
+      chunk_text: 'This Circular applies to State Universities and Colleges. RA No. 12009 Section 115 expressly repeals RA No. 9184. Section 5.1 covers projects published before the effectivity of the IRR of RA No. 12009. Section 5.2.1 allows continued use until the necessary guidelines, forms, and requirements are issued. Section 5.4 identifies 15 May 2028.',
       metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/10/GPPB-Resolution-No.-05-2025.pdf' },
     },
   ];
@@ -808,7 +808,7 @@ test('Current procurement law question without explicitly naming RA 9184 is answ
   assert.match(answer, /GPPB-approved IRR/i);
 });
 
-test('Abstract evidence accepts the official IRR operative paragraph when PDF extraction omits the subsection label', () => {
+test('Abstract answer requires both the operative Abstract paragraph and the award-recommendation paragraph', () => {
   const answer = buildVerifiedProcurementAnswer(
     'What is the purpose of the Abstract of Quotations in Small Value Procurement?',
     [{
@@ -817,8 +817,22 @@ test('Abstract evidence accepts the official IRR operative paragraph when PDF ex
       metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
     }],
   );
-  assert.match(answer, /formal record of the quotations or ratings received/i);
-  assert.doesNotMatch(answer, /can’t verify this procurement rule/i);
+  assert.match(answer, /can’t verify this procurement rule/i);
+  assert.match(answer, /Section 34\.3\(f\)–\(g\)/);
+});
+
+test('No-quotation natural-language question is routed to the current SVP contingency rule', () => {
+  const answer = buildVerifiedProcurementAnswer(
+    'What happens if no supplier submits a quotation?',
+    [{
+      document_name: 'Implementing Rules and Regulations of RA 12009',
+      chunk_text: 'd) In case no price quotation is received from the suppliers, the Procuring Entity may extend the deadline for submission of price quotation until receipt of at least a single price quotation; but the extension shall not go beyond the validity of the corresponding appropriations.',
+      metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
+    }],
+  );
+  assert.match(answer, /Section 34\.3\(d\)/);
+  assert.match(answer, /may extend the deadline/i);
+  assert.match(answer, /at least one quotation/i);
 });
 
 test('Cheapest quotation question is answered using the current IRR evaluation and recommendation rule', () => {
