@@ -794,8 +794,15 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
           if (asksSvpAbstractOfQuotations
             && documentName === 'Implementing Rules and Regulations of RA 12009'
-            && /34\.3\s*\(\s*f\s*\)|abstract of quotations|quotations or ratings|after the deadline/i.test(text)) score += 1000;
+            && /34\.3\s*\(\s*f\s*\)|abstract of quotations|quotations or ratings|after the deadline/i.test(text)) score += 10000;
           else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\. 06-2026/i.test(identity)) score += 12;
+          // The award question needs the actual SVP evaluation and recommendation text,
+          // not generic award language from another procurement method.
+          if (asksLowestQuotationAward
+            && documentName === 'Implementing Rules and Regulations of RA 12009'
+            && /Abstract of Quotations or Ratings/i.test(text)
+            && /The BAC shall recommend to the HoPE the award/i.test(text)
+            && /LCRB,?\s*MEARB,?\s*MARB or HRRB/i.test(text)) score += 10000;
           if ((asksSvpDocumentaryRequirements || asksCircularResubmission || asksCircularLicenseCvAmbiguity)
             && documentName === 'GPPB Circular No. 06-2026') score += 1000;
           if (asksNoSvpQuotation
