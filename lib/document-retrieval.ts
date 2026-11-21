@@ -789,6 +789,12 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           if (asksCurrentGoverningProcurementLaw
             && documentName === 'Implementing Rules and Regulations of RA 12009'
             && /Section 115/i.test(text)) score += 5000;
+          // The high-risk current-law answer also verifies the Act's short title.
+          // Keep the exact Section 1 excerpt alongside the transition Circular.
+          if (asksCurrentGoverningProcurementLaw
+            && documentName === 'RA 12009 (New)'
+            && /SECTION 1\\. Short Title/i.test(text)
+            && /New Government Procurement Act/i.test(text)) score += 10000;
           if (asksDraftToStepOne && documentName === 'ProcureMateSU System Workflow') score += 1000;
           if (asksPurchaseRequestWorkflow && documentName === 'PMO Administrative Manual' && /IV\. PROCESS FLOW|Receipt of Purchase Request/i.test(text)) score += 1000;
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
