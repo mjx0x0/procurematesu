@@ -6,7 +6,9 @@ const {
   isDeterministicProcurementPolicyQuestion,
   isBriefSvpMethodQuestion,
   isHistoricalRa9184Question,
+  isRa9184DefinitionQuestion,
   isPmoDirectorContactQuestion,
+  isPmoDirectorIdentityQuestion,
   isSmallValueProcurementQuestion,
 } = require('../../lib/procurement-answer-guards.js');
 
@@ -903,4 +905,59 @@ test('generic BAC Abstract question is answered narrowly from IRR Section 34.3(f
   assert.match(answer, /names of those who responded/i);
   assert.match(answer, /corresponding price quotations or ratings/i);
   assert.doesNotMatch(answer, /qualified suppliers|price-reasonableness|controlled procurement document/i);
+});
+
+
+test('plain English and Tagalog RA 9184 definition prompts use the Act and official transition source', () => {
+  for (const query of ['What is RA 9184?', 'Ano ang RA 9184?']) {
+    assert.equal(isRa9184DefinitionQuestion(query), true, query);
+    const answer = buildVerifiedProcurementAnswer(query, [
+      {
+        document_name: 'RA 9184',
+        chunk_text: 'Republic Act No. 9184. Section 1. Short Title. This Act shall be known as the Government Procurement Reform Act.',
+      },
+      {
+        document_name: 'GPPB Circular No. 01-2025',
+        chunk_text: 'Section 4.2: RA No. 12009 Section 115 expressly repeals RA No. 9184. Section 5.1: RA No. 9184 and its IRR remain applicable to procurement projects published before the effectivity of the IRR of RA No. 12009.',
+        metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/10/GPPB-Resolution-No.-05-2025.pdf' },
+      },
+    ]);
+    assert.match(answer, /Government Procurement Reform Act/);
+    assert.match(answer, /not the current general procurement law/i);
+    assert.match(answer, /RA No\. 12009/);
+    assert.match(answer, /Official Gazette/);
+    assert.match(answer, /GPPB Circular No\. 01-2025/);
+  }
+});
+
+test('RA 9184 definition does not misclassify current-status or specific-provision questions', () => {
+  assert.equal(isRa9184DefinitionQuestion('Is RA 9184 still applicable?'), false);
+  assert.equal(isRa9184DefinitionQuestion('What was the SVP threshold under RA 9184?'), false);
+});
+
+test('PMO director identity is answered only from the official university directory', () => {
+  const query = 'Sino ang head ng procurement office?';
+  assert.equal(isPmoDirectorIdentityQuestion(query), true);
+  const answer = buildVerifiedProcurementAnswer(query, [
+    {
+      document_name: 'PMO Administrative Manual',
+      chunk_text: 'PMO Director: Unverified manual text naming a different person.',
+    },
+    {
+      document_name: 'MSU-GenSan University Directory',
+      chunk_text: 'Procurement Management Office | Head: Assoc. Prof. Nelson P. Benares, Jr. | Director',
+      metadata: { source_url: 'https://msugensan.edu.ph/about/university-directory/' },
+    },
+  ]);
+  assert.match(answer, /Assoc\. Prof\. Nelson P\. Benares, Jr\./);
+  assert.match(answer, /Director of the Procurement Management Office/);
+  assert.match(answer, /MSU-GenSan University Directory/);
+  assert.doesNotMatch(answer, /PMO Administrative Manual|unverified manual/i);
+});
+
+test('PMO director identity fails closed when the official directory excerpt is absent', () => {
+  const answer = buildVerifiedProcurementAnswer('Who is the head of the Procurement Office?', [
+    { document_name: 'PMO Administrative Manual', chunk_text: 'Director: Assoc. Prof. Nelson P. Benares, Jr.' },
+  ]);
+  assert.match(answer, /could not verify|cannot verify|can’t verify/i);
 });
