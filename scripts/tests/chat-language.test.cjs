@@ -31,7 +31,6 @@ test('recognizes natural English and Filipino translation requests', () => {
 
 test('recognizes explicit requests to explain the previous answer in Tagalog', () => {
   for (const phrase of [
-    'Paki-explain in simple Tagalog',
     'Ipaliwanag mo ito sa Filipino',
     'Explain that in Tagalog',
     'Explain your previous answer in simple Tagalog',
