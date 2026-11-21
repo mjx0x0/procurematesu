@@ -331,6 +331,12 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         );
       }
       if (asksCurrentGoverningProcurementLaw) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'GPPB Circular No. 01-2025')
+            .limit(12),
+          scopedPhraseSearch('Implementing Rules and Regulations of RA 12009', 'Section 115. Repealing Clause')
+        );
         for (const documentName of ['RA 12009 (New)', 'RA 12009']) {
           searches.push(
             supabase.from('document_chunks').select(selectedColumns)
@@ -510,9 +516,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
       if (asksLowestQuotationAward) {
         const currentIrr = 'Implementing Rules and Regulations of RA 12009';
         searches.push(
-          scopedPhraseSearch(currentIrr, '34.3(f)'),
           scopedPhraseSearch(currentIrr, 'Abstract of Quotations or Ratings'),
-          scopedPhraseSearch(currentIrr, '34.3(g)'),
+          scopedPhraseSearch(currentIrr, 'The BAC shall recommend to the HoPE the award'),
           scopedPhraseSearch(currentIrr, 'LCRB, MEARB, MARB or HRRB')
         );
       }
@@ -563,6 +568,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         const currentIrr = 'Implementing Rules and Regulations of RA 12009';
         searches.push(
           scopedPhraseSearch(currentIrr, 'in case no price quotation is received from the suppliers'),
+          scopedPhraseSearch(currentIrr, 'may extend the deadline for submission of price quotation'),
+          scopedPhraseSearch(currentIrr, 'at least a single price quotation'),
           scopedPhraseSearch(currentIrr, 'extension shall not go beyond the validity of the corresponding appropriations')
         );
       }
@@ -809,7 +816,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // The documentary answer is intentionally cross-source: retain the six
   // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
   // quotations, posting, and the no-quotation exception independently.
-  const resultLimit = (asksBacFunctions || asksPrPpmpComparison || asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
+  const resultLimit = (asksBacFunctions || asksNoSvpQuotation || asksCurrentLawStatus || asksCurrentGoverningProcurementLaw || asksBacFunctions || asksPrPpmpComparison || asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
     ? Math.max(limit, 12)
     : asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
