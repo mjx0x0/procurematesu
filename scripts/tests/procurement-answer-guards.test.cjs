@@ -794,6 +794,12 @@ test('SVP Abstract evidence rejects an IRR title with an unverified source URL',
 });
 
 
+test('Generic current-law, quotation-award, and no-response questions enter deterministic policy routing', () => {
+  assert.equal(isDeterministicProcurementPolicyQuestion('What is the current procurement law in the Philippines?'), true);
+  assert.equal(isDeterministicProcurementPolicyQuestion('Is the cheapest quotation automatically awarded?'), true);
+  assert.equal(isDeterministicProcurementPolicyQuestion('What happens if no supplier submits a quotation?'), true);
+});
+
 test('Current procurement law question without explicitly naming RA 9184 is answered from transition evidence', () => {
   const currentLawChunks = [
     {
