@@ -148,8 +148,10 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   const asksTemporaryPmoLocation = /\b(?:where|location|located|address)\b/i.test(query) &&
     /\b(?:procurement office|procurement management office|PMO)\b/i.test(query);
   const asksSvpCompetitiveComparison = /\b(?:SVP|Small Value Procurement)\b/i.test(query) && /\bCompetitive Bidding\b/i.test(query);
-  const asksLowestQuotationAward = /\b(?:lowest|cheapest|lowest[- ]priced)\b/i.test(query) &&
-    /\b(?:quotation|quote|supplier|bid)\b/i.test(query) && /\b(?:win|award|awarded|guarantee|definitely|automatic|automatically)\b/i.test(query);
+  const asksLowestQuotationAward = /\b(?:lowest|cheapest|lowest[- ]priced|least[- ]expensive)\b/i.test(query)
+    && /\b(?:quotation|quote|supplier|bid)\b/i.test(query)
+    && (/\b(?:win|award|awarded|guarantee|definitely|automatic|automatically)\b/i.test(query)
+      || /\b(?:supplier|vendor)\b.{0,50}\b(?:submit|submits|submitted|offers?|provides?)\b.{0,40}\b(?:quotation|quote)\b/i.test(query));
   const asksCircular06Coverage = /\b(?:what does|what is covered by|coverage|cover)\b/i.test(query) && /\b(?:GPPB\s+)?Circular\s+No\.?\s*06[-–]2026\b/i.test(query);
   const asksDraftToStepOne =
     /\bdraft\b/i.test(query) &&
@@ -161,13 +163,15 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:purchase requests?|PR)\b/i.test(query) &&
     /\b(?:after|receives?|received|receipt|what happens|how will i know|confirmation|confirm)\b/i.test(query);
 
-  const asksNoSvpQuotation = /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got|submits?|submitted)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b|\bno supplier submits? (?:a )?quotation\b/i.test(query);
+  const asksNoSvpQuotation = /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got|submits?|submitted)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b|\bno supplier submits? (?:a )?quotation\b|\b(?:nobody|no one)\s+(?:submits?|submitted|sends?|sent|provides?|provided|receives?|received)\s+(?:any\s+)?(?:price\s+)?quotations?\b/i.test(query);
+  const asksSvpAbstractOfQuotations = /\babstract\s+of\s+(?:quotations?|ratings?)\b/i.test(query)
+    && (/\b(?:BAC|Bids and Awards Committee|SVP|Small Value Procurement)\b/i.test(query)
+      || /\b(?:why|purpose|reason|prepare|prepares|prepared)\b/i.test(query));
   const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
     || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query))
     || asksNoSvpQuotation
-    || asksLowestQuotationAward;
-  const asksSvpAbstractOfQuotations = asksSvpDetails
-    && /\babstract\s+of\s+(?:quotations?|ratings?)\b/i.test(query);
+    || asksLowestQuotationAward
+    || asksSvpAbstractOfQuotations;
   const asksSvpDocumentaryRequirements = asksSvpDetails
     && /\b(?:documentary requirements?|eligibility documents?|supplier documents?|documents? (?:to check|to submit|required|should be checked)|document checklist)\b/i.test(query);
   const asksCircularResubmission =
