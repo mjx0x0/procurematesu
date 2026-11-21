@@ -8,6 +8,8 @@ import { isPlausibleDraftReply, isCompletedPRDraftEdit } from '@/lib/pr-draft-ex
 import { classifyProcurementIntent, isContextualFollowUp, PR_INTENT_CLARIFICATION_RESPONSE } from '@/lib/chat-intent';
 import { formatRecentConversationContext, hasRecentProcurementContext } from '@/lib/chat-conversation-context';
 import { PROCUREMENT_STAGES } from '@/lib/procurement-process';
+import { callGroq } from '@/lib/groq';
+import { buildTagalogTranslationPrompt, isTagalogTranslationRequest } from '@/lib/chat-language';
 
 // Treat both standalone cancellation commands ("cancel", "stop") and natural phrases
 // ("cancel drafting", "stop the PR", "never mind") as explicit draft cancellation.
@@ -135,6 +137,53 @@ export async function POST(request: NextRequest) {
       console.warn('[chat/send] Recent conversation context is unavailable:', historyError);
     }
     const conversationContext = formatRecentConversationContext(priorMessages);
+
+    // A translation request is a presentation-only follow-up. Handle it before
+    // procurement scope/intent guards so "paki-Tagalog" is not mistaken for an
+    // unrelated question. Use only the latest persisted assistant answer from
+    // this owner-verified session; never translate client-supplied transcript text.
+    if (isTagalogTranslationRequest(message)) {
+      const latestAssistantAnswer = [...priorMessages].reverse()
+        .find((entry) => entry.sender === 'ai' && typeof entry.content === 'string' && entry.content.trim())
+        ?.content.trim();
+
+      if (!latestAssistantAnswer) {
+        return NextResponse.json({
+          response: 'Wala pa akong naunang sagot sa usapang ito na maaari kong isalin. Magtanong muna tungkol sa procurement, pagkatapos ay sabihin ang “isalin sa Tagalog.”',
+          sources: ['Gab AI conversation context'],
+        });
+      }
+
+      const translated = await callGroq(
+        buildTagalogTranslationPrompt(latestAssistantAnswer),
+        'You are a precise Filipino/Tagalog translator. Translate faithfully. Do not answer the underlying question, add legal research, alter citations, or change URLs.',
+        0.1,
+        { maxOutputTokens: 2600, timeoutMs: 12000 },
+      );
+
+      if (!translated?.trim()) {
+        return NextResponse.json({
+          response: 'Hindi ko maisalin nang maayos ang naunang sagot sa ngayon. Pakisubukang muli.',
+          sources: ['Gab AI translation service'],
+        }, { status: 503 });
+      }
+
+      try {
+        await clientToUse.from('chat_messages').insert([
+          { session_id: sessionId, sender: 'user', content: message },
+          { session_id: sessionId, sender: 'ai', content: translated.trim() },
+        ]);
+      } catch (persistError) {
+        // A translation remains useful even if chat-history persistence fails.
+        console.warn('[chat/send] Could not persist Tagalog translation turn:', persistError);
+      }
+
+      return NextResponse.json({
+        response: translated.trim(),
+        sources: ['Translation of Gab AI’s latest answer; original references preserved'],
+      });
+    }
+
     const recentProcurementContext = hasRecentProcurementContext(priorMessages) && isContextualFollowUp(message);
 
     // Some older completed chat sessions do not store a draftReady flag.
