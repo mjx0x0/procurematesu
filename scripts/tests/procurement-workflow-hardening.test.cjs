@@ -78,3 +78,21 @@ test('SVP Abstract questions source-scope and prioritize IRR Section 34.3(f) exc
   assert.match(guards, /function answerSvpAbstractOfQuotations/);
   assert.match(guards, /\]\.join\('\\\\n'\)/);
 });
+
+test('Gab AI runtime retrieval generates 384-dimensional query embeddings and calls vector RPC with keyword fallback', () => {
+  const retrieval = read('lib/document-retrieval.ts');
+  assert.match(retrieval, /Xenova\/all-MiniLM-L6-v2/);
+  assert.match(retrieval, /vector\.length !== 384/);
+  assert.match(retrieval, /supabase\.rpc\('match_documents'/);
+  assert.match(retrieval, /source_type: 'supabase_vector'/);
+  assert.match(retrieval, /Vector search unavailable; using keyword retrieval/);
+});
+
+test('vector RPC returns provenance fields required by Gab AI citations', () => {
+  const sql = read('supabase/migrations/20261121090000_add_gab_ai_vector_retrieval.sql');
+  assert.match(sql, /extensions\.vector\(384\)/);
+  assert.match(sql, /document_name text/);
+  assert.match(sql, /document_type text/);
+  assert.match(sql, /metadata jsonb/);
+  assert.match(sql, /1 - \(dc\.embedding <=> query_embedding\) as similarity/);
+});

@@ -18,6 +18,27 @@ export interface RetrievalResult {
   sources: string[];
 }
 
+const QUERY_EMBEDDING_MODEL = 'Xenova/all-MiniLM-L6-v2';
+let queryEmbedderPromise: Promise<any> | null = null;
+
+async function generateQueryEmbedding(query: string): Promise<number[]> {
+  if (!queryEmbedderPromise) {
+    queryEmbedderPromise = import('@xenova/transformers')
+      .then(({ pipeline }) => pipeline('feature-extraction', QUERY_EMBEDDING_MODEL))
+      .catch((error) => {
+        queryEmbedderPromise = null;
+        throw error;
+      });
+  }
+  const embedder = await queryEmbedderPromise;
+  const output = await embedder(query, { pooling: 'mean', normalize: true });
+  const vector = Array.from(output.data as Float32Array, Number);
+  if (vector.length !== 384 || vector.some((value) => !Number.isFinite(value))) {
+    throw new Error(`Query embedding must contain 384 finite values; received ${vector.length}.`);
+  }
+  return vector;
+}
+
 let supabaseClient: SupabaseClient | null = null;
 function getSupabase(): SupabaseClient | null {
   if (supabaseClient) return supabaseClient;
@@ -127,8 +148,10 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   const asksTemporaryPmoLocation = /\b(?:where|location|located|address)\b/i.test(query) &&
     /\b(?:procurement office|procurement management office|PMO)\b/i.test(query);
   const asksSvpCompetitiveComparison = /\b(?:SVP|Small Value Procurement)\b/i.test(query) && /\bCompetitive Bidding\b/i.test(query);
-  const asksLowestQuotationAward = /\b(?:lowest|cheapest|lowest[- ]priced)\b/i.test(query) &&
-    /\b(?:quotation|quote|supplier|bid)\b/i.test(query) && /\b(?:win|award|awarded|guarantee|definitely|automatic|automatically)\b/i.test(query);
+  const asksLowestQuotationAward = /\b(?:lowest|cheapest|lowest[- ]priced|least[- ]expensive)\b/i.test(query)
+    && /\b(?:quotation|quote|supplier|bid)\b/i.test(query)
+    && (/\b(?:win|award|awarded|guarantee|definitely|automatic|automatically)\b/i.test(query)
+      || /\b(?:supplier|vendor)\b.{0,50}\b(?:submit|submits|submitted|offers?|provides?)\b.{0,40}\b(?:quotation|quote)\b/i.test(query));
   const asksCircular06Coverage = /\b(?:what does|what is covered by|coverage|cover)\b/i.test(query) && /\b(?:GPPB\s+)?Circular\s+No\.?\s*06[-–]2026\b/i.test(query);
   const asksDraftToStepOne =
     /\bdraft\b/i.test(query) &&
@@ -140,10 +163,15 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:purchase requests?|PR)\b/i.test(query) &&
     /\b(?:after|receives?|received|receipt|what happens|how will i know|confirmation|confirm)\b/i.test(query);
 
+  const asksNoSvpQuotation = /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got|submits?|submitted)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b|\bno supplier submits? (?:a )?quotation\b|\b(?:nobody|no one)\s+(?:submits?|submitted|sends?|sent|provides?|provided|receives?|received)\s+(?:(?:a|any)\s+)?(?:price\s+)?quotations?\b/i.test(query);
+  const asksSvpAbstractOfQuotations = /\babstract\s+of\s+(?:quotations?|ratings?)\b/i.test(query)
+    && (/\b(?:BAC|Bids and Awards Committee|SVP|Small Value Procurement)\b/i.test(query)
+      || /\b(?:why|purpose|reason|prepare|prepares|prepared)\b/i.test(query));
   const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
-    || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query));
-  const asksSvpAbstractOfQuotations = asksSvpDetails
-    && /\babstract\s+of\s+(?:quotations?|ratings?)\b/i.test(query);
+    || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query))
+    || asksNoSvpQuotation
+    || asksLowestQuotationAward
+    || asksSvpAbstractOfQuotations;
   const asksSvpDocumentaryRequirements = asksSvpDetails
     && /\b(?:documentary requirements?|eligibility documents?|supplier documents?|documents? (?:to check|to submit|required|should be checked)|document checklist)\b/i.test(query);
   const asksCircularResubmission =
@@ -154,8 +182,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     && /professional\s+license|curriculum vitae|\bcv\b/i.test(query)
     && /consulting/i.test(query)
     && /section\s*4\.3\.3|section\s*4\.7|inconsisten|for every|mandatory|compare/i.test(query);
-  const asksNoSvpQuotation = asksSvpDetails
-    && /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b/i.test(query);
+
 
   const officialIssuanceTargets = getOfficialIssuanceRetrievalTargets(query);
 
@@ -192,6 +219,75 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         .map(t => t.trim())
         .filter(t => t.length >= 3 && !stopWords.has(t)))
   )).slice(0, 24);
+
+  // Semantic retrieval supplements the existing source-scoped keyword search.
+  // It uses the same 384-dimensional model used when the knowledge-base chunks
+  // were embedded; failures leave the established keyword path available.
+  if (supabase && query.trim()) {
+    try {
+      const queryEmbedding = await generateQueryEmbedding(query);
+      const { data: vectorRows, error: vectorError } = await supabase.rpc('match_documents', {
+        query_embedding: queryEmbedding,
+        match_threshold: 0.30,
+        match_count: Math.min(30, Math.max(12, limit * 4)),
+      });
+      if (vectorError) throw vectorError;
+
+      const asksHistoricalVectorQuestion =
+        /\b9184\b/i.test(query) &&
+        /\b(?:before|prior to|previous(?:ly)?|historical(?:ly)?|history|old law|former|applied under)\b/i.test(query) &&
+        /\b12009\b|\bhistorical(?:ly)?\b|\bprevious(?:ly)?\b|\bformer\b/i.test(query);
+
+      for (const doc of vectorRows || []) {
+        const text = String(doc.chunk_text || '').trim();
+        if (!text) continue;
+        const metadata =
+          doc.metadata && typeof doc.metadata === 'object' && !Array.isArray(doc.metadata)
+            ? (doc.metadata as Record<string, unknown>)
+            : undefined;
+        const documentName = String(doc.document_name || '');
+        const identity = sourceIdentity(documentName, String(doc.document_type || ''), metadata);
+        const isLegacy = isLegacyProcurementSource(identity);
+
+        if (asksPmoDirectorContact && documentName !== 'MSU-GenSan University Directory') continue;
+        if (asksHistoricalVectorQuestion && !['RA 9184', 'IRR 2016', 'IRR'].includes(documentName)) continue;
+        if ((asksCurrentLawStatus || asksCurrentGoverningProcurementLaw) && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
+        if (isLegacy && !asksAboutLegacyRules(query)) continue;
+        const is2014LguManualContent = /Local Government Units Procurement Manual|Manual of Procedures for the Procurement of Goods and Services under RA No.?\s*9184/i.test(text);
+        if (is2014LguManualContent && !asksAboutLegacyRules(query)) continue;
+        if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009'
+          && !/Section\s+34\.\s+Small Value Procurement|\b34\.1\b|\b34\.3\b|shall not require posting|Abstract of Quotations or Ratings|in case no price quotation is received/i.test(text)) continue;
+        if (asksSvpDocumentaryRequirements && !['GPPB Circular No. 06-2026', 'Implementing Rules and Regulations of RA 12009'].includes(documentName)) continue;
+        if ((asksPmoReceiptQuestion || asksDraftToStepOne) && documentName !== 'ProcureMateSU System Workflow') continue;
+        if ((asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure) && documentName !== 'PMO Administrative Manual') continue;
+        if (asksPmoPrNumber && !['PMO Administrative Manual', 'ProcureMateSU System Workflow'].includes(documentName)) continue;
+        if (asksTemporaryPmoLocation && !/STTC|temporary office location/i.test(text)) continue;
+
+        const similarity = Number(doc.similarity);
+        if (!Number.isFinite(similarity)) continue;
+        const key = String(doc.id || text.slice(0, 120));
+        const score = similarity * 100;
+        const existing = candidates.get(key);
+        if (!existing || score > existing.score) {
+          candidates.set(key, {
+            id: doc.id,
+            document_name: documentName || 'Procurement Records',
+            document_type: String(doc.document_type || 'document_chunks'),
+            chunk_text: text.replaceAll(
+              'https://www.gppb.gov.ph/wp-content/uploads/2026/06/ApprovedGPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf',
+              '[direct public link unavailable — do not link]'
+            ),
+            metadata,
+            similarity,
+            source_type: 'supabase_vector',
+            score,
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[Retrieval] Vector search unavailable; using keyword retrieval:', err);
+    }
+  }
 
   // Search both the exact phrase and several meaningful terms. The old
   // implementation searched only one "target term", which could retrieve a
@@ -241,6 +337,12 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         );
       }
       if (asksCurrentGoverningProcurementLaw) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'GPPB Circular No. 01-2025')
+            .limit(12),
+          scopedPhraseSearch('Implementing Rules and Regulations of RA 12009', 'Section 115. Repealing Clause')
+        );
         for (const documentName of ['RA 12009 (New)', 'RA 12009']) {
           searches.push(
             supabase.from('document_chunks').select(selectedColumns)
@@ -420,9 +522,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
       if (asksLowestQuotationAward) {
         const currentIrr = 'Implementing Rules and Regulations of RA 12009';
         searches.push(
-          scopedPhraseSearch(currentIrr, '34.3(f)'),
           scopedPhraseSearch(currentIrr, 'Abstract of Quotations or Ratings'),
-          scopedPhraseSearch(currentIrr, '34.3(g)'),
+          scopedPhraseSearch(currentIrr, 'The BAC shall recommend to the HoPE the award'),
           scopedPhraseSearch(currentIrr, 'LCRB, MEARB, MARB or HRRB')
         );
       }
@@ -473,6 +574,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         const currentIrr = 'Implementing Rules and Regulations of RA 12009';
         searches.push(
           scopedPhraseSearch(currentIrr, 'in case no price quotation is received from the suppliers'),
+          scopedPhraseSearch(currentIrr, 'may extend the deadline for submission of price quotation'),
+          scopedPhraseSearch(currentIrr, 'at least a single price quotation'),
           scopedPhraseSearch(currentIrr, 'extension shall not go beyond the validity of the corresponding appropriations')
         );
       }
@@ -607,7 +710,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
 
           // A current-law status question must be anchored in the official 2025
           // transition circular, not diluted by the historical RA 9184/2016 IRR chunks.
-          if (asksCurrentLawStatus && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
+          if ((asksCurrentLawStatus || asksCurrentGoverningProcurementLaw) && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
 
           // On ordinary/current-law questions, exclude historical documents unless
           // the user explicitly asks for history, comparison, or transition.
@@ -679,14 +782,37 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const issuanceTarget = officialIssuanceTargets.find((target) => target.documentName === documentName);
           if (issuanceTarget) score += issuanceTarget.priorityBoost || 1000;
           if (asksUniversityChancellor && documentName === 'MSU-GenSan University Directory') score += 1000;
-          if (asksCurrentLawStatus && documentName === 'GPPB Circular No. 01-2025') score += 1000;
+          // Pin the authoritative transition-circular chunk above generic candidates.
+          // The answer guard needs its SUC scope, repeal, transition, and 2028 deadline together.
+          if ((asksCurrentLawStatus || asksCurrentGoverningProcurementLaw)
+            && documentName === 'GPPB Circular No. 01-2025'
+            && /Section 115 expressly repeals RA No\\.? 9184/i.test(text)
+            && /Section 5\\.1/i.test(text)
+            && /Section 5\\.2\\.1/i.test(text)
+            && /15 May 2028/i.test(text)) score += 10000;
+          if (asksCurrentGoverningProcurementLaw
+            && documentName === 'Implementing Rules and Regulations of RA 12009'
+            && /Section 115/i.test(text)) score += 5000;
+          // The high-risk current-law answer also verifies the Act's short title.
+          // Keep the exact Section 1 excerpt alongside the transition Circular.
+          if (asksCurrentGoverningProcurementLaw
+            && documentName === 'RA 12009 (New)'
+            && /SECTION 1\\. Short Title/i.test(text)
+            && /New Government Procurement Act/i.test(text)) score += 10000;
           if (asksDraftToStepOne && documentName === 'ProcureMateSU System Workflow') score += 1000;
           if (asksPurchaseRequestWorkflow && documentName === 'PMO Administrative Manual' && /IV\. PROCESS FLOW|Receipt of Purchase Request/i.test(text)) score += 1000;
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
           if (asksSvpAbstractOfQuotations
             && documentName === 'Implementing Rules and Regulations of RA 12009'
-            && /34\.3\s*\(\s*f\s*\)|abstract of quotations|quotations or ratings|after the deadline/i.test(text)) score += 1000;
+            && /34\.3\s*\(\s*f\s*\)|abstract of quotations|quotations or ratings|after the deadline/i.test(text)) score += 10000;
           else if (asksSvpDetails && /small value procurement|section 34/i.test(text) && /circular no\. 06-2026/i.test(identity)) score += 12;
+          // The award question needs the actual SVP evaluation and recommendation text,
+          // not generic award language from another procurement method.
+          if (asksLowestQuotationAward
+            && documentName === 'Implementing Rules and Regulations of RA 12009'
+            && /Abstract of Quotations or Ratings/i.test(text)
+            && /The BAC shall recommend to the HoPE the award/i.test(text)
+            && /LCRB,?\s*MEARB,?\s*MARB or HRRB/i.test(text)) score += 10000;
           if ((asksSvpDocumentaryRequirements || asksCircularResubmission || asksCircularLicenseCvAmbiguity)
             && documentName === 'GPPB Circular No. 06-2026') score += 1000;
           if (asksNoSvpQuotation
@@ -718,7 +844,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // The documentary answer is intentionally cross-source: retain the six
   // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
   // quotations, posting, and the no-quotation exception independently.
-  const resultLimit = (asksBacFunctions || asksPrPpmpComparison || asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
+  const resultLimit = (asksBacFunctions || asksNoSvpQuotation || asksCurrentLawStatus || asksCurrentGoverningProcurementLaw || asksLowestQuotationAward || asksPrPpmpComparison || asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
     ? Math.max(limit, 12)
     : asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
