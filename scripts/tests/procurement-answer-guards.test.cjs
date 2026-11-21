@@ -924,7 +924,7 @@ test('plain English and Tagalog RA 9184 definition prompts use the Act and offic
     ]);
     assert.match(answer, /Government Procurement Reform Act/);
     assert.match(answer, /not the current general procurement law/i);
-    assert.match(answer, /RA No\\. 12009/);
+    assert.match(answer, /RA No\. 12009/);
     assert.match(answer, /Official Gazette/);
     assert.match(answer, /GPPB Circular No\\. 01-2025/);
   }
@@ -949,7 +949,7 @@ test('PMO director identity is answered only from the official university direct
       metadata: { source_url: 'https://msugensan.edu.ph/about/university-directory/' },
     },
   ]);
-  assert.match(answer, /Assoc\\. Prof\\. Nelson P\\. Benares, Jr\\./);
+  assert.match(answer, /Assoc\. Prof\. Nelson P\. Benares, Jr\./);
   assert.match(answer, /Director of the Procurement Management Office/);
   assert.match(answer, /MSU-GenSan University Directory/);
   assert.doesNotMatch(answer, /PMO Administrative Manual|unverified manual/i);
