@@ -110,7 +110,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:requirement|requirements|documents?|what.*need|needed|must.*include|should.*include|checklist|prepar(?:e|es|ed|ing)|preparation|information|provide|include|contents?|details?)\b/i.test(query) &&
     !asksPrPpmpComparison;
   const asksPrItemPreparation =
-    /\b(?:PR|Purchase Request|procurement|purchase)\b/i.test(query) &&
+    (/\b(?:PR|Purchase Request|procurement|purchase)\b/i.test(query) ||
+      /\b(?:technical specifications?|specs?|describe.*items?|items?\b.*\b(?:purchase|need|want)|quantit(?:y|ies).*estimated (?:unit )?(?:price|cost)|estimated (?:unit )?(?:price|cost).*each item)\b/i.test(query)) &&
     /\b(?:item descriptions?|describe.*items?|technical specifications?|specs?|quantit(?:y|ies)|estimated (?:unit )?(?:price|cost)|unit cost|price per item)\b/i.test(query);
   const asksPrValidationFailure =
     /\b(?:PR|Purchase Request)\b/i.test(query) &&
