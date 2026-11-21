@@ -20,7 +20,7 @@ export function getTagalogFollowUpMode(message: string): TagalogFollowUpMode | n
   // back to it without introducing a fresh subject (e.g. "explain that in Tagalog").
   const hasNewTopic =
     /\b(?:section|subsection|article|ra\s*\.?\s*no?\.?|republic\s+act|svp|small\s+value\s+procurement|ppmp|app|bac|pmo|rfq|rfp|abstract\s+of\s+quotations|purchase\s+request|procurement|quotation|ho?pe)\b/i.test(text) ||
-    /\b(?:\d{1,3}\.\d+(?:\\([a-z0-9]+\\))?|ra\s*\d{4,5})\b/i.test(text);
+    /\b(?:\d{1,3}\.\d+(?:\([a-z0-9]+\))?|ra\s*\d{4,5})\b/i.test(text);
   const explicitlyRefersToPreviousAnswer =
     /\b(?:previous|preceding|latest|last)\s+(?:answer|response|explanation|reply)\b/i.test(text) ||
     /\b(?:that|this|it|above)\b/i.test(text) ||
