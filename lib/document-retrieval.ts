@@ -245,7 +245,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
 
         if (asksPmoDirectorContact && documentName !== 'MSU-GenSan University Directory') continue;
         if (asksHistoricalVectorQuestion && !['RA 9184', 'IRR 2016', 'IRR'].includes(documentName)) continue;
-        if (asksCurrentLawStatus && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
+        if ((asksCurrentLawStatus || asksCurrentGoverningProcurementLaw) && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
         if (isLegacy && !asksAboutLegacyRules(query)) continue;
         const is2014LguManualContent = /Local Government Units Procurement Manual|Manual of Procedures for the Procurement of Goods and Services under RA No.?\s*9184/i.test(text);
         if (is2014LguManualContent && !asksAboutLegacyRules(query)) continue;
@@ -697,7 +697,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
 
           // A current-law status question must be anchored in the official 2025
           // transition circular, not diluted by the historical RA 9184/2016 IRR chunks.
-          if (asksCurrentLawStatus && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
+          if ((asksCurrentLawStatus || asksCurrentGoverningProcurementLaw) && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
 
           // On ordinary/current-law questions, exclude historical documents unless
           // the user explicitly asks for history, comparison, or transition.
@@ -769,7 +769,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const issuanceTarget = officialIssuanceTargets.find((target) => target.documentName === documentName);
           if (issuanceTarget) score += issuanceTarget.priorityBoost || 1000;
           if (asksUniversityChancellor && documentName === 'MSU-GenSan University Directory') score += 1000;
-          if (asksCurrentLawStatus && documentName === 'GPPB Circular No. 01-2025') score += 1000;
+          if ((asksCurrentLawStatus || asksCurrentGoverningProcurementLaw) && documentName === 'GPPB Circular No. 01-2025') score += 1000;
+          if (asksCurrentGoverningProcurementLaw && documentName === 'Implementing Rules and Regulations of RA 12009') score += 900;
           if (asksDraftToStepOne && documentName === 'ProcureMateSU System Workflow') score += 1000;
           if (asksPurchaseRequestWorkflow && documentName === 'PMO Administrative Manual' && /IV\. PROCESS FLOW|Receipt of Purchase Request/i.test(text)) score += 1000;
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
