@@ -792,3 +792,45 @@ test('SVP Abstract evidence rejects an IRR title with an unverified source URL',
 
   assert.match(answer, /can’t verify this procurement rule/i);
 });
+
+
+test('Current procurement law question without explicitly naming RA 9184 is answered from transition evidence', () => {
+  const currentLawChunks = [
+    {
+      document_name: 'GPPB Circular No. 01-2025',
+      chunk_text: 'This Circular applies to State Universities and Colleges. Section 115 expressly repeals RA No. 9184. Section 5.1 covers projects published before the effectivity of the IRR of RA No. 12009. Section 5.2.1 allows continued use until the necessary guidelines, forms, and requirements are issued. Section 5.4 identifies 15 May 2028.',
+      metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/10/GPPB-Resolution-No.-05-2025.pdf' },
+    },
+  ];
+  const answer = buildVerifiedProcurementAnswer('What is the current procurement law in the Philippines?', currentLawChunks);
+  assert.match(answer, /RA No\. 12009/);
+  assert.match(answer, /transition rules/i);
+  assert.match(answer, /GPPB-approved IRR/i);
+});
+
+test('Abstract evidence accepts the official IRR operative paragraph when PDF extraction omits the subsection label', () => {
+  const answer = buildVerifiedProcurementAnswer(
+    'What is the purpose of the Abstract of Quotations in Small Value Procurement?',
+    [{
+      document_name: 'Implementing Rules and Regulations of RA 12009',
+      chunk_text: 'f) After the deadline for submission of quotations or proposals, an Abstract of Quotations or Ratings shall be prepared setting forth the names of those who responded to the RFQ or RFP, and their corresponding price quotations or ratings.',
+      metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
+    }],
+  );
+  assert.match(answer, /formal record of the quotations or ratings received/i);
+  assert.doesNotMatch(answer, /can’t verify this procurement rule/i);
+});
+
+test('Cheapest quotation question is answered using the current IRR evaluation and recommendation rule', () => {
+  const answer = buildVerifiedProcurementAnswer(
+    'Is the cheapest quotation automatically awarded?',
+    [{
+      document_name: 'Implementing Rules and Regulations of RA 12009',
+      chunk_text: 'f) After the deadline for submission of quotations or proposals, an Abstract of Quotations or Ratings shall be prepared. g) The BAC shall recommend to the HoPE the award of a contract in favor of the supplier, contractor, or consultant with the LCRB, MEARB, MARB or HRRB.',
+      metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
+    }],
+  );
+  assert.match(answer, /not automatically awarded/i);
+  assert.match(answer, /LCRB, MEARB, MARB, or HRRB/i);
+  assert.match(answer, /HoPE/i);
+});
