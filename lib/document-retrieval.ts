@@ -778,8 +778,17 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const issuanceTarget = officialIssuanceTargets.find((target) => target.documentName === documentName);
           if (issuanceTarget) score += issuanceTarget.priorityBoost || 1000;
           if (asksUniversityChancellor && documentName === 'MSU-GenSan University Directory') score += 1000;
-          if ((asksCurrentLawStatus || asksCurrentGoverningProcurementLaw) && documentName === 'GPPB Circular No. 01-2025') score += 1000;
-          if (asksCurrentGoverningProcurementLaw && documentName === 'Implementing Rules and Regulations of RA 12009') score += 900;
+          // Pin the authoritative transition-circular chunk above generic candidates.
+          // The answer guard needs its SUC scope, repeal, transition, and 2028 deadline together.
+          if ((asksCurrentLawStatus || asksCurrentGoverningProcurementLaw)
+            && documentName === 'GPPB Circular No. 01-2025'
+            && /Section 115 expressly repeals RA No\\.? 9184/i.test(text)
+            && /Section 5\\.1/i.test(text)
+            && /Section 5\\.2\\.1/i.test(text)
+            && /15 May 2028/i.test(text)) score += 10000;
+          if (asksCurrentGoverningProcurementLaw
+            && documentName === 'Implementing Rules and Regulations of RA 12009'
+            && /Section 115/i.test(text)) score += 5000;
           if (asksDraftToStepOne && documentName === 'ProcureMateSU System Workflow') score += 1000;
           if (asksPurchaseRequestWorkflow && documentName === 'PMO Administrative Manual' && /IV\. PROCESS FLOW|Receipt of Purchase Request/i.test(text)) score += 1000;
           if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009' && /section 34|small value procurement|shall not require posting|at least three \(3\) suppliers|abstract of quotations or ratings/i.test(text)) score += 50;
@@ -818,7 +827,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // The documentary answer is intentionally cross-source: retain the six
   // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
   // quotations, posting, and the no-quotation exception independently.
-  const resultLimit = (asksBacFunctions || asksNoSvpQuotation || asksCurrentLawStatus || asksCurrentGoverningProcurementLaw || asksBacFunctions || asksPrPpmpComparison || asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
+  const resultLimit = (asksBacFunctions || asksNoSvpQuotation || asksCurrentLawStatus || asksCurrentGoverningProcurementLaw || asksLowestQuotationAward || asksPrPpmpComparison || asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
     ? Math.max(limit, 12)
     : asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
