@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 
 const {
   buildVerifiedProcurementAnswer,
+  isDeterministicProcurementPolicyQuestion,
   isBriefSvpMethodQuestion,
   isHistoricalRa9184Question,
   isPmoDirectorContactQuestion,
@@ -140,7 +141,7 @@ const completeSvpProcedureChunks = [
   },
   {
     document_name: 'Implementing Rules and Regulations of RA 12009',
-    chunk_text: '34.3(f)–(g): After the deadline, an Abstract of Quotations or Ratings is prepared and the BAC recommends award to the HoPE under the applicable rule.',
+    chunk_text: '34.3(f): After the deadline for submission of quotations or proposals, an Abstract of Quotations or Ratings shall be prepared setting forth the names of those who responded to the RFQ or RFP, and their corresponding price quotations or ratings. 34.3(g): The BAC shall recommend to the HoPE the award of a contract in favor of the supplier, contractor, or consultant with the LCRB, MEARB, MARB or HRRB.',
   },
 ];
 
@@ -182,7 +183,7 @@ test('current-law question distinguishes RA 12009 repeal from limited transition
   const query = 'Is RA 9184 still the current procurement law for MSU-Gensan?';
   const answer = buildVerifiedProcurementAnswer(query, transitionCircularChunks);
   assert.ok(answer);
-  assert.match(answer, /No—not as the general governing law for new procurement activities/i);
+  assert.match(answer, /RA No\. 12009.*current general framework for new procurement activities/i);
   assert.match(answer, /expressly repealed RA No\. 9184/i);
   assert.match(answer, /State Universities and Colleges/i);
   assert.match(answer, /published before.*25 February 2025/i);
@@ -209,7 +210,7 @@ test('current-law guard accepts the exact Oxford-comma wording stored in the liv
   }];
   const answer = buildVerifiedProcurementAnswer('Is RA 9184 still the current procurement law for MSU-Gensan?', liveStyleChunks);
   assert.ok(answer);
-  assert.match(answer, /No—not as the general governing law/i);
+  assert.match(answer, /RA No\. 12009.*current general framework/i);
   assert.doesNotMatch(answer, /can’t verify this procurement rule/i);
 });
 
