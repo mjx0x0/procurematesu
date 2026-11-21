@@ -875,3 +875,32 @@ test('Cheapest quotation question is answered using the current IRR evaluation a
   assert.match(answer, /LCRB, MEARB, MARB, or HRRB/i);
   assert.match(answer, /HoPE/i);
 });
+
+
+test('natural-language nobody submits a quotation question is answered from SVP Section 34.3(d)', () => {
+  const answer = buildVerifiedProcurementAnswer(
+    'What happens if nobody submits a quotation for SVP?',
+    [{
+      document_name: 'Implementing Rules and Regulations of RA 12009',
+      chunk_text: 'd) In case no price quotation is received from the suppliers, the Procuring Entity may extend the deadline for submission of price quotation until receipt of at least a single price quotation; but the extension shall not go beyond the validity of the corresponding appropriations.',
+      metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
+    }],
+  );
+  assert.match(answer, /Section 34\.3\(d\)/);
+  assert.match(answer, /may extend the deadline/i);
+  assert.match(answer, /validity of the corresponding appropriations/i);
+});
+
+test('generic BAC Abstract question is answered narrowly from IRR Section 34.3(f)-(g)', () => {
+  const answer = buildVerifiedProcurementAnswer(
+    'Why does the BAC prepare an Abstract of Quotations?',
+    [{
+      document_name: 'Implementing Rules and Regulations of RA 12009',
+      chunk_text: 'f) After the deadline for submission of quotations or proposals, an Abstract of Quotations or Ratings shall be prepared setting forth the names of those who responded to the RFQ or RFP, and their corresponding price quotations or ratings. g) The BAC shall recommend to the HoPE the award of a contract in favor of the supplier, contractor, or consultant with the LCRB, MEARB, MARB or HRRB.',
+      metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf' },
+    }],
+  );
+  assert.match(answer, /names of those who responded/i);
+  assert.match(answer, /corresponding price quotations or ratings/i);
+  assert.doesNotMatch(answer, /qualified suppliers|price-reasonableness|controlled procurement document/i);
+});
