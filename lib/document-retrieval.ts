@@ -161,8 +161,11 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:purchase requests?|PR)\b/i.test(query) &&
     /\b(?:after|receives?|received|receipt|what happens|how will i know|confirmation|confirm)\b/i.test(query);
 
+  const asksNoSvpQuotation = /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got|submits?|submitted)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b|\bno supplier submits? (?:a )?quotation\b/i.test(query);
   const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
-    || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query));
+    || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query))
+    || asksNoSvpQuotation
+    || asksLowestQuotationAward;
   const asksSvpAbstractOfQuotations = asksSvpDetails
     && /\babstract\s+of\s+(?:quotations?|ratings?)\b/i.test(query);
   const asksSvpDocumentaryRequirements = asksSvpDetails
@@ -175,8 +178,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     && /professional\s+license|curriculum vitae|\bcv\b/i.test(query)
     && /consulting/i.test(query)
     && /section\s*4\.3\.3|section\s*4\.7|inconsisten|for every|mandatory|compare/i.test(query);
-  const asksNoSvpQuotation = asksSvpDetails
-    && /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b/i.test(query);
+
 
   const officialIssuanceTargets = getOfficialIssuanceRetrievalTargets(query);
 
