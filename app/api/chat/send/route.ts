@@ -402,45 +402,54 @@ export async function POST(request: NextRequest) {
       const { data: history } = await clientToUse.from('pr_stages_completed').select('stage_key,stage_name,completed_at,remarks,notes').eq('pr_no', latestPR.pr_no).neq('status', 'remark').order('completed_at', { ascending: false }).limit(1);
       return NextResponse.json({ response: buildNextStepResponse(latestPR, history?.[0] || null), sources: ['ProcuremateSU procurement process', 'Purchase Request stage history'] });
     }
-    // The authenticated wrapper owns inquiry logging for delegated responses.
-    // This avoids relying on the legacy route's internal persistence path and keeps
-    // exactly one session-level log entry for this user turn.
+    // The wrapper authenticates the user and verifies session ownership.
+    // The delegated chat route persists both chat messages and the inquiry log
+    // through its authenticated Supabase client in one place.
     const trustedHeaders = new Headers(request.headers);
     trustedHeaders.set('x-chat-send-delegated', '1');
     const trustedRequest = new NextRequest(request.url, { method: 'POST', headers: trustedHeaders, body: JSON.stringify({ message, sessionId, userId: user.id, conversationContext }) });
     const legacyResponse = await legacyChatPOST(trustedRequest);
-    // Persist the delegated response through the authenticated service-role client.
-    // Parse the cloned body as text first so logging is not skipped by a response
-    // content-type/JSON parsing edge case.
-    if (db) {
-      let responseText = '';
+
+    // Log only successful delegated turns, after the legacy handler has produced
+    // the final answer. Use the same authenticated client that verified the user
+    // and session; do not issue a separate raw PostgREST fetch.
+    console.info('[chat/send] Delegated response completed:', { status: legacyResponse.status, ok: legacyResponse.ok, hasServiceClient: Boolean(db) });
+    if (legacyResponse.ok) {
       try {
-        const rawBody = await legacyResponse.clone().text();
-        const payload = JSON.parse(rawBody);
-        responseText = typeof payload?.response === 'string' ? payload.response.trim() : '';
-      } catch (logError) {
-        console.warn('[chat/send] Could not parse delegated response for inquiry logging:', logError);
-      }
-      if (responseText) {
-        const loggedPrNo = message.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-').match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
-        const { error: inquiryLogError } = await db.rpc('append_monitor_inquiry_session', {
-          p_session_id: sessionId,
-          p_user_id: user.id,
-          p_user_name: authenticatedUserName || user.user_metadata?.name || 'ProcuremateSU User',
-          p_user_department: 'MSU-GenSan',
-          p_pr_no: loggedPrNo ? normalizePRIdentifier(loggedPrNo) : null,
-          p_user_message: message,
-          p_bot_response: responseText,
-          p_inquiry_type: 'general',
-        });
-        if (inquiryLogError) {
-          console.error('[chat/send] Delegated session inquiry log update failed:', inquiryLogError.message);
-          // Keep the chat response available, but make the persistence failure visible in CI logs.
+        const result = await legacyResponse.clone().json();
+        const botResponse = typeof result?.response === 'string' ? result.response : '';
+        console.info('[chat/send] Delegated response parsed for inquiry logging:', { hasResponseText: Boolean(botResponse), responseType: typeof result?.response });
+        if (botResponse) {
+          const normalizedForPR = message.replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-');
+          const prMatch = normalizedForPR.match(/\bPR[- ]?(?:TEMP[- ]?)?(?:\d{4}[- ]?)?\d{1,6}\b/i)?.[0] || null;
+          const inquiryType = messageIntent === 'create_pr_draft' || messageIntent === 'draft_revision'
+            ? 'draft_pr'
+            : messageIntent === 'track_pr' || messageIntent === 'list_prs'
+              ? 'track_pr'
+              : 'procurement_guidance';
+          console.info('[chat/send] Sending inquiry-log RPC:', { sessionId, userId: user.id, inquiryType });
+          const { error: inquiryLogError } = await clientToUse.rpc('append_monitor_inquiry_session', {
+            p_session_id: sessionId,
+            p_user_id: user.id,
+            p_user_name: authenticatedUserName || 'ProcuremateSU User',
+            p_user_department: 'MSU-GenSan',
+            p_pr_no: prMatch ? normalizePRIdentifier(prMatch) : null,
+            p_user_message: message,
+            p_bot_response: botResponse,
+            p_inquiry_type: inquiryType,
+          });
+          if (inquiryLogError) {
+            console.error('[chat/send] Inquiry session logging failed:', inquiryLogError.message);
+          } else {
+            console.info('[chat/send] Inquiry session logging succeeded:', { sessionId });
+          }
         }
-      } else {
-        console.warn('[chat/send] Delegated response had no response text; inquiry log was not updated.');
+      } catch (logError) {
+        // Inquiry logging must not replace a valid chatbot response.
+        console.error('[chat/send] Could not persist inquiry session:', logError);
       }
     }
+
     return legacyResponse;
   } catch (error) { console.error('[chat/send] Unexpected error:', error); return NextResponse.json({ error: 'Unable to process the chat request.' }, { status: 500 }); }
 }

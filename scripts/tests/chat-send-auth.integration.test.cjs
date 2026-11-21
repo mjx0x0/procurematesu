@@ -31,6 +31,7 @@ const sessions = new Map([
   ['session-context-follow-up', { id: 'session-context-follow-up', user_id: 'user-a', is_active: true, state: {} }],
   ['session-ppmp-basic-question', { id: 'session-ppmp-basic-question', user_id: 'user-a', is_active: true, state: {} }],
   ['session-reference-links', { id: 'session-reference-links', user_id: 'user-a', is_active: true, state: {} }],
+  ['session-pr-draft-persistence', { id: 'session-pr-draft-persistence', user_id: 'user-a', is_active: true, state: {} }],
   ['session-natural-language-create', {
     id: 'session-natural-language-create',
     user_id: 'user-a',
@@ -70,6 +71,7 @@ const storedMessages = [
   { session_id: 'session-reference-links', sender: 'ai', content: 'The PR is verified against PPMP/APP. References • PMO Administrative Manual, IV. PROCESS FLOW (PDF page 12).' },
 ];
 const storedInquiries = [];
+const inquiryRpcRequests = [];
 const purchaseRequests = [
   {
     pr_no: 'PR-2026-0001',
@@ -193,6 +195,7 @@ async function handleMockSupabase(request, response) {
 
   if (url.pathname === '/rest/v1/rpc/append_monitor_inquiry_session' && request.method === 'POST') {
     const args = await readJSON(request);
+    inquiryRpcRequests.push({ args, authorization: request.headers.authorization || null, apikey: request.headers.apikey || null });
     const existing = storedInquiries.find((entry) => entry.session_id === args.p_session_id);
     if (existing) {
       existing.user_message += '\\n\\n' + args.p_user_message;
@@ -466,9 +469,11 @@ test('authenticated chatbot API enforces identity, account status, session owner
     await t.test('an authenticated active user can start a PR draft and persist the chat turn', async () => {
       const beforeMessages = storedMessages.length;
       const beforeInquiries = storedInquiries.length;
+      const beforeInquiryRpcRequests = inquiryRpcRequests.length;
+      const draftSessionId = 'session-pr-draft-persistence';
       const result = await postChat({
         token: 'user-a-token',
-        sessionId: 'session-user-a',
+        sessionId: draftSessionId,
         message: 'Help me draft a PR',
       });
 
@@ -477,23 +482,31 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.equal(result.payload.state.drafting, true);
       assert.equal(result.payload.state.step, 'purpose');
 
-      const savedSession = sessions.get('session-user-a');
+      const savedSession = sessions.get(draftSessionId);
       assert.equal(savedSession.state.drafting, true);
       assert.equal(savedSession.state.step, 'purpose');
       assert.equal(storedMessages.length - beforeMessages, 2);
       assert.deepEqual(storedMessages.slice(-2).map((message) => message.sender), ['user', 'ai']);
-      assert.equal(storedInquiries.length - beforeInquiries, 1);
-      assert.equal(storedInquiries.at(-1).user_id, 'user-a');
+      assert.equal(storedInquiries.length - beforeInquiries, 1, 'The isolated draft session should create one inquiry record.');
+      const draftInquiry = storedInquiries.find((entry) => entry.session_id === draftSessionId);
+      assert.ok(draftInquiry, 'The PR-draft inquiry should be persisted under its own session.');
+      assert.equal(draftInquiry.user_id, 'user-a');
+      assert.equal(draftInquiry.inquiry_type, 'draft_pr');
+      assert.equal(inquiryRpcRequests.length - beforeInquiryRpcRequests, 1, 'The first draft turn should issue exactly one RPC.');
+      const draftRpc = inquiryRpcRequests.at(-1);
+      assert.equal(draftRpc.args.p_session_id, draftSessionId);
+      assert.equal(draftRpc.args.p_user_id, 'user-a');
 
       const followUp = await postChat({
         token: 'user-a-token',
-        sessionId: 'session-user-a',
+        sessionId: draftSessionId,
         message: 'Thanks',
       });
       assert.equal(followUp.status, 200, JSON.stringify(followUp.payload));
       assert.equal(storedInquiries.length - beforeInquiries, 1, 'A second prompt in the same chat must update the existing session log.');
       assert.match(storedInquiries.at(-1).user_message, /Help me draft a PR[\s\S]*Thanks/);
       assert.equal(storedInquiries.at(-1).metadata.message_count, 2);
+      assert.equal(inquiryRpcRequests.length - beforeInquiryRpcRequests, 2, 'The follow-up must issue one additional RPC to update the existing inquiry session.');
     });
 
     await t.test('natural-language request to prepare a PR starts slot filling and retains supplied microscope details', async () => {

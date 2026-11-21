@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { retrieveDocumentChunks } from '@/lib/document-retrieval';
 import { buildVerifiedProcurementAnswer, isDeterministicProcurementPolicyQuestion } from '@/lib/procurement-answer-guards';
+import { buildHighRiskProcurementResponse, isHighRiskProcurementQuestion } from '@/lib/procurement-response-hardening';
 import { getProcurementScopeDecision, buildProcurementSmallTalkResponse, PROCUREMENT_SCOPE_RESPONSE, UNSUPPORTED_LAW_REFERENCE_RESPONSE, hasUnsupportedLawReference } from '@/lib/procurement-scope-guard';
 import { extractPRDetailsRuleBased as extractPRDetailsRuleBasedFromHelper, hasCompletePRDetails, mergePRDetailsFromDepartmentReply, applyPRItemMessage, getMissingItemFields, isPRDraftRevisionMessage } from '@/lib/pr-draft-extraction';
 import { GoogleGenAI } from '@google/genai';
@@ -853,7 +854,7 @@ export async function POST(req: NextRequest) {
       activePRDraft: Boolean(currentState.drafting || currentState.draftReady || isCompletedDraftEdit),
       recentProcurementContext,
     });
-    const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg);
+    const deterministicPolicyQuestion = isDeterministicProcurementPolicyQuestion(trimmedMsg) || isHighRiskProcurementQuestion(trimmedMsg, conversationContext);
     const chatIntent = classifyProcurementIntent(trimmedMsg, {
       activeDraft: Boolean(currentState.drafting),
       draftReady: Boolean(currentState.draftReady || isCompletedDraftEdit),
@@ -894,11 +895,13 @@ export async function POST(req: NextRequest) {
       inquiryType = 'procurement_guidance';
       updatedState = { ...currentState };
     } else if (deterministicPolicyQuestion) {
-      const policyRetrieval = await retrieveDocumentChunks(trimmedMsg, 6);
-      const verifiedPolicyAnswer = buildVerifiedProcurementAnswer(trimmedMsg, policyRetrieval.chunks);
+      const policyRetrieval = await retrieveDocumentChunks(buildContextualProcurementQuery(trimmedMsg, conversationContext), 12);
+      const verifiedPolicyAnswer = buildHighRiskProcurementResponse(trimmedMsg, policyRetrieval.chunks, conversationContext)
+        || buildVerifiedProcurementAnswer(trimmedMsg, policyRetrieval.chunks);
       // The guard returns a source-linked evidence-gap answer when current excerpts
       // are missing. Keep that behavior rather than falling through to free-form guessing.
-      const policyEvidenceGapAnswer = buildVerifiedProcurementAnswer(trimmedMsg, []);
+      const policyEvidenceGapAnswer = buildHighRiskProcurementResponse(trimmedMsg, [], conversationContext)
+        || buildVerifiedProcurementAnswer(trimmedMsg, []);
       responseText = verifiedPolicyAnswer || policyEvidenceGapAnswer
         || 'I could not verify this procurement rule from the official excerpts retrieved. Please consult the relevant GPPB issuance before acting.';
       citedSources = policyRetrieval.sources.map(normalizeSourceLabel);
@@ -993,12 +996,21 @@ CRITICAL DIRECTIVES:\n0A. LANGUAGE MATCHING: Understand and respond naturally in
 3. For factual procurement-law and MSU-specific answers, cite the retrieved source title and any section/article/page available in the excerpt. Never invent section numbers, page numbers, or links. For a common definition where no legal claim is made, a citation may be omitted.
 3A. REFERENCE LINK VERIFICATION: Never provide broken, inaccessible, or unverified reference links. A URL may be presented as a clickable reference only when it is explicitly present in retrieved source metadata and has been verified to open the actual cited document or official source page—not merely a general government homepage. Prefer official GPPB, PhilGEPS, and other government sources. If no verified URL is available, cite the accurate document title, issuance number, and relevant section/page without a link, and clearly say that a verified direct link is unavailable. Never guess, reconstruct, or invent a replacement URL.
 4. Treat specific institutional questions as high-precision questions. Use the retrieved institutional source that directly names the office, person, role, or contact information.
+4A. SOURCE CLASSIFICATION: Classify each material claim as (a) a legal/regulatory requirement from RA No. 12009, its currently applicable IRR, or an official GPPB issuance; (b) an MSU-GenSan institutional procedure from the PMO Administrative Manual or an official university document; or (c) general explanatory guidance. Label these categories clearly when more than one appears. Never present an institutional manual instruction as a statutory requirement, or a legal requirement as merely an MSU preference.
+4B. PR REQUIREMENTS: For questions about what an MSU-GenSan Purchase Request must contain or what supporting documents must be submitted, use the PMO Administrative Manual and current official MSU forms/notices. The manual's review criteria (accuracy and completeness of PR entries, specifications/details, signatories/dates, and consistency with the approved PPMP/APP) are review criteria; do not turn them into an exhaustive end-user attachment checklist unless the source explicitly says so. State what the manual expressly supports and identify fields or attachments it does not enumerate.
+4C. PR PREPARATION: Explain the documented MSU workflow separately from general practical preparation advice. Mark general advice as nonbinding guidance, not an official MSU requirement. Do not invent form fields, supporting attachments, signatures, routing steps, or deadlines.
+4D. PR AND PPMP COMPARISON: Explain their distinct roles using the current RA No. 12009 IRR for the legal procurement-planning framework and the PMO Administrative Manual for MSU implementation. A PPMP is a planning instrument prepared by the end-user unit; a PR is the transaction-level request submitted for procurement processing. State only details supported by retrieved current IRR/manual excerpts. If the current IRR excerpt is missing, give only the institutional distinction supported by the manual and say the legal section could not be verified from the retrieved excerpt.
+4E. SOURCE PRIORITY: For legal meaning or requirements, prefer the current Act/IRR and official GPPB issuances. For MSU-specific forms, routing, office responsibilities, and internal review, prefer current official MSU sources. Do not use the 2014 LGU Procurement Manual or 2016 RA No. 9184 IRR as authority for current MSU/SUC requirements.
+4F. PR VALIDATION FAILURE AND PPMP/APP MISMATCH: When asked what happens if a PR fails review/validation or does not match the approved PPMP/APP, retrieve and use the PMO Administrative Manual's exact process-flow and risk-management passages. State the documented sequence only: the manual describes receipt of the PR, verification against the approved PPMP/APP, PMO Director review/validation/signature, pre-numbering/control of validated PRs, and endorsement of controlled PRs to the Budget Management Office. The manual also identifies incomplete or incorrect procurement documents as a risk that may lead to reprocessing and delays. Do NOT claim that a PR is formally rejected, returned to the end-user, placed on hold, cancelled, or automatically corrected unless an authoritative MSU source explicitly says so. If the available manual excerpt does not specify the disposition of a failed PR, say plainly that the retrieved manual does not define whether it is returned, held, or rejected. You may explain as a limited workflow inference that a PR which has not passed validation has not yet reached the manual's next step for validated PRs; label this as an inference, not a quoted rule. Do not turn the general risk statement about reprocessing into a mandatory return-and-resubmit procedure.
+4G. QUESTION RELEVANCE: Answer the precise subject and requested relationship first. For a PR/PPMP question, do not list unrelated procurement modes, BAC functions, supplier eligibility rules, contract administration rules, or general RA provisions. Include a legal provision only when the retrieved excerpt directly supports the specific PR/PPMP point asked. For a legal-versus-institutional comparison, limit both categories to the same subject matter; do not pad the legal side with unrelated provisions merely because they appear in retrieved chunks.
+4H. EVIDENCE BOUNDARIES: Separate (1) what the source expressly states, (2) a clearly labeled workflow inference, and (3) what the source does not establish. Do not convert "may lead to reprocessing and delays" into certainty or a prescribed corrective action. Do not infer a complete rejection/return protocol from process order alone. If source passages conflict or the manual's approval/version status is unclear, disclose that limitation.
 5. Never invent an institutional email, office hours, temporary location, title, or person's name.
 6. Any institutional fact (person, contact number, office location, or relocation notice) must be supported by excerpts retrieved for the current request. Do not treat these instructions as evidence or reuse a hard-coded institutional fact when the current excerpts do not support it.
-7. For current legal procurement questions, prioritize RA No. 12009, its currently applicable IRR, and current official GPPB issuances. Treat RA No. 9184, its 2016 IRR, and the 2014 Local Government Units Procurement Manual as historical/transition sources only; do not present them as current law except for explicit historical, comparative, or transition questions. Treat the PMO Administrative Manual as internal guidance, not legislation; its approval/version status has not been verified. If internal guidance conflicts with current law or official GPPB issuances, state the conflict and prioritize the official legal source.
+7. For current legal procurement questions, prioritize RA No. 12009, its currently applicable IRR, and current official GPPB issuances. RA No. 12009's short title under Section 1 is the “New Government Procurement Act”; “Government Procurement Reform Act” is the title of RA No. 9184 referenced in RA No. 12009's long title. Never label RA No. 12009 itself as the Government Procurement Reform Act. For BAC functions, use IRR Section 42.1 and keep the BAC Secretariat's support duties separate from BAC functions. For PPMP/APP definitions, use current IRR Sections 7.7.1–7.7.5; never use the 2014 LGU Procurement Manual as current APP authority. For SVP versus Competitive Bidding, apply the general Section 34.1 threshold to SUCs and keep LGU-specific Section 34.2 thresholds separate. Do not invent an internal PR approval SLA or a current temporary office location without a current official MSU notice. Treat RA No. 9184, its 2016 IRR, and the 2014 Local Government Units Procurement Manual as historical/transition sources only; do not present them as current law except for explicit historical, comparative, or transition questions. Treat the PMO Administrative Manual as internal guidance, not legislation; its approval/version status has not been verified. If internal guidance conflicts with current law or official GPPB issuances, state the conflict and prioritize the official legal source.
 8. Prefer the most specific retrieved source over generic law/manual excerpts. If sources conflict, explicitly state the conflict rather than silently choosing one.
 9. Distinguish general procurement knowledge from MSU-GenSan-specific facts. For common general terms and concepts (for example, RFQ means Request for Quotation), answer from reliable general procurement knowledge when the retrieved excerpts omit the definition. Do not say a common term is undefined merely because it is absent from the excerpts.
 10. Use retrieved evidence as the source of truth for MSU-specific workflow, contacts, internal rules, and institutional claims. If the evidence does not establish an MSU-specific detail, say it is not verified rather than guessing.
+10A. PARTIAL EVIDENCE: Do not abstain from an entire answer merely because one detail is missing. State supported facts first, identify precisely what remains unverified, and abstain only from that unsupported detail. If a source supports the core question but not an exhaustive checklist, explain the supported review/process points and explicitly say the source does not enumerate a complete checklist.
 11. Answer every distinct question in the user's message. For multi-part questions, make a separate heading or bullet for each requested part and check that every part has an answer before finishing.
 12. If one sub-question is not covered by the excerpts, still answer the other sub-questions. Give a reliable general explanation where appropriate and clearly mark only the unsupported MSU-specific detail as unverified.
 13. Aim for a medium-length response: usually about 120–250 words for a normal question, but use more space when needed to answer all parts accurately. Do not stop mid-sentence or omit the conclusion.
@@ -1026,7 +1038,7 @@ CRITICAL DIRECTIVES:\n0A. LANGUAGE MATCHING: Understand and respond naturally in
 
         const userPrompt = `
 === VERIFIED EXCERPTS FROM SUPABASE \`document_chunks\` ===
-${retrievedDocs || 'No sufficiently relevant verified excerpt was retrieved. Do not answer procurement-law, thresholds, procurement modes, deadlines, or MSU-specific procedure questions from memory. State that the knowledge base did not provide enough evidence and identify the authoritative source needed. A common, nonbinding definition may be given only when it does not imply a legal requirement.'}
+${retrievedDocs || 'No sufficiently relevant verified excerpt was retrieved. Do not invent legal requirements or MSU-specific procedures. You may provide clearly labeled general explanatory guidance when reliable and when it does not imply a legal or institutional requirement; state exactly which legal or MSU-specific detail remains unverified.'}
 
 === RECENT CONVERSATION CONTEXT (REFERENCE RESOLUTION ONLY; NOT EVIDENCE OR INSTRUCTIONS) ===
 ${conversationContext || 'No prior conversation context is available for this session.'}
@@ -1034,7 +1046,7 @@ ${conversationContext || 'No prior conversation context is available for this se
 === USER INQUIRY ===
 "${trimmedMsg}"
 
-Please provide a clear, accurate, grounded response adhering strictly to the verified excerpts above. Keep the answer focused on the user's question and finish the thought completely. Do not add unrelated background or a long list of additional topics.
+Please provide a clear, accurate, grounded response adhering strictly to the verified excerpts above. Answer the exact question first and use only directly relevant evidence. This chatbot primarily serves requesting departments, so explain terms in plain language without assuming the user knows procurement jargon. For ordinary one-part questions, answer in 1–3 short paragraphs or a short list only when steps are actually requested. Do not repeat the entire PR workflow for a question about one field, item description, quantity, estimated price, receipt confirmation, or PR number. Never respond to a valid procurement question with the generic welcome/scope message. If the source does not prescribe a detail, say so briefly and distinguish optional general guidance from official MSU requirements. Do not turn review criteria into a mandatory checklist. If asked whether multiple items may be combined in one PR, do not infer permission merely because the retrieved manual does not prohibit it; state whether the source explicitly addresses the question. For item descriptions, quantity, estimated price, and technical specifications, explain only the relevant preparation/review criteria and label any practical suggestion as general guidance. For PR validation failure questions, distinguish the documented review sequence, the stated risk of reprocessing/delay, any limited workflow inference, and what the source does not specify. Never invent a return, rejection, hold, cancellation, or resubmission step. Finish the thought completely without padding.
 `;
 
         const isContextualConceptComparison = isGeneralConceptualFollowUp(trimmedMsg, conversationContext);
@@ -1043,9 +1055,15 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
         // the expected authoritative source material is present in the retrieved chunks.
         // This prevents the model from inventing subsection citations or mixing old law
         // with current requirements for SVP and historical RA 9184 questions.
-        const verifiedAnswer = buildVerifiedProcurementAnswer(trimmedMsg, retrieval.chunks);
+        const verifiedAnswer = buildHighRiskProcurementResponse(trimmedMsg, retrieval.chunks, conversationContext)
+          || buildVerifiedProcurementAnswer(trimmedMsg, retrieval.chunks);
+        const conceptualFollowUpAnswer = buildOfflineConceptualFollowUpAnswer(trimmedMsg, conversationContext);
         if (verifiedAnswer) {
           responseText = verifiedAnswer;
+        } else if (conceptualFollowUpAnswer) {
+          // Resolve short conceptual follow-ups deterministically so a model cannot
+          // drift to a different procurement topic or omit the core comparison.
+          responseText = conceptualFollowUpAnswer;
         } else {
           const aiResponse = (!retrievedDocs.trim() && requiresVerifiedEvidence)
             ? ''
@@ -1108,23 +1126,22 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
           { session_id: currentSessionId, sender: 'ai', content: responseText },
         ]);
 
-        // Maintain one helpdesk log per chat session. Each prompt/response pair
-        // is appended to that session's existing log instead of creating a row.
+        // /api/chat/send owns inquiry logging because it has already authenticated
+        // the caller and verified session ownership. Direct /api/chat requests still
+        // log here. This prevents delegated requests from writing the same turn twice.
         if (req.headers.get('x-chat-send-delegated') !== '1') {
-        const loggedPrNo = trimmedMsg.replace(/[\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]/g, '-').match(/\\b(PR[- ]?(?:TEMP[- ]?)?(?:\\d{4}[- ]?)?\\d{1,6})\\b/i)?.[0];
-        const { error: inquiryLogError } = await supabase.rpc('append_monitor_inquiry_session', {
-          p_session_id: currentSessionId,
-          p_user_id: userId,
-          p_user_name: 'ProcuremateSU User',
-          p_user_department: 'MSU-GenSan',
-          p_pr_no: loggedPrNo ? normalizePrNumber(loggedPrNo) : null,
-          p_user_message: trimmedMsg,
-          p_bot_response: responseText,
-          p_inquiry_type: inquiryType,
-        });
-        if (inquiryLogError) {
-          console.warn('[chat] Session inquiry log update failed:', inquiryLogError.message);
-        }
+          const loggedPrNo = trimmedMsg.replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').match(/\b(PR[- ]?(?:TEMP[- ]?)?(?:\d{4}[- ]?)?\d{1,6})\b/i)?.[0];
+          const { error: inquiryLogError } = await supabase.rpc('append_monitor_inquiry_session', {
+            p_session_id: currentSessionId,
+            p_user_id: userId,
+            p_user_name: authenticatedUser.name || 'ProcuremateSU User',
+            p_user_department: 'MSU-GenSan',
+            p_pr_no: loggedPrNo ? normalizePrNumber(loggedPrNo) : null,
+            p_user_message: trimmedMsg,
+            p_bot_response: responseText,
+            p_inquiry_type: inquiryType,
+          });
+          if (inquiryLogError) console.error('[chat] Session inquiry log update failed:', inquiryLogError.message);
         }
       } catch (dbErr) {
         console.warn('Non-blocking database log notice:', dbErr);

@@ -700,7 +700,7 @@ test('printable PR omits the office footer and places a small System Tracking Co
   const printSource = fs.readFileSync(
     path.join(__dirname, '../../app/dashboard/pr-print/PRPrintContent.tsx'),
     'utf8'
-  );
+  ).replace(/\r\n/g, '\n');
   assert.doesNotMatch(printSource, /Mindanao State University - General Santos City Procurement Office/);
   assert.ok(printSource.includes('System Tracking Control:'));
   assert.ok(printSource.includes('text-[8px] leading-tight text-stone-600 print:text-[7px]'));
@@ -750,4 +750,43 @@ test('price-only replies complete the unit-cost field of one incomplete item', (
   assert.equal(result.items[0].quantity, 50);
   assert.equal(result.items[0].unit_cost, 150);
   assert.equal(result.items[0].total_cost, 7500);
+});
+
+test('PR and PPMP comparison prompts retrieve both the current IRR and MSU PMO manual', () => {
+  const retrieval = fs.readFileSync(
+    path.join(__dirname, '../../lib/document-retrieval.ts'),
+    'utf8'
+  );
+  assert.match(retrieval, /const asksPrPpmpComparison[\s\S]*?PPMP[\s\S]*?difference\|differ\|compare/);
+  assert.match(retrieval, /if \(asksPrPpmpComparison\)[\s\S]*?Implementing Rules and Regulations of RA 12009[\s\S]*?PMO Administrative Manual/);
+  assert.match(retrieval, /asksPrPpmpComparison[\s\S]*?score \+= 180[\s\S]*?score \+= 160/);
+});
+
+test('PR requirements and preparation prioritize the MSU manual without inventing a checklist', () => {
+  const retrieval = fs.readFileSync(
+    path.join(__dirname, '../../lib/document-retrieval.ts'),
+    'utf8'
+  );
+  const route = fs.readFileSync(
+    path.join(__dirname, '../../app/api/chat/route.ts'),
+    'utf8'
+  );
+  assert.match(retrieval, /const asksPrRequirements[\s\S]*?requirement\|requirements/);
+  assert.match(retrieval, /if \(asksPrRequirements \|\| asksPrItemPreparation\)[\s\S]*?PMO Administrative Manual[\s\S]*?Verification of Signatories and Dates/);
+  assert.match(route, /SOURCE CLASSIFICATION/);
+  assert.match(route, /do not turn them into an exhaustive end-user attachment checklist/);
+  assert.match(route, /Mark general advice as nonbinding guidance/);
+  assert.match(route, /Do not abstain from an entire answer merely because one detail is missing/);
+});
+
+
+test('basic PR questions use distinct targeted retrieval intents instead of the generic workflow', () => {
+  const retrieval = fs.readFileSync(path.join(__dirname, '../../lib/document-retrieval.ts'), 'utf8');
+  assert.match(retrieval, /const asksPrItemPreparation[\s\S]*?technical specifications[\s\S]*?estimated/);
+  assert.match(retrieval, /prepar\(\?:e\|es\|ed\|ing\)/);
+  assert.match(retrieval, /const asksPmoReceiptQuestion[\s\S]*?how will i know[\s\S]*?confirmation/);
+  assert.match(retrieval, /const asksPmoPrNumber[\s\S]*?official PR/);
+  assert.match(retrieval, /ProcureMateSU System Workflow[\s\S]*?confirms receipt/);
+  assert.match(retrieval, /asksPmoReceiptQuestion && documentName === 'ProcureMateSU System Workflow'/);
+  assert.match(retrieval, /asksPmoPrNumber && documentName === 'ProcureMateSU System Workflow'/);
 });
