@@ -926,7 +926,7 @@ test('plain English and Tagalog RA 9184 definition prompts use the Act and offic
     assert.match(answer, /not the current general procurement law/i);
     assert.match(answer, /RA No\. 12009/);
     assert.match(answer, /Official Gazette/);
-    assert.match(answer, /GPPB Circular No\\. 01-2025/);
+    assert.match(answer, /GPPB Circular No\. 01-2025/);
   }
 });
 
