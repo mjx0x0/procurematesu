@@ -18,6 +18,27 @@ export interface RetrievalResult {
   sources: string[];
 }
 
+const QUERY_EMBEDDING_MODEL = 'Xenova/all-MiniLM-L6-v2';
+let queryEmbedderPromise: Promise<any> | null = null;
+
+async function generateQueryEmbedding(query: string): Promise<number[]> {
+  if (!queryEmbedderPromise) {
+    queryEmbedderPromise = import('@xenova/transformers')
+      .then(({ pipeline }) => pipeline('feature-extraction', QUERY_EMBEDDING_MODEL))
+      .catch((error) => {
+        queryEmbedderPromise = null;
+        throw error;
+      });
+  }
+  const embedder = await queryEmbedderPromise;
+  const output = await embedder(query, { pooling: 'mean', normalize: true });
+  const vector = Array.from(output.data as Float32Array, Number);
+  if (vector.length !== 384 || vector.some((value) => !Number.isFinite(value))) {
+    throw new Error(`Query embedding must contain 384 finite values; received ${vector.length}.`);
+  }
+  return vector;
+}
+
 let supabaseClient: SupabaseClient | null = null;
 function getSupabase(): SupabaseClient | null {
   if (supabaseClient) return supabaseClient;
@@ -192,6 +213,75 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         .map(t => t.trim())
         .filter(t => t.length >= 3 && !stopWords.has(t)))
   )).slice(0, 24);
+
+  // Semantic retrieval supplements the existing source-scoped keyword search.
+  // It uses the same 384-dimensional model used when the knowledge-base chunks
+  // were embedded; failures leave the established keyword path available.
+  if (supabase && query.trim()) {
+    try {
+      const queryEmbedding = await generateQueryEmbedding(query);
+      const { data: vectorRows, error: vectorError } = await supabase.rpc('match_documents', {
+        query_embedding: queryEmbedding,
+        match_threshold: 0.30,
+        match_count: Math.min(30, Math.max(12, limit * 4)),
+      });
+      if (vectorError) throw vectorError;
+
+      const asksHistoricalVectorQuestion =
+        /\b9184\b/i.test(query) &&
+        /\b(?:before|prior to|previous(?:ly)?|historical(?:ly)?|history|old law|former|applied under)\b/i.test(query) &&
+        /\b12009\b|\bhistorical(?:ly)?\b|\bprevious(?:ly)?\b|\bformer\b/i.test(query);
+
+      for (const doc of vectorRows || []) {
+        const text = String(doc.chunk_text || '').trim();
+        if (!text) continue;
+        const metadata =
+          doc.metadata && typeof doc.metadata === 'object' && !Array.isArray(doc.metadata)
+            ? (doc.metadata as Record<string, unknown>)
+            : undefined;
+        const documentName = String(doc.document_name || '');
+        const identity = sourceIdentity(documentName, String(doc.document_type || ''), metadata);
+        const isLegacy = isLegacyProcurementSource(identity);
+
+        if (asksPmoDirectorContact && documentName !== 'MSU-GenSan University Directory') continue;
+        if (asksHistoricalVectorQuestion && !['RA 9184', 'IRR 2016', 'IRR'].includes(documentName)) continue;
+        if (asksCurrentLawStatus && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
+        if (isLegacy && !asksAboutLegacyRules(query)) continue;
+        const is2014LguManualContent = /Local Government Units Procurement Manual|Manual of Procedures for the Procurement of Goods and Services under RA No.?\s*9184/i.test(text);
+        if (is2014LguManualContent && !asksAboutLegacyRules(query)) continue;
+        if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009'
+          && !/Section\s+34\.\s+Small Value Procurement|\b34\.1\b|\b34\.3\b|shall not require posting|Abstract of Quotations or Ratings|in case no price quotation is received/i.test(text)) continue;
+        if (asksSvpDocumentaryRequirements && !['GPPB Circular No. 06-2026', 'Implementing Rules and Regulations of RA 12009'].includes(documentName)) continue;
+        if ((asksPmoReceiptQuestion || asksDraftToStepOne) && documentName !== 'ProcureMateSU System Workflow') continue;
+        if ((asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure) && documentName !== 'PMO Administrative Manual') continue;
+        if (asksPmoPrNumber && !['PMO Administrative Manual', 'ProcureMateSU System Workflow'].includes(documentName)) continue;
+        if (asksTemporaryPmoLocation && !/STTC|temporary office location/i.test(text)) continue;
+
+        const similarity = Number(doc.similarity);
+        if (!Number.isFinite(similarity)) continue;
+        const key = String(doc.id || text.slice(0, 120));
+        const score = similarity * 100;
+        const existing = candidates.get(key);
+        if (!existing || score > existing.score) {
+          candidates.set(key, {
+            id: doc.id,
+            document_name: documentName || 'Procurement Records',
+            document_type: String(doc.document_type || 'document_chunks'),
+            chunk_text: text.replaceAll(
+              'https://www.gppb.gov.ph/wp-content/uploads/2026/06/ApprovedGPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf',
+              '[direct public link unavailable — do not link]'
+            ),
+            metadata,
+            similarity,
+            source_type: 'supabase_vector',
+            score,
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[Retrieval] Vector search unavailable; using keyword retrieval:', err);
+    }
+  }
 
   // Search both the exact phrase and several meaningful terms. The old
   // implementation searched only one "target term", which could retrieve a
