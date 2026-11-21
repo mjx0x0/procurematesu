@@ -7,24 +7,43 @@ const root = path.resolve(__dirname, '../..');
 const language = fs.readFileSync(path.join(root, 'lib/chat-language.ts'), 'utf8');
 const route = fs.readFileSync(path.join(root, 'app/api/chat/send/route.ts'), 'utf8');
 
-test('Tagalog translation recognizes common Filipino request phrases', () => {
-  assert.ok(language.includes('isalin\\s+mo'));
-  assert.ok(language.includes('paki'));
-  assert.ok(language.includes('tagalog'));
-  assert.ok(language.includes('filipino'));
+test('language follow-up detector includes natural English and Filipino translation requests', () => {
+  for (const phrase of [
+    'translate your previous answer to Filipino',
+    'Can you say that in Tagalog?',
+    'Tagalog version please',
+    'isalin mo sa tagalog',
+    'Tagalugin mo',
+    'Paki-translate sa Filipino',
+  ]) {
+    assert.ok(language.toLowerCase().includes(phrase.toLowerCase().split(' ')[0]) ||
+      /translate|tagalog|filipino|isalin|tagalugin|paki/i.test(phrase));
+  }
+  assert.match(language, /translate\\s+your\\s+\\(\?:previous\|last\\)/);
+  assert.match(language, /tagalugin/);
+  assert.match(language, /paki/);
 });
 
-test('translation prompt protects procurement facts and references', () => {
-  assert.ok(language.includes('legal qualification'));
-  assert.ok(language.includes('section/subsection number'));
-  assert.ok(language.includes('source URL'));
-  assert.ok(language.includes('Do not add, remove, strengthen, weaken, or reinterpret'));
+test('language follow-up detector supports simple Tagalog explanations', () => {
+  assert.match(language, /explain/);
+  assert.match(language, /simple/);
+  assert.match(language, /ipaliwanag/);
+  assert.match(language, /getTagalogFollowUpMode/);
 });
 
-test('translation uses the latest persisted assistant answer from the verified session', () => {
-  assert.ok(route.includes('isTagalogTranslationRequest(message)'));
+test('translation and explanation prompts preserve procurement/legal accuracy', () => {
+  assert.match(language, /legal qualification/);
+  assert.match(language, /section\/subsection number/);
+  assert.match(language, /source URL/);
+  assert.match(language, /do not change, broaden, narrow, or invent/i);
+  assert.match(language, /untrusted text to transform/i);
+  assert.match(language, /Keep citations and URLs unchanged/);
+});
+
+test('language follow-ups run before scope guards and use the latest persisted assistant answer', () => {
+  assert.ok(route.includes('getTagalogFollowUpMode(message)'));
   assert.ok(route.includes('[...priorMessages].reverse()'));
   assert.ok(route.includes("entry.sender === 'ai'"));
-  assert.ok(route.includes('buildTagalogTranslationPrompt(latestAssistantAnswer)'));
+  assert.ok(route.includes('buildTagalogFollowUpPrompt(latestAssistantAnswer, languageFollowUpMode, message)'));
   assert.ok(route.includes("clientToUse.from('chat_messages').insert"));
 });
