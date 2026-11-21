@@ -117,7 +117,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:fail(?:s|ed|ure)?|not pass|does not pass|doesn't pass|reject(?:ed|ion)?|return(?:ed)?|hold|validation|validate|discrepanc(?:y|ies)|mismatch|inconsisten(?:t|cy)|not match|does not match|doesn't match|incomplete|incorrect)\b/i.test(query) &&
     /\b(?:PPMP|APP|validat|review|requirement|process|happen|next step|what happens)\b/i.test(query);
   const asksPmoDefinition = /\b(?:what is|define|definition|meaning)\b/i.test(query) && /\b(?:Purchase Request|Purchase Order|PR|PO)\b/i.test(query);
-  const asksPmoPrWorkflow = !asksPrRequirements && !asksPrItemPreparation && !asksPmoPrNumber &&
+  const asksPmoPrWorkflow = !asksPrRequirements && !asksPrItemPreparation &&
     /\b(?:Purchase Request|PR)\b/i.test(query) &&
     /\b(?:sequence|workflow|process|steps|what happens after|what happens once|how is .* processed)\b/i.test(query);
   const asksPmoPrNumber = /\b(?:who|which office|what office|when|what stage|at what stage|how)\b/i.test(query) &&
