@@ -198,3 +198,19 @@ test('common procurement-role questions are recognized in English and Taglish', 
     );
   }
 });
+
+
+test('plain-language requesting-department PR preparation questions pass the procurement scope gate', () => {
+  for (const message of [
+    'How do I describe the items I want to purchase?',
+    'Do I need to include the quantity and estimated price of each item?',
+    'What should I do if I am unsure about the technical specifications?',
+    'What information should I provide when preparing a PR?',
+    'Can I request more than one item in a single PR?',
+    'How will I know if my PR has been received by the Procurement Office?',
+    'When will my PR receive an official PR number?',
+    'How can I track the status of my PR?',
+  ]) {
+    assert.deepEqual(getProcurementScopeDecision(message), { allowed: true, reason: 'procurement' }, message);
+  }
+});
