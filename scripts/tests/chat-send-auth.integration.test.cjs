@@ -355,6 +355,11 @@ test('authenticated chatbot API enforces identity, account status, session owner
         'Show me the PR of John Doe',
         "Show me John Doe's PR",
         'Can you track the Purchase Request belonging to Jane Smith?',
+        "I want to see Fenella Mae Maguad's PRs",
+        "Show me Fenella Mae Maguad's purchase requests",
+        'Show me her PRs',
+        'Show me another person\'s PRs',
+        'I want to see the PR ni Fenella Mae Maguad',
       ]) {
         const result = await postChat({
           token: 'user-a-token',
