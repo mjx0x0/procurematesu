@@ -107,17 +107,21 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:difference|differ|compare|versus|vs\.?|between|distinguish)\b/i.test(query);
   const asksPrRequirements =
     /\b(?:PR|Purchase Request)\b/i.test(query) &&
-    /\b(?:requirement|requirements|documents?|what.*need|needed|must.*include|should.*include|checklist|prepare|preparation)\b/i.test(query) &&
+    /\b(?:requirement|requirements|documents?|what.*need|needed|must.*include|should.*include|checklist|prepar(?:e|es|ed|ing)|preparation|information|provide|include|contents?|details?)\b/i.test(query) &&
     !asksPrPpmpComparison;
+  const asksPrItemPreparation =
+    /\b(?:PR|Purchase Request|procurement|purchase)\b/i.test(query) &&
+    /\b(?:item descriptions?|describe.*items?|technical specifications?|specs?|quantit(?:y|ies)|estimated (?:unit )?(?:price|cost)|unit cost|price per item)\b/i.test(query);
   const asksPrValidationFailure =
     /\b(?:PR|Purchase Request)\b/i.test(query) &&
     /\b(?:fail(?:s|ed|ure)?|not pass|does not pass|doesn't pass|reject(?:ed|ion)?|return(?:ed)?|hold|validation|validate|discrepanc(?:y|ies)|mismatch|inconsisten(?:t|cy)|not match|does not match|doesn't match|incomplete|incorrect)\b/i.test(query) &&
     /\b(?:PPMP|APP|validat|review|requirement|process|happen|next step|what happens)\b/i.test(query);
   const asksPmoDefinition = /\b(?:what is|define|definition|meaning)\b/i.test(query) && /\b(?:Purchase Request|Purchase Order|PR|PO)\b/i.test(query);
-  const asksPmoPrWorkflow = /\b(?:Purchase Request|PR)\b/i.test(query) &&
-    /\b(?:after|once|when|sequence|workflow|process|steps|what happens|prepared|prepares|receives|received)\b/i.test(query);
-  const asksPmoPrNumber = /\b(?:who|which office|what office)\b/i.test(query) &&
-    /\b(?:assign|records?|issues?)\b/i.test(query) && /\b(?:official )?PR (?:number|no\.?)\b/i.test(query);
+  const asksPmoPrWorkflow = !asksPrRequirements && !asksPrItemPreparation && !asksPmoPrNumber &&
+    /\b(?:Purchase Request|PR)\b/i.test(query) &&
+    /\b(?:sequence|workflow|process|steps|what happens after|what happens once|how is .* processed)\b/i.test(query);
+  const asksPmoPrNumber = /\b(?:who|which office|what office|when|what stage|at what stage|how)\b/i.test(query) &&
+    /\b(?:assign|assigned|records?|issues?|receive|receives|received|get|gets|given|numbered|numbering|official)\b/i.test(query) && /\b(?:official )?PR (?:number|no\.?)\b/i.test(query);
   const asksPmoApprovalTimeLimit = /\b(?:approval|processing|turnaround)\s*(?:time|period|deadline|limit|duration|days?)\b/i.test(query) && /\b(?:PR|purchase request)\b/i.test(query);
   const asksTemporaryPmoLocation = /\b(?:where|location|located|address)\b/i.test(query) &&
     /\b(?:procurement office|procurement management office|PMO)\b/i.test(query);
@@ -131,9 +135,9 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:when|move|moves|moving|advance|advances|transition|transitions|change|changes|from|until|before|after|receipt|received)\b/i.test(query) &&
     (/\bpurchase request\b|\bPR\b/i.test(query));
   const asksPmoReceiptQuestion =
-    /\b(?:procurement management office|PMO)\b/i.test(query) &&
-    /\bpurchase requests?\b|\bPR\b/i.test(query) &&
-    /\b(?:after|receives?|received|receipt|what happens)/i.test(query);
+    /\b(?:procurement management office|PMO|procurement office)\b/i.test(query) &&
+    /\b(?:purchase requests?|PR)\b/i.test(query) &&
+    /\b(?:after|receives?|received|receipt|what happens|how will i know|confirmation|confirm)\b/i.test(query);
 
   const asksSvpDetails = /\b(small value procurement|svp|relatively small purchase|small purchase|low[- ]cost purchase)\b/i.test(query)
     || (/\b(?:supplier|price)\s+quotations?\b/i.test(query) && /\b(?:method|threshold|posting|exception|procurement)\b/i.test(query));
@@ -290,7 +294,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch(pmoManual, 'approved Project Procurement Management Plan')
         );
       }
-      if (asksPrRequirements) {
+      if (asksPrRequirements || asksPrItemPreparation) {
         const pmoManual = 'PMO Administrative Manual';
         // The MSU manual is the source for local PR review and workflow;
         // do not substitute generic or LGU-specific checklists.
@@ -301,6 +305,29 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           scopedPhraseSearch(pmoManual, 'Verification of Signatories and Dates'),
           scopedPhraseSearch(pmoManual, 'approved Purchase Requests signed by the Chancellor'),
           scopedPhraseSearch(pmoManual, 'Endorsement to Budget Management Office')
+        );
+      }
+      if (asksPrItemPreparation) {
+        const pmoManual = 'PMO Administrative Manual';
+        searches.push(
+          scopedPhraseSearch(pmoManual, 'accuracy and completeness of PR entries'),
+          scopedPhraseSearch(pmoManual, 'specifications and other pertinent details'),
+          scopedPhraseSearch(pmoManual, 'quantity, unit cost, and total amount'),
+          scopedPhraseSearch(pmoManual, 'Verification Against PPMP/APP')
+        );
+      }
+      if (asksPmoReceiptQuestion) {
+        const systemWorkflow = 'ProcureMateSU System Workflow';
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', systemWorkflow)
+            .ilike('chunk_text', '%printed PR%').limit(6),
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', systemWorkflow)
+            .ilike('chunk_text', '%confirms receipt%').limit(6),
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', systemWorkflow)
+            .ilike('chunk_text', '%Step 1%').limit(6)
         );
       }
       if (asksPpmpApp) {
@@ -636,8 +663,12 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
             // Never let the 2014 LGU manual or 2016 RA 9184 IRR answer a current comparison.
             if (isLegacy) score -= 1000;
           }
-          if (asksPrRequirements && documentName === 'PMO Administrative Manual' &&
-            /Purchase Request|PRs|signator|specification|completeness|Budget Management Office|Chancellor/i.test(text)) score += 220;
+          if ((asksPrRequirements || asksPrItemPreparation) && documentName === 'PMO Administrative Manual' &&
+            /Purchase Request|PRs|signator|specification|completeness|quantity|unit cost|total amount|Budget Management Office|Chancellor/i.test(text)) score += 260;
+          if (asksPmoReceiptQuestion && documentName === 'ProcureMateSU System Workflow' &&
+            /printed PR|confirms receipt|Step 1|physical submission/i.test(text)) score += 520;
+          if (asksPmoPrNumber && documentName === 'ProcureMateSU System Workflow' &&
+            /Step 4|official PR number|pre-numbering|control number/i.test(text)) score += 520;
           if (asksPrValidationFailure) {
             if (documentName === 'PMO Administrative Manual' &&
               /Verification Against PPMP\/APP|Validation by the PMO Director|Pre-Numbering and Control of PRs|Endorsement to Budget Management Office|Incomplete or Incorrect Documentation|may lead to reprocessing|Regular Review and Validation of Documents/i.test(text)) score += 420;
@@ -686,13 +717,13 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // The documentary answer is intentionally cross-source: retain the six
   // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
   // quotations, posting, and the no-quotation exception independently.
-  const resultLimit = (asksBacFunctions || asksPrPpmpComparison || asksPrRequirements || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
+  const resultLimit = (asksBacFunctions || asksPrPpmpComparison || asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
     ? Math.max(limit, 12)
     : asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
     : officialIssuanceTargets.length > 0
       ? Math.max(limit, Math.min(18, 4 + officialIssuanceTargets.length * 2))
-      : (asksUniversityChancellor || asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation || asksSvpAbstractOfQuotations || asksCurrentLawStatus || asksPmoReceiptQuestion)
+      : (asksUniversityChancellor || asksPrItemPreparation || asksPmoPrNumber || asksPmoReceiptQuestion || asksCircularResubmission || asksCircularLicenseCvAmbiguity || asksNoSvpQuotation || asksSvpAbstractOfQuotations || asksCurrentLawStatus || asksPmoReceiptQuestion)
         ? Math.max(limit, 8)
         : asksDraftToStepOne
           ? Math.max(limit, 4)
