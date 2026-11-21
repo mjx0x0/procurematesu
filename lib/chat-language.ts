@@ -55,5 +55,5 @@ export function buildTagalogFollowUpPrompt(
     '<SOURCE_ANSWER>',
     answer,
     '</SOURCE_ANSWER>',
-  ].join('\\n');
+  ].join('\n');
 }
