@@ -772,9 +772,21 @@ test('PR requirements and preparation prioritize the MSU manual without inventin
     'utf8'
   );
   assert.match(retrieval, /const asksPrRequirements[\s\S]*?requirement\|requirements/);
-  assert.match(retrieval, /if \(asksPrRequirements\)[\s\S]*?PMO Administrative Manual[\s\S]*?Verification of Signatories and Dates/);
+  assert.match(retrieval, /if \(asksPrRequirements \|\| asksPrItemPreparation\)[\s\S]*?PMO Administrative Manual[\s\S]*?Verification of Signatories and Dates/);
   assert.match(route, /SOURCE CLASSIFICATION/);
   assert.match(route, /do not turn them into an exhaustive end-user attachment checklist/);
   assert.match(route, /Mark general advice as nonbinding guidance/);
   assert.match(route, /Do not abstain from an entire answer merely because one detail is missing/);
+});
+
+
+test('basic PR questions use distinct targeted retrieval intents instead of the generic workflow', () => {
+  const retrieval = fs.readFileSync(path.join(__dirname, '../../lib/document-retrieval.ts'), 'utf8');
+  assert.match(retrieval, /const asksPrItemPreparation[\s\S]*?technical specifications[\s\S]*?estimated/);
+  assert.match(retrieval, /prepar\(\?:e\|es\|ed\|ing\)/);
+  assert.match(retrieval, /const asksPmoReceiptQuestion[\s\S]*?how will i know[\s\S]*?confirmation/);
+  assert.match(retrieval, /const asksPmoPrNumber[\s\S]*?official PR/);
+  assert.match(retrieval, /ProcureMateSU System Workflow[\s\S]*?confirms receipt/);
+  assert.match(retrieval, /asksPmoReceiptQuestion && documentName === 'ProcureMateSU System Workflow'/);
+  assert.match(retrieval, /asksPmoPrNumber && documentName === 'ProcureMateSU System Workflow'/);
 });
