@@ -163,7 +163,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:purchase requests?|PR)\b/i.test(query) &&
     /\b(?:after|receives?|received|receipt|what happens|how will i know|confirmation|confirm)\b/i.test(query);
 
-  const asksNoSvpQuotation = /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got|submits?|submitted)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b|\bno supplier submits? (?:a )?quotation\b|\b(?:nobody|no one)\s+(?:submits?|submitted|sends?|sent|provides?|provided|receives?|received)\s+(?:any\s+)?(?:price\s+)?quotations?\b/i.test(query);
+  const asksNoSvpQuotation = /\b(?:no|zero)\s+(?:(?:price|supplier)\s+)?quotations?\b|\b(?:receives?|received|gets?|got|submits?|submitted)\s+no\s+(?:(?:price|supplier)\s+)?quotations?\b|\bno supplier submits? (?:a )?quotation\b|\b(?:nobody|no one)\s+(?:submits?|submitted|sends?|sent|provides?|provided|receives?|received)\s+(?:(?:a|any)\s+)?(?:price\s+)?quotations?\b/i.test(query);
   const asksSvpAbstractOfQuotations = /\babstract\s+of\s+(?:quotations?|ratings?)\b/i.test(query)
     && (/\b(?:BAC|Bids and Awards Committee|SVP|Small Value Procurement)\b/i.test(query)
       || /\b(?:why|purpose|reason|prepare|prepares|prepared)\b/i.test(query));
