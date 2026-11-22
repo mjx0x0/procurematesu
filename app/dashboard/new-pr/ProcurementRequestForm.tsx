@@ -411,20 +411,8 @@ export default function ProcurementRequestForm() {
                               />
                               <button
                                 type="button"
-                                onClick={(event) => {
-                                  const panel = document.getElementById("spec-guide-" + item.id);
-                                  if (!panel) return;
-                                  if (panel.matches(":popover-open")) {
-                                    panel.hidePopover();
-                                    return;
-                                  }
-                                  const rect = event.currentTarget.getBoundingClientRect();
-                                  const panelWidth = Math.min(340, window.innerWidth - 24);
-                                  panel.style.width = panelWidth + "px";
-                                  panel.style.left = Math.max(12, Math.min(rect.left, window.innerWidth - panelWidth - 12)) + "px";
-                                  panel.style.top = Math.max(12, Math.min(rect.bottom + 4, window.innerHeight - 300)) + "px";
-                                  panel.showPopover();
-                                }}
+                                popovertarget={"spec-guide-" + item.id}
+                                popovertargetaction="toggle"
                                 className="mt-2 flex w-full items-center justify-between gap-2 rounded-lg border border-stone-200 bg-[#FCFAFC] px-2.5 py-2 text-left text-[11px] font-semibold text-[#7B0046] transition hover:bg-[#F8F1F5]"
                                 aria-label="Toggle technical specifications guide"
                               >
