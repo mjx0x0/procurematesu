@@ -335,10 +335,10 @@ export async function POST(request: NextRequest) {
     const ownName = normalizePersonName(authenticatedUserName);
     const normalizedMessage = normalizePersonName(message);
     const mentionsOwnName = Boolean(ownName && normalizedMessage.includes(ownName));
+    const hasPossessivePRReference = /(?:['’]s)\s+(?:prs?|purchase\s+requests?)\b/i.test(message);
     const isNamedPRRequest = NAMED_PERSON_PR_REQUEST_PATTERN.test(message) ||
-      /.+['’]s\s+(?:prs?|purchase\s+requests?)\b/iu.test(message) ||
+      hasPossessivePRReference ||
       (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message));
-
     // If the named person is the authenticated user, let the normal owner-scoped PR
     // lookup run. For a list request, query only rows whose user_id equals this session.
     if (mentionsOwnName && PR_ACCESS_PATTERN.test(message) && !prIdentifier) {
