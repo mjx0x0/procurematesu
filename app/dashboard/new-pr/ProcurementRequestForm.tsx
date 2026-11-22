@@ -413,6 +413,7 @@ export default function ProcurementRequestForm() {
                                 type="button"
                                 popoverTarget={"spec-guide-" + item.id}
                                 popoverTargetAction="toggle"
+                                style={{ anchorName: ("--spec-guide-anchor-" + item.id) as string } as React.CSSProperties}
                                 className="mt-2 flex w-full items-center justify-between gap-2 rounded-lg border border-stone-200 bg-[#FCFAFC] px-2.5 py-2 text-left text-[11px] font-semibold text-[#7B0046] transition hover:bg-[#F8F1F5]"
                                 aria-label="Toggle technical specifications guide"
                               >
@@ -422,8 +423,14 @@ export default function ProcurementRequestForm() {
                               <div
                                 id={"spec-guide-" + item.id}
                                 popover="auto"
-                                className="fixed m-0 max-h-[min(70vh,420px)] overflow-y-auto rounded-lg border border-stone-200 bg-white p-2.5 text-left shadow-2xl"
-                                style={{ inset: "auto" }}
+                                className="fixed m-0 w-[min(340px,calc(100vw-24px))] max-h-[min(70vh,420px)] overflow-y-auto rounded-lg border border-stone-200 bg-white p-2.5 text-left shadow-2xl"
+                                style={{
+                                  positionAnchor: ("--spec-guide-anchor-" + item.id) as string,
+                                  positionArea: "bottom",
+                                  positionTryFallbacks: "flip-block",
+                                  justifySelf: "start",
+                                  marginTop: "4px",
+                                } as React.CSSProperties}
                               >
                                 <p className="text-[10px] text-stone-500">Choose a category for suggested details and an example.</p>
                                 <div className="mt-2 grid grid-cols-2 gap-2">
