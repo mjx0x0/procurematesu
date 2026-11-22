@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Eye, FileText, Filter, PlusCircle, Printer, Search, Trash2 } from "lucide-react";
+import { AlertCircle, AlertTriangle, Eye, FileText, Filter, PlusCircle, Printer, Search, Trash2, X } from "lucide-react";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
@@ -52,6 +52,7 @@ export default function PurchaseRequestsPage() {
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<"all" | "draft" | "under_review" | "approved" | "completed">("all");
   const [deletingPrNo, setDeletingPrNo] = useState<string | null>(null);
+  const [draftPendingDeletion, setDraftPendingDeletion] = useState<PurchaseRequest | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -106,14 +107,9 @@ export default function PurchaseRequestsPage() {
     };
   }, [router]);
 
-  const deleteDraftPR = async (pr: PurchaseRequest) => {
-    if (pr.current_stage !== "draft" || deletingPrNo) return;
-    const confirmed = window.confirm(
-      "Delete Draft Purchase Request?\n\n" +
-      "Are you sure you want to delete this draft? Once deleted, it will no longer appear in your Draft PR list or the Admin Dashboard's active Draft PR records. This action cannot be undone through the system.\n\n" +
-      "Note: Only unsubmitted draft PRs can be deleted. Physically submitted and officially registered PRs cannot be deleted by end users."
-    );
-    if (!confirmed) return;
+  const deleteDraftPR = async () => {
+    const pr = draftPendingDeletion;
+    if (!pr || pr.current_stage !== "draft" || deletingPrNo) return;
     setDeletingPrNo(pr.pr_no);
     try {
       const response = await fetch("/api/pr/delete-draft", {
@@ -125,6 +121,7 @@ export default function PurchaseRequestsPage() {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "Unable to delete this draft.");
       setPrs((current) => current.filter((item) => item.pr_no !== pr.pr_no));
+      setDraftPendingDeletion(null);
     } catch (error) {
       console.error("Draft PR deletion failed:", error);
       window.alert(error instanceof Error ? error.message : "Unable to delete this draft. Please try again.");
@@ -402,7 +399,7 @@ export default function PurchaseRequestsPage() {
                         {pr.current_stage === "draft" && (
                           <button
                             type="button"
-                            onClick={() => deleteDraftPR(pr)}
+                            onClick={() => setDraftPendingDeletion(pr)}
                             disabled={deletingPrNo === pr.pr_no}
                             className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-xl border border-red-200 bg-white text-red-600 hover:bg-red-50 disabled:opacity-50 transition-colors"
                             title="Delete unsubmitted draft"
@@ -420,6 +417,41 @@ export default function PurchaseRequestsPage() {
           )}
         </section>
       </main>
+
+      {draftPendingDeletion && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1B1018]/65 px-4 py-6 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !deletingPrNo) setDraftPendingDeletion(null);
+          }}
+        >
+          <section role="alertdialog" aria-modal="true" aria-labelledby="delete-draft-title" aria-describedby="delete-draft-description" className="w-full max-w-md overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl">
+            <div className="flex items-start gap-3 border-b border-red-100 bg-red-50/80 px-5 py-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-700"><AlertTriangle className="h-5 w-5" /></div>
+              <div className="min-w-0 flex-1 pt-0.5">
+                <h2 id="delete-draft-title" className="text-base font-extrabold text-[#4D002C]">Delete Draft Purchase Request?</h2>
+                <p className="mt-1 text-xs font-medium text-stone-600">{draftPendingDeletion.pr_no}</p>
+              </div>
+              <button type="button" onClick={() => setDraftPendingDeletion(null)} disabled={Boolean(deletingPrNo)} className="rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-stone-700 disabled:opacity-40" aria-label="Close confirmation"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="space-y-4 px-5 py-5">
+              <p id="delete-draft-description" className="text-sm leading-relaxed text-stone-700">
+                Are you sure you want to delete this draft? Once deleted, it will no longer appear in your Draft PR list or the Admin Dashboard&apos;s active Draft PR records. This action cannot be undone through the system.
+              </p>
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                <p className="text-xs font-extrabold uppercase tracking-wide text-amber-900">Important reminder</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-amber-900">Only unsubmitted draft PRs can be deleted. Physically submitted and officially registered PRs cannot be deleted by end users.</p>
+              </div>
+              <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end">
+                <button type="button" onClick={() => setDraftPendingDeletion(null)} disabled={Boolean(deletingPrNo)} className="inline-flex min-h-10 items-center justify-center rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-bold text-stone-700 transition hover:bg-stone-50 disabled:opacity-50">Cancel</button>
+                <button type="button" onClick={deleteDraftPR} disabled={Boolean(deletingPrNo)} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-red-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60">
+                  {deletingPrNo ? <><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />Deleting...</> : <><Trash2 className="h-4 w-4" />Delete Draft PR</>}
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
 
       <footer className="mx-auto max-w-7xl px-4 py-6 text-center text-xs text-stone-500">
         {SYSTEM_NAME} · Purchase Requests Directory · RA 12009 Compliant
