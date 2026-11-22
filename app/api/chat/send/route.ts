@@ -103,6 +103,25 @@ export async function POST(request: NextRequest) {
     if (sessionError || !session) return NextResponse.json({ error: 'Chat session not found.' }, { status: 404 });
     if (session.is_active === false) return NextResponse.json({ error: 'This conversation is closed. Start a new chat.' }, { status: 409 });
 
+    // Enforce third-party PR privacy immediately after authentication and session
+    // ownership checks. This must run before language, scope, small-talk, or draft
+    // handlers, any of which can return HTTP 200 without reaching PR tracking.
+    const normalizePersonNameForAccess = (value: string) =>
+      value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const ownNameForAccess = normalizePersonNameForAccess(authenticatedUserName);
+    const messageForAccess = normalizePersonNameForAccess(message);
+    const mentionsAuthenticatedUser = Boolean(ownNameForAccess && messageForAccess.includes(ownNameForAccess));
+    const hasNamedThirdPartyPRReference =
+      NAMED_PERSON_PR_REQUEST_PATTERN.test(message) ||
+      /['’]s\s+(?:prs?|purchase\s+requests?)\b/i.test(message) ||
+      (OTHER_USER_PR_PATTERN.test(message) && /\b(?:pr|prs|purchase\s+request|procurement)\b/i.test(message));
+    if (hasNamedThirdPartyPRReference && !mentionsAuthenticatedUser) {
+      return NextResponse.json({
+        error: 'Access denied. For privacy and security, you can only view Purchase Requests associated with your own account.',
+      }, { status: 403 });
+    }
+
+
     let draftState = (session.state || {}) as { drafting?: boolean; draftReady?: boolean; step?: string | null; collected?: any; cancelledAt?: string };
 
     // Handle stale cancellation state before any PR slot logic.
