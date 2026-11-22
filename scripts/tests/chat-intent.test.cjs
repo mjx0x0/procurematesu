@@ -41,7 +41,7 @@ test('informational questions about PR preparation remain in procurement Q&A', (
 });
 
 test('active draft field replies and completed-draft revisions remain distinct', () => {
-  assert.equal(classifyProcurementIntent('College of Education (CED)', { activeDraft: true }), 'draft_continuation');
+  assert.equal(classifyProcurementIntent('College of Education (COED)', { activeDraft: true }), 'draft_continuation');
   assert.equal(classifyProcurementIntent('What are the PR requirements under RA 12009?', { activeDraft: true }), 'procurement_question');
   assert.equal(classifyProcurementIntent('30 pcs laboratory glassware at ₱150 each', { activeDraft: true }), 'draft_continuation');
   assert.equal(classifyProcurementIntent('Change item 1 quantity to 60 pcs', { draftReady: true }), 'draft_revision');
@@ -180,10 +180,10 @@ test('completed draft corrections remain detectable for legacy sessions without 
     step: null,
     collected: {
       purpose: 'Procurement of laboratory glassware for Chemistry classes',
-      department: 'College of Education (CED)',
+      department: 'College of Education (COED)',
       extracted: {
         purpose: 'Procurement of laboratory glassware for Chemistry classes',
-        department: 'College of Education (CED)',
+        department: 'College of Education (COED)',
         items: [{ item_description: 'laboratory glassware', quantity: 50, unit: 'pcs', unit_cost: 150, total_cost: 7500 }],
         total_amount: 7500,
       },
