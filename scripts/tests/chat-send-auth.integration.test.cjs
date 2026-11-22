@@ -47,10 +47,10 @@ const sessions = new Map([
       step: null,
       collected: {
         purpose: 'Procurement of laboratory glassware for Chemistry classes',
-        department: 'College of Education (CED)',
+        department: 'College of Education (COED)',
         extracted: {
           purpose: 'Procurement of laboratory glassware for Chemistry classes',
-          department: 'College of Education (CED)',
+          department: 'College of Education (COED)',
           items: [{
             item_description: 'laboratory glassware',
             quantity: 50,
@@ -564,7 +564,7 @@ test('authenticated chatbot API enforces identity, account status, session owner
       const correctionFormUrl = new URL(correctionFormLink[1], 'https://procurematesu.test');
       assert.equal(correctionFormUrl.pathname, '/dashboard/new-pr');
       const correctedHandoff = readPRDraftHandoff(correctionFormUrl.searchParams);
-      assert.equal(correctedHandoff.department, 'College of Education (CED)');
+      assert.equal(correctedHandoff.department, 'College of Education (COED)');
       assert.equal(correctedHandoff.purpose, 'Procurement of laboratory glassware for Chemistry classes');
       assert.equal(correctedHandoff.items.length, 1);
       assert.equal(correctedHandoff.items[0].item_description, 'laboratory glassware');
@@ -593,7 +593,7 @@ test('authenticated chatbot API enforces identity, account status, session owner
       assert.ok(additionFormLink, 'The updated draft should include a parseable New PR Form link.');
       const additionFormUrl = new URL(additionFormLink[1], 'https://procurematesu.test');
       const addedHandoff = readPRDraftHandoff(additionFormUrl.searchParams);
-      assert.equal(addedHandoff.department, 'College of Education (CED)');
+      assert.equal(addedHandoff.department, 'College of Education (COED)');
       assert.equal(addedHandoff.items.length, 2);
       assert.equal(addedHandoff.items[1].item_description, 'laboratory gloves');
       assert.equal(addedHandoff.items[1].quantity, 2);
