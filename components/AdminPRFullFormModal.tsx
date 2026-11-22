@@ -280,7 +280,18 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
         @media print {
           @page {
             size: A4 portrait;
-            margin: 8mm;
+            margin: 6mm;
+          }
+
+          html,
+          body {
+            width: 100% !important;
+            min-width: 0 !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            background: #fff !important;
           }
 
           body * {
@@ -290,6 +301,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
           .admin-pr-full-form-overlay,
           .admin-pr-full-form-modal,
           .admin-pr-full-form-body,
+          .admin-pr-official-form-scroll,
           #admin-pr-print,
           #admin-pr-print * {
             visibility: visible !important;
@@ -298,9 +310,14 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
           .admin-pr-full-form-overlay {
             position: static !important;
             display: block !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
             padding: 0 !important;
-            background: transparent !important;
+            margin: 0 !important;
+            background: #fff !important;
             backdrop-filter: none !important;
+            overflow: visible !important;
           }
 
           .admin-pr-full-form-modal {
@@ -311,34 +328,86 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
             height: auto !important;
             max-height: none !important;
             min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
             overflow: visible !important;
             border: 0 !important;
             border-radius: 0 !important;
-            background: transparent !important;
+            background: #fff !important;
             box-shadow: none !important;
             transform: none !important;
           }
 
           .admin-pr-full-form-header,
-          .admin-pr-full-form-footer {
+          .admin-pr-full-form-footer,
+          .admin-pr-full-form-body > p,
+          .admin-pr-full-form-body > div:not(.admin-pr-official-form-scroll) {
             display: none !important;
           }
 
           .admin-pr-full-form-body {
             display: block !important;
-            overflow: visible !important;
+            width: 100% !important;
+            height: auto !important;
+            max-height: none !important;
+            min-height: 0 !important;
+            margin: 0 !important;
             padding: 0 !important;
+            overflow: visible !important;
+          }
+
+          .admin-pr-official-form-scroll {
+            display: block !important;
+            position: static !important;
+            width: 100% !important;
+            max-width: none !important;
+            min-width: 0 !important;
+            height: auto !important;
+            max-height: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
           }
 
           #admin-pr-print {
             display: block !important;
-            position: static !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
             width: 100% !important;
             min-width: 0 !important;
             max-width: none !important;
             margin: 0 !important;
-            box-shadow: none !important;
+            padding: 0 !important;
             overflow: visible !important;
+            background: #fff !important;
+            box-shadow: none !important;
+            zoom: 0.88;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+
+          #admin-pr-print > div {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            border-width: 1.5px !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+
+          #admin-pr-print * {
+            box-sizing: border-box !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          #admin-pr-print .grid {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
           }
         }
       `}</style>
