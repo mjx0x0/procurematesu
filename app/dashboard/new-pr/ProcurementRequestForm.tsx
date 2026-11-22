@@ -66,6 +66,8 @@ export default function ProcurementRequestForm() {
   const [departmentOther, setDepartmentOther] = useState(false);
   const [items, setItems] = useState<Item[]>([emptyItem()]);
   const [specGuideCategory, setSpecGuideCategory] = useState("office");
+  const [openSpecGuideId, setOpenSpecGuideId] = useState<string | null>(null);
+  const [specGuidePosition, setSpecGuidePosition] = useState({ top: 0, left: 0, width: 340 });
 
   useEffect(() => {
     (async () => {
@@ -411,49 +413,64 @@ export default function ProcurementRequestForm() {
                               />
                               <button
                                 type="button"
-                                popoverTarget={"spec-guide-" + item.id}
-                                popoverTargetAction="toggle"
-                                style={{ anchorName: ("--spec-guide-anchor-" + item.id) as string } as React.CSSProperties}
+                                onClick={(event) => {
+                                  if (openSpecGuideId === item.id) {
+                                    setOpenSpecGuideId(null);
+                                    return;
+                                  }
+                                  const rect = event.currentTarget.getBoundingClientRect();
+                                  const width = Math.min(340, window.innerWidth - 24);
+                                  const left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
+                                  const estimatedHeight = 280;
+                                  const top = rect.bottom + estimatedHeight <= window.innerHeight - 12
+                                    ? rect.bottom + 4
+                                    : Math.max(12, rect.top - estimatedHeight - 4);
+                                  setSpecGuidePosition({ top, left, width });
+                                  setOpenSpecGuideId(item.id);
+                                }}
                                 className="mt-2 flex w-full items-center justify-between gap-2 rounded-lg border border-stone-200 bg-[#FCFAFC] px-2.5 py-2 text-left text-[11px] font-semibold text-[#7B0046] transition hover:bg-[#F8F1F5]"
                                 aria-label="Toggle technical specifications guide"
+                                aria-expanded={openSpecGuideId === item.id}
                               >
                                 <span className="flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> Need help writing specifications?</span>
-                                <ChevronDown className="h-3.5 w-3.5" />
+                                <ChevronDown className={"h-3.5 w-3.5 transition-transform " + (openSpecGuideId === item.id ? "rotate-180" : "")} />
                               </button>
-                              <div
-                                id={"spec-guide-" + item.id}
-                                popover="auto"
-                                className="fixed m-0 w-[min(340px,calc(100vw-24px))] max-h-[min(70vh,420px)] overflow-y-auto rounded-lg border border-stone-200 bg-white p-2.5 text-left shadow-2xl"
-                                style={{
-                                  positionAnchor: ("--spec-guide-anchor-" + item.id) as string,
-                                  positionArea: "bottom",
-                                  positionTryFallbacks: "flip-block",
-                                  justifySelf: "start",
-                                  marginTop: "4px",
-                                } as React.CSSProperties}
-                              >
-                                <p className="text-[10px] text-stone-500">Choose a category for suggested details and an example.</p>
-                                <div className="mt-2 grid grid-cols-2 gap-2">
-                                  {[
-                                    { id: "it", label: "IT equipment" },
-                                    { id: "office", label: "Office supplies" },
-                                    { id: "furniture", label: "Furniture" },
-                                    { id: "services", label: "Services" },
-                                  ].map((category) => (
-                                    <label key={category.id} className={"flex min-h-8 w-full items-center justify-start gap-1.5 rounded-md border px-2 py-1.5 text-[10px] " + (specGuideCategory === category.id ? "border-[#7B0046] bg-[#7B0046]/5 text-[#4D002C] font-bold" : "border-stone-200 bg-white text-stone-600")}>
-                                      <input type="radio" name="specification-guide-category" value={category.id} checked={specGuideCategory === category.id} onChange={() => setSpecGuideCategory(category.id)} className="h-3 w-3 accent-[#7B0046]" />
-                                      {category.label}
-                                    </label>
-                                  ))}
-                                </div>
-                                <div className="mt-2 rounded-md bg-[#FCFAFC] p-2 text-[10px] leading-relaxed text-stone-700">
-                                  {specGuideCategory === "it" && <><strong>IT Equipment and Electronics</strong><p className="mt-1">Consider processor performance, memory and storage, display, connectivity, compatibility, power requirements, and applicable warranty or accessories.</p><p className="mt-1"><strong>Example:</strong> Desktop computer with at least 16 GB RAM, 512 GB SSD storage, Full HD monitor, and required connectivity ports.</p></>}
-                                  {specGuideCategory === "office" && <><strong>Office Supplies and Materials</strong><p className="mt-1">Consider size and dimensions, material, color, weight or grade, packaging, and unit of measurement.</p><p className="mt-1"><strong>Example:</strong> A4 bond paper, 80 GSM, white, multipurpose printing paper, 500 sheets per ream.</p></>}
-                                  {specGuideCategory === "furniture" && <><strong>Furniture and Fixtures</strong><p className="mt-1">Consider dimensions, material and construction, finish, functional features, weight capacity, and assembly or installation needs.</p><p className="mt-1"><strong>Example:</strong> Office desk, approximately 120 cm × 60 cm, with a durable work surface and stable supporting frame.</p></>}
-                                  {specGuideCategory === "services" && <><strong>Services</strong><p className="mt-1">Describe the scope of work, deliverables, quality or performance standards, schedule, duration, location, and completion requirements.</p><p className="mt-1"><strong>Example:</strong> Preventive maintenance of office air-conditioning units, including inspection, cleaning, performance testing, and a service report.</p></>}
-                                </div>
-                                <p className="mt-2 text-[10px] leading-relaxed text-stone-500">Suggested details only; include what applies. Use clear, measurable, non-restrictive requirements.</p>
-                              </div>
+                              {openSpecGuideId === item.id && (
+                                <>
+                                  <button
+                                    type="button"
+                                    aria-label="Close specifications guide"
+                                    className="fixed inset-0 z-[60] cursor-default bg-transparent"
+                                    onClick={() => setOpenSpecGuideId(null)}
+                                  />
+                                  <div
+                                    className="fixed z-[70] max-h-[min(70vh,420px)] overflow-y-auto rounded-lg border border-stone-200 bg-white p-2.5 text-left shadow-2xl"
+                                    style={{ top: specGuidePosition.top, left: specGuidePosition.left, width: specGuidePosition.width }}
+                                  >
+                                    <p className="text-[10px] text-stone-500">Choose a category for suggested details and an example.</p>
+                                    <div className="mt-2 grid grid-cols-2 gap-2">
+                                      {[
+                                        { id: "it", label: "IT equipment" },
+                                        { id: "office", label: "Office supplies" },
+                                        { id: "furniture", label: "Furniture" },
+                                        { id: "services", label: "Services" },
+                                      ].map((category) => (
+                                        <label key={category.id} className={"flex min-h-8 w-full items-center justify-start gap-1.5 rounded-md border px-2 py-1.5 text-[10px] " + (specGuideCategory === category.id ? "border-[#7B0046] bg-[#7B0046]/5 text-[#4D002C] font-bold" : "border-stone-200 bg-white text-stone-600")}>
+                                          <input type="radio" name={"specification-guide-category-" + item.id} value={category.id} checked={specGuideCategory === category.id} onChange={() => setSpecGuideCategory(category.id)} className="h-3 w-3 accent-[#7B0046]" />
+                                          {category.label}
+                                        </label>
+                                      ))}
+                                    </div>
+                                    <div className="mt-2 rounded-md bg-[#FCFAFC] p-2 text-[10px] leading-relaxed text-stone-700">
+                                      {specGuideCategory === "it" && <><strong>IT Equipment and Electronics</strong><p className="mt-1">Consider processor performance, memory and storage, display, connectivity, compatibility, power requirements, and applicable warranty or accessories.</p><p className="mt-1"><strong>Example:</strong> Desktop computer with at least 16 GB RAM, 512 GB SSD storage, Full HD monitor, and required connectivity ports.</p></>}
+                                      {specGuideCategory === "office" && <><strong>Office Supplies and Materials</strong><p className="mt-1">Consider size and dimensions, material, color, weight or grade, packaging, and unit of measurement.</p><p className="mt-1"><strong>Example:</strong> A4 bond paper, 80 GSM, white, multipurpose printing paper, 500 sheets per ream.</p></>}
+                                      {specGuideCategory === "furniture" && <><strong>Furniture and Fixtures</strong><p className="mt-1">Consider dimensions, material and construction, finish, functional features, weight capacity, and assembly or installation needs.</p><p className="mt-1"><strong>Example:</strong> Office desk, approximately 120 cm × 60 cm, with a durable work surface and stable supporting frame.</p></>}
+                                      {specGuideCategory === "services" && <><strong>Services</strong><p className="mt-1">Describe the scope of work, deliverables, quality or performance standards, schedule, duration, location, and completion requirements.</p><p className="mt-1"><strong>Example:</strong> Preventive maintenance of office air-conditioning units, including inspection, cleaning, performance testing, and a service report.</p></>}
+                                    </div>
+                                    <p className="mt-2 text-[10px] leading-relaxed text-stone-500">Suggested details only; include what applies. Use clear, measurable, non-restrictive requirements.</p>
+                                  </div>
+                                </>
+                              )}
                               {item.description.trim().length > 0 && item.description.trim().length < 15 && (
                                 <p className="text-[10px] text-amber-700 font-medium mt-1">
                                   Please provide complete technical specifications (size, material, capacity, performance, etc.).
