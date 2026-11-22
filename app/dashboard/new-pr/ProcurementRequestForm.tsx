@@ -409,21 +409,21 @@ export default function ProcurementRequestForm() {
                                 placeholder="e.g., Desktop computer, 16 GB RAM, 512 GB SSD"
                                 className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-lg border border-stone-300 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
                               />
-                              <details className="group mt-2 rounded-lg border border-stone-200 bg-[#FCFAFC]">
+                              <details className="group relative mt-2 rounded-lg border border-stone-200 bg-[#FCFAFC] open:z-30">
                                 <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-2.5 py-2 text-[11px] font-semibold text-[#7B0046] hover:bg-[#F8F1F5] [&::-webkit-details-marker]:hidden">
                                   <span className="flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> Need help writing specifications?</span>
                                   <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
                                 </summary>
-                                <div className="border-t border-stone-200 px-2.5 py-2.5">
+                                <div className="absolute left-0 top-full z-40 w-full min-w-[280px] rounded-b-lg border border-t-0 border-stone-200 bg-white px-2.5 py-2.5 shadow-xl">
                                   <p className="text-[10px] text-stone-500">Choose a category for suggested details and an example.</p>
-                                  <div className="mt-2 flex flex-wrap gap-2">
+                                  <div className="mt-2 grid grid-cols-2 gap-2">
                                     {[
                                       { id: "it", label: "IT equipment" },
                                       { id: "office", label: "Office supplies" },
                                       { id: "furniture", label: "Furniture" },
                                       { id: "services", label: "Services" },
                                     ].map((category) => (
-                                      <label key={category.id} className={"inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1.5 text-[10px] " + (specGuideCategory === category.id ? "border-[#7B0046] bg-[#7B0046]/5 text-[#4D002C] font-bold" : "border-stone-200 bg-white text-stone-600")}>
+                                      <label key={category.id} className={"flex min-h-8 w-full items-center justify-start gap-1.5 rounded-md border px-2 py-1.5 text-[10px] " + (specGuideCategory === category.id ? "border-[#7B0046] bg-[#7B0046]/5 text-[#4D002C] font-bold" : "border-stone-200 bg-white text-stone-600")}>
                                         <input type="radio" name="specification-guide-category" value={category.id} checked={specGuideCategory === category.id} onChange={() => setSpecGuideCategory(category.id)} className="h-3 w-3 accent-[#7B0046]" />
                                         {category.label}
                                       </label>
