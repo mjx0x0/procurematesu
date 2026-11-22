@@ -362,92 +362,6 @@ export default function ProcurementRequestForm() {
                   </button>
                 </div>
 
-                <details className="group rounded-xl border border-[#7B0046]/20 bg-[#FCFAFC] shadow-xs">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-4 py-3.5 transition hover:bg-[#F8F1F5] [&::-webkit-details-marker]:hidden">
-                    <span className="flex min-w-0 items-center gap-2.5">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#7B0046]/10 text-[#7B0046]">
-                        <BookOpen className="h-4.5 w-4.5" />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block text-sm font-extrabold text-[#4D002C]">Need help writing specifications?</span>
-                        <span className="mt-0.5 block text-[11px] text-stone-500">Open the Technical Specifications Guide for examples and suggested details.</span>
-                      </span>
-                    </span>
-                    <ChevronDown className="h-4 w-4 shrink-0 text-[#7B0046] transition-transform group-open:rotate-180" />
-                  </summary>
-                  <div className="border-t border-[#7B0046]/10 px-4 pb-4 pt-3.5">
-                    <h4 className="text-sm font-extrabold text-[#4D002C]">Technical Specifications Guide</h4>
-                    <p className="mt-1 text-xs text-stone-600">Select a category to see examples of the information you should provide.</p>
-                    <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                      {[
-                        { id: "it", label: "IT Equipment and Electronics" },
-                        { id: "office", label: "Office Supplies and Materials" },
-                        { id: "furniture", label: "Furniture and Fixtures" },
-                        { id: "services", label: "Services" },
-                      ].map((category) => (
-                        <label key={category.id} className={"flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-xs font-semibold transition " + (specGuideCategory === category.id ? "border-[#7B0046] bg-[#7B0046]/5 text-[#4D002C]" : "border-stone-200 bg-white text-stone-700 hover:border-stone-300")}>
-                          <input type="radio" name="specification-guide-category" value={category.id} checked={specGuideCategory === category.id} onChange={() => setSpecGuideCategory(category.id)} className="h-4 w-4 accent-[#7B0046]" />
-                          {category.label}
-                        </label>
-                      ))}
-                    </div>
-                    <div className="mt-4 rounded-lg border border-stone-200 bg-white p-3.5">
-                      {specGuideCategory === "it" && (
-                        <>
-                          <h5 className="text-xs font-extrabold text-[#4D002C]">IT Equipment and Electronics</h5>
-                          <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-relaxed text-stone-700">
-                            <li>Processor type and performance requirements, when applicable</li>
-                            <li>Memory and storage capacity</li>
-                            <li>Display size, resolution, and other relevant dimensions</li>
-                            <li>Connectivity, ports, power requirements, and compatibility</li>
-                            <li>Required software, operating system, warranty, and included accessories, when applicable</li>
-                          </ul>
-                          <p className="mt-2.5 text-[11px] leading-relaxed text-stone-500"><strong>Example:</strong> Desktop computer with at least 16 GB RAM, 512 GB SSD storage, Full HD monitor, and required connectivity ports.</p>
-                        </>
-                      )}
-                      {specGuideCategory === "office" && (
-                        <>
-                          <h5 className="text-xs font-extrabold text-[#4D002C]">Office Supplies and Materials</h5>
-                          <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-relaxed text-stone-700">
-                            <li>Size and dimensions</li>
-                            <li>Material and composition</li>
-                            <li>Color, weight, or grade</li>
-                            <li>Packaging and unit of measurement</li>
-                          </ul>
-                          <p className="mt-2.5 text-[11px] leading-relaxed text-stone-500"><strong>Example:</strong> A4 bond paper, 80 GSM, white, multipurpose printing paper, 500 sheets per ream.</p>
-                        </>
-                      )}
-                      {specGuideCategory === "furniture" && (
-                        <>
-                          <h5 className="text-xs font-extrabold text-[#4D002C]">Furniture and Fixtures</h5>
-                          <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-relaxed text-stone-700">
-                            <li>Dimensions and required measurements</li>
-                            <li>Material, construction, and finish</li>
-                            <li>Color and relevant design or functional features</li>
-                            <li>Weight capacity or load rating, when applicable</li>
-                            <li>Assembly, delivery, and installation requirements, when applicable</li>
-                          </ul>
-                          <p className="mt-2.5 text-[11px] leading-relaxed text-stone-500"><strong>Example:</strong> Office desk, approximately 120 cm × 60 cm, with a durable work surface and stable supporting frame.</p>
-                        </>
-                      )}
-                      {specGuideCategory === "services" && (
-                        <>
-                          <h5 className="text-xs font-extrabold text-[#4D002C]">Services</h5>
-                          <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-relaxed text-stone-700">
-                            <li>Scope of work and specific tasks to be performed</li>
-                            <li>Expected deliverables, outputs, or results</li>
-                            <li>Required service quality or performance standards</li>
-                            <li>Schedule, duration, and service location</li>
-                            <li>Reporting, acceptance, and other relevant completion requirements</li>
-                          </ul>
-                          <p className="mt-2.5 text-[11px] leading-relaxed text-stone-500"><strong>Example:</strong> Preventive maintenance service for office air-conditioning units, including inspection, cleaning, performance testing, and a service report for each unit.</p>
-                        </>
-                      )}
-                    </div>
-                    <p className="mt-3 text-[11px] leading-relaxed text-stone-500">These are suggested details. Include only those applicable to the requested item or service. Use clear, measurable, and non-restrictive requirements; do not include unnecessary brand or model restrictions.</p>
-                  </div>
-                </details>
-
                 <div className="border border-stone-200 rounded-xl overflow-hidden shadow-xs">
                   <div className="overflow-x-auto">
                     <table className="pr-items-entry-table w-full min-w-[760px] text-left border-collapse text-xs sm:text-sm">
@@ -492,12 +406,41 @@ export default function ProcurementRequestForm() {
                                 type="text"
                                 value={item.description}
                                 onChange={(e) => updateItem(index, { description: e.target.value })}
-                                placeholder="e.g., Desktop computer, Core i7, 16GB RAM, 512GB SSD"
+                                placeholder="e.g., Desktop computer, 16 GB RAM, 512 GB SSD"
                                 className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-lg border border-stone-300 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
                               />
+                              <details className="group mt-2 rounded-lg border border-stone-200 bg-[#FCFAFC]">
+                                <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-2.5 py-2 text-[11px] font-semibold text-[#7B0046] hover:bg-[#F8F1F5] [&::-webkit-details-marker]:hidden">
+                                  <span className="flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> Need help writing specifications?</span>
+                                  <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
+                                </summary>
+                                <div className="border-t border-stone-200 px-2.5 py-2.5">
+                                  <p className="text-[10px] text-stone-500">Choose a category for suggested details and an example.</p>
+                                  <div className="mt-2 flex flex-wrap gap-2">
+                                    {[
+                                      { id: "it", label: "IT equipment" },
+                                      { id: "office", label: "Office supplies" },
+                                      { id: "furniture", label: "Furniture" },
+                                      { id: "services", label: "Services" },
+                                    ].map((category) => (
+                                      <label key={category.id} className={"inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1.5 text-[10px] " + (specGuideCategory === category.id ? "border-[#7B0046] bg-[#7B0046]/5 text-[#4D002C] font-bold" : "border-stone-200 bg-white text-stone-600")}>
+                                        <input type="radio" name="specification-guide-category" value={category.id} checked={specGuideCategory === category.id} onChange={() => setSpecGuideCategory(category.id)} className="h-3 w-3 accent-[#7B0046]" />
+                                        {category.label}
+                                      </label>
+                                    ))}
+                                  </div>
+                                  <div className="mt-2 rounded-md bg-white p-2 text-[10px] leading-relaxed text-stone-700">
+                                    {specGuideCategory === "it" && <><strong>IT Equipment and Electronics</strong><p className="mt-1">Consider processor performance, memory and storage, display, connectivity, compatibility, power requirements, and applicable warranty or accessories.</p><p className="mt-1"><strong>Example:</strong> Desktop computer with at least 16 GB RAM, 512 GB SSD storage, Full HD monitor, and required connectivity ports.</p></>}
+                                    {specGuideCategory === "office" && <><strong>Office Supplies and Materials</strong><p className="mt-1">Consider size and dimensions, material, color, weight or grade, packaging, and unit of measurement.</p><p className="mt-1"><strong>Example:</strong> A4 bond paper, 80 GSM, white, multipurpose printing paper, 500 sheets per ream.</p></>}
+                                    {specGuideCategory === "furniture" && <><strong>Furniture and Fixtures</strong><p className="mt-1">Consider dimensions, material and construction, finish, functional features, weight capacity, and assembly or installation needs.</p><p className="mt-1"><strong>Example:</strong> Office desk, approximately 120 cm × 60 cm, with a durable work surface and stable supporting frame.</p></>}
+                                    {specGuideCategory === "services" && <><strong>Services</strong><p className="mt-1">Describe the scope of work, deliverables, quality or performance standards, schedule, duration, location, and completion requirements.</p><p className="mt-1"><strong>Example:</strong> Preventive maintenance of office air-conditioning units, including inspection, cleaning, performance testing, and a service report.</p></>}
+                                  </div>
+                                  <p className="mt-2 text-[10px] leading-relaxed text-stone-500">Suggested details only; include what applies. Use clear, measurable, non-restrictive requirements.</p>
+                                </div>
+                              </details>
                               {item.description.trim().length > 0 && item.description.trim().length < 15 && (
                                 <p className="text-[10px] text-amber-700 font-medium mt-1">
-                                  Please provide complete technical specs (brand, model, size/specs, capacity, etc.)
+                                  Please provide complete technical specifications (size, material, capacity, performance, etc.).
                                 </p>
                               )}
                             </td>
