@@ -29,7 +29,7 @@ test('the exact chatbot example round-trips every field through the New PR Form 
   const parsed = readPRDraftHandoff(url.searchParams);
 
   assert.equal(url.pathname, '/dashboard/new-pr');
-  assert.equal(parsed.department, 'College of Education (CED)');
+  assert.equal(parsed.department, 'College of Education (COED)');
   assert.equal(parsed.purpose, exampleDraft.purpose);
   assert.equal(parsed.items.length, 1);
   assert.equal(parsed.items[0].item_description, 'laboratory glassware');
@@ -69,14 +69,14 @@ test('legacy department/purpose/items query links still prefill correctly', () =
   });
   const payload = readPRDraftHandoff(params);
 
-  assert.equal(payload.department, 'College of Education (CED)');
+  assert.equal(payload.department, 'College of Education (COED)');
   assert.equal(payload.items[0].quantity, 50);
   assert.equal(payload.total_amount, 7500);
 });
 
 test('legacy item aliases description and qty are normalized', () => {
   const params = new URLSearchParams({
-    department: 'College of Education (CED)',
+    department: 'College of Education (COED)',
     purpose: 'Procurement of laboratory glassware',
     items: JSON.stringify([{ description: 'Beakers', qty: 4, unit: 'pcs', unit_cost: 25 }]),
   });
