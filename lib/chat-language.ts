@@ -15,14 +15,28 @@ export function getTagalogFollowUpMode(message: string): TagalogFollowUpMode | n
     /\btagalugin(?:\s+mo)?\b/i.test(text) ||
     /\b(?:paki[- ]?(?:translate|tagalog)|pwede\s+bang\s+isalin|maaari\s+bang\s+isalin)\b/i.test(text);
 
-  if (asksForTranslation) return 'translate';
+  // A named topic means this is a NEW procurement question that must go through
+  // retrieval. Only transform the previous answer when the user clearly refers
+  // back to it without introducing a fresh subject (e.g. "explain that in Tagalog").
+  const hasNewTopic =
+    /\b(?:section|subsection|article|ra\s*\.?\s*no?\.?|republic\s+act|svp|small\s+value\s+procurement|ppmp|app|bac|pmo|rfq|rfp|abstract\s+of\s+quotations|purchase\s+request|procurement|quotation|ho?pe)\b/i.test(text) ||
+    /\b(?:\d{1,3}\.\d+(?:\([a-z0-9]+\))?|ra\s*\d{4,5})\b/i.test(text);
+  const explicitlyRefersToPreviousAnswer =
+    /\b(?:previous|preceding|latest|last)\s+(?:answer|response|explanation|reply)\b/i.test(text) ||
+    /\b(?:that|this|it|above)\b/i.test(text) ||
+    /\b(?:ito|iyan|iyon|nito|niyan|naunang\s+sagot|huling\s+sagot)\b/i.test(text);
+
+  if (asksForTranslation) {
+    return hasNewTopic ? null : 'translate';
+  }
 
   const asksForExplanation =
     /\b(?:explain|clarify|simplify|break\s+down|describe)\b.{0,120}\b(?:in|into)\s+(?:simple\s+)?(?:tagalog|filipino)\b/i.test(text) ||
     /\b(?:tagalog|filipino)\b.{0,100}\b(?:explanation|explain|simple|simpler)\b/i.test(text) ||
     /\b(?:paki[- ]?(?:explain|explanation)|ipaliwanag|paliwanag(?:in)?|simplehin)\b.{0,100}\b(?:tagalog|filipino|ito|iyan|section|provision)\b/i.test(text);
 
-  return asksForExplanation ? 'explain' : null;
+  if (asksForExplanation && !hasNewTopic && explicitlyRefersToPreviousAnswer) return 'explain';
+  return null;
 }
 
 export function buildTagalogFollowUpPrompt(

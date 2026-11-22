@@ -18,8 +18,8 @@ const STOP_DRAFTING_PATTERN = /^(?:stop|cancel|quit|exit|abort|end|never\s*mind|
 // Normalize Unicode dash variants before matching so copied IDs (for example PR‑FINAL‑123) work too.
 const PR_IDENTIFIER_PATTERN = /\bPR\s*-\s*[A-Z0-9]+(?:\s*-\s*[A-Z0-9]+)*\b|\bPR\s+\d{4}(?:[\s-]+\d{1,})?\b|\bPR(?=\d)\d{4,12}\b/i;
 const PR_ACCESS_PATTERN = /\b(track(?:ing)?|show|view|see|open|display|details?|status|progress|update|history|timeline|next|check|find|locate|lookup|look\s+up)\b/i;
-const OTHER_USER_PR_PATTERN = /\b(another|other|someone\s+else|somebody\s+else|different)\s+(user|person|account|requester)|\b(?:someone\s+else'?s|another\s+user'?s|other\s+user'?s)\b/i;
-const NAMED_PERSON_PR_REQUEST_PATTERN = /\b(?:pr|purchase\s+request)\s+(?:of|for|under|belonging\s+to|submitted\s+by)\s+(?!me\b|my\b|mine\b|our\b|us\b|the\b)[\p{L}][\p{L}\p{M}'’.-]*(?:\s+[\p{L}][\p{L}\p{M}'’.-]*){0,3}\b|\b[\p{L}][\p{L}\p{M}'’.-]*(?:\s+[\p{L}][\p{L}\p{M}'’.-]*){0,3}['’]s\s+(?:pr|purchase\s+request)\b/iu;
+const OTHER_USER_PR_PATTERN = /\b(another|other|someone\s+else|somebody\s+else|different)\s+(user|person|account|requester)|\b(?:someone\s+else'?s|another\s+(?:user|person)'?s|other\s+user'?s)\b|\b(?:her|his|their)\s+(?:prs?|purchase\s+requests?)\b/i;
+const NAMED_PERSON_PR_REQUEST_PATTERN = /\b(?:prs?|purchase\s+requests?)\s+(?:of|for|under|belonging\s+to|submitted\s+by)\s+(?!me\b|my\b|mine\b|our\b|us\b|the\b)[\p{L}][\p{L}\p{M}'’.-]*(?:\s+[\p{L}][\p{L}\p{M}'’.-]*){0,3}\b|\b[\p{L}][\p{L}\p{M}.-]*(?:(?:['’](?!s\b)|[.-])[\p{L}][\p{L}\p{M}.-]*)*(?:\s+[\p{L}][\p{L}\p{M}.-]*(?:(?:['’](?!s\b)|[.-])[\p{L}][\p{L}\p{M}.-]*)*){0,3}['’]s\s+(?:prs?|purchase\s+requests?)\b|\b(?:mga\s+)?(?:prs?|purchase\s+requests?)\s+ni\s+(?!akin\b|ko\b|namin\b|natin\b)[\p{L}][\p{L}\p{M}'’.-]*(?:\s+[\p{L}][\p{L}\p{M}'’.-]*){0,3}\b/iu;
 const PROCUREMENT_FLOW_PATTERN = /\b(?:MSU(?:[- ]?GenSan)?|Mindanao\s+State\s+University(?:\s*[-–—]\s*General\s+Santos)?|General\s+Santos)\b.{0,80}\b(?:procurement|purchas(?:e|ing)|PR|process|flow|procedure|steps?|stages?)\b|\b(?:procurement|purchasing|PR)\s+(?:flow|process|procedure|steps?|stages?)\b/i;
 const OFFICE_INFO_PATTERN = /\b(?:where(?:'s| is| can I find)|location|address|contact|contacts|phone|telephone|email|e-mail|how can I contact|how do I reach)\b.{0,50}\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO|BAC|procurement)\b|\b(?:procurement\s+(?:management\s+)?office|procurement\s+office|PMO)\b.{0,50}\b(?:where|location|address|contact|phone|telephone|email|reach)\b/i;
 const NEXT_PATTERN = /\b(what|where|which|how)\s+(happens?|comes?|is)\s+next\b|\bwhat'?s\s+next\b|\bnext\s+(step|stage)\b|\bwhat\s+do\s+i\s+do\s+next\b/i;
@@ -102,6 +102,25 @@ export async function POST(request: NextRequest) {
     const { data: session, error: sessionError } = await clientToUse.from('chat_sessions').select('id, user_id, is_active, state').eq('id', sessionId).eq('user_id', user.id).maybeSingle();
     if (sessionError || !session) return NextResponse.json({ error: 'Chat session not found.' }, { status: 404 });
     if (session.is_active === false) return NextResponse.json({ error: 'This conversation is closed. Start a new chat.' }, { status: 409 });
+
+    // Enforce third-party PR privacy immediately after authentication and session
+    // ownership checks. This must run before language, scope, small-talk, or draft
+    // handlers, any of which can return HTTP 200 without reaching PR tracking.
+    const normalizePersonNameForAccess = (value: string) =>
+      value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const ownNameForAccess = normalizePersonNameForAccess(authenticatedUserName);
+    const messageForAccess = normalizePersonNameForAccess(message);
+    const mentionsAuthenticatedUser = Boolean(ownNameForAccess && messageForAccess.includes(ownNameForAccess));
+    const hasNamedThirdPartyPRReference =
+      NAMED_PERSON_PR_REQUEST_PATTERN.test(message) ||
+      /['’]s\s+(?:prs?|purchase\s+requests?)\b/i.test(message) ||
+      (OTHER_USER_PR_PATTERN.test(message) && /\b(?:pr|prs|purchase\s+request|procurement)\b/i.test(message));
+    if (hasNamedThirdPartyPRReference && !mentionsAuthenticatedUser) {
+      return NextResponse.json({
+        error: 'Access denied. For privacy and security, you can only view Purchase Requests associated with your own account.',
+      }, { status: 403 });
+    }
+
 
     let draftState = (session.state || {}) as { drafting?: boolean; draftReady?: boolean; step?: string | null; collected?: any; cancelledAt?: string };
 
@@ -335,9 +354,10 @@ export async function POST(request: NextRequest) {
     const ownName = normalizePersonName(authenticatedUserName);
     const normalizedMessage = normalizePersonName(message);
     const mentionsOwnName = Boolean(ownName && normalizedMessage.includes(ownName));
+    const hasPossessivePRReference = /(?:['’]s)\s+(?:prs?|purchase\s+requests?)\b/i.test(message);
     const isNamedPRRequest = NAMED_PERSON_PR_REQUEST_PATTERN.test(message) ||
+      hasPossessivePRReference ||
       (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message));
-
     // If the named person is the authenticated user, let the normal owner-scoped PR
     // lookup run. For a list request, query only rows whose user_id equals this session.
     if (mentionsOwnName && PR_ACCESS_PATTERN.test(message) && !prIdentifier) {
