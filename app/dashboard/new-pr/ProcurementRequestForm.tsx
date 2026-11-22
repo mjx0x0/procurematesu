@@ -411,8 +411,8 @@ export default function ProcurementRequestForm() {
                               />
                               <button
                                 type="button"
-                                popovertarget={"spec-guide-" + item.id}
-                                popovertargetaction="toggle"
+                                popoverTarget={"spec-guide-" + item.id}
+                                popoverTargetAction="toggle"
                                 className="mt-2 flex w-full items-center justify-between gap-2 rounded-lg border border-stone-200 bg-[#FCFAFC] px-2.5 py-2 text-left text-[11px] font-semibold text-[#7B0046] transition hover:bg-[#F8F1F5]"
                                 aria-label="Toggle technical specifications guide"
                               >
