@@ -67,7 +67,7 @@ export default function ProcurementRequestForm() {
   const [items, setItems] = useState<Item[]>([emptyItem()]);
   const [specGuideCategory, setSpecGuideCategory] = useState("office");
   const [openSpecGuideId, setOpenSpecGuideId] = useState<string | null>(null);
-  const [specGuidePosition, setSpecGuidePosition] = useState({ top: 0, left: 0, width: 340 });
+  const [specGuidePosition, setSpecGuidePosition] = useState({ top: 0, left: 0, width: 340, maxHeight: 420 });
 
   useEffect(() => {
     (async () => {
@@ -421,11 +421,11 @@ export default function ProcurementRequestForm() {
                                   const rect = event.currentTarget.getBoundingClientRect();
                                   const width = Math.min(340, window.innerWidth - 24);
                                   const left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
-                                  const estimatedHeight = 280;
-                                  const top = rect.bottom + estimatedHeight <= window.innerHeight - 12
-                                    ? rect.bottom + 4
-                                    : Math.max(12, rect.top - estimatedHeight - 4);
-                                  setSpecGuidePosition({ top, left, width });
+                                  // Always open below the trigger. If the remaining viewport is short,
+                                  // constrain the dropdown height and let its contents scroll.
+                                  const top = rect.bottom + 4;
+                                  const maxHeight = Math.max(120, Math.min(420, window.innerHeight - top - 12));
+                                  setSpecGuidePosition({ top, left, width, maxHeight });
                                   setOpenSpecGuideId(item.id);
                                 }}
                                 className="mt-2 flex w-full items-center justify-between gap-2 rounded-lg border border-stone-200 bg-[#FCFAFC] px-2.5 py-2 text-left text-[11px] font-semibold text-[#7B0046] transition hover:bg-[#F8F1F5]"
@@ -445,7 +445,7 @@ export default function ProcurementRequestForm() {
                                   />
                                   <div
                                     className="fixed z-[70] max-h-[min(70vh,420px)] overflow-y-auto rounded-lg border border-stone-200 bg-white p-2.5 text-left shadow-2xl"
-                                    style={{ top: specGuidePosition.top, left: specGuidePosition.left, width: specGuidePosition.width }}
+                                    style={{ top: specGuidePosition.top, left: specGuidePosition.left, width: specGuidePosition.width, maxHeight: specGuidePosition.maxHeight }}
                                   >
                                     <p className="text-[10px] text-stone-500">Choose a category for suggested details and an example.</p>
                                     <div className="mt-2 grid grid-cols-2 gap-2">
