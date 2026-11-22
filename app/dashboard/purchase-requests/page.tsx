@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Eye, FileText, Filter, PlusCircle, Printer, Search } from "lucide-react";
+import { AlertCircle, Eye, FileText, Filter, PlusCircle, Printer, Search, Trash2 } from "lucide-react";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS } from "@/lib/procurement-process";
 import { supabase } from "@/lib/supabase/client";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
@@ -51,6 +51,7 @@ export default function PurchaseRequestsPage() {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<"all" | "draft" | "under_review" | "approved" | "completed">("all");
+  const [deletingPrNo, setDeletingPrNo] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -104,6 +105,33 @@ export default function PurchaseRequestsPage() {
       cancelled = true;
     };
   }, [router]);
+
+  const deleteDraftPR = async (pr: PurchaseRequest) => {
+    if (pr.current_stage !== "draft" || deletingPrNo) return;
+    const confirmed = window.confirm(
+      "Delete Draft Purchase Request?\n\n" +
+      "Are you sure you want to delete this draft? Once deleted, it will no longer appear in your Draft PR list or the Admin Dashboard's active Draft PR records. This action cannot be undone through the system.\n\n" +
+      "Note: Only unsubmitted draft PRs can be deleted. Physically submitted and officially registered PRs cannot be deleted by end users."
+    );
+    if (!confirmed) return;
+    setDeletingPrNo(pr.pr_no);
+    try {
+      const response = await fetch("/api/pr/delete-draft", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ prNo: pr.pr_no }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Unable to delete this draft.");
+      setPrs((current) => current.filter((item) => item.pr_no !== pr.pr_no));
+    } catch (error) {
+      console.error("Draft PR deletion failed:", error);
+      window.alert(error instanceof Error ? error.message : "Unable to delete this draft. Please try again.");
+    } finally {
+      setDeletingPrNo(null);
+    }
+  };
 
   const counts = useMemo(() => {
     const total = prs.length;
@@ -371,6 +399,18 @@ export default function PurchaseRequestsPage() {
                         >
                           <Printer className="h-3.5 w-3.5" />
                         </Link>
+                        {pr.current_stage === "draft" && (
+                          <button
+                            type="button"
+                            onClick={() => deleteDraftPR(pr)}
+                            disabled={deletingPrNo === pr.pr_no}
+                            className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-xl border border-red-200 bg-white text-red-600 hover:bg-red-50 disabled:opacity-50 transition-colors"
+                            title="Delete unsubmitted draft"
+                            aria-label={`Delete draft purchase request ${pr.pr_no}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
