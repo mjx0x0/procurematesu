@@ -455,9 +455,17 @@ export default function ProcurementRequestForm() {
                                         { id: "furniture", label: "Furniture" },
                                         { id: "services", label: "Services" },
                                       ].map((category) => (
-                                        <label key={category.id} className={"flex min-h-8 w-full items-center justify-start gap-1.5 rounded-md border px-2 py-1.5 text-[10px] " + (specGuideCategory === category.id ? "border-[#7B0046] bg-[#7B0046]/5 text-[#4D002C] font-bold" : "border-stone-200 bg-white text-stone-600")}>
-                                          <input type="radio" name={"specification-guide-category-" + item.id} value={category.id} checked={specGuideCategory === category.id} onChange={() => setSpecGuideCategory(category.id)} className="h-3 w-3 accent-[#7B0046]" />
-                                          {category.label}
+                                        <label key={category.id} className={"flex min-h-[38px] w-full min-w-0 items-center gap-2 rounded-md border px-2.5 py-2 text-[11px] leading-tight sm:text-xs " + (specGuideCategory === category.id ? "border-[#7B0046] bg-[#7B0046]/5 text-[#4D002C] font-semibold" : "border-stone-200 bg-white text-stone-600")}>
+                                          <input
+                                            type="radio"
+                                            name={"specification-guide-category-" + item.id}
+                                            value={category.id}
+                                            checked={specGuideCategory === category.id}
+                                            onChange={() => setSpecGuideCategory(category.id)}
+                                            className="!m-0 !h-[14px] !w-[14px] !min-h-[14px] !min-w-[14px] shrink-0 accent-[#7B0046]"
+                                            style={{ width: 14, height: 14, minWidth: 14, minHeight: 14, maxWidth: 14, maxHeight: 14, flex: "0 0 14px", margin: 0, padding: 0 }}
+                                          />
+                                          <span className="min-w-0">{category.label}</span>
                                         </label>
                                       ))}
                                     </div>
