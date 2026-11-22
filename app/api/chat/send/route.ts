@@ -336,6 +336,8 @@ export async function POST(request: NextRequest) {
     const normalizedMessage = normalizePersonName(message);
     const mentionsOwnName = Boolean(ownName && normalizedMessage.includes(ownName));
     const isNamedPRRequest = NAMED_PERSON_PR_REQUEST_PATTERN.test(message) ||
+      /\b[\p{L}][\p{L}\p{M} .'-]{1,80}['’]s\s+(?:prs?|purchase\s+requests?)\b/iu.test(message) ||
+      (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message));
       (OTHER_USER_PR_PATTERN.test(message) && /\b(pr|prs|purchase\s+request|procurement)\b/i.test(message));
 
     // If the named person is the authenticated user, let the normal owner-scoped PR
