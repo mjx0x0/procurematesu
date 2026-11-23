@@ -8,6 +8,8 @@ interface SystemPageHeaderProps {
   titlePrimary?: string;
   titleAccent?: string;
   icon?: LucideIcon;
+  backHref?: string | null;
+  showAdminPortal?: boolean;
   containerClassName?: string;
   workspaceLabel?: string;
   subtitle?: string;
@@ -75,7 +77,7 @@ export function SystemPageHeader({
           ) : null}
           <div className="min-w-0">
             <b
-              aria-label={brandWordmark ? "ProcureMateSU" : undefined}
+              aria-label={brandWordmark ? "ProcureMSU" : undefined}
               className={`block truncate font-black leading-tight ${brandWordmark ? "text-[17px] tracking-[-0.04em] sm:text-[20px]" : `${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} tracking-tight text-[#4D002C]`}`}
             >
               {headerTitle ? (
@@ -91,7 +93,7 @@ export function SystemPageHeader({
                 </span>
               ) : brandWordmark ? (
                 <span className="flex items-center whitespace-nowrap">
-                  <span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">M</span><span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">ate</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">SU</span>
+                  <span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">M</span><span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">SU</span>
                 </span>
               ) : (
                 <>
