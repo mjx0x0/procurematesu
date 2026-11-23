@@ -111,7 +111,7 @@ export default function ProcurementRequestForm() {
     } catch (prefillError) {
       console.error("[PR form] Unable to load chatbot draft:", prefillError);
       const message = prefillError instanceof Error ? prefillError.message : "The draft data is unreadable.";
-      setError(message + " Please return to Gab AI and generate the PR draft again. Your form has not been submitted.");
+      setError(message + " Please return to GAB AI and generate the PR draft again. Your form has not been submitted.");
     }
   }, [searchParams]);
 
