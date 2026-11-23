@@ -258,12 +258,12 @@ export default function PRDetailPage() {
           </div>
         </div>
 
-        <div className="grid min-w-0 grid-cols-1 gap-6 2xl:grid-cols-[minmax(0,1fr)_400px] 2xl:items-start">
+        <div className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start 2xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="min-w-0 space-y-4">
         {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-medium text-red-700">{error}</div>}
 
-        <section className="w-full min-w-0 overflow-x-auto rounded-2xl border border-stone-300 bg-white p-3 shadow-xs sm:p-5 lg:p-6 print:w-full print:min-w-0 print:overflow-visible print:p-0 print:border-0 print:shadow-none">
-          <div className="w-full min-w-[760px] border-2 border-black bg-white text-black box-border print:w-full print:min-w-0 print:box-border">
+        <section className="w-full min-w-0 overflow-x-auto overscroll-x-contain rounded-2xl border border-stone-300 bg-white p-3 shadow-xs sm:p-4 lg:p-5 print:w-full print:min-w-0 print:overflow-visible print:p-0 print:border-0 print:shadow-none">
+          <div className="box-border w-full min-w-[760px] border-[2px] border-solid border-black bg-white text-black print:w-full print:min-w-0">
             <div className="border-b-2 border-black text-center py-3 px-4">
               <h2 className="text-xl font-black uppercase tracking-wider font-serif">PURCHASE REQUEST</h2>
               <p className="text-sm font-bold mt-0.5 tracking-wide font-serif">MINDANAO STATE UNIVERSITY - General Santos City</p>
@@ -357,7 +357,7 @@ export default function PRDetailPage() {
         </section>
 <div className="text-xs text-stone-500 flex items-center gap-2 print:hidden"><FileCheck className="h-4 w-4" />The Download PR Form button generates only the official Purchase Request form as a PDF.</div>
           </div>
-        <aside className="pr-timeline min-w-0 w-full rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 print:hidden">
+        <aside className="pr-timeline min-w-0 w-full max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:sticky xl:top-5 xl:max-h-[calc(100vh-2.5rem)] print:hidden">
           <div className="flex min-w-0 flex-col items-start gap-3 border-b border-stone-200/80 pb-4 mb-4">
             <div className="flex min-w-0 items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046] border border-[#7B0046]/15">
