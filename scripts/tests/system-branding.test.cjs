@@ -334,7 +334,11 @@ test('admin dashboard exposes a persistent, per-admin notification center', () =
   assert.match(notifications, /profile\?\.status !== "approved"/);
   assert.match(notifications, /profile\?\.is_active !== true/);
   assert.match(notifications, /Notification Center/);
-  assert.match(notifications, /Saved across sessions/);
+  assert.match(notifications, /Saved to your account/);
+  assert.match(notifications, /flex max-h-\\[min\\(620px/);
+  assert.match(notifications, /overscroll-contain/);
+  assert.match(notifications, /Mark all as read/);
+  assert.match(notifications, /items\.map\(\(item\) =>/);
   assert.match(notifications, /Mark all read/);
   assert.match(migration, /trg_notify_admins_new_purchase_request/);
   assert.match(migration, /trg_notify_admins_new_user_registration/);
@@ -470,6 +474,27 @@ test('admin notification center loads, updates, and receives persisted per-admin
   assert.match(migration, /trg_notify_admins_pr_stage_change/);
   assert.match(migration, /trg_notify_admins_official_pr_number/);
   assert.match(migration, /ALTER PUBLICATION supabase_realtime ADD TABLE public\.notifications/);
+});
+
+test('admin and end-user notification centers use the same clean responsive layout system', () => {
+  const admin = read('components/AdminPRNotificationPopover.tsx');
+  const user = read('components/NotificationPopover.tsx');
+
+  for (const source of [admin, user]) {
+    assert.match(source, /role="dialog"/);
+    assert.match(source, /max-h-\[min\(620px/);
+    assert.match(source, /overscroll-contain/);
+    assert.match(source, /rounded-2xl border border-stone-200 bg-white/);
+    assert.match(source, /flex h-9 w-9 shrink-0 items-center/);
+    assert.match(source, /flex flex-wrap items-center justify-between/);
+    assert.match(source, /Mark all as read/);
+    assert.match(source, /You’re all caught up/);
+  }
+
+  assert.match(admin, /deleteNotification\(item\)/);
+  assert.match(admin, /toggleRead\(item\)/);
+  assert.match(user, /View PR/);
+  assert.match(user, /markRead\(item\.id\)/);
 });
 
 test('admin procurement reports provide date filters, aggregate metrics, department summaries, and CSV export', () => {
