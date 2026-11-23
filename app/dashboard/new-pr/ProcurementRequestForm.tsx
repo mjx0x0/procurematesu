@@ -205,7 +205,7 @@ export default function ProcurementRequestForm() {
       <main className="mx-auto w-full max-w-none px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8">
         {/* Page Heading */}
         <div className="mb-4 sm:mb-5">
-          <h1 className="text-2xl font-black tracking-tight text-[#4D002C] sm:text-3xl">Create Purchase Request</h1>
+          <h1 className="text-xl sm:text-[1.65rem] md:text-[1.8rem] font-semibold tracking-[-0.035em] leading-tight text-[#4D002C]">Create Purchase Request</h1>
         </div>
 
         <div className="w-full rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden">
