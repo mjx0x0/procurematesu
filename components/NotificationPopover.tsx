@@ -170,165 +170,143 @@ export function NotificationPopover({ variant = "default" }: { variant?: "defaul
       {/* Popover */}
       {open && (
         <>
-          {/* Mobile backdrop to dismiss cleanly */}
-          <div
-            className="fixed inset-0 z-[65] bg-stone-900/20 backdrop-blur-[1px] sm:hidden"
+          <button
+            type="button"
+            aria-label="Close notifications"
             onClick={() => setOpen(false)}
-            aria-hidden="true"
+            className="fixed inset-0 z-[65] cursor-default bg-stone-950/20 backdrop-blur-[2px] sm:hidden"
           />
-
-          <div
-            className="fixed left-3 right-3 top-[68px] z-[70] mx-auto max-w-sm overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-[0_20px_50px_rgba(45,0,26,0.18),0_4px_16px_rgba(0,0,0,0.08)] sm:absolute sm:inset-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-[380px] sm:max-w-none sm:mx-0"
+          <section
+            role="dialog"
+            aria-label="Notification center"
+            className="fixed left-3 right-3 top-[68px] z-[70] mx-auto flex max-h-[min(620px,calc(100svh-84px))] w-auto max-w-md flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_22px_60px_rgba(45,0,26,0.2)] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-[400px] sm:max-w-[calc(100vw-2rem)]"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-stone-100 bg-[#FAF8F5] px-4 py-3 sm:px-4.5">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#7B0046]/10 text-[#7B0046]">
-                  <Bell className="h-4 w-4" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xs sm:text-sm font-black text-[#4D002C]">
-                      Notifications
-                    </h3>
-                    {unread > 0 && (
-                      <span className="rounded-full bg-[#7B0046] px-1.5 py-0.5 text-[9px] font-extrabold text-white">
-                        {unread} new
+            <div className="border-b border-stone-100 bg-white px-4 py-4 sm:px-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-start gap-3">
+                  <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/[0.07] text-[#7B0046]">
+                    <Bell className="h-[18px] w-[18px]" />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <h3 className="text-[15px] font-extrabold leading-tight text-[#4D002C]">Notifications</h3>
+                      <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-bold tabular-nums text-stone-600">
+                        {items.length} total
                       </span>
-                    )}
+                    </div>
+                    <p className="mt-1 text-[11px] text-stone-500">Procurement updates and remarks</p>
                   </div>
-                  <p className="text-[10px] text-stone-500 font-medium">
-                    Procurement updates &amp; remarks
-                  </p>
                 </div>
+                {unread > 0 && (
+                  <span className="shrink-0 rounded-full bg-[#7B0046] px-2.5 py-1 text-[10px] font-bold text-white">
+                    {unread} unread
+                  </span>
+                )}
               </div>
-
               {unread > 0 && (
-                <button
-                  type="button"
-                  onClick={markAll}
-                  className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold text-[#7B0046] transition hover:bg-[#FDF2F7] active:scale-95"
-                >
-                  <CheckCheck className="h-3.5 w-3.5" />
-                  <span>Mark all read</span>
-                </button>
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={markAll}
+                    className="inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2.5 text-[11px] font-bold text-[#7B0046] transition hover:bg-[#FDF2F7] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]"
+                  >
+                    <CheckCheck className="h-3.5 w-3.5" />
+                    Mark all as read
+                  </button>
+                </div>
               )}
             </div>
 
-            {/* List */}
-            <div className="max-h-[min(420px,calc(100svh-170px))] overflow-y-auto divide-y divide-stone-100">
+            <div className="min-h-0 flex-1 divide-y divide-stone-100 overflow-y-auto overscroll-contain">
               {loading && items.length === 0 ? (
-                <div className="px-5 py-12 text-center text-xs text-stone-400">
+                <div className="px-5 py-12 text-center text-xs text-stone-500">
                   <div className="mx-auto mb-2.5 h-5 w-5 animate-spin rounded-full border-2 border-[#7B0046] border-t-transparent" />
                   Loading notifications…
                 </div>
               ) : error ? (
                 <div className="px-5 py-10 text-center">
                   <Bell className="mx-auto h-8 w-8 text-stone-300" />
-                  <p className="mt-2 text-xs font-bold text-stone-700">
-                    Notifications unavailable
-                  </p>
-                  <button
-                    type="button"
-                    onClick={load}
-                    className="mt-2 text-xs font-bold text-[#7B0046] hover:underline"
-                  >
-                    Try again
-                  </button>
+                  <p className="mt-2 text-xs font-bold text-stone-700">Notifications unavailable</p>
+                  <button type="button" onClick={load} className="mt-2 text-xs font-bold text-[#7B0046] hover:underline">Try again</button>
                 </div>
               ) : items.length === 0 ? (
-                <div className="px-5 py-11 text-center">
-                  <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 text-stone-400">
+                <div className="px-5 py-12 text-center">
+                  <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-stone-100 text-stone-400">
                     <Bell className="h-5 w-5" />
-                  </div>
-                  <p className="text-xs font-bold text-stone-800">
-                    No notifications yet
-                  </p>
-                  <p className="mt-1 text-[11px] leading-relaxed text-stone-500 max-w-[220px] mx-auto">
+                  </span>
+                  <p className="mt-3 text-xs font-bold text-stone-800">You’re all caught up</p>
+                  <p className="mx-auto mt-1 max-w-[240px] text-[11px] leading-relaxed text-stone-500">
                     New procurement updates, status changes, and remarks will appear here.
                   </p>
                 </div>
               ) : (
                 items.map((item) => (
-                  <div
+                  <article
                     key={item.id}
-                    className={`p-3.5 sm:p-4 transition-colors ${
-                      item.is_read
-                        ? "bg-white hover:bg-stone-50/70"
-                        : "bg-[#FFFDF7] hover:bg-[#FFF9EE]"
+                    className={`px-4 py-3.5 transition-colors sm:px-5 ${
+                      item.is_read ? "bg-white hover:bg-stone-50/70" : "bg-[#FFFCF7] hover:bg-[#FFF9EF]"
                     }`}
                   >
-                    <div className="flex gap-3">
-                      <div
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border ${
-                          item.type === "rejected"
-                            ? "border-red-200 bg-red-50 text-red-600"
-                            : item.type === "remark"
-                            ? "border-amber-200 bg-amber-50 text-amber-700"
-                            : "border-[#7B0046]/15 bg-[#FDF2F7] text-[#7B0046]"
-                        }`}
-                      >
+                    <div className="flex min-w-0 items-start gap-3">
+                      <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${
+                        item.type === "rejected"
+                          ? "border-red-200 bg-red-50 text-red-600"
+                          : item.type === "remark"
+                          ? "border-amber-200 bg-amber-50 text-amber-700"
+                          : "border-[#7B0046]/10 bg-[#7B0046]/[0.055] text-[#7B0046]"
+                      }`}>
                         {iconFor(item.type)}
-                      </div>
-
+                      </span>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
-                          <h4 className="text-xs font-bold text-stone-900 leading-snug">
-                            {item.title}
-                          </h4>
+                          <h4 className="text-[12px] font-bold leading-snug text-[#4D002C]">{item.title}</h4>
                           {!item.is_read && (
-                            <span className="shrink-0 rounded-full bg-[#7B0046] px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-white">
-                              New
-                            </span>
+                            <span className="shrink-0 rounded-full bg-[#7B0046] px-2 py-0.5 text-[8px] font-extrabold uppercase tracking-wide text-white">New</span>
                           )}
                         </div>
-
-                        <p className="mt-1 text-[11px] leading-relaxed text-stone-600 break-words">
-                          {item.message}
-                        </p>
-
-                        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2">
-                          <span className="inline-flex items-center gap-1 text-[10px] text-stone-400 font-medium">
+                        <p className="mt-1 break-words text-[11px] leading-[1.55] text-stone-600">{item.message}</p>
+                        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-stone-400">
                             <Clock className="h-3 w-3" />
                             {formatTimeAgo(item.created_at)}
                           </span>
-
-                          <div className="flex items-center gap-2">
+                          <div className="flex shrink-0 items-center gap-1.5">
                             {item.pr_no && (
                               <Link
-                                href={`/dashboard/pr/${item.pr_no}`}
+                                href={`/dashboard/pr/${encodeURIComponent(item.pr_no)}`}
                                 onClick={() => {
-                                  if (!item.is_read) markRead(item.id);
+                                  if (!item.is_read) void markRead(item.id);
                                   setOpen(false);
                                 }}
-                                className="inline-flex items-center gap-1 rounded-md bg-[#7B0046]/10 px-2 py-0.5 text-[11px] font-bold text-[#7B0046] transition hover:bg-[#7B0046] hover:text-white"
+                                className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#7B0046]/[0.07] px-2.5 text-[10px] font-bold text-[#7B0046] transition hover:bg-[#7B0046] hover:text-white"
                               >
                                 <span>View PR</span>
-                                <ExternalLink className="h-2.5 w-2.5" />
+                                <ExternalLink className="h-3 w-3" />
                               </Link>
                             )}
-
                             {!item.is_read && (
                               <button
                                 type="button"
-                                onClick={() => markRead(item.id)}
-                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-stone-500 transition hover:bg-stone-100 hover:text-stone-800"
+                                onClick={() => void markRead(item.id)}
+                                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-2.5 text-[10px] font-semibold text-stone-600 transition hover:border-[#7B0046]/25 hover:bg-[#FDF2F7] hover:text-[#7B0046]"
                               >
-                                <Check className="h-3 w-3" />
-                                <span>Read</span>
+                                <Check className="h-3.5 w-3.5" />
+                                Read
                               </button>
                             )}
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </article>
                 ))
               )}
             </div>
-          </div>
+            <div className="border-t border-stone-100 bg-stone-50/80 px-4 py-2.5 text-center">
+              <p className="text-[10px] text-stone-500">Your procurement notifications are saved to your account.</p>
+            </div>
+          </section>
         </>
-      )}
-    </div>
+      )}    </div>
   );
 }
