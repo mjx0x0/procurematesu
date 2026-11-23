@@ -87,7 +87,7 @@ export default function TransparencyPage() {
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-3xl font-black tracking-tight text-[#4D002C]">
-              Procurement Transparency Board
+              PUBLIC BIDDING DOCUMENTS
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-stone-600 max-w-2xl leading-relaxed">
               Publicly listed procurement projects, bidding opportunities, and official disclosures of Mindanao State University – General Santos.
