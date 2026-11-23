@@ -12,7 +12,7 @@ const SYSTEM_NAME = 'MSU - General Santos Digital Procurement Logbook and Inquir
 test('the shared branding constant contains the exact official system name', () => {
   const source = read('lib/system-branding.ts');
   assert.ok(source.includes('export const SYSTEM_NAME = "' + SYSTEM_NAME + '";'));
-  assert.ok(source.includes('export const SYSTEM_SHORT_NAME = "ProcureMateSU";'));
+  assert.ok(source.includes('export const SYSTEM_SHORT_NAME = "ProcureMSU";'));
 });
 
 
@@ -20,7 +20,7 @@ test('landing page brand lockup uses a framed logo, refined gradient wordmark, a
   const landing = read('components/LandingPage.tsx');
   const branding = read('lib/system-branding.ts');
 
-  assert.match(landing, /aria-label="ProcureMateSU/);
+  assert.match(landing, /aria-label="ProcureMSU/);
   assert.match(landing, /rounded-\[14px\].*border border-\[#F2D28A\]\/45/s);
   assert.ok(landing.includes('from-white via-[#FFF5E5] to-[#F1E4EF]'));
   assert.ok(landing.includes('from-[#FFF0B5] via-[#F6C453] to-[#C9871B]'));
@@ -68,7 +68,7 @@ test('legacy institutional branding labels resolve to the official name', () => 
   const source = read('components/SystemBranding.tsx');
   assert.match(source, /import \{ SYSTEM_NAME \}/);
   for (const legacy of [
-    'ProcuremateSU',
+    'ProcureMSU',
     'Procuremate SU',
     'MSU Gensan Procurement System',
     'MSU GenSan Procurement Management System',
@@ -105,7 +105,7 @@ test('main dashboard headers show the ProcureMSU wordmark with MSU letters highl
   const admin = read('app/admin/page.tsx');
 
   assert.match(header, /brandWordmark\?: boolean/);
-  assert.match(header, /aria-label=\{brandWordmark \? "ProcureMateSU"/);
+  assert.match(header, /aria-label=\{brandWordmark \? "ProcureMSU"/);
   assert.ok(header.includes('<MsuLogo size={38} className="shrink-0" />'));
   assert.ok(!header.includes('rounded-[14px] border border-[#F2D28A]/45'));
   assert.ok(header.includes('from-white via-[#FFF5E5] to-[#F1E4EF]'));
@@ -143,13 +143,12 @@ test('main dashboard headers show the ProcureMSU wordmark with MSU letters highl
   assert.match(admin, /brandWordmark/);
 });
 
-test('the short ProcureMateSU wordmark and Gab AI assistant identity remain separate', () => {
+test('the short ProcureMSU wordmark and Gab AI assistant identity remain separate', () => {
   const landing = read('components/LandingPage.tsx');
   const login = read('components/auth/LandingLoginCard.tsx');
   assert.match(landing, /Procure/);
   assert.ok(landing.includes('>Procure</span>'));
   assert.ok(landing.includes('>M</span>'));
-  assert.ok(landing.includes('>ate</span>'));
   assert.ok(landing.includes('>SU</span>'));
   assert.match(landing, /Gab AI/);
   assert.match(login, /Gab AI|SYSTEM_NAME/);
@@ -243,7 +242,7 @@ test('the three user-identified landing-page callouts and About statistics are r
 test('the New PR physical-submission notice now refers to the digital procurement system', () => {
   const source = read('app/dashboard/new-pr/ProcurementRequestForm.tsx');
   assert.match(source, /through this digital procurement system only records and prepares the PR digitally/);
-  assert.doesNotMatch(source, /through ProcuremateSU/);
+  assert.doesNotMatch(source, /through ProcureMSU/);
 });
 
 test('dashboard actions and directories avoid unnecessary decorative controls', () => {
@@ -364,7 +363,7 @@ test('admin full PR modal shows the official form before supplemental details an
   assert.doesNotMatch(mobileFormRules, /order:\s*-1/);
 });
 
-test('admin notification bell is separated from the account control and has no live-status dot', () => {
+test('admin notification bell has no decorative divider or live-status dot', () => {
   const admin = read('app/admin/page.tsx');
   const header = read('components/dashboard/SystemPageHeader.tsx');
   const notifications = read('components/AdminPRNotificationPopover.tsx');
