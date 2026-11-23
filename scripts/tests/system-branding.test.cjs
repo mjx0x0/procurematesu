@@ -611,7 +611,7 @@ test('admin conversation detail loads and renders every saved turn for a chat se
   assert.match(inquiries, /conversationTurns\.map\(\(turn\)/);
   assert.match(inquiries, /Full Conversation/);
   assert.match(inquiries, /turn\.sender === "user"/);
-  assert.match(inquiries, /Gab AI/);
+  assert.match(inquiries, /GAB AI/);
 });
 
 
@@ -664,7 +664,7 @@ test('historical legacy helpdesk logs are grouped and retain ordered conversatio
 });
 
 
-test('admin conversation bubbles mirror the end-user Gab AI chat and expand legacy paragraphs', () => {
+test('admin conversation bubbles mirror the end-user GAB AI chat and expand legacy paragraphs', () => {
   const inquiries = read('app/admin/inquiries/page.tsx');
   const conversationRoute = read('app/api/admin/inquiries/conversation/route.ts');
 
