@@ -263,7 +263,7 @@ export default function PRDetailPage() {
         {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-medium text-red-700">{error}</div>}
 
         <section className="w-full min-w-0 overflow-x-auto overscroll-x-contain rounded-2xl border border-stone-300 bg-white p-3 shadow-xs sm:p-4 lg:p-5 print:w-full print:min-w-0 print:overflow-visible print:p-0 print:border-0 print:shadow-none">
-          <div className="box-border w-full min-w-[760px] bg-white text-black print:w-full print:min-w-0" style={{ border: "2px solid #000000", borderStyle: "solid", boxSizing: "border-box" }}>
+          <div className="pr-form-screen-frame box-border w-full min-w-[760px] bg-white text-black print:w-full print:min-w-0" style={{ border: "2px solid #000000", borderTop: "2px solid #000000", borderRight: "2px solid #000000", borderBottom: "2px solid #000000", borderLeft: "2px solid #000000", outline: "1px solid #000000", outlineOffset: "-2px", boxShadow: "inset 0 0 0 1px #000000", boxSizing: "border-box" }}>
             <div className="border-b-2 border-black text-center py-3 px-4">
               <h2 className="text-xl font-black uppercase tracking-wider font-serif">PURCHASE REQUEST</h2>
               <p className="text-sm font-bold mt-0.5 tracking-wide font-serif">MINDANAO STATE UNIVERSITY - General Santos City</p>
