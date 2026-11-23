@@ -63,11 +63,14 @@ export function validatePurchaseRequest(input: {
   const errors: PRValidationErrors = {};
   const purpose = input.purpose.trim(); const department = input.department.trim(); const section = (input.section || '').trim();
   const requestedBy = input.requestedBy.trim(); const designation = (input.designation || '').trim();
-  const purposeRelevant = /\b(purchase|procure|procurement|buy|acquire|need|supply|supplies|equipment|materials?|office|laboratory|classroom|teaching|instruction|learning|research|project|program|operations|activities|event|seminar|training|repair|maintenance|service|services|replace|replacement|use|support)\b/i;
   const departmentRelevant = /\b(college|school|department|office|unit|laboratory|lab|faculty|institute|center|division|administration|program|section|campus|library|registrar|accounting|finance|engineering|education|science|business|nursing|research|graduate|ict|hr|human\s+resources)\b/i;
 
-  if (purpose.length < 10 || cleanWords(purpose).length < 3) errors.purpose = 'Please provide a complete procurement purpose or description, not a short/random phrase.';
-  else if (looksGibberish(purpose) || !purposeRelevant.test(purpose)) errors.purpose = 'The purpose appears unrelated or invalid. Describe what the procurement is for and how it will be used.';
+  // Accept concise, naturally worded purposes. Do not require procurement keywords,
+  // a minimum word count, or particular capitalization; reject only blank/very short
+  // input and text that strongly resembles random characters.
+  if (purpose.length < 3 || looksGibberish(purpose)) {
+    errors.purpose = 'Please enter a readable purpose or brief description of the request.';
+  }
   if (department.length < 2 || looksGibberish(department) || (!departmentRelevant.test(department) && cleanWords(department).length < 2)) errors.department = 'Please enter a valid department, college, office, laboratory, or university unit.';
   if (section && looksGibberish(section)) errors.section = 'Please enter a valid section/unit name, or leave this field blank.';
   if (!requestedBy || requestedBy.includes('@') || cleanWords(requestedBy).length < 2 || looksGibberish(requestedBy)) errors.requestedBy = 'Please enter your actual full name.';
