@@ -106,7 +106,7 @@ export function SystemPageHeader({
                 </>
               )}
             </b>
-            {headerTitle === "Gab AI" || hideSystemSuffix ? (
+            {headerTitle === "GAB AI" || headerTitle === "Gab AI" || hideSystemSuffix ? (
               <p className="mt-1 flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[7.5px] font-bold uppercase tracking-[0.10em] sm:text-[8.5px] sm:tracking-[0.13em]">
                 <span className="shrink-0 text-[#F6D58A]">{effectiveWorkspaceLabel || "Procurement Assistant"}</span>
               </p>
