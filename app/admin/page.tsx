@@ -123,35 +123,6 @@ export default function AdminDashboard() {
 
   if (loading) return <LoadingScreen label="Loading admin workspace..." />;
 
-  const mainActions = [
-    {
-      title: "Purchase Requests",
-      description: "Review, update, and manage submitted purchase requests.",
-      href: "/admin/purchase-requests",
-      action: "Open logbook",
-    },
-    {
-      title: "User Approvals",
-      description: "Review account registrations and manage staff access.",
-      href: "/admin/users",
-      action: "Review accounts",
-    },
-    {
-      title: "Inquiries",
-      description: "Review procurement questions and Gab AI responses.",
-      href: "/admin/inquiries",
-      action: "View inquiries",
-    },
-    {
-      title: "Procurement Reports & Analytics",
-      description: "Review request volume, estimated values, departments, and workflow distribution.",
-      href: "/admin/reports",
-      action: "Open reports",
-    },
-  ];
-
-
-
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
       <SystemPageHeader
@@ -176,26 +147,6 @@ export default function AdminDashboard() {
             Manage purchase requests, staff access, and procurement inquiries from one workspace.
           </p>
         </div>
-
-        <nav
-          aria-label="Admin main menu"
-          className="mb-5 sm:mb-7 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4"
-        >
-          {mainActions.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="group flex min-h-[124px] flex-col rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_5px_20px_rgba(45,20,10,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#7B0046]/30 hover:shadow-[0_8px_24px_rgba(77,0,44,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2 sm:p-5"
-            >
-              <h2 className="text-base sm:text-lg font-bold text-[#4D002C]">{item.title}</h2>
-              <p className="mt-1.5 text-xs leading-relaxed text-stone-600">{item.description}</p>
-              <span className="mt-auto flex items-center justify-between border-t border-stone-100 pt-3 text-xs font-bold text-[#7B0046]">
-                {item.action}
-                <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </span>
-            </Link>
-          ))}
-        </nav>
 
         <section
           aria-labelledby="admin-action-required-heading"
