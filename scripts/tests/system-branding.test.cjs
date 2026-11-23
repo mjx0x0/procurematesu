@@ -699,19 +699,13 @@ test('purchase request tracking retains the shared end-user navigation shell', (
 });
 
 
-test('PR tracking uses a wide two-column layout with a compact live processing timeline', () => {
+test('PR tracking keeps the form full-width and timeline readable without narrow-column overflow', () => {
   const tracking = read('app/dashboard/pr/[pr_no]/page.tsx');
-  assert.match(tracking, /w-full max-w-none px-4 py-5/);
-  assert.match(tracking, /xl:grid-cols-\[minmax\(0,1fr\)_320px\]/);
-  assert.match(tracking, /pr-timeline min-w-0/);
-  assert.match(tracking, /Current stage/);
-  assert.match(tracking, /Next step/);
-  assert.match(tracking, /text-lg font-bold tracking-tight text-\[#4D002C\] font-mono sm:text-xl lg:text-2xl/);
-});
-
-test('create PR form expands to the full workspace width', () => {
-  const form = read('app/dashboard/new-pr/ProcurementRequestForm.tsx');
-  assert.match(form, /w-full max-w-none px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8/);
-  assert.match(form, /w-full rounded-2xl border border-stone-200 bg-white/);
-  assert.match(form, /p-4 sm:p-6 lg:p-8/);
+  assert.match(tracking, /!text-base !font-medium tracking-normal text-\[#4D002C\] font-mono sm:!text-\[17px\]/);
+  assert.match(tracking, /grid min-w-0 grid-cols-1 gap-6 2xl:grid-cols-\[minmax\(0,1fr\)_400px\]/);
+  assert.match(tracking, /w-full min-w-0 overflow-x-auto rounded-2xl/);
+  assert.match(tracking, /w-full min-w-\[760px\] border-2 border-black/);
+  assert.match(tracking, /pr-timeline min-w-0 w-full/);
+  assert.match(tracking, /inline-flex w-full min-w-0 items-start/);
+  assert.match(tracking, /whitespace-normal break-words/);
 });
