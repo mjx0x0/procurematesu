@@ -479,11 +479,6 @@ export default function ProcurementRequestForm() {
                                   </div>
                                 </>
                               )}
-                              {item.description.trim().length > 0 && item.description.trim().length < 15 && (
-                                <p className="text-[10px] text-amber-700 font-medium mt-1">
-                                  Please provide complete technical specifications (size, material, capacity, performance, etc.).
-                                </p>
-                              )}
                             </td>
                             <td data-label="Quantity" className="py-3 px-3">
                               <input
