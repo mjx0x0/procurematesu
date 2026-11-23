@@ -199,20 +199,20 @@ export default function ProcurementRequestForm() {
         workspaceLabel="End User Workspace"
         backHref="/dashboard"
         roleLabel="End User"
-        containerClassName="max-w-5xl px-4"
+        containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8"
       />
 
-      <main className="max-w-5xl mx-auto px-3.5 sm:px-4 pt-4 sm:pt-6">
+      <main className="mx-auto w-full max-w-none px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8">
         {/* Page Heading */}
         <div className="mb-4 sm:mb-5">
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-[#4D002C]">Create Purchase Request</h1>
+          <h1 className="text-2xl font-black tracking-tight text-[#4D002C] sm:text-3xl">Create Purchase Request</h1>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+        <div className="w-full rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden">
           {/* Header Banner */}
           <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
           
-          <div className="p-3 sm:p-6 md:p-8">
+          <div className="p-4 sm:p-6 lg:p-8">
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 sm:space-y-8">
               {/* Physical Submission Notice */}
@@ -249,7 +249,7 @@ export default function ProcurementRequestForm() {
                   <h3 className="text-base font-extrabold text-[#4D002C]">Document &amp; Department Information</h3>
                 </div>
 
-                <div className="max-w-xs space-y-1">
+                <div className="w-full max-w-sm space-y-1">
                   <label className="block text-xs font-bold text-stone-700">Date</label>
                   <input
                     type="date"
