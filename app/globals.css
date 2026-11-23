@@ -449,7 +449,7 @@ nav.sticky, nav[class*="sticky"] { box-shadow: 0 1px 0 rgba(53,7,8,.04), 0 8px 2
 .app-theme main h1:not(.font-serif) {
   font-family: var(--font-inter);
   font-size: clamp(1.7rem, 2.15vw, 2.1rem) !important;
-  font-weight: 500 !important;
+  font-weight: 550 !important;
   letter-spacing: -0.055em !important;
   line-height: 1.12 !important;
   color: #570033;
