@@ -468,7 +468,11 @@ test('admin notification center loads, updates, and receives persisted per-admin
   assert.match(notifications, /postgres_changes/);
   assert.match(notifications, /table: "notifications"/);
   assert.match(notifications, /user_id=eq\./);
-  assert.match(notifications, /Saved across sessions/);
+  assert.match(notifications, /Saved to your account/);
+  assert.match(notifications, /max-h-\\[min\\(620px/);
+  assert.match(notifications, /overscroll-contain/);
+  assert.match(notifications, /Mark all as read/);
+  assert.match(notifications, /items\\.map\\(\\(item\\) =>/);
   assert.match(migration, /trg_notify_admins_new_purchase_request/);
   assert.match(migration, /trg_notify_admins_new_user_registration/);
   assert.match(migration, /trg_notify_admins_pr_stage_change/);
