@@ -379,7 +379,7 @@ export default function PRDetailPage() {
               <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusClass(pr.current_stage)}`}>{statusLabel(pr.current_stage)}</span>
             </div>
             <p className="mt-2 text-sm font-bold leading-snug text-[#4D002C]">{currentStageInfo?.shortLabel || statusLabel(pr.current_stage)}</p>
-            {currentStageInfo?.description && <p className="mt-1 text-[11px] leading-relaxed text-stone-600">{currentStageInfo.description}</p>}
+            {currentStageInfo?.description && <p className="mt-1 break-words text-[11px] leading-relaxed text-stone-600">{currentStageInfo.description}</p>}
             {nextStageInfo && (
               <div className="mt-3 border-t border-[#7B0046]/10 pt-2.5">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500">Next step</span>
@@ -408,7 +408,7 @@ export default function PRDetailPage() {
                 return (
                   <div key={group.key} className="relative min-w-0 w-full group/timeline">
                     {/* Timeline Node Icon */}
-                    <div className="absolute -left-6 sm:-left-8 top-1.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white border-2 border-emerald-500 text-emerald-600 shadow-xs z-10">
+                    <div className="absolute -left-6 top-1.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white border-2 border-emerald-500 text-emerald-600 shadow-xs z-10">
                       <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-emerald-50 text-emerald-600" />
                     </div>
 
@@ -436,7 +436,7 @@ export default function PRDetailPage() {
                             <MessageSquare className="h-3 w-3" />
                             <span>Stage Remark</span>
                           </div>
-                          <p className="text-xs leading-relaxed text-stone-700">{event.remarks || event.notes}</p>
+                          <p className="break-words text-xs leading-relaxed text-stone-700">{event.remarks || event.notes}</p>
                         </div>
                       ) : null}
 
@@ -449,7 +449,7 @@ export default function PRDetailPage() {
                                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#C27803]" />
                                 <div className="min-w-0 flex-1">
                                   <div className="flex min-w-0 flex-col items-start gap-1">
-                                    <span className="leading-relaxed text-stone-700">{remark.remarks || remark.notes || "No remarks provided."}</span>
+                                    <span className="min-w-0 break-words leading-relaxed text-stone-700">{remark.remarks || remark.notes || "No remarks provided."}</span>
                                     <span className="max-w-full whitespace-normal break-words text-[10px] font-mono text-stone-400">
                                       {new Date(remark.completed_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })} {new Date(remark.completed_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                                     </span>
