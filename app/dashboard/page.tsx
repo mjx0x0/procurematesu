@@ -146,7 +146,7 @@ export default function DashboardPage() {
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
         <section className="pt-1 pb-1 sm:pt-2 sm:pb-2">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-[#4D002C] leading-tight">
+          <h1 className="text-xl sm:text-[1.65rem] md:text-[1.8rem] font-semibold tracking-[-0.035em] leading-tight text-[#4D002C]">
             Procurement Dashboard
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-stone-600 max-w-2xl leading-relaxed">
