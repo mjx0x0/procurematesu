@@ -68,12 +68,14 @@ test('legacy institutional branding labels resolve to the official name', () => 
   const source = read('components/SystemBranding.tsx');
   assert.match(source, /import \{ SYSTEM_NAME \}/);
   for (const legacy of [
-    'ProcureMSU',
+    'ProcuremateSU',
+    'ProcureMateSU',
     'Procuremate SU',
     'MSU Gensan Procurement System',
     'MSU GenSan Procurement Management System',
   ]) {
-    assert.ok(source.includes('"' + legacy + '": SYSTEM_NAME'), legacy);
+    const expected = legacy === 'ProcuremateSU' || legacy === 'ProcureMateSU' ? 'SYSTEM_SHORT_NAME' : 'SYSTEM_NAME';
+    assert.ok(source.includes('"' + legacy + '": ' + expected), legacy);
   }
 });
 
