@@ -98,7 +98,7 @@ const loadUsers = useCallback(async () => {
       <main className="mx-auto w-full max-w-none px-5 py-5 sm:px-7 sm:py-7 xl:px-10 2xl:px-12">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-xl sm:text-3xl font-black tracking-tight text-[#4D002C]">End-User Accounts</h1>
+            <h1 className="text-xl sm:text-[1.7rem] md:text-[1.85rem] font-semibold tracking-[-0.035em] leading-tight text-[#4D002C]">End-User Accounts</h1>
             <p className="text-xs sm:text-sm text-stone-600 mt-1">Review and authorize institutional account registrations.</p>
           </div>
           <button
