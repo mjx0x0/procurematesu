@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { SYSTEM_NAME } from "@/lib/system-branding";
+import { SYSTEM_NAME, SYSTEM_SHORT_NAME } from "@/lib/system-branding";
 
 /** Keeps legacy UI labels consistent with the current institutional system name. */
 export default function SystemBranding() {
   useEffect(() => {
     const replacements: Record<string, string> = {
-      "ProcuremateSU": SYSTEM_NAME,
+      "ProcuremateSU": SYSTEM_SHORT_NAME,
+      "ProcureMateSU": SYSTEM_SHORT_NAME,
       "Procuremate SU": SYSTEM_NAME,
       "MSU Gensan Procurement System": SYSTEM_NAME,
       "MSU GenSan Procurement System": SYSTEM_NAME,
