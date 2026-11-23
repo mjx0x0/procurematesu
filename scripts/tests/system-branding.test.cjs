@@ -701,10 +701,10 @@ test('purchase request tracking retains the shared end-user navigation shell', (
 
 test('PR tracking keeps the form full-width and timeline readable without narrow-column overflow', () => {
   const tracking = read('app/dashboard/pr/[pr_no]/page.tsx');
-  assert.match(tracking, /!text-base !font-medium tracking-normal text-\[#4D002C\] font-mono sm:!text-\[17px\]/);
+  assert.match(tracking, /text-\[22px\] font-semibold leading-tight tracking-\[-0\.025em\] text-\[#4D002C\] font-mono sm:text-2xl/);
   assert.match(tracking, /grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-\[minmax\(0,1fr\)_340px\]/);
   assert.match(tracking, /w-full min-w-0 overflow-x-auto overscroll-x-contain rounded-2xl/);
-  assert.match(tracking, /box-border w-full min-w-\[760px\] border-\[2px\] border-solid border-black/);
+  assert.match(tracking, /box-border w-full min-w-\[760px\] bg-white text-black print:w-full print:min-w-0.*border: "2px solid #000000".*boxSizing: "border-box"/);
   assert.match(tracking, /pr-timeline min-w-0 w-full max-h-\[70vh\] overflow-y-auto overscroll-contain/);
   assert.match(tracking, /inline-flex w-full min-w-0 items-start/);
   assert.match(tracking, /whitespace-normal break-words/);
