@@ -17,7 +17,6 @@ export function EndUserPageHeader({
   titlePrimary,
   titleAccent,
   icon: PageIcon,
-  containerClassName = "max-w-7xl px-4 sm:px-6",
   children,
 }: EndUserPageHeaderProps) {
   return (
