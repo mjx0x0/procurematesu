@@ -64,6 +64,9 @@ export default function PRDetailPage() {
   const [stages, setStages] = useState<Stage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [printedName, setPrintedName] = useState("");
+  const [savingPrintedName, setSavingPrintedName] = useState(false);
+  const [printedNameMessage, setPrintedNameMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -92,6 +95,7 @@ export default function PRDetailPage() {
         }
         if (!prData) { setError("Purchase request not found"); return; }
         setPr(prData);
+        setPrintedName(String(prData.printed_name || ""));
         const [{ data: itemData }, { data: stageData }] = await Promise.all([
           supabase.from("pr_items").select("*").eq("pr_no", targetPrNo).order("created_at", { ascending: true }),
           supabase.from("pr_stages_completed").select("*").eq("pr_no", targetPrNo).order("completed_at", { ascending: true }),
@@ -107,6 +111,33 @@ export default function PRDetailPage() {
     };
     load();
   }, [prNo, router]);
+
+  const savePrintedName = async () => {
+    if (!pr || pr.current_stage !== "draft" || savingPrintedName) return;
+    setSavingPrintedName(true);
+    setPrintedNameMessage(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch("/api/pr/update-printed-name", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ prNo: pr.pr_no, printedName }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Unable to update the printed name.");
+      setPr((current) => current ? { ...current, printed_name: result.printed_name } : current);
+      setPrintedName(result.printed_name);
+      setPrintedNameMessage("Printed name updated.");
+    } catch (saveError) {
+      setPrintedNameMessage(saveError instanceof Error ? saveError.message : "Unable to update the printed name.");
+    } finally {
+      setSavingPrintedName(false);
+    }
+  };
 
   const statusLabel = (status: string) => PROCUREMENT_STAGE_LABELS[status] || ({ completed: "Completed", rejected: "Rejected", cancelled: "Cancelled" } as Record<string, string>)[status] || status;
   const statusClass = (status: string) => {
@@ -277,9 +308,29 @@ export default function PRDetailPage() {
             <div className="grid grid-cols-12 border-b-2 border-black text-xs font-bold text-center"><div className="col-span-6 border-r-2 border-black py-1.5">REQUESTED BY</div><div className="col-span-6 py-1.5">APPROVED BY</div></div>
             <div className="grid grid-cols-12 min-h-[96px] text-xs">
               <div className="col-span-6 border-r-2 border-black p-3 flex flex-col justify-end">
-                <div className="flex mb-2">
-                  <span className="w-24">Printed Name</span>
-                  <span className="font-bold uppercase">{pr.printed_name || ""}</span>
+                <div className="mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-24 shrink-0">Printed Name</span>
+                    {pr.current_stage === "draft" ? (
+                      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 print:hidden">
+                        <input
+                          aria-label="Printed name"
+                          value={printedName}
+                          onChange={(event) => { setPrintedName(event.target.value); setPrintedNameMessage(null); }}
+                          maxLength={120}
+                          className="min-w-0 flex-1 rounded border border-stone-300 px-2 py-1 text-xs font-bold uppercase focus:border-[#7B0046] focus:outline-none focus:ring-1 focus:ring-[#7B0046]/20"
+                        />
+                        <button type="button" onClick={savePrintedName} disabled={savingPrintedName || printedName.trim().length < 2 || printedName.trim() === (pr.printed_name || "")} className="rounded bg-[#7B0046] px-2.5 py-1 text-[10px] font-bold text-white hover:bg-[#610037] disabled:cursor-not-allowed disabled:opacity-50">
+                          {savingPrintedName ? "Saving..." : "Save"}
+                        </button>
+                        {printedNameMessage && <span role="status" className="w-full text-[10px] font-medium text-stone-600">{printedNameMessage}</span>}
+                      </div>
+                    ) : (
+                      <span className="font-bold uppercase">{pr.printed_name || ""}</span>
+                    )}
+                    {pr.current_stage === "draft" && <span className="hidden print:inline font-bold uppercase">{printedName || pr.printed_name || ""}</span>}
+                  </div>
+                  {pr.current_stage === "draft" && <p className="mt-1 text-[10px] text-stone-500 print:hidden">Editable until the Procurement Office records receipt of the printed PR.</p>}
                 </div>
                 <div className="flex">
                   <span className="w-24">Designation</span>
