@@ -89,13 +89,13 @@ const loadUsers = useCallback(async () => {
         icon={Users}
         backHref="/admin"
         roleLabel="Administrator"
-        containerClassName="max-w-6xl px-4"
+        containerClassName="w-full max-w-none px-5 sm:px-7 xl:px-10 2xl:px-12"
         showControlsDivider
       >
         <AdminPRNotificationPopover />
       </SystemPageHeader>
 
-      <main className="max-w-6xl mx-auto px-3.5 py-4 sm:px-6 sm:py-7">
+      <main className="mx-auto w-full max-w-none px-5 py-5 sm:px-7 sm:py-7 xl:px-10 2xl:px-12">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-xl sm:text-3xl font-black tracking-tight text-[#4D002C]">End-User Accounts</h1>
@@ -149,9 +149,9 @@ const loadUsers = useCallback(async () => {
           ))}
         </div>
 
-        <div className="space-y-3">
+        <div className="w-full space-y-3.5">
           {filteredUsers.length === 0 ? (
-            <div className="ui-card p-12 text-center text-stone-500">
+            <div className="ui-card flex min-h-[240px] w-full flex-col items-center justify-center px-6 py-10 text-center text-stone-500 sm:min-h-[280px] sm:px-10">
               <Users className="h-10 w-10 mx-auto text-stone-300 mb-2" />
               <p className="font-semibold">No {filter === "all" ? "user registrations" : filter + " accounts"} found.</p>
               <p className="text-xs text-stone-400 mt-1">Select another filter tab or refresh the listing.</p>
@@ -160,7 +160,7 @@ const loadUsers = useCallback(async () => {
             filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className="ui-card p-3.5 sm:p-5 hover:border-amber-200 transition-all hover:shadow-md"
+                className="ui-card w-full p-4 sm:p-5 xl:px-6 hover:border-amber-200 transition-all hover:shadow-md"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex items-start gap-3.5 min-w-0">
@@ -233,7 +233,7 @@ const loadUsers = useCallback(async () => {
           )}
         </div>
 
-        <div className="mt-6 text-xs text-stone-500 flex items-center gap-2 p-3 bg-stone-50 rounded-xl border border-stone-200">
+        <div className="mt-6 w-full text-xs text-stone-500 flex items-center gap-2.5 p-3.5 sm:p-4 bg-stone-50 rounded-xl border border-stone-200">
           <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
           <span>New registrations remain inactive until an administrator approves them. Once approved, the user can immediately log in.</span>
         </div>
