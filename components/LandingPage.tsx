@@ -67,7 +67,7 @@ export default function LandingPage() {
                 <MsuLogo size={35} className="relative z-10" />
               </span>
               <span className="min-w-0 leading-none">
-                <span className="flex items-center whitespace-nowrap text-[17px] font-semibold tracking-[-0.035em] sm:text-[20px]">
+                <span className="flex items-center whitespace-nowrap text-[17px] font-[750] tracking-[-0.035em] sm:text-[20px]">
                   <span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">MSU</span>
                 </span>
                 <span className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[8px] font-bold uppercase tracking-[0.13em] sm:text-[8.5px]">
