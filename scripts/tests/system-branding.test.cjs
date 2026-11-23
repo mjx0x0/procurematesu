@@ -368,11 +368,8 @@ test('admin notification bell has no decorative divider or live-status dot', () 
   const header = read('components/dashboard/SystemPageHeader.tsx');
   const notifications = read('components/AdminPRNotificationPopover.tsx');
 
-  assert.match(admin, /showControlsDivider/);
-  assert.match(header, /showControlsDivider\?: boolean/);
-  assert.match(header, /role="separator"/);
-  assert.match(header, /aria-orientation="vertical"/);
-  assert.match(header, /bg-white\/25/);
+  assert.doesNotMatch(header, /role="separator"/);
+  assert.doesNotMatch(admin, /h-7 w-px/);
   assert.doesNotMatch(notifications, /bg-emerald-400/);
 });
 
