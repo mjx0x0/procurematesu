@@ -1,16 +1,26 @@
 "use client";
+
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import AppSidebar from "@/components/AppSidebar";
 import SystemBranding from "@/components/SystemBranding";
 
-const PRESERVE_PAGE_ROUTES=["/","/auth/signup","/dashboard/new-pr","/dashboard/pr-print","/dashboard/pr/"];
-export default function AppThemeShell({children}:{children:React.ReactNode}){
-  const pathname=usePathname()||"";
-  const preserve=PRESERVE_PAGE_ROUTES.some(route=>route.endsWith("/")?pathname.startsWith(route):pathname===route);
-  if(preserve)return <>{children}</>;
-  const isAdmin=pathname==="/admin"||pathname.startsWith("/admin/");
+const PRESERVE_PAGE_ROUTES = ["/", "/auth/signup", "/dashboard/new-pr", "/dashboard/pr-print", "/dashboard/pr/"];
+
+export default function AppThemeShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname() || "";
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const preserve = PRESERVE_PAGE_ROUTES.some((route) =>
+    route.endsWith("/") ? pathname.startsWith(route) : pathname === route
+  );
+
+  if (preserve) return <>{children}</>;
+
+  const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
+  const isChat = pathname === "/dashboard/chatbot";
+
   return (
-    <div className={`app-theme ${isAdmin ? "admin-shell" : "portal-shell"}`}>
+    <div className={`app-theme ${isAdmin ? "admin-shell" : "portal-shell"} ${sidebarCollapsed ? "sidebar-is-collapsed" : "sidebar-is-expanded"}`}>
       <style>{`
         .portal-shell button[aria-label="Logout"]::after,
         .portal-shell button[title="Logout"]::after,
@@ -18,8 +28,12 @@ export default function AppThemeShell({children}:{children:React.ReactNode}){
         .admin-shell button[title="Logout"]::after,
         .app-sidebar button::after { content: none !important; display: none !important; }
       `}</style>
-      <AppSidebar mode={isAdmin ? "admin" : "user"} />
-      <div className={`app-theme-content ${pathname === "/dashboard/chatbot" ? "mobile-chat-shell" : ""}`}>{children}</div>
+      <AppSidebar
+        mode={isAdmin ? "admin" : "user"}
+        collapsed={sidebarCollapsed}
+        onToggleCollapsed={() => setSidebarCollapsed((current) => !current)}
+      />
+      <div className={`app-theme-content ${isChat ? "mobile-chat-shell" : ""}`}>{children}</div>
       <SystemBranding />
     </div>
   );
