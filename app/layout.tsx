@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: `%s | ${SYSTEM_NAME}`,
   },
   description: SYSTEM_DESCRIPTION,
-  keywords: ["procurement", "MSU-GenSan", "RA 12009", "purchase request", "Gab AI", "Mindanao State University", "General Santos", "government procurement", "e-procurement"],
+  keywords: ["procurement", "MSU-GenSan", "RA 12009", "purchase request", "GAB AI", "Mindanao State University", "General Santos", "government procurement", "e-procurement"],
   authors: [{ name: SYSTEM_NAME }],
   openGraph: {
     title: SYSTEM_NAME,
