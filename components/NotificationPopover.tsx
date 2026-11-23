@@ -307,6 +307,7 @@ export function NotificationPopover({ variant = "default" }: { variant?: "defaul
             </div>
           </section>
         </>
-      )}    </div>
+      )}
+    </div>
   );
 }
