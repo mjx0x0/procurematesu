@@ -444,3 +444,28 @@ nav.sticky, nav[class*="sticky"] { box-shadow: 0 1px 0 rgba(53,7,8,.04), 0 8px 2
   box-shadow: inset 0 0 0 1px #000 !important;
   box-sizing: border-box !important;
 }
+
+/* Unified page-title typography: lighter, more editorial, and consistent across workspaces. */
+.app-theme main h1:not(.font-serif) {
+  font-family: var(--font-inter);
+  font-size: clamp(1.7rem, 2.15vw, 2.1rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.055em !important;
+  line-height: 1.12 !important;
+  color: #570033;
+  text-wrap: balance;
+}
+
+.app-theme main h1:not(.font-serif) strong,
+.app-theme main h1:not(.font-serif) b {
+  font-weight: 600 !important;
+}
+
+@media (max-width: 640px) {
+  .app-theme main h1:not(.font-serif) {
+    font-size: 1.65rem !important;
+    letter-spacing: -0.045em !important;
+    line-height: 1.16 !important;
+  }
+}
+
