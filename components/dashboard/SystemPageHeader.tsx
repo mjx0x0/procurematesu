@@ -29,7 +29,6 @@ export function SystemPageHeader({
   titlePrimary,
   titleAccent,
   icon: PageIcon,
-  containerClassName = "max-w-7xl px-4 sm:px-6 lg:px-8",
   workspaceLabel,
   subtitle,
   headerTitle,
