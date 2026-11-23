@@ -86,7 +86,7 @@ export default function TransparencyPage() {
         {/* Simple & Clean Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-3xl font-black tracking-tight text-[#4D002C]">
+            <h1 className="text-xl sm:text-[1.7rem] md:text-[1.85rem] font-semibold tracking-[-0.035em] leading-tight text-[#4D002C]">
               Public Bidding Documents
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-stone-600 max-w-2xl leading-relaxed">
