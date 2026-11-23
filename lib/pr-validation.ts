@@ -21,35 +21,6 @@ function looksGibberish(value: string): boolean {
   return false;
 }
 
-const GENERIC_ITEMS = new Set([
-  'computer', 'computers', 'pc', 'pcs', 'laptop', 'laptops', 'desktop', 'desktops',
-  'printer', 'printers', 'scanner', 'scanners', 'projector', 'projectors',
-  'table', 'tables', 'chair', 'chairs', 'paper', 'papers', 'pen', 'pens',
-  'ink', 'inks', 'toner', 'toners', 'desk', 'desks', 'cabinet', 'cabinets',
-  'monitor', 'monitors', 'mouse', 'keyboard', 'keyboards', 'phone', 'phones',
-  'camera', 'cameras', 'aircon', 'fan', 'fans', 'software', 'equipment',
-  'supplies', 'materials', 'tools', 'device', 'devices', 'book', 'books',
-  'hard drive', 'flash drive', 'usb', 'headset', 'whiteboard', 'stapler'
-]);
-
-function isGenericWithoutSpecs(desc: string): boolean {
-  const clean = desc.trim().toLowerCase();
-  const words = clean.split(/[^a-z0-9]+/).filter(Boolean);
-
-  // A bare item name is too vague, but one meaningful detail is enough.
-  // Examples accepted: "laptop, i7", "pen, black", "ballpen, black color".
-  if (GENERIC_ITEMS.has(clean)) return true;
-
-  if (words.length <= 2) {
-    const hasGenericItemName = words.some((word) => GENERIC_ITEMS.has(word));
-    const hasAdditionalDetail = words.some((word) => !GENERIC_ITEMS.has(word));
-    if (hasGenericItemName && !hasAdditionalDetail) return true;
-  }
-
-  // Keep rejecting very short, single-word entries (including unknown item names).
-  if (words.length < 2 && clean.length < 12) return true;
-  return false;
-}
 
 function cleanWords(value: string) { return value.trim().split(/\s+/).filter(Boolean); }
 
@@ -97,3 +68,6 @@ export function validatePurchaseRequest(input: {
 }
 
 export function firstValidationError(errors: PRValidationErrors) { return Object.values(errors)[0] || null; }
+    if (description.length < 4 || looksGibberish(description)) {
+      errors[`item_${index}_description`] = `Item ${index + 1}: enter a meaningful item description.`;
+    }
