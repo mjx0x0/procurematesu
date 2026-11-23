@@ -335,7 +335,7 @@ test('admin dashboard exposes a persistent, per-admin notification center', () =
   assert.match(notifications, /profile\?\.is_active !== true/);
   assert.match(notifications, /Notification Center/);
   assert.match(notifications, /Saved to your account/);
-  assert.match(notifications, /flex max-h-\\[min\\(620px/);
+  assert.match(notifications, /flex max-h-\\[min\\(650px/);
   assert.match(notifications, /overscroll-contain/);
   assert.match(notifications, /Mark all as read/);
   assert.match(notifications, /items\.map\(\(item\) =>/);
@@ -469,7 +469,7 @@ test('admin notification center loads, updates, and receives persisted per-admin
   assert.match(notifications, /table: "notifications"/);
   assert.match(notifications, /user_id=eq\./);
   assert.match(notifications, /Saved to your account/);
-  assert.match(notifications, /max-h-\\[min\\(620px/);
+  assert.match(notifications, /max-h-\\[min\\(650px/);
   assert.match(notifications, /overscroll-contain/);
   assert.match(notifications, /Mark all as read/);
   assert.match(notifications, /items\\.map\\(\\(item\\) =>/);
