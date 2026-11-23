@@ -10,8 +10,13 @@ const PRESERVE_PAGE_ROUTES = ["/", "/auth/signup", "/dashboard/pr-print", "/dash
 export default function AppThemeShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // Match the root route exactly; "/" must not act as a prefix for every page.
   const preserve = PRESERVE_PAGE_ROUTES.some((route) =>
-    route.endsWith("/") ? pathname.startsWith(route) : pathname === route
+    route === "/"
+      ? pathname === "/"
+      : route.endsWith("/")
+        ? pathname.startsWith(route)
+        : pathname === route
   );
 
   if (preserve) return <>{children}</>;
