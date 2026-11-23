@@ -34,13 +34,19 @@ const GENERIC_ITEMS = new Set([
 
 function isGenericWithoutSpecs(desc: string): boolean {
   const clean = desc.trim().toLowerCase();
-  const words = clean.split(/\s+/).filter(Boolean);
+  const words = clean.split(/[^a-z0-9]+/).filter(Boolean);
+
+  // A bare item name is too vague, but one meaningful detail is enough.
+  // Examples accepted: "laptop, i7", "pen, black", "ballpen, black color".
+  if (GENERIC_ITEMS.has(clean)) return true;
+
   if (words.length <= 2) {
-    if (GENERIC_ITEMS.has(clean)) return true;
-    for (const w of words) {
-      if (GENERIC_ITEMS.has(w) && words.length <= 2) return true;
-    }
+    const hasGenericItemName = words.some((word) => GENERIC_ITEMS.has(word));
+    const hasAdditionalDetail = words.some((word) => !GENERIC_ITEMS.has(word));
+    if (hasGenericItemName && !hasAdditionalDetail) return true;
   }
+
+  // Keep rejecting very short, single-word entries (including unknown item names).
   if (words.length < 2 && clean.length < 12) return true;
   return false;
 }
