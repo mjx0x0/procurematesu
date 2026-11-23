@@ -344,134 +344,140 @@ export default function AdminPRNotificationPopover() {
             type="button"
             aria-label="Close notifications"
             onClick={() => setOpen(false)}
-            className="fixed inset-0 z-[65] cursor-default bg-stone-900/20 backdrop-blur-[1px] sm:hidden"
+            className="fixed inset-0 z-[65] cursor-default bg-stone-950/20 backdrop-blur-[2px] sm:hidden"
           />
           <section
             role="dialog"
             aria-label="Admin notification center"
-            className="fixed left-3 right-3 top-[66px] z-[70] mx-auto max-h-[min(520px,calc(100svh-84px))] w-auto max-w-md overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_20px_50px_rgba(45,0,26,0.2)] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-[410px] sm:max-w-[calc(100vw-2rem)]"
+            className="fixed left-3 right-3 top-[68px] z-[70] mx-auto flex max-h-[min(620px,calc(100svh-84px))] w-auto max-w-md flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_22px_60px_rgba(45,0,26,0.22)] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-[420px] sm:max-w-[calc(100vw-2rem)]"
           >
-            <div className="flex items-center justify-between gap-3 border-b border-stone-100 bg-[#FAF8F5] px-4 py-3">
-              <div className="flex min-w-0 items-center gap-2.5">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#7B0046]/10 text-[#7B0046]">
-                  <Bell className="h-4 w-4" />
-                </span>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-sm font-black text-[#4D002C]">Notification Center</h2>
-                    {unread > 0 && (
-                      <span className="rounded-full bg-[#7B0046] px-1.5 py-0.5 text-[9px] font-extrabold text-white">
-                        {unread} unread
+            <div className="border-b border-stone-100 bg-white px-4 py-4 sm:px-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-start gap-3">
+                  <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/[0.07] text-[#7B0046]">
+                    <Bell className="h-[18px] w-[18px]" />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <h2 className="text-[15px] font-extrabold leading-tight text-[#4D002C]">Notifications</h2>
+                      <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-bold tabular-nums text-stone-600">
+                        {items.length} total
                       </span>
-                    )}
+                    </div>
+                    <p className="mt-1 text-[11px] text-stone-500">
+                      {connection === "live"
+                        ? "Live updates · Saved to your account"
+                        : connection === "offline"
+                        ? "Saved notifications · Live updates unavailable"
+                        : "Connecting to notifications…"}
+                    </p>
                   </div>
-                  <p className="mt-0.5 text-[10px] font-medium text-stone-500">
-                    {connection === "live"
-                      ? "Live updates · Saved across sessions"
-                      : connection === "offline"
-                      ? "Saved notifications · Live updates unavailable"
-                      : "Loading saved notifications…"}
-                  </p>
                 </div>
+                {unread > 0 && (
+                  <span className="shrink-0 rounded-full bg-[#7B0046] px-2.5 py-1 text-[10px] font-bold text-white">
+                    {unread} unread
+                  </span>
+                )}
               </div>
               {unread > 0 && (
-                <button
-                  type="button"
-                  onClick={() => void markAllRead()}
-                  className="shrink-0 rounded-lg px-2 py-1 text-[10px] font-bold text-[#7B0046] transition hover:bg-[#FDF2F7]"
-                >
-                  <span className="inline-flex items-center gap-1">
-                    <CheckCheck className="h-3 w-3" />
-                    Mark all read
-                  </span>
-                </button>
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => void markAllRead()}
+                    className="inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2.5 text-[11px] font-bold text-[#7B0046] transition hover:bg-[#FDF2F7] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]"
+                  >
+                    <CheckCheck className="h-3.5 w-3.5" />
+                    Mark all as read
+                  </button>
+                </div>
               )}
             </div>
 
             {error && (
-              <p role="alert" className="border-b border-red-100 bg-red-50 px-4 py-2 text-[10px] text-red-700">
+              <p role="alert" className="border-b border-red-100 bg-red-50 px-4 py-2.5 text-[11px] text-red-700">
                 {error}
               </p>
             )}
 
-            <div className="max-h-[min(420px,calc(100svh-190px))] divide-y divide-stone-100 overflow-y-auto">
+            <div className="min-h-0 flex-1 divide-y divide-stone-100 overflow-y-auto overscroll-contain">
               {loading ? (
-                <div className="px-5 py-10 text-center text-xs text-stone-500">Loading saved notifications…</div>
+                <div className="px-5 py-12 text-center text-xs text-stone-500">Loading notifications…</div>
               ) : items.length === 0 ? (
-                <div className="px-5 py-10 text-center">
+                <div className="px-5 py-12 text-center">
                   <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-stone-100 text-stone-400">
                     <Bell className="h-5 w-5" />
                   </span>
-                  <p className="mt-3 text-xs font-bold text-stone-800">No admin notifications yet</p>
+                  <p className="mt-3 text-xs font-bold text-stone-800">You’re all caught up</p>
                   <p className="mx-auto mt-1 max-w-[260px] text-[11px] leading-relaxed text-stone-500">
-                    New PR submissions, personnel registrations, official PR number assignments, and PR stage changes will appear here.
+                    New PR submissions, user registrations, official PR number assignments, and stage updates will appear here.
                   </p>
                 </div>
               ) : (
                 items.map((item) => (
-                  <div
+                  <article
                     key={item.id}
-                    className={"flex items-start gap-2 px-3.5 py-3 transition-colors " + (
-                      item.is_read ? "bg-white" : "bg-[#FFFDF7]"
+                    className={"px-4 py-3.5 transition-colors sm:px-5 " + (
+                      item.is_read ? "bg-white hover:bg-stone-50/70" : "bg-[#FFFCF7] hover:bg-[#FFF9EF]"
                     )}
                   >
-                    <button
-                      type="button"
-                      onClick={() => void openNotification(item)}
-                      className="flex min-w-0 flex-1 items-start gap-3 rounded-lg py-0.5 text-left transition-colors hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#7B0046]"
-                      aria-label={"Open notification: " + item.title}
-                    >
-                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#7B0046]/15 bg-[#FDF2F7] text-[#7B0046]">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#7B0046]/10 bg-[#7B0046]/[0.055] text-[#7B0046]">
                         {getIcon(item.type)}
                       </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="flex items-start justify-between gap-2">
-                          <span className="text-xs font-extrabold text-[#4D002C]">{item.title}</span>
-                          {!item.is_read && (
-                            <span className="shrink-0 rounded-full bg-[#7B0046] px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide text-white">
-                              New
-                            </span>
-                          )}
-                        </span>
-                        <span className="mt-1 block break-words text-[11px] leading-relaxed text-stone-600">{item.message}</span>
+                      <div className="min-w-0 flex-1">
+                        <button
+                          type="button"
+                          onClick={() => void openNotification(item)}
+                          className="block w-full rounded-md text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]"
+                          aria-label={"Open notification: " + item.title}
+                        >
+                          <span className="flex min-w-0 items-start justify-between gap-2">
+                            <span className="min-w-0 text-[12px] font-bold leading-snug text-[#4D002C]">{item.title}</span>
+                            {!item.is_read && (
+                              <span className="shrink-0 rounded-full bg-[#7B0046] px-2 py-0.5 text-[8px] font-extrabold uppercase tracking-wide text-white">New</span>
+                            )}
+                          </span>
+                          <span className="mt-1 block break-words text-[11px] leading-[1.55] text-stone-600">{item.message}</span>
+                        </button>
                         {item.pr_no && (
-                          <span className="mt-1 block break-all font-mono text-[10px] font-bold text-[#7B0046]">{item.pr_no}</span>
+                          <span className="mt-1.5 inline-block max-w-full break-all rounded-md bg-stone-100 px-2 py-1 font-mono text-[9px] font-semibold text-stone-600">{item.pr_no}</span>
                         )}
-                        <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-stone-400">
-                          <Clock className="h-3 w-3" />
-                          {formatTime(item.created_at)}
-                        </span>
-                      </span>
-                    </button>
-
-                    <div className="mt-0.5 flex shrink-0 items-center gap-1">
-                      <button
-                        type="button"
-                        disabled={busyIds.includes(item.id)}
-                        onClick={() => void toggleRead(item)}
-                        aria-label={item.is_read ? "Mark as unread" : "Mark as read"}
-                        title={item.is_read ? "Mark as unread" : "Mark as read"}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-500 transition hover:border-[#7B0046]/25 hover:bg-[#FDF2F7] hover:text-[#7B0046] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] disabled:cursor-wait disabled:opacity-40"
-                      >
-                        {item.is_read ? <Mail className="h-3.5 w-3.5" /> : <MailOpen className="h-3.5 w-3.5" />}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={busyIds.includes(item.id)}
-                        onClick={() => void deleteNotification(item)}
-                        aria-label={"Delete notification: " + item.title}
-                        title="Delete notification"
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 disabled:cursor-wait disabled:opacity-40"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                          <span className="inline-flex items-center gap-1.5 text-[10px] text-stone-400">
+                            <Clock className="h-3 w-3" />
+                            {formatTime(item.created_at)}
+                          </span>
+                          <div className="flex shrink-0 items-center gap-1.5">
+                            <button
+                              type="button"
+                              disabled={busyIds.includes(item.id)}
+                              onClick={() => void toggleRead(item)}
+                              aria-label={item.is_read ? "Mark as unread" : "Mark as read"}
+                              title={item.is_read ? "Mark as unread" : "Mark as read"}
+                              className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-2 text-[10px] font-semibold text-stone-600 transition hover:border-[#7B0046]/25 hover:bg-[#FDF2F7] hover:text-[#7B0046] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] disabled:opacity-40"
+                            >
+                              {item.is_read ? <Mail className="h-3.5 w-3.5" /> : <MailOpen className="h-3.5 w-3.5" />}
+                              <span>{item.is_read ? "Unread" : "Mark read"}</span>
+                            </button>
+                            <button
+                              type="button"
+                              disabled={busyIds.includes(item.id)}
+                              onClick={() => void deleteNotification(item)}
+                              aria-label={"Delete notification: " + item.title}
+                              title="Delete notification"
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 disabled:opacity-40"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </article>
                 ))
               )}
             </div>
-
-            <div className="border-t border-stone-100 bg-stone-50/70 px-3 py-2 text-center">
+            <div className="border-t border-stone-100 bg-stone-50/80 px-4 py-2.5 text-center">
               <p className="text-[10px] text-stone-500">Notifications are saved to your administrator account.</p>
             </div>
           </section>
