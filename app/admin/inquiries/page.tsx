@@ -460,7 +460,7 @@ const formatDate = (date: string) => {
                         <div key={turn.id} className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}>
                           <div className={`w-fit max-w-[88%] rounded-2xl px-3.5 py-3 text-xs sm:max-w-[82%] sm:px-4 sm:py-3.5 sm:text-sm whitespace-pre-wrap leading-relaxed shadow-sm ${isUser ? "rounded-tr-sm bg-gradient-to-r from-[#7B0046] to-[#8E0052] text-white" : "rounded-tl-sm border border-stone-200 bg-white text-stone-800"}`}>
                             <p className={`text-[10px] uppercase tracking-wider font-bold mb-1.5 ${isUser ? "text-amber-200" : "text-[#7B0046]"}`}>
-                              {isUser ? "You" : "Gab AI"}
+                              {isUser ? "You" : "GAB AI"}
                             </p>
                             {turn.content}
                             <p className={`text-[10px] mt-2 text-right ${isUser ? "text-white/60" : "text-stone-400"}`}>{formatDate(turn.created_at)}</p>
@@ -476,7 +476,7 @@ const formatDate = (date: string) => {
                       <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs sm:text-sm text-stone-800 whitespace-pre-wrap font-medium">{selectedInquiry.user_message}</div>
                     </div>
                     <div>
-                      <p className="text-[11px] uppercase tracking-wider text-[#C27803] font-bold mb-1.5">Gab AI Reply</p>
+                      <p className="text-[11px] uppercase tracking-wider text-[#C27803] font-bold mb-1.5">GAB AI Reply</p>
                       <div className="p-3 bg-amber-50/40 rounded-xl border border-amber-200/80 text-xs sm:text-sm text-stone-900 whitespace-pre-wrap leading-relaxed">{selectedInquiry.bot_response || "No response recorded"}</div>
                     </div>
                   </div>
