@@ -1,17 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, ChevronDown, LogOut, ShieldCheck, User, type LucideIcon } from "lucide-react";
+import { type ReactNode } from "react";
+import { type LucideIcon } from "lucide-react";
 import { MsuLogo } from "@/components/msu-logo";
-import { supabase } from "@/lib/supabase/client";
 
 interface SystemPageHeaderProps {
   titlePrimary?: string;
   titleAccent?: string;
   icon?: LucideIcon;
-  backHref?: string | null;
   containerClassName?: string;
   workspaceLabel?: string;
   subtitle?: string;
@@ -20,7 +16,6 @@ interface SystemPageHeaderProps {
   brandLogo?: boolean;
   brandWordmark?: boolean;
   roleLabel?: string;
-  showAdminPortal?: boolean;
   compactOnMobile?: boolean;
   mobileTitlePrimary?: string;
   mobileTitleAccent?: string;
@@ -32,7 +27,6 @@ export function SystemPageHeader({
   titlePrimary,
   titleAccent,
   icon: PageIcon,
-  backHref = "/dashboard",
   containerClassName = "max-w-7xl px-4 sm:px-6 lg:px-8",
   workspaceLabel,
   subtitle,
@@ -41,67 +35,16 @@ export function SystemPageHeader({
   brandLogo = true,
   brandWordmark = true,
   roleLabel = "End User",
-  showAdminPortal = false,
   compactOnMobile = false,
   mobileTitlePrimary,
   mobileTitleAccent,
   children,
   showControlsDivider = false,
 }: SystemPageHeaderProps) {
-  const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-  const accountMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const loadUser = async () => {
-      try {
-        let { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          const { data: { session } } = await supabase.auth.getSession();
-          user = session?.user || null;
-        }
-        if (!cancelled) setCurrentUser(user);
-      } catch (error) {
-        console.warn("Unable to load account for system header:", error);
-      }
-    };
-    void loadUser();
-    return () => { cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
-        setAccountMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const displayName =
-    currentUser?.user_metadata?.full_name ||
-    currentUser?.user_metadata?.name ||
-    currentUser?.email?.split("@")[0] ||
-    "Signed-in user";
-
   const effectiveWorkspaceLabel =
     subtitle ||
     workspaceLabel ||
     (roleLabel === "Administrator" ? "Administrative Workspace" : "End User Workspace");
-
-  const handleLogout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) console.error("Logout failed:", error);
-    } catch (error) {
-      console.error("Logout failed:", error);
-    } finally {
-      router.replace("/");
-    }
-  };
 
   return (
     <nav
@@ -119,18 +62,6 @@ export function SystemPageHeader({
     >
       <div className={`mx-auto flex h-full items-center justify-between ${compactOnMobile ? "gap-1 sm:gap-3" : "gap-3"} ${containerClassName}`}>
         <div className={`flex min-w-0 items-center ${compactOnMobile ? "gap-1.5 sm:gap-3" : "gap-2 sm:gap-3"}`}>
-          {backHref !== null && (
-            <Link
-              href={backHref}
-              className={`group flex shrink-0 items-center justify-center rounded-xl border border-white/20 bg-white/[0.09] text-white/90 hover:border-[#F6D58A]/45 hover:bg-white/15 hover:text-[#F6D58A] active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-[#F6D58A]/50 ${
-                compactOnMobile ? "h-9 w-9" : "h-10 w-10 sm:h-9 sm:w-9"
-              }`}
-              title="Back"
-              aria-label="Back"
-            >
-              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:-translate-x-0.5" />
-            </Link>
-          )}
           {brandLogo ? (
             brandWordmark ? (
               <MsuLogo size={38} className="shrink-0" />
@@ -203,44 +134,7 @@ export function SystemPageHeader({
               className="mx-1.5 h-6 w-px shrink-0 bg-white/25 sm:mx-0 sm:h-7"
             />
           )}
-          <div ref={accountMenuRef} className="relative shrink-0">
-            <button
-              type="button"
-              onClick={() => setAccountMenuOpen((previous) => !previous)}
-              className={`flex ${compactOnMobile ? "h-10 max-w-[48vw] gap-1.5 px-1.5 sm:gap-2 sm:px-3" : "h-11 max-w-[48vw] gap-2 px-2.5 sm:h-10 sm:px-3"} cursor-pointer items-center rounded-xl border text-xs transition focus:outline-none focus:ring-2 sm:max-w-[250px] ${brandWordmark
-                ? "border-white/20 bg-white/[0.09] text-white/95 hover:border-[#F6D58A]/45 hover:bg-white/[0.15] focus:ring-[#F6D58A]/50"
-                : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50 focus:ring-[#7B0046]/20"}`}
-              aria-expanded={accountMenuOpen}
-              aria-label="User account menu"
-            >
-              <div className={`flex ${compactOnMobile ? "h-6 w-6 sm:h-7 sm:w-7" : "h-7 w-7"} shrink-0 items-center justify-center rounded-full ${brandWordmark ? "bg-[#F6D58A]/15 text-[#F6D58A]" : "bg-[#7B0046]/10 text-[#7B0046]"}`}>
-                <User className="h-3.5 w-3.5" />
-              </div>
-              <span className={`hidden max-w-[170px] truncate text-xs font-medium sm:inline ${brandWordmark ? "text-white/95" : "text-stone-800"}`}>{displayName}</span>
-              <ChevronDown className={`h-3.5 w-3.5 shrink-0 transition-transform ${brandWordmark ? "text-white/65" : "text-stone-400"} ${accountMenuOpen ? `rotate-180 ${brandWordmark ? "text-[#F6D58A]" : "text-[#7B0046]"}` : ""}`} />
-            </button>
-            {accountMenuOpen && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-60 overflow-hidden rounded-2xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_36px_rgba(45,25,20,0.12)]">
-                <div className="border-b border-stone-100 px-3 py-2.5">
-                  <p className="truncate text-xs font-bold text-stone-900">{displayName}</p>
-                  <p className="mt-0.5 truncate text-[11px] text-stone-500">{currentUser?.email || "Signed-in user"}</p>
-                  <div className="mt-1.5 flex items-center gap-1.5">
-                    <span className="inline-flex items-center rounded-full border border-[#F5D6E5] bg-[#FDF2F7] px-2 py-0.5 text-[9px] font-bold text-[#7B0046]">{roleLabel}</span>
-                  </div>
-                </div>
-                {showAdminPortal && (
-                  <Link href="/admin" onClick={() => setAccountMenuOpen(false)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-stone-700 transition hover:bg-stone-50 hover:text-[#7B0046]">
-                    <ShieldCheck className="h-4 w-4 text-[#C27803]" />
-                    <span>Admin Portal</span>
-                  </Link>
-                )}
-                <button type="button" onClick={handleLogout} className="flex w-full cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-semibold text-red-600 transition hover:bg-red-50">
-                  <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            )}
-          </div>
+
         </div>
       </div>
     </nav>
