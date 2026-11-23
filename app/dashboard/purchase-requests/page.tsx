@@ -179,7 +179,7 @@ export default function PurchaseRequestsPage() {
       <main className="mx-auto max-w-7xl px-3.5 py-4 sm:px-6 sm:py-8 lg:px-8">
         <div className="mb-4 sm:mb-5 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#4D002C]">My Purchase Requests</h1>
+            <h1 className="text-xl sm:text-[1.65rem] md:text-[1.8rem] font-semibold tracking-[-0.035em] leading-tight text-[#4D002C]">My Purchase Requests</h1>
             <p className="mt-1 max-w-2xl text-xs sm:text-sm leading-relaxed text-stone-600">
               Review your requests, check their current status, and print drafts for physical submission.
             </p>
