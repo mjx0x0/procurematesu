@@ -126,7 +126,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-[#F9F7F4] text-gray-800 admin-dashboard-page">
       <SystemPageHeader
-        titlePrimary="ProcureMateSU"
+        titlePrimary="ProcureMSU"
         titleAccent=""
         compactOnMobile
         workspaceLabel="Administrative Workspace"
