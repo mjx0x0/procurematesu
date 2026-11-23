@@ -21,8 +21,8 @@ export function EndUserPageHeader({
   children,
 }: EndUserPageHeaderProps) {
   return (
-    <nav className="sticky top-0 z-40 shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md">
-      <div className={`mx-auto flex items-center justify-between gap-3 py-3.5 ${containerClassName}`}>
+    <nav className="sticky top-0 z-40 h-[68px] shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[72px]">
+      <div className={`flex h-full w-full items-center justify-between gap-3 px-4 sm:px-6 lg:px-8`}>
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <div className="shrink-0 rounded-xl bg-[#4D002C] p-2 text-amber-300 shadow-sm">
             <PageIcon className="h-5 w-5" />
