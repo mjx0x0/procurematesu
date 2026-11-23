@@ -47,7 +47,7 @@ const SUGGESTIONS = [
 const createWelcomeMessage = (name?: string): Message => ({
   id: "welcome",
   role: "assistant",
-  content: `👋 **Hi${name ? `, ${name.split(" ")[0]}` : ""}! I’m Gab AI.**
+  content: `👋 **Hi${name ? `, ${name.split(" ")[0]}` : ""}! I’m GAB AI.**
 
 I’m here to help with MSU-General Santos procurement. I can explain procurement rules, guide you through Purchase Request drafting, help track submitted PRs, and answer questions about the Procurement Office and its procedures.
 
@@ -554,7 +554,7 @@ export default function ChatbotDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
         <div className="text-center">
           <Loader2 className="h-10 w-10 animate-spin text-[#7B0046] mx-auto mb-3" />
-          <p className="text-xs font-semibold text-stone-600">Connecting to Gab AI...</p>
+          <p className="text-xs font-semibold text-stone-600">Connecting to GAB AI...</p>
         </div>
       </div>
     );
@@ -566,7 +566,7 @@ export default function ChatbotDashboard() {
     >
       {/* Top Navbar */}
       <SystemPageHeader
-        headerTitle="Gab AI"
+        headerTitle="GAB AI"
         subtitle="Procurement Assistant"
         hideSystemSuffix
         compactOnMobile
@@ -901,7 +901,7 @@ export default function ChatbotDashboard() {
                 <div className="flex justify-start">
                   <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl rounded-tl-sm p-3 text-xs text-stone-500 flex items-center gap-2">
                     <Loader2 className="h-3.5 w-3.5 animate-spin text-[#7B0046]" />
-                    <span>Gab AI is thinking...</span>
+                    <span>GAB AI is thinking...</span>
                   </div>
                 </div>
               )}
@@ -949,7 +949,7 @@ export default function ChatbotDashboard() {
               </button>
             </div>
             <p className="mx-auto mt-2 w-full max-w-4xl px-1 text-center text-[10px] leading-relaxed text-stone-400 sm:text-[11px]">
-              Gab AI can make mistakes. Please verify important information with official procurement references.
+              GAB AI can make mistakes. Please verify important information with official procurement references.
             </p>
           </div>
         </section>
