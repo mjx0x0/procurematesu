@@ -131,7 +131,7 @@ export default function DashboardPage() {
   return (
     <div className="app-theme min-h-[100svh] overflow-x-clip bg-[#F7F5F2] text-[#302725] dashboard-page">
       <SystemPageHeader
-        titlePrimary="ProcureMateSU"
+        titlePrimary="ProcureMSU"
         titleAccent=""
         workspaceLabel="End User Workspace"
         brandLogo
