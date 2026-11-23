@@ -76,7 +76,7 @@ export function SystemPageHeader({
           <div className="min-w-0">
             <b
               aria-label={brandWordmark ? "ProcureMSU" : undefined}
-              className={`block truncate font-black leading-tight ${brandWordmark ? "text-[18px] tracking-[-0.04em] sm:text-[20px]" : `${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} tracking-tight text-[#4D002C]`}`}
+              className={`block truncate font-semibold leading-tight ${brandWordmark ? "text-[18px] tracking-[-0.04em] sm:text-[20px]" : `${compactOnMobile ? "text-sm sm:text-xl" : "text-lg sm:text-xl"} tracking-tight text-[#4D002C]`}`}
             >
               {headerTitle ? (
                 <span className="flex items-center whitespace-nowrap">
