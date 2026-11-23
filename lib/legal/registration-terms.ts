@@ -30,7 +30,7 @@ export const REGISTRATION_TERMS = [
     heading: "4. Purchase Request status and AI-assisted guidance",
     paragraphs: [
       "A digital PR draft and its temporary tracking number are not, by themselves, proof that the Procurement Office has physically received the printed Purchase Request or assigned its official university control number. The official PR number and workflow progression are subject to the Procurement Office's receipt, verification, and recording procedures.",
-      "Gab AI and other automated guidance are provided to assist users in understanding procurement procedures. AI-generated responses may be incomplete, may not reflect the latest official instruction, and are not legal advice or an official procurement decision. Verify important requirements against current official issuances and with the Procurement Office before acting.",
+      "GAB AI and other automated guidance are provided to assist users in understanding procurement procedures. AI-generated responses may be incomplete, may not reflect the latest official instruction, and are not legal advice or an official procurement decision. Verify important requirements against current official issuances and with the Procurement Office before acting.",
     ],
   },
   {
