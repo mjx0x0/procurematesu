@@ -60,7 +60,7 @@ export function SystemPageHeader({
             : "sticky top-0 z-50 h-[68px] shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[72px]"
       }
     >
-      <div className={`flex h-full w-full items-center justify-between gap-3 px-4 sm:px-6 lg:px-8`}>
+      <div className={`flex h-full w-full items-center justify-between gap-3 px-4 pl-14 sm:px-6 sm:pl-6 lg:px-8`}>
         <div className={`flex min-w-0 items-center gap-3`}>
           {brandLogo ? (
             brandWordmark ? (
