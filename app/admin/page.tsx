@@ -247,7 +247,7 @@ export default function AdminDashboard() {
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#7B0046]/[0.07] text-[#7B0046]"><Workflow className="h-4 w-4" /></span>
               <div><h2 id="workflow-overview-heading" className="text-sm font-bold text-[#4D002C] sm:text-base">Procurement Workflow Overview</h2><p className="text-[10px] text-stone-500">Current distribution of {totalPRs} purchase requests across workflow phases</p></div>
             </div>
-            <Link href="/admin/purchase-requests" className="hidden items-center gap-1 text-[11px] font-bold text-[#7B0046] hover:underline sm:inline-flex">View logbook <ArrowRight className="h-3 w-3" /></Link>
+            <div className="flex items-center gap-3"><Link href="/admin/reports" className="hidden items-center gap-1 text-[11px] font-bold text-stone-600 hover:text-[#7B0046] sm:inline-flex">Reports &amp; Analytics</Link><Link href="/admin/purchase-requests" className="inline-flex items-center gap-1 text-[11px] font-bold text-[#7B0046] hover:underline">View logbook <ArrowRight className="h-3 w-3" /></Link></div>
           </div>
           <div className="grid gap-x-8 gap-y-4 p-4 sm:grid-cols-2 sm:p-5">
             {workflowRows.map((row) => (
