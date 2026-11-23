@@ -1134,7 +1134,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
           const { error: inquiryLogError } = await supabase.rpc('append_monitor_inquiry_session', {
             p_session_id: currentSessionId,
             p_user_id: userId,
-            p_user_name: authenticatedUser.name || 'ProcuremateSU User',
+            p_user_name: authenticatedUser.name || 'ProcureMSU User',
             p_user_department: 'MSU-GenSan',
             p_pr_no: loggedPrNo ? normalizePrNumber(loggedPrNo) : null,
             p_user_message: trimmedMsg,
@@ -1186,7 +1186,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
         return NextResponse.json({
           response: PROCUREMENT_SCOPE_RESPONSE,
           sessionId: 'sess_recovery',
-          sources: ['ProcureMateSU scope and security guard'],
+          sources: ['ProcureMSU scope and security guard'],
           degradedMode: true,
         }, { status: 200 });
       }
