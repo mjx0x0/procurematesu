@@ -432,7 +432,7 @@ test('registration terms open on demand and a single form checkbox gates account
 });
 
 
-test('admin dashboard replaces PR Overview with actionable queues and adds reports navigation', () => {
+test('admin dashboard combines actionable queues with live workflow, activity, and attention monitoring', () => {
   const admin = read('app/admin/page.tsx');
 
   assert.match(admin, /Action Required/);
@@ -442,8 +442,15 @@ test('admin dashboard replaces PR Overview with actionable queues and adds repor
   assert.match(admin, /\/admin\/users/);
   assert.match(admin, /\/admin\/purchase-requests\?status=draft/);
   assert.match(admin, /\/admin\/purchase-requests\?status=pr_pre_numbering/);
-  assert.match(admin, /Procurement Reports & Analytics/);
+  assert.match(admin, /Procurement Workflow Overview/);
+  assert.match(admin, /Recent System Activity/);
+  assert.match(admin, /Requests Requiring Attention/);
+  assert.match(admin, /from\("purchase_requests"\)/);
+  assert.match(admin, /from\("pr_stages_completed"\)/);
+  assert.match(admin, /postgres_changes/);
+  assert.match(admin, /updated_at \|\| pr\.created_at/);
   assert.match(admin, /href: "\/admin\/reports"/);
+  assert.match(admin, /Reports &amp; Analytics/);
   assert.doesNotMatch(admin, /PR Overview/);
 });
 
