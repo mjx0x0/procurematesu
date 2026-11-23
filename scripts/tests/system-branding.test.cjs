@@ -710,3 +710,13 @@ test('PR tracking keeps the form full-width and timeline readable without narrow
   assert.match(tracking, /whitespace-normal break-words/);
   assert.match(tracking, /xl:sticky xl:top-5 xl:max-h-\[calc\(100vh-2\.5rem\)\]/);
 });
+
+
+test('public bidding documents page uses the requested heading and account menu opens upward', () => {
+  const transparency = read('app/dashboard/transparency/page.tsx');
+  const sidebar = read('components/AppSidebar.tsx');
+  assert.match(transparency, /PUBLIC BIDDING DOCUMENTS/);
+  assert.doesNotMatch(transparency, /Procurement Transparency Board/);
+  assert.match(sidebar, /absolute bottom-full z-\[95\] mb-2/);
+  assert.match(sidebar, /absolute bottom-full left-3 right-3 z-\[105\] mb-2/);
+});
