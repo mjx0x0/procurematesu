@@ -68,7 +68,7 @@ export default function LandingPage() {
               </span>
               <span className="min-w-0 leading-none">
                 <span className="flex items-center whitespace-nowrap text-[17px] font-black tracking-[-0.04em] sm:text-[20px]">
-                  <span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">M</span><span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">SU</span>
+                  <span className="bg-gradient-to-r from-white via-[#FFF5E5] to-[#F1E4EF] bg-clip-text text-transparent">Procure</span><span className="bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">MSU</span>
                 </span>
                 <span className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[8px] font-bold uppercase tracking-[0.13em] sm:text-[8.5px]">
                   <span className="text-[#F6D58A]">{SYSTEM_TAGLINE}</span>
