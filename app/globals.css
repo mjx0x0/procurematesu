@@ -429,3 +429,18 @@ nav.sticky, nav[class*="sticky"] { box-shadow: 0 1px 0 rgba(53,7,8,.04), 0 8px 2
 }
 
 /* Timeline styling remains local to the PR detail component. */
+
+
+/* Keep the official PR form perimeter visible in the interactive browser view.
+   The PDF export has its own print renderer; this rule targets the on-screen form. */
+.pr-form-screen-frame {
+  border: 2px solid #000 !important;
+  border-top: 2px solid #000 !important;
+  border-right: 2px solid #000 !important;
+  border-bottom: 2px solid #000 !important;
+  border-left: 2px solid #000 !important;
+  outline: 1px solid #000 !important;
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 1px #000 !important;
+  box-sizing: border-box !important;
+}
