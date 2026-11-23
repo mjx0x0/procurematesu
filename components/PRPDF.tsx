@@ -135,29 +135,34 @@ const styles = StyleSheet.create({
     borderRightWidth: 1.2,
     borderColor: "#000000",
     textAlign: "center",
+    alignSelf: "stretch",
   },
   colUnit: {
     width: "10%",
     borderRightWidth: 1.2,
     borderColor: "#000000",
     textAlign: "center",
+    alignSelf: "stretch",
   },
   colDesc: {
     width: "41%",
     borderRightWidth: 1.2,
     borderColor: "#000000",
+    alignSelf: "stretch",
   },
   colStock: {
     width: "10%",
     borderRightWidth: 1.2,
     borderColor: "#000000",
     textAlign: "center",
+    alignSelf: "stretch",
   },
   colUnitCost: {
     width: "14%",
     borderRightWidth: 1.2,
     borderColor: "#000000",
     textAlign: "right",
+    alignSelf: "stretch",
   },
   colTotalCost: {
     width: "14%",
@@ -180,6 +185,7 @@ const styles = StyleSheet.create({
     fontSize: 8.5,
     paddingHorizontal: 2,
     paddingVertical: 3,
+    alignSelf: "stretch",
   },
   cellUnit: {
     width: "10%",
@@ -189,6 +195,7 @@ const styles = StyleSheet.create({
     fontSize: 8.5,
     paddingHorizontal: 2,
     paddingVertical: 3,
+    alignSelf: "stretch",
   },
   cellDesc: {
     width: "41%",
@@ -198,6 +205,7 @@ const styles = StyleSheet.create({
     paddingLeft: 6,
     paddingRight: 4,
     paddingVertical: 3,
+    alignSelf: "stretch",
   },
   cellStock: {
     width: "10%",
@@ -207,6 +215,7 @@ const styles = StyleSheet.create({
     fontSize: 8.5,
     paddingHorizontal: 2,
     paddingVertical: 3,
+    alignSelf: "stretch",
   },
   cellUnitCost: {
     width: "14%",
@@ -216,6 +225,7 @@ const styles = StyleSheet.create({
     fontSize: 8.5,
     paddingRight: 6,
     paddingVertical: 3,
+    alignSelf: "stretch",
   },
   cellTotalCost: {
     width: "14%",
