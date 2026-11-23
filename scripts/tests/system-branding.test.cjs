@@ -697,3 +697,21 @@ test('purchase request tracking retains the shared end-user navigation shell', (
   assert.match(tracking, /<SystemPageHeader/);
   assert.match(tracking, /Back to Purchase Requests/);
 });
+
+
+test('PR tracking uses a wide two-column layout with a compact live processing timeline', () => {
+  const tracking = read('app/dashboard/pr/[pr_no]/page.tsx');
+  assert.match(tracking, /w-full max-w-none px-4 py-5/);
+  assert.match(tracking, /xl:grid-cols-\[minmax\(0,1fr\)_320px\]/);
+  assert.match(tracking, /pr-timeline min-w-0/);
+  assert.match(tracking, /Current stage/);
+  assert.match(tracking, /Next step/);
+  assert.match(tracking, /text-lg font-bold tracking-tight text-\[#4D002C\] font-mono sm:text-xl lg:text-2xl/);
+});
+
+test('create PR form expands to the full workspace width', () => {
+  const form = read('app/dashboard/new-pr/ProcurementRequestForm.tsx');
+  assert.match(form, /w-full max-w-none px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8/);
+  assert.match(form, /w-full rounded-2xl border border-stone-200 bg-white/);
+  assert.match(form, /p-4 sm:p-6 lg:p-8/);
+});
