@@ -149,6 +149,9 @@ export default function PRDetailPage() {
     return "bg-amber-50 text-amber-800 border-amber-200";
   };
   const totalAmount = items.reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
+  const currentStageInfo = PROCUREMENT_STAGES.find((stage) => stage.key === pr?.current_stage);
+  const currentStageIndex = currentStageInfo ? PROCUREMENT_STAGES.findIndex((stage) => stage.key === currentStageInfo.key) : -1;
+  const nextStageInfo = currentStageIndex >= 0 && currentStageIndex < PROCUREMENT_STAGES.length - 1 && !["completed", "rejected", "cancelled"].includes(pr?.current_stage || "") ? PROCUREMENT_STAGES[currentStageIndex + 1] : undefined;
 
   const timelineGroups: TimelineGroup[] = (() => {
     const groups = new Map<string, TimelineGroup>();
@@ -200,14 +203,14 @@ export default function PRDetailPage() {
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <div className="print:hidden">
-        <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="max-w-5xl px-4" />
+        <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8" />
       </div>
 
-      <main className="max-w-5xl mx-auto px-4 py-8 print:max-w-none print:w-full print:px-0 print:py-0">
-        <div className="rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6 print:hidden">
+      <main className="mx-auto w-full max-w-none px-4 py-5 sm:px-6 lg:px-8 print:max-w-none print:w-full print:px-0 print:py-0">
+        <div className="mb-5 flex flex-col justify-between gap-4 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:flex-row xl:items-center print:hidden">
           <div className="min-w-0 flex-1 space-y-2.5">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-black text-[#4D002C] font-mono tracking-tight">
+              <h1 className="text-lg font-bold tracking-tight text-[#4D002C] font-mono sm:text-xl lg:text-2xl">
                 {pr.pr_no}
               </h1>
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${statusClass(pr.current_stage)}`}>
@@ -255,9 +258,11 @@ export default function PRDetailPage() {
           </div>
         </div>
 
-        {error && <div className="mb-5 bg-red-50 border border-red-200 text-red-700 p-3.5 rounded-xl text-xs font-medium">{error}</div>}
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px] 2xl:grid-cols-[minmax(0,1fr)_380px] xl:items-start">
+          <div className="min-w-0 space-y-4">
+        {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-medium text-red-700">{error}</div>}
 
-        <section className="bg-white rounded-2xl shadow-xs border border-stone-300 p-4 sm:p-8 overflow-x-auto print:w-full print:min-w-0 print:overflow-visible print:p-0 print:border-0 print:shadow-none">
+        <section className="min-w-0 overflow-x-auto rounded-2xl border border-stone-300 bg-white p-3 shadow-xs sm:p-5 lg:p-6 print:w-full print:min-w-0 print:overflow-visible print:p-0 print:border-0 print:shadow-none">
           <div className="min-w-[700px] border-2 border-black text-black bg-white print:w-full print:min-w-0 print:box-border">
             <div className="border-b-2 border-black text-center py-3 px-4">
               <h2 className="text-xl font-black uppercase tracking-wider font-serif">PURCHASE REQUEST</h2>
@@ -350,16 +355,17 @@ export default function PRDetailPage() {
             </div>
           )}
         </section>
-
-        <div className="pr-timeline rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-7 shadow-[0_2px_12px_rgba(0,0,0,0.03)] mt-8 mb-8 print:hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-stone-200/80">
+<div className="text-xs text-stone-500 flex items-center gap-2 print:hidden"><FileCheck className="h-4 w-4" />The Download PR Form button generates only the official Purchase Request form as a PDF.</div>
+          </div>
+        <div className="pr-timeline min-w-0 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] xl:sticky xl:top-5 xl:max-h-[calc(100vh-2.5rem)] xl:overflow-y-auto print:hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-stone-200/80">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046] border border-[#7B0046]/15">
                 <Clock className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-[#4D002C] tracking-tight">Processing Timeline</h3>
-                <p className="text-xs text-stone-500">Official log of completed procurement stages and office remarks</p>
+                <h3 className="text-base font-bold tracking-tight text-[#4D002C]">Processing Timeline</h3>
+                <p className="text-[11px] leading-relaxed text-stone-500">Official log of completed procurement stages and office remarks</p>
               </div>
             </div>
             <div className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border border-stone-200 bg-stone-50 px-3 py-1 text-xs font-semibold text-stone-600">
@@ -367,7 +373,20 @@ export default function PRDetailPage() {
               <span>{timelineGroups.length} recorded milestone{timelineGroups.length === 1 ? "" : "s"}</span>
             </div>
           </div>
-
+          <div className="mb-4 rounded-xl border border-[#7B0046]/15 bg-[#FCF7FA] p-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500">Current stage</span>
+              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusClass(pr.current_stage)}`}>{statusLabel(pr.current_stage)}</span>
+            </div>
+            <p className="mt-2 text-sm font-bold leading-snug text-[#4D002C]">{currentStageInfo?.shortLabel || statusLabel(pr.current_stage)}</p>
+            {currentStageInfo?.description && <p className="mt-1 text-[11px] leading-relaxed text-stone-600">{currentStageInfo.description}</p>}
+            {nextStageInfo && (
+              <div className="mt-3 border-t border-[#7B0046]/10 pt-2.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500">Next step</span>
+                <p className="mt-1 text-xs font-semibold leading-snug text-stone-800">{nextStageInfo.shortLabel}</p>
+              </div>
+            )}
+          </div>
           {stages.length === 0 ? (
             <div className="rounded-xl border border-dashed border-stone-200 bg-stone-50/60 py-12 px-4 text-center">
               <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-stone-100 text-stone-400 mb-3">
@@ -377,7 +396,7 @@ export default function PRDetailPage() {
               <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">Milestones will appear here automatically as your purchase request progresses through the procurement workflow.</p>
             </div>
           ) : (
-            <div className="relative pl-6 sm:pl-8 before:absolute before:left-3 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-stone-200 space-y-6">
+            <div className="relative pl-6 sm:pl-8 before:absolute before:left-3 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-stone-200 space-y-3">
               {timelineGroups.map((group) => {
                 const event = group.stage;
                 const stageBadgeLabel = group.stageNumber === 0 
@@ -393,13 +412,13 @@ export default function PRDetailPage() {
                       <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-emerald-50 text-emerald-600" />
                     </div>
 
-                    <article className="rounded-xl border border-stone-200/90 bg-[#FFFEFC] hover:border-stone-300 transition-colors p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                    <article className="rounded-xl border border-stone-200/90 bg-[#FFFEFC] p-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-colors hover:border-stone-300">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-2.5 flex-wrap">
                           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono font-bold text-[#7B0046] bg-[#7B0046]/8 border border-[#7B0046]/15">
                             {stageBadgeLabel}
                           </span>
-                          <h4 className="font-bold text-sm sm:text-base text-stone-900 leading-snug">
+                          <h4 className="font-bold text-sm text-stone-900 leading-snug">
                             {group.stageName}
                           </h4>
                         </div>
@@ -450,8 +469,7 @@ export default function PRDetailPage() {
             </div>
           )}
         </div>
-
-        <div className="text-xs text-stone-500 flex items-center gap-2 print:hidden"><FileCheck className="h-4 w-4" />The Download PR Form button generates only the official Purchase Request form as a PDF.</div>
+        </div>
       </main>
     </div>
   );
