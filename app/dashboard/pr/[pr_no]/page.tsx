@@ -210,9 +210,9 @@ export default function PRDetailPage() {
         <div className="mb-5 flex flex-col justify-between gap-4 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:flex-row xl:items-center print:hidden">
           <div className="min-w-0 flex-1 space-y-2.5">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="!text-base !font-medium tracking-normal text-[#4D002C] font-mono sm:!text-[17px]">
+              <p className="text-[22px] font-semibold leading-tight tracking-[-0.025em] text-[#4D002C] font-mono sm:text-2xl">
                 {pr.pr_no}
-              </h1>
+              </p>
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${statusClass(pr.current_stage)}`}>
                 <span className="h-1.5 w-1.5 rounded-full bg-current" />
                 {statusLabel(pr.current_stage)}
@@ -263,7 +263,7 @@ export default function PRDetailPage() {
         {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-medium text-red-700">{error}</div>}
 
         <section className="w-full min-w-0 overflow-x-auto overscroll-x-contain rounded-2xl border border-stone-300 bg-white p-3 shadow-xs sm:p-4 lg:p-5 print:w-full print:min-w-0 print:overflow-visible print:p-0 print:border-0 print:shadow-none">
-          <div className="box-border w-full min-w-[760px] border-[2px] border-solid border-black bg-white text-black print:w-full print:min-w-0">
+          <div className="box-border w-full min-w-[760px] bg-white text-black print:w-full print:min-w-0" style={{ border: "2px solid #000000", borderStyle: "solid", boxSizing: "border-box" }}>
             <div className="border-b-2 border-black text-center py-3 px-4">
               <h2 className="text-xl font-black uppercase tracking-wider font-serif">PURCHASE REQUEST</h2>
               <p className="text-sm font-bold mt-0.5 tracking-wide font-serif">MINDANAO STATE UNIVERSITY - General Santos City</p>
