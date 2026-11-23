@@ -15,8 +15,8 @@ export default function SystemBranding() {
       "MSU GenSan Procurement Management System": SYSTEM_NAME,
       "MSU GenSan Procurement Management": SYSTEM_NAME,
       "MSU Gensan Procurement Management System": SYSTEM_NAME,
-      "AI Assistant": "Gab AI",
-      "Ask AI": "Ask Gab AI",
+      "AI Assistant": "GAB AI",
+      "Ask AI": "Ask GAB AI",
     };
 
     const replaceText = (root: Node) => {
