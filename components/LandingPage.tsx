@@ -60,7 +60,7 @@ export default function LandingPage() {
           <div className="relative mx-auto flex w-full max-w-[1500px] items-center justify-between gap-3 px-4 py-2.5 sm:gap-6 sm:px-8">
             <Link
               href="#home"
-              aria-label="ProcureMateSU — MSU General Santos Digital Procurement Logbook"
+              aria-label="ProcureMSU — MSU General Santos Digital Procurement Logbook"
               className="group flex min-w-0 items-center gap-3 rounded-2xl py-1 pr-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F6D58A]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#4A002A]"
             >
               <span className="relative grid h-11 w-11 shrink-0 place-items-center rounded-[14px] border border-[#F2D28A]/45 bg-white/[0.08] shadow-xs">
