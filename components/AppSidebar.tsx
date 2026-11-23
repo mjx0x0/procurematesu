@@ -100,7 +100,7 @@ export default function AppSidebar({ mode, collapsed, onToggleCollapsed }: AppSi
         </div>
       </aside>
 
-      <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation menu" className="fixed left-3 top-[82px] z-[75] flex h-10 w-10 items-center justify-center rounded-xl border border-[#F5AB26]/30 bg-[#5B0035] text-white shadow-lg lg:hidden">
+      <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation menu" className="fixed left-3 top-3 z-[75] flex h-10 w-10 items-center justify-center rounded-xl border border-[#F5AB26]/30 bg-[#5B0035] text-white shadow-lg lg:hidden">
         <Menu className="h-5 w-5" />
       </button>
 
