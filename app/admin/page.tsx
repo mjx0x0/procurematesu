@@ -192,7 +192,7 @@ export default function AdminDashboard() {
       <main className="mx-auto min-w-0 max-w-7xl px-3.5 py-4 sm:px-6 sm:py-7">
         <div className="mb-4 flex flex-col gap-3 sm:mb-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-xl font-extrabold tracking-tight text-[#4D002C] sm:text-3xl">Admin Dashboard</h1>
+            <h1 className="text-xl sm:text-[1.7rem] md:text-[1.85rem] font-semibold tracking-[-0.035em] leading-tight text-[#4D002C]">Admin Dashboard</h1>
             <p className="mt-1 text-xs text-stone-600 sm:text-sm">Manage purchase requests, staff access, and procurement inquiries from one workspace.</p>
           </div>
           <button type="button" onClick={manualRefresh} disabled={refreshing} className="inline-flex min-h-9 items-center justify-center gap-2 self-start rounded-lg border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700 transition hover:bg-stone-50 disabled:opacity-60 sm:self-auto">
