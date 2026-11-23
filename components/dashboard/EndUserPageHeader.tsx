@@ -7,10 +7,12 @@ interface EndUserPageHeaderProps {
   titlePrimary: string;
   titleAccent: string;
   icon: LucideIcon;
+  backHref?: string;
   containerClassName?: string;
   children?: ReactNode;
 }
 
+/** Compact page title bar. Navigation and account actions live in the shared sidebar. */
 export function EndUserPageHeader({
   titlePrimary,
   titleAccent,
@@ -18,47 +20,20 @@ export function EndUserPageHeader({
   containerClassName = "max-w-7xl px-4 sm:px-6",
   children,
 }: EndUserPageHeaderProps) {
-  return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
-        setAccountMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const displayName =
-    currentUser?.user_metadata?.full_name ||
-    currentUser?.user_metadata?.name ||
-    currentUser?.email?.split("@")[0] ||
-    "End User";
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("End-user logout failed:", error);
-    } finally {
-      router.replace("/");
-    }
-  };
-
   return (
     <nav className="sticky top-0 z-40 shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md">
       <div className={`mx-auto flex items-center justify-between gap-3 py-3.5 ${containerClassName}`}>
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-          <div className="shrink-0 rounded-xl bg-[#4D002C] p-2 text-amber-300 shadow-sm"><PageIcon className="h-5 w-5" /></div>
-          <div className="min-w-0"><b className="block truncate text-lg font-black leading-tight text-[#4D002C] sm:text-xl">{titlePrimary} <span className="text-[#C27803]">{titleAccent}</span></b></div>
+          <div className="shrink-0 rounded-xl bg-[#4D002C] p-2 text-amber-300 shadow-sm">
+            <PageIcon className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <b className="block truncate text-lg font-black leading-tight text-[#4D002C] sm:text-xl">
+              {titlePrimary} <span className="text-[#C27803]">{titleAccent}</span>
+            </b>
+          </div>
         </div>
-
-        <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">{children}</div>
+        {children && <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">{children}</div>}
       </div>
     </nav>
   );
