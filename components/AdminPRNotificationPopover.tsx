@@ -375,7 +375,8 @@ export default function AdminPRNotificationPopover() {
                       <div className="flex items-start justify-between gap-2">
                         <button type="button" onClick={() => void openNotification(item)} className="min-w-0 text-left text-[12px] font-bold leading-snug text-[#4D002C] hover:text-[#7B0046] focus:outline-none focus-visible:underline">{item.title}</button>
                         <div className="flex shrink-0 items-center gap-2">
-                          {!item.is_read && <span className="mt-1 h-2 w-2 rounded-full bg-[#8B0050]" aria-label="Unread" />}
+
+                          {!item.is_read && <span className="h-2 w-2 rounded-full bg-[#8B0050]" aria-label="Unread" />}
                           <button type="button" disabled={busyIds.includes(item.id)} onClick={() => void deleteNotification(item)} aria-label={"Delete notification: " + item.title} title="Delete notification" className="rounded-md p-1 text-stone-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-40"><Trash2 className="h-3.5 w-3.5" /></button>
                         </div>
                       </div>
