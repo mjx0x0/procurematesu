@@ -335,7 +335,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
 
       <main className="max-w-7xl mx-auto min-w-0 px-3.5 sm:px-6 py-3.5 sm:py-7">
         <div className="mb-4 sm:mb-5">
-          <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#4D002C]">Purchase Requests</h1>
+          <h1 className="text-xl sm:text-[1.7rem] md:text-[1.85rem] font-semibold tracking-[-0.035em] leading-tight text-[#4D002C]">Purchase Requests</h1>
           <p className="text-xs sm:text-sm text-stone-600 mt-1">Review, filter, and manage submitted purchase requests through the official PMO procurement workflow.</p>
         </div>
 
