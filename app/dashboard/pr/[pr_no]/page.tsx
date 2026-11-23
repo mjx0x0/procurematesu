@@ -210,7 +210,7 @@ export default function PRDetailPage() {
         <div className="mb-5 flex flex-col justify-between gap-4 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:flex-row xl:items-center print:hidden">
           <div className="min-w-0 flex-1 space-y-2.5">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-lg font-bold tracking-tight text-[#4D002C] font-mono sm:text-xl lg:text-2xl">
+              <h1 className="!text-base !font-medium tracking-normal text-[#4D002C] font-mono sm:!text-[17px]">
                 {pr.pr_no}
               </h1>
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${statusClass(pr.current_stage)}`}>
@@ -258,12 +258,12 @@ export default function PRDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_320px] 2xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+        <div className="grid min-w-0 grid-cols-1 gap-6 2xl:grid-cols-[minmax(0,1fr)_400px] 2xl:items-start">
           <div className="min-w-0 space-y-4">
         {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-medium text-red-700">{error}</div>}
 
-        <section className="min-w-0 overflow-x-auto rounded-2xl border border-stone-300 bg-white p-3 shadow-xs sm:p-5 lg:p-6 print:w-full print:min-w-0 print:overflow-visible print:p-0 print:border-0 print:shadow-none">
-          <div className="min-w-[700px] border-2 border-black text-black bg-white print:w-full print:min-w-0 print:box-border">
+        <section className="w-full min-w-0 overflow-x-auto rounded-2xl border border-stone-300 bg-white p-3 shadow-xs sm:p-5 lg:p-6 print:w-full print:min-w-0 print:overflow-visible print:p-0 print:border-0 print:shadow-none">
+          <div className="w-full min-w-[760px] border-2 border-black bg-white text-black box-border print:w-full print:min-w-0 print:box-border">
             <div className="border-b-2 border-black text-center py-3 px-4">
               <h2 className="text-xl font-black uppercase tracking-wider font-serif">PURCHASE REQUEST</h2>
               <p className="text-sm font-bold mt-0.5 tracking-wide font-serif">MINDANAO STATE UNIVERSITY - General Santos City</p>
@@ -357,9 +357,9 @@ export default function PRDetailPage() {
         </section>
 <div className="text-xs text-stone-500 flex items-center gap-2 print:hidden"><FileCheck className="h-4 w-4" />The Download PR Form button generates only the official Purchase Request form as a PDF.</div>
           </div>
-        <div className="pr-timeline min-w-0 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] xl:sticky xl:top-5 xl:max-h-[calc(100vh-2.5rem)] xl:overflow-y-auto print:hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-stone-200/80">
-            <div className="flex items-center gap-3">
+        <aside className="pr-timeline min-w-0 w-full rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 print:hidden">
+          <div className="flex min-w-0 flex-col items-start gap-3 border-b border-stone-200/80 pb-4 mb-4">
+            <div className="flex min-w-0 items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046] border border-[#7B0046]/15">
                 <Clock className="h-5 w-5" />
               </div>
@@ -368,12 +368,12 @@ export default function PRDetailPage() {
                 <p className="text-[11px] leading-relaxed text-stone-500">Official log of completed procurement stages and office remarks</p>
               </div>
             </div>
-            <div className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border border-stone-200 bg-stone-50 px-3 py-1 text-xs font-semibold text-stone-600">
+            <div className="inline-flex max-w-full items-center gap-1.5 self-start rounded-full border border-stone-200 bg-stone-50 px-3 py-1 text-xs font-semibold text-stone-600">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               <span>{timelineGroups.length} recorded milestone{timelineGroups.length === 1 ? "" : "s"}</span>
             </div>
           </div>
-          <div className="mb-4 rounded-xl border border-[#7B0046]/15 bg-[#FCF7FA] p-3">
+          <div className="mb-4 min-w-0 w-full rounded-xl border border-[#7B0046]/15 bg-[#FCF7FA] p-3">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500">Current stage</span>
               <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusClass(pr.current_stage)}`}>{statusLabel(pr.current_stage)}</span>
@@ -396,7 +396,7 @@ export default function PRDetailPage() {
               <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">Milestones will appear here automatically as your purchase request progresses through the procurement workflow.</p>
             </div>
           ) : (
-            <div className="relative pl-6 sm:pl-8 before:absolute before:left-3 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-stone-200 space-y-3">
+            <div className="relative min-w-0 space-y-3 pl-7 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-0.5 before:bg-stone-200">
               {timelineGroups.map((group) => {
                 const event = group.stage;
                 const stageBadgeLabel = group.stageNumber === 0 
@@ -406,34 +406,32 @@ export default function PRDetailPage() {
                     : "Milestone";
 
                 return (
-                  <div key={group.key} className="relative group/timeline">
+                  <div key={group.key} className="relative min-w-0 w-full group/timeline">
                     {/* Timeline Node Icon */}
                     <div className="absolute -left-6 sm:-left-8 top-1.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white border-2 border-emerald-500 text-emerald-600 shadow-xs z-10">
                       <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-emerald-50 text-emerald-600" />
                     </div>
 
-                    <article className="rounded-xl border border-stone-200/90 bg-[#FFFEFC] p-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-colors hover:border-stone-300">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div className="flex items-center gap-2.5 flex-wrap">
+                    <article className="min-w-0 w-full rounded-xl border border-stone-200/90 bg-[#FFFEFC] p-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-colors hover:border-stone-300 sm:p-4">
+                      <div className="flex min-w-0 flex-col items-start gap-2">
+                        <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
                           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono font-bold text-[#7B0046] bg-[#7B0046]/8 border border-[#7B0046]/15">
                             {stageBadgeLabel}
                           </span>
-                          <h4 className="font-bold text-sm text-stone-900 leading-snug">
+                          <h4 className="min-w-0 max-w-full break-words text-sm font-semibold leading-snug text-stone-900">
                             {group.stageName}
                           </h4>
                         </div>
                         {event && (
-                          <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+                          <div className="inline-flex w-full min-w-0 items-start gap-1.5 rounded-lg border border-emerald-200/80 bg-emerald-50 px-2.5 py-2 text-[11px] font-medium leading-relaxed text-emerald-700">
                             <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
-                            <span>
-                              Completed · {new Date(event.completed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} at {new Date(event.completed_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-                            </span>
+                            <span className="min-w-0 whitespace-normal break-words">Completed · {new Date(event.completed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} at {new Date(event.completed_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</span>
                           </div>
                         )}
                       </div>
 
                       {event?.remarks || event?.notes ? (
-                        <div className="mt-3.5 rounded-lg border border-stone-200/80 bg-stone-50/80 p-3 sm:p-3.5">
+                        <div className="mt-3 rounded-lg border border-stone-200/80 bg-stone-50/80 p-3">
                           <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase text-[#7B0046] mb-1">
                             <MessageSquare className="h-3 w-3" />
                             <span>Stage Remark</span>
@@ -443,16 +441,16 @@ export default function PRDetailPage() {
                       ) : null}
 
                       {group.remarks.length > 0 && (
-                        <div className="mt-3.5 pt-3 border-t border-stone-100">
+                        <div className="mt-3 min-w-0 border-t border-stone-100 pt-3">
                           <p className="text-[10px] font-bold tracking-wider uppercase text-stone-400 mb-2">Additional Remarks</p>
                           <div className="space-y-2">
                             {group.remarks.map((remark) => (
-                              <div key={remark.id} className="flex items-start gap-2.5 rounded-lg bg-stone-50/50 border border-stone-100 p-2.5 text-xs">
+                              <div key={remark.id} className="flex min-w-0 items-start gap-2.5 rounded-lg border border-stone-100 bg-stone-50/50 p-2.5 text-xs">
                                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#C27803]" />
                                 <div className="min-w-0 flex-1">
-                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                  <div className="flex min-w-0 flex-col items-start gap-1">
                                     <span className="leading-relaxed text-stone-700">{remark.remarks || remark.notes || "No remarks provided."}</span>
-                                    <span className="text-[10px] text-stone-400 font-mono shrink-0">
+                                    <span className="max-w-full whitespace-normal break-words text-[10px] font-mono text-stone-400">
                                       {new Date(remark.completed_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })} {new Date(remark.completed_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                                     </span>
                                   </div>
@@ -468,7 +466,7 @@ export default function PRDetailPage() {
               })}
             </div>
           )}
-        </div>
+        </aside>
         </div>
       </main>
     </div>
