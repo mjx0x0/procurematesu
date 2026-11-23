@@ -195,7 +195,7 @@ export default function LandingPage() {
                 Operating strictly in alignment with Philippine public procurement guidelines and university standards, every request progresses through the standardized <strong className="font-extrabold text-[#4D002C]">end-to-end procurement workflow</strong> with complete auditability.
               </p>
               <p className="mt-4">
-                Users can also consult <strong className="font-extrabold text-[#4D002C]">Gab AI</strong> for instant guidance on procurement policies, required attachments, and standard operating procedures.
+                Users can also consult <strong className="font-extrabold text-[#4D002C]">GAB AI</strong> for instant guidance on procurement policies, required attachments, and standard operating procedures.
               </p>
 
             </motion.div>
@@ -546,7 +546,7 @@ export default function LandingPage() {
             </p>
             <h2 className="mt-1 max-w-xl text-xl font-extrabold tracking-tight">Digital Procurement Logbook and Inquiry System</h2>
             <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-white/60">
-              Centralized platform for Purchase Requests, standardized procurement workflows, transparency disclosures, and Gab AI assistance.
+              Centralized platform for Purchase Requests, standardized procurement workflows, transparency disclosures, and GAB AI assistance.
             </p>
           </div>
           <Link
