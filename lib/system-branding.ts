@@ -1,6 +1,6 @@
 export const SYSTEM_NAME = "MSU - General Santos Digital Procurement Logbook and Inquiry System";
 
-export const SYSTEM_SHORT_NAME = "ProcureMateSU";
+export const SYSTEM_SHORT_NAME = "ProcureMSU";
 
 export const SYSTEM_TAGLINE = "MSU – General Santos";
 
