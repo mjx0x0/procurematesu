@@ -145,15 +145,15 @@ test('main dashboard headers show the ProcureMSU wordmark with MSU letters highl
   assert.match(admin, /brandWordmark/);
 });
 
-test('the short ProcureMSU wordmark and Gab AI assistant identity remain separate', () => {
+test('the short ProcureMSU wordmark and GAB AI assistant identity remain separate', () => {
   const landing = read('components/LandingPage.tsx');
   const login = read('components/auth/LandingLoginCard.tsx');
   assert.match(landing, /Procure/);
   assert.ok(landing.includes('>Procure</span>'));
   assert.ok(landing.includes('>M</span>'));
   assert.ok(landing.includes('>SU</span>'));
-  assert.match(landing, /Gab AI/);
-  assert.match(login, /Gab AI|SYSTEM_NAME/);
+  assert.match(landing, /GAB AI/);
+  assert.match(login, /GAB AI|SYSTEM_NAME/);
 });
 
 
@@ -673,4 +673,27 @@ test('admin conversation bubbles mirror the end-user Gab AI chat and expand lega
   assert.match(inquiries, /conversationTurns\.map\(\(turn\)/);
   assert.match(conversationRoute, /split\(\/\\r\?\\n\\s\*\\r\?\\n\//);
   assert.match(conversationRoute, /paragraphs\.map\(\(content: string, partIndex: number\)/);
+});
+
+
+test('floating chatbot is icon-only and its panel clears the sticky workspace header', () => {
+  const chatbot = read('components/chatbot/Chatbot.tsx');
+  assert.match(chatbot, /aria-label="Open GAB AI"/);
+  assert.match(chatbot, /z-\[70\]/);
+  assert.match(chatbot, /top-\[80px\]/);
+  assert.match(chatbot, /sm:top-\[88px\]/);
+  const launcher = chatbot.slice(chatbot.indexOf('return <>{!isOpen'), chatbot.indexOf('{isOpen&&'));
+  assert.match(launcher, /<Bot/);
+  assert.doesNotMatch(launcher, /<span[^>]*>GAB AI<\/span>/);
+  assert.match(chatbot, /<span className="truncate text-xs font-bold sm:text-sm">GAB AI<\/span>/);
+});
+
+test('purchase request tracking retains the shared end-user navigation shell', () => {
+  const shell = read('components/AppThemeShell.tsx');
+  const sidebar = read('components/AppSidebar.tsx');
+  const tracking = read('app/dashboard/pr/[pr_no]/page.tsx');
+  assert.doesNotMatch(shell, /["']\/dashboard\/pr\/["']/);
+  assert.match(sidebar, /href: "\/dashboard\/purchase-requests"/);
+  assert.match(tracking, /<SystemPageHeader/);
+  assert.match(tracking, /Back to Purchase Requests/);
 });
