@@ -99,7 +99,7 @@ test('sign-in, registration, logo accessibility, loading and workspace labels ar
   assert.doesNotMatch(logo, /General Santos City/);
 });
 
-test('main dashboard headers show the ProcureMateSU wordmark with MSU letters highlighted and role-specific workspace labels', () => {
+test('main dashboard headers show the ProcureMSU wordmark with MSU letters highlighted and role-specific workspace labels', () => {
   const header = read('components/dashboard/SystemPageHeader.tsx');
   const dashboard = read('app/dashboard/page.tsx');
   const admin = read('app/admin/page.tsx');
@@ -116,6 +116,9 @@ test('main dashboard headers show the ProcureMateSU wordmark with MSU letters hi
   assert.ok(header.includes('text-white/75'));
   assert.ok(header.includes('tracking-[0.10em]'));
   assert.ok(header.includes('rounded-full bg-[#E9B957]'));
+  assert.ok(header.includes('bg-gradient-to-br from-[#FFF0B5] via-[#F6C453] to-[#C9871B] bg-clip-text text-transparent">SU</span>'));
+  assert.ok(header.includes('h-[68px]'));
+  assert.ok(!header.includes('role="separator"'));
   assert.ok(header.includes('data-workspace-brand={brandLogo && brandWordmark ? "true" : undefined}'));
   const globalStyles = read('app/globals.css');
   assert.ok(globalStyles.includes('nav[class*="sticky"][data-workspace-brand="true"]'));
@@ -131,6 +134,7 @@ test('main dashboard headers show the ProcureMateSU wordmark with MSU letters hi
   assert.ok(header.includes('bg-[#F6D58A]/15 text-[#F6D58A]'));
   assert.ok(dashboard.includes('<NotificationPopover variant="workspace" />'));
   assert.ok(globalStyles.includes('top: 0 !important;'));
+  assert.doesNotMatch(dashboard, /h-7 w-px bg-white\\/20/);
   assert.match(dashboard, /overflow-x-clip/);
   assert.doesNotMatch(dashboard, /overflow-x-hidden/);
   assert.match(dashboard, /workspaceLabel="End User Workspace"/);
