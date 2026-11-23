@@ -69,7 +69,7 @@ function buildProcurementFlowResponse() {
   return [
     '🏛️ **MSU-General Santos Procurement Workflow**',
     '',
-    'This is the workflow configured in ProcureMateSU, from receipt of the Purchase Request through monitoring and documentation.',
+    'This is the workflow configured in ProcureMSU, from receipt of the Purchase Request through monitoring and documentation.',
     '',
     lines,
     '',
@@ -77,12 +77,12 @@ function buildProcurementFlowResponse() {
     '- **SVP RFQ/RFP posting — RA No. 12009 IRR, Section 34.3(b):** The request for quotation/proposal must be posted for three (3) calendar days on PhilGEPS, the procuring entity website if available, and a conspicuous place at its premises. The posting exception applies when the Approved Budget for the Contract (ABC) is **₱200,000 or below**.',
     '- **Omnibus Sworn Statement — GPPB Circular No. 06-2026, Sections 4.3.7 and 4.7, as applicable:** the Circular identifies this document for procurements with an ABC **above ₱50,000**. This is a documentary requirement threshold, not an RFQ/RFP posting threshold.',
     '',
-    'The stages above reflect ProcureMateSU’s configured workflow. Confirm office-specific instructions with the Procurement Management Office (PMO), and use PR tracking for the status of an individual request.',
+    'The stages above reflect ProcureMSU’s configured workflow. Confirm office-specific instructions with the Procurement Management Office (PMO), and use PR tracking for the status of an individual request.',
     '',
     '**Official sources:** [GPPB-approved IRR of RA No. 12009, Section 34](https://www.gppb.gov.ph/wp-content/uploads/2025/02/IRR-of-RA-No.-12009.pdf); [GPPB Circular No. 06-2026 / Resolution No. 10-2026](https://www.gppb.gov.ph/wp-content/uploads/2026/06/Approved_GPPB-Resolution-No.-10-2026-Documentary-Requirements.pdf).',
     ].join('\n');
 }
-function buildNextStepResponse(pr: any, latestStage: any) { const currentIndex = PROCUREMENT_STAGES.findIndex(s => s.key === pr.current_stage); const current = currentIndex >= 0 ? PROCUREMENT_STAGES[currentIndex] : null; const next = currentIndex >= 0 && currentIndex < PROCUREMENT_STAGES.length - 1 ? PROCUREMENT_STAGES[currentIndex + 1] : null; if (pr.current_stage === 'completed' || !next) return `✅ **${pr.pr_no} has reached the final procurement stage.**\n\nThere is no next workflow stage recorded in ProcuremateSU. The PR has successfully completed the entire procurement workflow.\n\nFor the official transaction outcome or any remaining documentary requirement, coordinate with the Procurement Management Office.`; const age = latestStage?.completed_at ? Math.max(0, (Date.now() - new Date(latestStage.completed_at).getTime()) / 86400000) : null; return `📍 **What happens next for ${pr.pr_no}?**\n\n**Current stage:** Step ${current?.number || '?'} — ${current?.label || pr.current_stage}\n${latestStage?.completed_at ? `**Current stage recorded:** ${new Date(latestStage.completed_at).toLocaleString()}${age !== null ? ` (${age.toFixed(1)} days ago)` : ''}\n` : ''}\n**Next stage:** Step ${next.number} — ${next.label}\n\n**What this means:** ${next.description}\n\nThe next step is based on ProcuremateSU's centralized procurement workflow. Processing time can vary by transaction, office action, documentary requirements, and applicable procurement rules; the system does not treat the monitoring heuristic as an official SLA.`; }
+function buildNextStepResponse(pr: any, latestStage: any) { const currentIndex = PROCUREMENT_STAGES.findIndex(s => s.key === pr.current_stage); const current = currentIndex >= 0 ? PROCUREMENT_STAGES[currentIndex] : null; const next = currentIndex >= 0 && currentIndex < PROCUREMENT_STAGES.length - 1 ? PROCUREMENT_STAGES[currentIndex + 1] : null; if (pr.current_stage === 'completed' || !next) return `✅ **${pr.pr_no} has reached the final procurement stage.**\n\nThere is no next workflow stage recorded in ProcureMSU. The PR has successfully completed the entire procurement workflow.\n\nFor the official transaction outcome or any remaining documentary requirement, coordinate with the Procurement Management Office.`; const age = latestStage?.completed_at ? Math.max(0, (Date.now() - new Date(latestStage.completed_at).getTime()) / 86400000) : null; return `📍 **What happens next for ${pr.pr_no}?**\n\n**Current stage:** Step ${current?.number || '?'} — ${current?.label || pr.current_stage}\n${latestStage?.completed_at ? `**Current stage recorded:** ${new Date(latestStage.completed_at).toLocaleString()}${age !== null ? ` (${age.toFixed(1)} days ago)` : ''}\n` : ''}\n**Next stage:** Step ${next.number} — ${next.label}\n\n**What this means:** ${next.description}\n\nThe next step is based on ProcureMSU's centralized procurement workflow. Processing time can vary by transaction, office action, documentary requirements, and applicable procurement rules; the system does not treat the monitoring heuristic as an official SLA.`; }
 
 export async function POST(request: NextRequest) {
   try {
@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
       // slot validation, retrieval, or an AI provider.
       return NextResponse.json({
         response: PROCUREMENT_SCOPE_RESPONSE,
-        sources: ['ProcureMateSU scope and security guard'],
+        sources: ['ProcureMSU scope and security guard'],
       });
     }
 
@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
           const { error: logError } = await db.rpc('append_monitor_inquiry_session', {
             p_session_id: sessionId,
             p_user_id: user.id,
-            p_user_name: user.user_metadata?.full_name || user.user_metadata?.name || 'ProcuremateSU User',
+            p_user_name: user.user_metadata?.full_name || user.user_metadata?.name || 'ProcureMSU User',
             p_user_department: 'MSU-GenSan',
             p_pr_no: null,
             p_user_message: message,
@@ -342,7 +342,7 @@ export async function POST(request: NextRequest) {
       !/\b(purpose|request for quotation|rfq|who handles|who is|director|contact|explain what|what is|define|sources?|citations?|references?)\b/i.test(message) &&
       !/\b(and|also|additionally|plus|as well as)\b/i.test(message) &&
       message.trim().split(/\s+/).length <= 14;
-    if (asksOnlyForWorkflow) return NextResponse.json({ response: buildProcurementFlowResponse(), sources: ['ProcuremateSU procurement process'] });
+    if (asksOnlyForWorkflow) return NextResponse.json({ response: buildProcurementFlowResponse(), sources: ['ProcureMSU procurement process'] });
     // Normalize common Unicode dashes used when users copy PR numbers from forms or chat.
     const searchableMessage = message.replace(/[\u2010-\u2015\u2212]/g, '-');
     const prIdentifier = searchableMessage.match(PR_IDENTIFIER_PATTERN)?.[0] || '';
@@ -429,7 +429,7 @@ export async function POST(request: NextRequest) {
         const latestHistory = [...(stageHistory || [])].reverse().find((entry: any) => entry.status !== 'remark') || null;
         return NextResponse.json({
           response: buildNextStepResponse(pr, latestHistory),
-          sources: ['Live Purchase Request record', 'ProcuremateSU procurement process', 'Purchase Request stage history'],
+          sources: ['Live Purchase Request record', 'ProcureMSU procurement process', 'Purchase Request stage history'],
         });
       }
 
@@ -466,7 +466,7 @@ export async function POST(request: NextRequest) {
       const { data: latestPR, error: latestError } = await clientToUse.from('purchase_requests').select('pr_no,purpose,total,current_stage,created_at,department').eq('user_id', user.id).not('current_stage', 'eq', 'draft').order('created_at', { ascending: false }).limit(1).maybeSingle();
       if (latestError || !latestPR) return NextResponse.json({ response: `📋 **I couldn't find a submitted Purchase Request under your account yet.**\n\nSubmit a PR first, then ask **"What happens next?"** and I will explain its current and next procurement stage.`, sources: ['Purchase Request records'] });
       const { data: history } = await clientToUse.from('pr_stages_completed').select('stage_key,stage_name,completed_at,remarks,notes').eq('pr_no', latestPR.pr_no).neq('status', 'remark').order('completed_at', { ascending: false }).limit(1);
-      return NextResponse.json({ response: buildNextStepResponse(latestPR, history?.[0] || null), sources: ['ProcuremateSU procurement process', 'Purchase Request stage history'] });
+      return NextResponse.json({ response: buildNextStepResponse(latestPR, history?.[0] || null), sources: ['ProcureMSU procurement process', 'Purchase Request stage history'] });
     }
     // The wrapper authenticates the user and verifies session ownership.
     // The delegated chat route persists both chat messages and the inquiry log
@@ -497,7 +497,7 @@ export async function POST(request: NextRequest) {
           const { error: inquiryLogError } = await clientToUse.rpc('append_monitor_inquiry_session', {
             p_session_id: sessionId,
             p_user_id: user.id,
-            p_user_name: authenticatedUserName || 'ProcuremateSU User',
+            p_user_name: authenticatedUserName || 'ProcureMSU User',
             p_user_department: 'MSU-GenSan',
             p_pr_no: prMatch ? normalizePRIdentifier(prMatch) : null,
             p_user_message: message,
