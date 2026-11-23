@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import AppSidebar from "@/components/AppSidebar";
 import SystemBranding from "@/components/SystemBranding";
 
-const PRESERVE_PAGE_ROUTES = ["/", "/auth/signup", "/dashboard/pr-print", "/dashboard/pr/"];
+const PRESERVE_PAGE_ROUTES = ["/", "/auth/signup", "/dashboard/pr-print"];
 
 export default function AppThemeShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
