@@ -22,6 +22,7 @@ interface SystemPageHeaderProps {
   mobileTitlePrimary?: string;
   mobileTitleAccent?: string;
   children?: ReactNode;
+  showControlsDivider?: boolean;
 }
 
 export function SystemPageHeader({
