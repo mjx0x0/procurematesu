@@ -25,7 +25,7 @@ const userItems: SidebarItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
   { href: "/dashboard/new-pr", label: "Create Purchase Request", icon: FilePlus2 },
   { href: "/dashboard/purchase-requests", label: "My Purchase Requests", icon: FileText },
-  { href: "/dashboard/chatbot", label: "Gab AI", icon: Bot },
+  { href: "/dashboard/chatbot", label: "GAB AI", icon: Bot },
   { href: "/dashboard/transparency", label: "Transparency Board", icon: ShieldCheck },
 ];
 
