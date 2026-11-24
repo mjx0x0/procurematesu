@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data: updated, error: updateError } = await db
-      .from('purchase_requests').update({ printed_name: printedName }).eq('pr_no', prNo).eq('user_id', user.id).eq('current_stage', 'draft').select('printed_name').maybeSingle();
+      .from('purchase_requests').update({ printed_name: printedName }).eq('pr_no', prNo).eq('user_id', user.id).eq('current_stage', 'draft').is('physical_submitted_at', null).select('printed_name').maybeSingle();
     if (updateError || !updated) {
       console.error('[update-printed-name] Update failed:', updateError?.message || 'No row updated');
       return NextResponse.json({ error: 'Unable to update the printed name. Please refresh and try again.' }, { status: 500, headers: JSON_HEADERS });
