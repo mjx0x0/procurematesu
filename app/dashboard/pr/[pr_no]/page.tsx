@@ -271,13 +271,13 @@ export default function PRDetailPage() {
               </div>
             )}
           </div>
-          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end sm:gap-2.5 shrink-0 self-start lg:self-center print:hidden">
-            {pr.current_stage === "draft" && !pr.physical_submitted_at && <Link href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} className="inline-flex min-h-10 items-center justify-center rounded-xl bg-[#7B0046] px-3 sm:px-4 text-xs font-bold text-white hover:bg-[#610037]">Edit Draft</Link>}
-            {pr.current_stage === "draft" && !pr.physical_submitted_at && <button type="button" onClick={() => setShowPhysicalSubmitConfirm(true)} disabled={submittingPhysical} className="col-span-2 inline-flex min-h-10 items-center justify-center rounded-xl border border-[#7B0046] bg-[#7B0046] px-3 sm:px-4 text-xs font-bold text-white hover:bg-[#610037] disabled:opacity-60 sm:col-span-1">{submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}</button>}
-            <button type="button" onClick={() => window.print()} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-3 sm:px-4 text-xs sm:text-sm font-semibold text-stone-700 shadow-xs transition hover:bg-stone-50 hover:border-stone-400 active:scale-[0.98] whitespace-nowrap">
-              <Printer className="h-4 w-4 text-stone-600 shrink-0" /><span>Print Form</span>
+          <div className="grid w-full grid-cols-1 gap-2 sm:w-full sm:max-w-[520px] sm:grid-cols-2 sm:gap-2.5 lg:w-[520px] lg:shrink-0 print:hidden">
+            {pr.current_stage === "draft" && !pr.physical_submitted_at && <Link href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[#7B0046] px-3 text-center text-xs font-bold text-white hover:bg-[#610037]">Edit Draft</Link>}
+            {pr.current_stage === "draft" && !pr.physical_submitted_at && <button type="button" onClick={() => setShowPhysicalSubmitConfirm(true)} disabled={submittingPhysical} className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-[#7B0046] bg-[#7B0046] px-3 text-center text-xs font-bold leading-tight text-white hover:bg-[#610037] disabled:opacity-60">{submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}</button>}
+            <button type="button" onClick={() => window.print()} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-3 text-xs font-semibold text-stone-700 shadow-xs transition hover:bg-stone-50 hover:border-stone-400 active:scale-[0.98]">
+              <Printer className="h-4 w-4 shrink-0 text-stone-600" /><span>Print Form</span>
             </button>
-            <div className="min-w-0"><PRDownloadButton pr={pr} items={items} /></div>
+            <div className="w-full [&>button]:min-h-11 [&>button]:w-full"><PRDownloadButton pr={pr} items={items} /></div>
           </div>
         </div>
 
