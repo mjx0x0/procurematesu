@@ -9,6 +9,11 @@ export async function POST(req: NextRequest) {
     if (!(req.headers.get('content-type') || '').toLowerCase().includes('application/json')) {
       return NextResponse.json({ error: 'Content-Type must be application/json.' }, { status: 415, headers });
     }
+    const origin = req.headers.get('origin');
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+    if (origin && host && new URL(origin).host.split(':')[0] !== host.split(':')[0]) {
+      return NextResponse.json({ error: 'Invalid request origin.' }, { status: 403, headers });
+    }
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) return NextResponse.json({ error: 'Authentication required.' }, { status: 401, headers });
