@@ -604,7 +604,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                     </span>
                   )}
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold border ${COLORS[selectedPR.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
-                    {detailStage ? `Stage ${detailStage.number}: ${detailStage.shortLabel}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
+                    {selectedPR.current_stage === "draft" && selectedPR.physical_submitted_at ? "Awaiting Physical Receipt" : detailStage ? `Stage ${detailStage.number}: ${detailStage.shortLabel}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
                   </span>
                 </div>
                 <p className="text-[11px] sm:text-sm text-stone-500 mt-1 flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-1 leading-relaxed">
