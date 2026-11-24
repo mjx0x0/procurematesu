@@ -61,7 +61,7 @@ export default function ProcurementRequestForm() {
   const [error, setError] = useState<string | null>(null);
   const [showReview, setShowReview] = useState(false);
   const [createdPRNo, setCreatedPRNo] = useState<string | null>(null);
-  const [physicalSubmissionAcknowledged, setPhysicalSubmissionAcknowledged] = useState(false);
+  const [editingPrNo, setEditingPrNo] = useState<string | null>(null);
   const [form, setForm] = useState({ purpose: "", department: "", section: "", requested_by_designation: "" });
   const [departmentOther, setDepartmentOther] = useState(false);
   const [items, setItems] = useState<Item[]>([emptyItem()]);
@@ -80,6 +80,20 @@ export default function ProcurementRequestForm() {
       setUserId(user.id);
       const name = user.user_metadata?.full_name || "";
       setUserName(name && !name.includes("@") ? name : "");
+      const editNo = searchParams?.get("edit");
+      if (editNo) {
+        const { data: draft } = await supabase.from("purchase_requests").select("*").eq("pr_no", editNo).eq("user_id", user.id).maybeSingle();
+        if (!draft || draft.current_stage !== "draft" || draft.physical_submitted_at) {
+          setError("This PR is no longer an editable draft.");
+        } else {
+          const { data: draftItems } = await supabase.from("pr_items").select("*").eq("pr_no", editNo).order("created_at", { ascending: true });
+          setEditingPrNo(editNo);
+          setForm({ purpose: draft.purpose || "", department: draft.department || "", section: draft.section || "", requested_by_designation: draft.designation || "" });
+          setDepartmentOther(!MSU_DEPARTMENTS.includes(draft.department || ""));
+          setUserName(draft.printed_name || name || "");
+          setItems((draftItems || []).map((item: any, index: number) => ({ id: String(item.id || index), description: item.item_description || "", qty: Number(item.quantity || 1), unit: item.unit || "pcs", unit_cost: Number(item.unit_cost || 0), total_cost: Number(item.total_cost || 0) })));
+        }
+      }
       setLoading(false);
     })();
   }, [router]);
@@ -134,11 +148,6 @@ export default function ProcurementRequestForm() {
   const removeItem = (index: number) => setItems(prev => prev.length === 1 ? prev : prev.filter((_, i) => i !== index));
 
   const validateBeforeReview = () => {
-    if (!physicalSubmissionAcknowledged) {
-      setError("Please acknowledge the physical submission requirement. After creating the PR, you must print it and physically submit the signed PR and required supporting documents to the Procurement Office.");
-      setShowReview(false);
-      return false;
-    }
     const validationErrors = validatePurchaseRequest({
       purpose: form.purpose,
       department: form.department,
@@ -177,7 +186,8 @@ export default function ProcurementRequestForm() {
         };
       });
       const { data: sessionData } = await supabase.auth.getSession(); const accessToken = sessionData?.session?.access_token;
-      const res = await fetch("/api/pr/create", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json", ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) }, body: JSON.stringify({ department: form.department.trim(), section: form.section.trim() || null, purpose: form.purpose.trim(), total, printed_name: userName.trim(), designation: form.requested_by_designation.trim() || null, items: validItems }) });
+      const endpoint = editingPrNo ? "/api/pr/update-draft" : "/api/pr/create";
+      const res = await fetch(endpoint, { method: "POST", credentials: "include", headers: { "Content-Type": "application/json", ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) }, body: JSON.stringify({ ...(editingPrNo ? { prNo: editingPrNo } : {}), department: form.department.trim(), section: form.section.trim() || null, purpose: form.purpose.trim(), total, printed_name: userName.trim(), designation: form.requested_by_designation.trim() || null, items: validItems }) });
       const resData = await res.json();
       if (!res.ok || resData.error || !resData.pr) throw new Error(resData?.error || "Failed to create the purchase request.");
       setCreatedPRNo(resData.pr.pr_no);
@@ -218,12 +228,12 @@ export default function ProcurementRequestForm() {
               {/* Physical Submission Notice */}
               <div className="rounded-xl border-2 border-amber-300/80 bg-[#FFFDF7] p-3 sm:p-5 shadow-sm">
                 <div className="min-w-0">
-                  <h2 className="text-[13px] sm:text-sm font-black text-[#4D002C] tracking-tight uppercase">Important: Physical submission is required</h2>
+                  <h2 className="text-[13px] sm:text-sm font-black text-[#4D002C] tracking-tight uppercase">Draft preparation</h2>
                   <p className="mt-1.5 text-[11px] sm:text-sm leading-relaxed text-stone-700">
-                    Submitting this Purchase Request through this digital procurement system only records and prepares the PR digitally. It does <strong>not</strong> replace the required physical submission to the Procurement Office.
+                    Save your Purchase Request as a private draft. You can reopen and edit it any time while it has not yet been declared physically submitted.
                   </p>
                   <p className="mt-1 text-[11px] sm:text-sm leading-relaxed text-stone-700">
-                    After creating your PR, you must <strong>print the PR form</strong> and physically submit the signed copy together with the required supporting documents to the Procurement Office for actual processing.
+                    When you have printed, signed, and physically handed the form to the Procurement Office, open the draft and use the separate physical-submission confirmation.
                   </p>
                   <label className="mt-3 flex items-start gap-2.5 sm:gap-3 cursor-pointer select-none bg-amber-100/50 hover:bg-amber-100/80 transition-colors p-2.5 sm:p-3 rounded-lg border border-amber-200">
                     <input
@@ -645,12 +655,12 @@ export default function ProcurementRequestForm() {
                   {submitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin text-amber-300" />
-                      <span>Validating &amp; Submitting...</span>
+                      <span>Validating &amp; Saving...</span>
                     </>
                   ) : (
                     <>
                       <Save className="h-4 w-4 text-amber-300" />
-                      <span>Submit Purchase Request</span>
+                      <span>{editingPrNo ? "Save Draft Changes" : "Create Purchase Request"}</span>
                     </>
                   )}
                 </button>
@@ -744,11 +754,11 @@ export default function ProcurementRequestForm() {
                 <button
                   type="button"
                   onClick={confirmReview}
-                  disabled={submitting || !physicalSubmissionAcknowledged}
+                  disabled={submitting}
                   className="ui-button ui-button-primary flex-1 order-1 sm:order-2"
                 >
                   <CheckCircle2 className="h-4 w-4 text-amber-300" />
-                  <span>Confirm &amp; Create PR</span>
+                  <span>{editingPrNo ? "Confirm &amp; Save Draft" : "Confirm &amp; Create Draft"}</span>
                 </button>
               </div>
             </div>
@@ -765,8 +775,8 @@ export default function ProcurementRequestForm() {
               <div className="mx-auto w-14 h-14 rounded-2xl bg-green-50 border border-green-200 flex items-center justify-center shadow-xs">
                 <CheckCircle2 className="h-7 w-7 text-green-600" />
               </div>
-              <h3 className="text-xl font-black text-[#4D002C] mt-4">Purchase Request Created</h3>
-              <p className="text-xs text-stone-600 mt-1.5">Your Purchase Request has been recorded with a temporary control number.</p>
+              <h3 className="text-xl font-black text-[#4D002C] mt-4">{editingPrNo ? "Draft Updated" : "Draft Created"}</h3>
+              <p className="text-xs text-stone-600 mt-1.5">Your PR is saved privately as a draft. It has not been submitted to the Procurement Office.</p>
               
               <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50/70 p-4">
                 <div className="flex items-center justify-between mb-1">
@@ -792,7 +802,7 @@ export default function ProcurementRequestForm() {
                   onClick={viewCreatedPR}
                   className="w-full ui-button ui-button-primary py-3"
                 >
-                  <span>View Purchase Request</span>
+                  <span>Open Draft</span>
                 </button>
                 <button
                   type="button"
