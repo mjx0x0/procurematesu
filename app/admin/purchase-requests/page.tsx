@@ -591,8 +591,8 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
       </main>
 
       {showDetails && selectedPR && (
-        <div className="admin-pr-detail-overlay fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center overflow-y-auto p-2 sm:p-5">
-          <div className="admin-pr-detail-modal bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-5xl max-h-[calc(100dvh-1rem)] sm:max-h-[94vh] overflow-hidden flex flex-col border border-stone-200">
+        <div className="admin-pr-detail-overlay fixed inset-0 z-[120] isolate bg-black/60 backdrop-blur-sm flex items-center justify-center overflow-y-auto overscroll-contain p-2 sm:p-5">
+          <div className="admin-pr-detail-modal bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-5xl max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2.5rem)] overflow-hidden flex flex-col border border-stone-200">
             {/* Modal Header */}
             <div className="admin-pr-detail-header sticky top-0 bg-white border-b border-stone-200 px-3.5 sm:px-6 py-3 sm:py-4 flex justify-between items-start gap-2 z-10 shrink-0 shadow-2xs">
               <div className="min-w-0 flex-1">
