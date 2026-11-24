@@ -24,6 +24,7 @@ export default function AdminUsersPage() {
 
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
@@ -48,6 +49,16 @@ const loadUsers = useCallback(async () => {
   useEffect(() => {
     loadUsers();
   }, [loadUsers]);
+
+  const refreshUsers = async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    try {
+      await loadUsers();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const updateStatus = async (userId: string, status: "approved" | "rejected") => {
     if (busyId) return;
@@ -102,10 +113,13 @@ const loadUsers = useCallback(async () => {
             <p className="text-xs sm:text-sm text-stone-600 mt-1">Review and authorize institutional account registrations.</p>
           </div>
           <button
-            onClick={loadUsers}
-            className="inline-flex min-h-10 w-full sm:w-auto items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs font-bold text-stone-700 hover:bg-stone-50 transition-colors shadow-xs"
+            type="button"
+            onClick={() => void refreshUsers()}
+            disabled={refreshing}
+            aria-label={refreshing ? "Refreshing accounts" : "Refresh accounts"}
+            className="inline-flex min-h-10 w-full sm:w-auto items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-[#7B0046]/35 bg-white text-xs font-bold text-[#7B0046] hover:bg-[#FDF2F7] hover:border-[#7B0046] transition-colors shadow-xs disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30"
           >
-            <RefreshCw className="h-3.5 w-3.5 text-[#C27803]" /> Refresh Accounts
+            <RefreshCw className={"h-3.5 w-3.5 " + (refreshing ? "animate-spin" : "")} /> {refreshing ? "Refreshing..." : "Refresh Accounts"}
           </button>
         </div>
 
