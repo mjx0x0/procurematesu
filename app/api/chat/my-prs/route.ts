@@ -62,7 +62,8 @@ export async function GET(request: NextRequest) {
     // Load user's PRs
     let query = db
       .from('purchase_requests')
-      .select('pr_no, purpose, total, current_stage, created_at, department')
+       .select('pr_no, purpose, total, current_stage, created_at, department')
+      .neq('current_stage', 'draft')
       .order('created_at', { ascending: false });
 
     // If regular end user, strictly scope to their user_id
@@ -72,7 +73,8 @@ export async function GET(request: NextRequest) {
       // If admin, first check if admin has their own PRs, otherwise return university PRs
       const { data: ownPRs } = await db
         .from('purchase_requests')
-        .select('pr_no, purpose, total, current_stage, created_at, department')
+         .select('pr_no, purpose, total, current_stage, created_at, department')
+        .neq('current_stage', 'draft')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
