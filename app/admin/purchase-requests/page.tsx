@@ -22,6 +22,8 @@ interface PR {
   user_id: string;
   printed_name: string;
   pr_date: string;
+  physical_submitted_at?: string | null;
+  physical_received_at?: string | null;
   [key: string]: unknown;
 }
 interface StageHistory {
