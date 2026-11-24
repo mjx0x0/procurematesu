@@ -231,7 +231,7 @@ const formatDate = (date: string) => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-xl sm:text-[1.7rem] md:text-[1.85rem] font-[550] tracking-[-0.055em] leading-[1.12] text-[#570033]">Chatbot &amp; Helpdesk Logs</h1>
+            <h1 className="text-xl sm:text-[1.7rem] md:text-[1.85rem] font-semibold tracking-[-0.035em] leading-tight text-[#4D002C]">Chatbot &amp; Helpdesk Logs</h1>
             <p className="text-xs sm:text-sm text-stone-600 mt-1">
               <b>{filteredInquiries.length}</b> conversation sessions recorded.
             </p>
