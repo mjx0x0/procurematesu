@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   if (!prNo) return NextResponse.json({ error: "Purchase Request number is required." }, { status: 400 });
 
   const { data: pr, error: prError } = await supabase.from("purchase_requests").select("*").eq("pr_no", prNo).single();
-  if (prError || !pr) return NextResponse.json({ error: "Purchase Request not found." }, { status: 404 });
+  if (prError || !pr || (pr.current_stage === "draft" && !pr.physical_submitted_at)) return NextResponse.json({ error: "Purchase Request not found." }, { status: 404 });
 
   const { data: items, error: itemsError } = await supabase.from("pr_items").select("*").eq("pr_no", prNo).order("created_at", { ascending: true });
   if (itemsError) return NextResponse.json({ error: "Unable to load Purchase Request items." }, { status: 500 });
