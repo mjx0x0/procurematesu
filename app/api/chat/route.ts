@@ -354,7 +354,7 @@ async function handleTrackPR(prNo: string, authenticatedUserId: string, isAdmin:
       }
     }
 
-    if (!pr || (pr.current_stage === 'draft' && !pr.physical_submitted_at)) return notFoundResponse;
+    if (!pr || pr.current_stage === 'draft') return notFoundResponse;
 
     const stageDisplayName = PROCUREMENT_STAGE_LABELS[pr.current_stage] || getStageFriendlyName(pr.current_stage);
     let text = `📋 **Purchase Request Tracking: ${pr.pr_no}**\n\n`;
