@@ -230,6 +230,7 @@ export default function ChatbotDashboard() {
       let query = supabase
         .from("purchase_requests")
         .select("pr_no, purpose, total, current_stage, created_at, department")
+        .neq("current_stage", "draft")
         .order("created_at", { ascending: false });
 
       if (userId) {
