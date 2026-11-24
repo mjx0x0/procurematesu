@@ -32,6 +32,7 @@ interface PurchaseRequest {
   current_stage: string;
   created_at: string;
   department: string;
+  physical_submitted_at?: string | null;
 }
 
 const TERMINAL_STAGES = ["completed", "cancelled", "rejected"];
@@ -95,7 +96,7 @@ export default function DashboardPage() {
 
         const [{ data: profile }, { data: prData }] = await Promise.all([
           supabase.from("users").select("role").eq("id", authUser.id).maybeSingle(),
-          supabase.from("purchase_requests") .select("pr_no,purpose,total,current_stage,created_at,department").eq("user_id", authUser.id).order("created_at", { ascending: false }).limit(20),
+          supabase.from("purchase_requests") .select("pr_no,purpose,total,current_stage,created_at,department,physical_submitted_at").eq("user_id", authUser.id).order("created_at", { ascending: false }).limit(20),
         ]);
 
         if (cancelled) return;
@@ -109,7 +110,7 @@ export default function DashboardPage() {
         setPrs(list);
         setStats({
           total: list.length,
-          pending: list.filter((pr) => !TERMINAL_STAGES.includes(pr.current_stage)).length,
+          pending: list.filter((pr) => !TERMINAL_STAGES.includes(pr.current_stage) && !(pr.current_stage === "draft" && !pr.physical_submitted_at)).length,
           completed: list.filter((pr) => pr.current_stage === "completed").length,
         });
       } catch (error) {
@@ -124,7 +125,7 @@ export default function DashboardPage() {
 
   const displayName = user?.user_metadata?.full_name || "Requisitioner";
   const initials = displayName.slice(0, 2).toUpperCase();
-  const pendingDraftsCount = prs.filter((pr) => pr.current_stage === "draft").length;
+  const pendingDraftsCount = prs.filter((pr) => pr.current_stage === "draft" && !pr.physical_submitted_at).length;
 
   if (loading) return <LoadingScreen label="Preparing your workspace..." />;
 
