@@ -504,8 +504,8 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                             ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
                           <td className="px-3 lg:px-4 py-3.5 align-middle">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] lg:text-xs font-bold border max-w-full truncate ${COLORS[pr.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`} title={pr.current_stage === "draft" && pr.physical_submitted_at ? "Awaiting Physical Receipt" : LABELS[pr.current_stage] || pr.current_stage}>
-                              <span className="truncate">{stageNumber ? `Stage ${stageNumber}: ` : ""}{pr.current_stage === "draft" && pr.physical_submitted_at ? "Awaiting Physical Receipt" : LABELS[pr.current_stage] || pr.current_stage}</span>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] lg:text-xs font-bold border max-w-full truncate ${COLORS[pr.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`} title={pr.current_stage === "draft" && pr.physical_submitted_at ? "Draft Stage" : LABELS[pr.current_stage] || pr.current_stage}>
+                              <span className="truncate">{stageNumber ? `Stage ${stageNumber}: ` : ""}{pr.current_stage === "draft" && pr.physical_submitted_at ? "Draft Stage" : LABELS[pr.current_stage] || pr.current_stage}</span>
                             </span>
                           </td>
                           <td className="hidden lg:table-cell px-3 lg:px-4 py-3.5 align-middle text-xs font-semibold text-stone-500 whitespace-nowrap">
@@ -606,7 +606,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                     </span>
                   )}
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold border ${COLORS[selectedPR.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`}>
-                    {selectedPR.current_stage === "draft" && selectedPR.physical_submitted_at ? "Awaiting Physical Receipt" : detailStage ? `Stage ${detailStage.number}: ${detailStage.shortLabel}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
+                    {selectedPR.current_stage === "draft" && selectedPR.physical_submitted_at ? "Draft Stage" : detailStage ? `Stage ${detailStage.number}: ${detailStage.shortLabel}` : LABELS[selectedPR.current_stage] || selectedPR.current_stage}
                   </span>
                 </div>
                 <p className="text-[11px] sm:text-sm text-stone-500 mt-1 flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-1 leading-relaxed">
