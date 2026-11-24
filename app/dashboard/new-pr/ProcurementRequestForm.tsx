@@ -772,7 +772,7 @@ export default function ProcurementRequestForm() {
                 </div>
                 <div className="text-2xl font-black text-[#7B0046] mt-1 font-mono tracking-tight">{createdPRNo}</div>
                 <p className="text-[11px] text-amber-900 mt-2 leading-relaxed text-left border-t border-amber-200/80 pt-2">
-                  ℹ️ The PR number is <strong>empty on the printed form</strong> so the Procurement Office can write the official number in the blank space. Your temporary tracking number (<code>{createdPRNo}</code>) tracks your request in the system until the office inputs the official number at <strong>Step 4 (Pre-Numbering and Control of PRs)</strong>.
+                  ℹ️ The PR number is <strong>empty on the printed form</strong> so the Procurement Office can write the official number in the blank space. Your temporary control reference (<code>{createdPRNo}</code>) identifies this saved draft. Active PR tracking will begin only after you declare physical submission and the Procurement Office confirms receipt.
                 </p>
               </div>
 
