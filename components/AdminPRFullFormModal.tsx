@@ -45,7 +45,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4">
+      <div className="fixed inset-0 z-[140] flex items-center justify-center bg-black/60 p-4">
         <div
           role="status"
           aria-live="polite"
@@ -64,7 +64,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
 
   if (!pr) {
     return (
-      <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[140] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -81,7 +81,7 @@ export default function AdminPRFullFormModal({ prNo, onClose }: Props) {
   }
 
   return (
-    <div className="admin-pr-full-form-overlay fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-2 backdrop-blur-sm sm:p-6 transition-colors">
+    <div className="admin-pr-full-form-overlay fixed inset-0 z-[140] flex items-center justify-center bg-black/60 p-2 backdrop-blur-sm sm:p-6 transition-colors">
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
