@@ -90,7 +90,7 @@ export default function AdminPurchaseRequestsPage() {
 
   const showFeedback = (tone: FeedbackTone, title: string, message: string) => setFeedback({ open: true, tone, title, message });
   const loadData = async () => {
-    const { data, error } = await supabase.from("purchase_requests").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("purchase_requests").select("*").or("current_stage.neq.draft,physical_submitted_at.not.is.null").order("created_at", { ascending: false });
     if (error) { console.error("Failed to load PRs:", error); return; }
     setPrs((data || []) as PR[]);
   };
