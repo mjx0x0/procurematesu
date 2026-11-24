@@ -873,7 +873,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
       )}
 
       {action && selectedPR && (
-        <div className="admin-pr-action-overlay fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true">
+        <div className="admin-pr-action-overlay fixed inset-0 z-[160] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-5 border border-stone-200">
             <div className="flex items-center justify-between gap-3 pb-3 mb-3.5 border-b border-stone-100">
               <div className="flex items-center gap-2.5 min-w-0">
@@ -993,7 +993,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
 
       {/* Step 4 Official PR Assignment Modal — aligned with the standard Advance Stage modal */}
       {showOfficialPrModal && selectedPR && (
-        <div className="admin-pr-official-overlay fixed inset-0 z-[75] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="step4-official-pr-title">
+        <div className="admin-pr-official-overlay fixed inset-0 z-[160] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="step4-official-pr-title">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-5 border border-stone-200">
             <div className="flex items-center justify-between gap-3 pb-3 mb-3.5 border-b border-stone-100">
               <div className="flex items-center gap-2.5 min-w-0">
@@ -1078,7 +1078,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
         </div>
       )}
 
-      {deletePR && <div className="admin-pr-delete-overlay fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-4 sm:p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className="p-3 rounded-xl bg-red-50 text-red-600"><Trash2 className="h-6 w-6" /></div><div><h3 className="text-lg font-bold text-gray-900">Delete Purchase Request?</h3><p className="text-sm text-stone-600 mt-1"><b>{deletePR}</b> and its recorded stage history will be permanently removed.</p></div></div><div className="flex justify-end gap-2"><button onClick={() => setDeletePR(null)} className="px-4 py-2 rounded-lg bg-stone-100 text-stone-700 text-sm font-semibold">Cancel</button><button onClick={() => void deleteRequest()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold flex items-center gap-2"><Trash2 className="h-4 w-4" /> Delete Permanently</button></div></div></div>}
+      {deletePR && <div className="admin-pr-delete-overlay fixed inset-0 z-[160] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"><div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-4 sm:p-6 border border-stone-200"><div className="flex items-start gap-3 mb-5"><div className="p-3 rounded-xl bg-red-50 text-red-600"><Trash2 className="h-6 w-6" /></div><div><h3 className="text-lg font-bold text-gray-900">Delete Purchase Request?</h3><p className="text-sm text-stone-600 mt-1"><b>{deletePR}</b> and its recorded stage history will be permanently removed.</p></div></div><div className="flex justify-end gap-2"><button onClick={() => setDeletePR(null)} className="px-4 py-2 rounded-lg bg-stone-100 text-stone-700 text-sm font-semibold">Cancel</button><button onClick={() => void deleteRequest()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold flex items-center gap-2"><Trash2 className="h-4 w-4" /> Delete Permanently</button></div></div></div>}
 
       {fullPrNo && <AdminPRFullFormModal prNo={fullPrNo} onClose={() => setFullPrNo(null)} />}
       <ActionFeedbackModal open={feedback.open} tone={feedback.tone} title={feedback.title} message={feedback.message} onClose={() => setFeedback((f) => ({ ...f, open: false }))} actionLabel="Done" />
