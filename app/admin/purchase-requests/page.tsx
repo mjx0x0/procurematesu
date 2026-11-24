@@ -93,10 +93,10 @@ export default function AdminPurchaseRequestsPage() {
   const showFeedback = (tone: FeedbackTone, title: string, message: string) => setFeedback({ open: true, tone, title, message });
   const loadData = async () => {
     const { data, error } = await supabase.from("purchase_requests").select("*").or("current_stage.neq.draft,physical_submitted_at.not.is.null").order("created_at", { ascending: false });
-    if (error) { console.error("Failed to load PRs:", error); return; }
+    if (error) { console.error("Failed to load PRs:", error); throw new Error("Purchase requests could not be refreshed. Please try again."); }
     setPrs((data || []) as PR[]);
   };
-  const manualRefresh = async () => { if (refreshing) return; setRefreshing(true); try { await loadData(); } finally { setRefreshing(false); } };
+  const manualRefresh = async () => { if (refreshing) return; setRefreshing(true); try { await loadData(); showFeedback("success", "List refreshed", "Purchase request records are up to date."); } catch (refreshError) { showFeedback("error", "Refresh failed", refreshError instanceof Error ? refreshError.message : "Unable to refresh purchase requests."); } finally { setRefreshing(false); } };
   const loadHistory = async (prNo: string) => {
     const { data, error } = await supabase.from("pr_stages_completed").select("stage_name,stage_key,completed_at,remarks,status").eq("pr_no", prNo).order("completed_at", { ascending: true });
     if (error) { console.error("Failed to load stage history:", error); setHistory([]); } else setHistory((data || []) as StageHistory[]);
@@ -438,7 +438,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                 disabled={refreshing}
                 title={refreshing ? "Refreshing…" : "Refresh purchase requests"}
                 aria-label={refreshing ? "Refreshing…" : "Refresh purchase requests"}
-                className="admin-refresh-btn inline-flex h-9 w-9 shrink-0 self-end sm:self-auto items-center justify-center rounded-xl border border-stone-200 bg-white text-[#7B0046] shadow-xs transition-colors hover:bg-[#FDF2F7] hover:border-[#7B0046]/40 active:scale-95 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2"
+                className="admin-refresh-btn inline-flex h-9 w-9 shrink-0 self-end sm:self-auto items-center justify-center rounded-xl border border-[#7B0046]/35 bg-white text-[#7B0046] shadow-xs transition-colors hover:bg-[#FDF2F7] hover:border-[#7B0046] active:scale-95 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046] focus-visible:ring-offset-2"
               >
                 <RefreshCw className={`h-4 w-4 shrink-0 ${refreshing ? "animate-spin" : ""}`} />
               </button>
