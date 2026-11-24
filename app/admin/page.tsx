@@ -66,7 +66,7 @@ export default function AdminDashboard() {
     setLoadError(null);
     const [pendingUsers, purchaseRequests, stageEvents] = await Promise.all([
       supabase.from("users").select("id", { count: "exact", head: true }).eq("role", "end_user").eq("status", "pending"),
-      supabase.from("purchase_requests").select("pr_no,purpose,department,total,current_stage,created_at,updated_at").order("created_at", { ascending: false }),
+      supabase.from("purchase_requests").select("pr_no,purpose,department,total,current_stage,created_at,updated_at,physical_submitted_at,physical_received_at").or("current_stage.neq.draft,physical_submitted_at.not.is.null").order("created_at", { ascending: false }),
       supabase.from("pr_stages_completed").select("pr_no,stage_name,stage_key,completed_at,remarks,status").order("completed_at", { ascending: false }).limit(8),
     ]);
 
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
       setPrs(rows);
       setActionCounts({
         pendingApprovals: pendingUsers.count || 0,
-        physicalReceipt: rows.filter((pr) => pr.current_stage === "draft").length,
+        physicalReceipt: rows.filter((pr) => pr.current_stage === "draft" && Boolean((pr as any).physical_submitted_at)).length,
         officialNumber: rows.filter((pr) => pr.current_stage === "pr_pre_numbering").length,
       });
     }
