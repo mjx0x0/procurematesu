@@ -95,7 +95,7 @@ export default function DashboardPage() {
 
         const [{ data: profile }, { data: prData }] = await Promise.all([
           supabase.from("users").select("role").eq("id", authUser.id).maybeSingle(),
-          supabase.from("purchase_requests").select("pr_no,purpose,total,current_stage,created_at,department").eq("user_id", authUser.id).order("created_at", { ascending: false }).limit(20),
+          supabase.from("purchase_requests") .select("pr_no,purpose,total,current_stage,created_at,department").eq("user_id", authUser.id).order("created_at", { ascending: false }).limit(20),
         ]);
 
         if (cancelled) return;
