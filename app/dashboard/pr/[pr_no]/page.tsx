@@ -24,6 +24,8 @@ interface PurchaseRequest {
   updated_at: string;
   sai_no: string | null;
   alobs_no: string | null;
+  physical_submitted_at?: string | null;
+  physical_received_at?: string | null;
 }
 
 interface Stage {
@@ -67,6 +69,8 @@ export default function PRDetailPage() {
   const [printedName, setPrintedName] = useState("");
   const [savingPrintedName, setSavingPrintedName] = useState(false);
   const [printedNameMessage, setPrintedNameMessage] = useState<string | null>(null);
+  const [submittingPhysical, setSubmittingPhysical] = useState(false);
+  const [physicalSubmissionMessage, setPhysicalSubmissionMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -203,7 +207,7 @@ export default function PRDetailPage() {
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <div className="print:hidden">
-        <SystemPageHeader titlePrimary="Purchase Requests" titleAccent="Tracking" backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8" />
+        <SystemPageHeader titlePrimary="Purchase Requests" titleAccent={pr.current_stage === "draft" ? "Draft" : "Tracking"} backHref="/dashboard/purchase-requests" roleLabel="End User" containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8" />
       </div>
 
       <main className="mx-auto w-full max-w-none px-4 py-5 sm:px-6 lg:px-8 print:max-w-none print:w-full print:px-0 print:py-0">
@@ -246,6 +250,8 @@ export default function PRDetailPage() {
             )}
           </div>
           <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap sm:flex-nowrap shrink-0 self-start lg:self-center">
+            {pr.current_stage === "draft" && !pr.physical_submitted_at && <Link href={`/dashboard/new-pr?edit=${encodeURIComponent(pr.pr_no)}`} className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#7B0046] px-4 text-xs font-bold text-white hover:bg-[#610037] print:hidden">Edit Draft</Link>}
+            {pr.current_stage === "draft" && !pr.physical_submitted_at && <button type="button" onClick={() => void confirmPhysicalSubmission()} disabled={submittingPhysical} className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#7B0046] bg-[#7B0046] px-4 text-xs font-bold text-white hover:bg-[#610037] disabled:opacity-60 print:hidden">{submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}</button>}
             <button
               type="button"
               onClick={() => window.print()}
@@ -258,7 +264,12 @@ export default function PRDetailPage() {
           </div>
         </div>
 
-        <div className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start 2xl:grid-cols-[minmax(0,1fr)_360px]">
+        {pr.current_stage === "draft" && <section className="mb-5 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-sm text-amber-950 print:hidden">
+          <h2 className="font-bold text-[#4D002C]">{pr.physical_submitted_at ? "Awaiting Procurement Office Receipt" : "Private Draft — Not Yet Submitted"}</h2>
+          <p className="mt-1 text-xs leading-relaxed">{pr.physical_submitted_at ? "You have declared that the printed PR was physically submitted. The Procurement Office must confirm actual receipt before Stage 1 tracking begins." : "This PR is still your private draft. You can edit and print it, but it is not yet visible in the Procurement Office logbook and no processing timeline is active."}</p>
+          {physicalSubmissionMessage && <p role="status" className="mt-2 text-xs font-semibold">{physicalSubmissionMessage}</p>}
+        </section>}
+        <div className={pr.current_stage === "draft" ? "grid min-w-0 grid-cols-1" : "grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start 2xl:grid-cols-[minmax(0,1fr)_360px]"}>
           <div className="min-w-0 space-y-4">
         {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-medium text-red-700">{error}</div>}
 
@@ -357,7 +368,7 @@ export default function PRDetailPage() {
         </section>
 <div className="text-xs text-stone-500 flex items-center gap-2 print:hidden"><FileCheck className="h-4 w-4" />The Download PR Form button generates only the official Purchase Request form as a PDF.</div>
           </div>
-        <aside className="pr-timeline min-w-0 w-full max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:sticky xl:top-5 xl:max-h-[calc(100vh-2.5rem)] print:hidden">
+        {pr.current_stage !== "draft" && <aside className="pr-timeline min-w-0 w-full max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:sticky xl:top-5 xl:max-h-[calc(100vh-2.5rem)] print:hidden">
           <div className="flex min-w-0 flex-col items-start gap-3 border-b border-stone-200/80 pb-4 mb-4">
             <div className="flex min-w-0 items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046] border border-[#7B0046]/15">
@@ -466,7 +477,7 @@ export default function PRDetailPage() {
               })}
             </div>
           )}
-        </aside>
+        </aside>}
         </div>
       </main>
     </div>
