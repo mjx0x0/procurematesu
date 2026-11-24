@@ -233,10 +233,10 @@ export default function ProcurementRequestForm() {
                 <div className="min-w-0">
                   <h2 className="text-[13px] sm:text-sm font-black text-[#4D002C] tracking-tight uppercase">Draft preparation</h2>
                   <p className="mt-1.5 text-[11px] sm:text-sm leading-relaxed text-stone-700">
-                    Save your Purchase Request as a private draft. You can reopen and edit it any time while it has not yet been declared physically submitted.
+                    Creating a PR online only saves a private draft. Print, sign, and submit it with the required documents to the Procurement Office.
                   </p>
                   <p className="mt-1 text-[11px] sm:text-sm leading-relaxed text-stone-700">
-                    When you have printed, signed, and physically handed the form to the Procurement Office, open the draft and use the separate physical-submission confirmation.
+                    After handing it in, open the draft and confirm physical submission so the Procurement Office can record it.
                   </p>
 
                 </div>
@@ -673,7 +673,7 @@ export default function ProcurementRequestForm() {
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-[#4D002C]">Double-check your Purchase Request</h3>
-                    <p className="text-xs text-stone-500 mt-0.5">Please verify the details below before official creation.</p>
+                    <p className="text-xs text-stone-500 mt-0.5">Please verify the details below before saving your draft.</p>
                   </div>
                 </div>
                 <button
@@ -748,7 +748,7 @@ export default function ProcurementRequestForm() {
                   className="ui-button ui-button-primary flex-1 order-1 sm:order-2"
                 >
                   <CheckCircle2 className="h-4 w-4 text-amber-300" />
-                  <span>{editingPrNo ? "Confirm &amp; Save Draft" : "Confirm &amp; Create Draft"}</span>
+                  <span>{editingPrNo ? "Confirm & Save Draft" : "Confirm & Create Draft"}</span>
                 </button>
               </div>
             </div>
