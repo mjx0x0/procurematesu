@@ -88,7 +88,8 @@ export default function AdminDashboard() {
       console.error("Failed to load recent procurement activity:", stageEvents.error);
       setRecentEvents([]);
     } else {
-      setRecentEvents((stageEvents.data || []) as RecentStageEvent[]);
+      const visiblePrNumbers = new Set(((purchaseRequests.data || []) as DashboardPR[]).map((pr) => pr.pr_no));
+      setRecentEvents(((stageEvents.data || []) as RecentStageEvent[]).filter((event) => visiblePrNumbers.has(event.pr_no)));
     }
   }, []);
 
