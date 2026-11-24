@@ -240,7 +240,7 @@ export default function PRDetailPage() {
               </p>
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${statusClass(pr.current_stage)}`}>
                 <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                {statusLabel(pr.current_stage)}
+                {pr.current_stage === "draft" && pr.physical_submitted_at ? "Awaiting Physical Receipt" : statusLabel(pr.current_stage)}
               </span>
             </div>
             <div className="flex items-center gap-x-4 gap-y-1.5 text-xs text-stone-600 font-medium flex-wrap">
