@@ -17,6 +17,7 @@ interface PurchaseRequest {
   current_stage: string;
   created_at: string;
   department: string;
+  physical_submitted_at?: string | null;
 }
 
 const stageNumber = (status: string) =>
@@ -88,7 +89,7 @@ export default function PurchaseRequestsPage() {
 
         const { data: prData } = await supabase
           .from("purchase_requests")
-          .select("pr_no,purpose,total,current_stage,created_at,department")
+          .select("pr_no,purpose,total,current_stage,created_at,department,physical_submitted_at")
           .eq("user_id", authUser.id)
           .order("created_at", { ascending: false });
 
@@ -305,7 +306,7 @@ export default function PurchaseRequestsPage() {
                 {query
                   ? "Try searching for a different keyword or clearing the search filter."
                   : stageFilter === "draft"
-                  ? "All your created purchase requests have been submitted or you have not drafted a new request yet."
+                  ? "You have no saved drafts yet."
                   : "Submit a new procurement request to track its progress through university approval."}
               </p>
               {query ? (
@@ -386,7 +387,7 @@ export default function PurchaseRequestsPage() {
                           className="inline-flex min-h-9 items-center gap-1 px-3 py-1.5 rounded-xl bg-[#7B0046] text-white text-[11px] sm:text-xs font-bold shadow-xs hover:bg-[#65003A] transition-colors"
                         >
                           <Eye className="h-3.5 w-3.5" />
-                          <span>Track</span>
+                          <span>{pr.current_stage === "draft" ? "Open Draft" : "Track"}</span>
                         </Link>
                         <Link
                           href={`/dashboard/pr-print?id=${pr.pr_no}`}
@@ -396,7 +397,7 @@ export default function PurchaseRequestsPage() {
                         >
                           <Printer className="h-3.5 w-3.5" />
                         </Link>
-                        {pr.current_stage === "draft" && (
+                        {pr.current_stage === "draft" && !pr.physical_submitted_at && (
                           <button
                             type="button"
                             onClick={() => setDraftPendingDeletion(pr)}
