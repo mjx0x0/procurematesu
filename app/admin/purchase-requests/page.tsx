@@ -502,8 +502,8 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                             ₱{Number(pr.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
                           <td className="px-3 lg:px-4 py-3.5 align-middle">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] lg:text-xs font-bold border max-w-full truncate ${COLORS[pr.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`} title={LABELS[pr.current_stage] || pr.current_stage}>
-                              <span className="truncate">{stageNumber ? `Stage ${stageNumber}: ` : ""}{LABELS[pr.current_stage] || pr.current_stage}</span>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] lg:text-xs font-bold border max-w-full truncate ${COLORS[pr.current_stage] || "bg-stone-100 text-stone-700 border-stone-200"}`} title={pr.current_stage === "draft" && pr.physical_submitted_at ? "Awaiting Physical Receipt" : LABELS[pr.current_stage] || pr.current_stage}>
+                              <span className="truncate">{stageNumber ? `Stage ${stageNumber}: ` : ""}{pr.current_stage === "draft" && pr.physical_submitted_at ? "Awaiting Physical Receipt" : LABELS[pr.current_stage] || pr.current_stage}</span>
                             </span>
                           </td>
                           <td className="hidden lg:table-cell px-3 lg:px-4 py-3.5 align-middle text-xs font-semibold text-stone-500 whitespace-nowrap">
