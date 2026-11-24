@@ -85,6 +85,9 @@ export default function ProcurementRequestForm() {
         const { data: draft } = await supabase.from("purchase_requests").select("*").eq("pr_no", editNo).eq("user_id", user.id).maybeSingle();
         if (!draft || draft.current_stage !== "draft" || draft.physical_submitted_at) {
           setError("This PR is no longer an editable draft.");
+          router.replace("/dashboard/purchase-requests");
+          setLoading(false);
+          return;
         } else {
           const { data: draftItems } = await supabase.from("pr_items").select("*").eq("pr_no", editNo).order("created_at", { ascending: true });
           setEditingPrNo(editNo);
