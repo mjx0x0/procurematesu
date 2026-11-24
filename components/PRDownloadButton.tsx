@@ -98,9 +98,9 @@ export default function PRDownloadButton({
         type="button"
         onClick={handleDownload}
         disabled={downloading}
-        className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-xl bg-gradient-to-r from-[#7B0046] to-[#5A0033] hover:from-[#6B003D] hover:to-[#4A002A] text-white px-4 text-xs sm:text-sm font-semibold shadow-xs transition active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
+        className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-xl border border-[#7B0046]/35 bg-white text-[#7B0046] px-4 text-xs sm:text-sm font-semibold shadow-xs transition hover:bg-[#FDF2F7] hover:border-[#7B0046] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30 disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
       >
-        {downloading ? <Loader2 className="h-4 w-4 animate-spin text-amber-300 shrink-0" /> : <FileDown className="h-4 w-4 text-amber-300 shrink-0" />}
+        {downloading ? <Loader2 className="h-4 w-4 animate-spin text-[#7B0046] shrink-0" /> : <FileDown className="h-4 w-4 text-amber-300 shrink-0" />}
         <span>{downloading ? "Generating PR..." : "Download PR Form"}</span>
       </button>
       {downloadError && (
