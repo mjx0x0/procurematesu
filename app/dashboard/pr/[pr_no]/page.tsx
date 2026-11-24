@@ -143,6 +143,27 @@ export default function PRDetailPage() {
     }
   };
 
+  const confirmPhysicalSubmission = async () => {
+    if (!pr || submittingPhysical || pr.physical_submitted_at) return;
+    if (!window.confirm("Confirm that you have already printed, signed, and physically handed this Purchase Request to the Procurement Office?")) return;
+    setSubmittingPhysical(true);
+    setPhysicalSubmissionMessage(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch("/api/pr/confirm-physical-submission", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json", ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+        body: JSON.stringify({ prNo: pr.pr_no }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Unable to confirm physical submission.");
+      setPr((current) => current ? { ...current, physical_submitted_at: result.pr.physical_submitted_at } : current);
+      setPhysicalSubmissionMessage("Your declaration has been recorded. The Procurement Office can now see this PR and must separately confirm actual receipt.");
+    } catch (submitError) {
+      setPhysicalSubmissionMessage(submitError instanceof Error ? submitError.message : "Unable to confirm physical submission.");
+    } finally { setSubmittingPhysical(false); }
+  };
+
   const statusLabel = (status: string) => PROCUREMENT_STAGE_LABELS[status] || ({ completed: "Completed", rejected: "Rejected", cancelled: "Cancelled" } as Record<string, string>)[status] || status;
   const statusClass = (status: string) => {
     if (status === "draft") return "bg-stone-100 text-stone-700 border-stone-200";
