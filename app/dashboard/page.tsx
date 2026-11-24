@@ -310,7 +310,7 @@ export default function DashboardPage() {
                               )}`}
                             >
                               {stageNum && stageNum > 0 ? `Stage ${stageNum} · ` : ""}
-                              {statusLabel(pr.current_stage)}
+                              {pr.current_stage === "draft" && pr.physical_submitted_at ? "Awaiting Physical Receipt" : statusLabel(pr.current_stage)}
                             </span>
                             <span className="text-[11px] text-stone-400 font-medium">
                               · {new Date(pr.created_at).toLocaleDateString("en-PH", {
