@@ -345,7 +345,7 @@ export default function DashboardPage() {
                             className="inline-flex min-h-9 items-center gap-1 px-3 py-1.5 rounded-xl bg-[#7B0046] text-white text-[11px] sm:text-xs font-bold shadow-xs hover:bg-[#65003A] transition-colors"
                           >
                             <Eye className="h-3.5 w-3.5" />
-                            <span>Track</span>
+                            <span>{pr.current_stage === "draft" ? "Open Draft" : "Track"}</span>
                           </Link>
                           <Link
                             href={`/dashboard/pr-print?id=${pr.pr_no}`}
