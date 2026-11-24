@@ -597,7 +597,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
             <div className="admin-pr-detail-header sticky top-0 bg-white border-b border-stone-200 px-3.5 sm:px-6 py-3 sm:py-4 flex justify-between items-start gap-2 z-10 shrink-0 shadow-2xs">
               <div className="min-w-0 flex-1">
                 <div className="flex min-w-0 items-center gap-2 sm:gap-3 flex-wrap">
-                  <h3 className="max-w-full break-words text-base sm:text-xl font-extrabold text-[#4D002C] tracking-tight">PR {selectedPR.pr_no}</h3>
+                  <h3 className="max-w-full break-words text-base sm:text-xl font-extrabold text-[#4D002C] tracking-tight">{selectedPR.pr_no}</h3>
                   {selectedPR.pr_no.includes("TEMP") && (
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">
                       Temporary Control #
