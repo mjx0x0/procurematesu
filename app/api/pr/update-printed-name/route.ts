@@ -44,10 +44,10 @@ export async function POST(req: NextRequest) {
     }
 
     const { data: pr, error: prError } = await db
-      .from('purchase_requests').select('pr_no,user_id,current_stage').eq('pr_no', prNo).maybeSingle();
+      .from('purchase_requests').select('pr_no,user_id,current_stage,physical_submitted_at').eq('pr_no', prNo).maybeSingle();
     if (prError || !pr) return NextResponse.json({ error: 'Purchase Request not found.' }, { status: 404, headers: JSON_HEADERS });
     if (pr.user_id !== user.id) return NextResponse.json({ error: 'You can only edit your own Purchase Request.' }, { status: 403, headers: JSON_HEADERS });
-    if (pr.current_stage !== 'draft') {
+    if (pr.current_stage !== 'draft' || pr.physical_submitted_at) {
       return NextResponse.json({ error: 'The printed name can only be edited while the PR is still in Draft and has not been received by the Procurement Office.' }, { status: 409, headers: JSON_HEADERS });
     }
 
