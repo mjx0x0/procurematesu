@@ -262,7 +262,7 @@ export default function AdminReportsPage() {
               type="button"
               onClick={refresh}
               disabled={refreshing}
-              className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-bold text-stone-700 hover:bg-stone-50 disabled:opacity-60"
+              className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#7B0046]/35 bg-white px-3 py-2 text-xs font-bold text-[#7B0046] shadow-xs hover:bg-[#FDF2F7] hover:border-[#7B0046] disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30"
             >
               <RefreshCw className={"h-3.5 w-3.5 " + (refreshing ? "animate-spin" : "")} />
               Refresh
