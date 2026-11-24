@@ -7,6 +7,7 @@ import { Bell, BellRing, CheckCheck, Clock, FileText, Hash, Mail, MailOpen, Tras
 
 const ADMIN_NOTIFICATION_TYPES = [
   "pr_created",
+  "pr_physical_submission",
   "user_registered",
   "pr_stage_changed",
   "pr_number_assigned",
