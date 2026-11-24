@@ -70,6 +70,7 @@ export default function PRDetailPage() {
   const [savingPrintedName, setSavingPrintedName] = useState(false);
   const [printedNameMessage, setPrintedNameMessage] = useState<string | null>(null);
   const [submittingPhysical, setSubmittingPhysical] = useState(false);
+  const [showPhysicalSubmitConfirm, setShowPhysicalSubmitConfirm] = useState(false);
   const [physicalSubmissionMessage, setPhysicalSubmissionMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -145,8 +146,8 @@ export default function PRDetailPage() {
 
   const confirmPhysicalSubmission = async () => {
     if (!pr || submittingPhysical || pr.physical_submitted_at) return;
-    if (!window.confirm("Confirm that you have already printed, signed, and physically handed this Purchase Request to the Procurement Office?")) return;
     setSubmittingPhysical(true);
+    setShowPhysicalSubmitConfirm(false);
     setPhysicalSubmissionMessage(null);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -270,18 +271,13 @@ export default function PRDetailPage() {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap sm:flex-nowrap shrink-0 self-start lg:self-center">
-            {pr.current_stage === "draft" && !pr.physical_submitted_at && <Link href={`/dashboard/new-pr?edit=${encodeURIComponent(pr.pr_no)}`} className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#7B0046] px-4 text-xs font-bold text-white hover:bg-[#610037] print:hidden">Edit Draft</Link>}
-            {pr.current_stage === "draft" && !pr.physical_submitted_at && <button type="button" onClick={() => void confirmPhysicalSubmission()} disabled={submittingPhysical} className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#7B0046] bg-[#7B0046] px-4 text-xs font-bold text-white hover:bg-[#610037] disabled:opacity-60 print:hidden">{submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}</button>}
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="inline-flex items-center justify-center gap-2 h-10 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 hover:border-stone-400 text-stone-700 px-4 text-xs sm:text-sm font-semibold shadow-xs transition active:scale-[0.98] print:hidden whitespace-nowrap"
-            >
-              <Printer className="h-4 w-4 text-stone-600 shrink-0" />
-              <span>Print Form</span>
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end sm:gap-2.5 shrink-0 self-start lg:self-center print:hidden">
+            {pr.current_stage === "draft" && !pr.physical_submitted_at && <Link href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} className="inline-flex min-h-10 items-center justify-center rounded-xl bg-[#7B0046] px-3 sm:px-4 text-xs font-bold text-white hover:bg-[#610037]">Edit Draft</Link>}
+            {pr.current_stage === "draft" && !pr.physical_submitted_at && <button type="button" onClick={() => setShowPhysicalSubmitConfirm(true)} disabled={submittingPhysical} className="col-span-2 inline-flex min-h-10 items-center justify-center rounded-xl border border-[#7B0046] bg-[#7B0046] px-3 sm:px-4 text-xs font-bold text-white hover:bg-[#610037] disabled:opacity-60 sm:col-span-1">{submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}</button>}
+            <button type="button" onClick={() => window.print()} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-3 sm:px-4 text-xs sm:text-sm font-semibold text-stone-700 shadow-xs transition hover:bg-stone-50 hover:border-stone-400 active:scale-[0.98] whitespace-nowrap">
+              <Printer className="h-4 w-4 text-stone-600 shrink-0" /><span>Print Form</span>
             </button>
-            <PRDownloadButton pr={pr} items={items} />
+            <div className="min-w-0"><PRDownloadButton pr={pr} items={items} /></div>
           </div>
         </div>
 
@@ -501,6 +497,27 @@ export default function PRDetailPage() {
         </aside>}
         </div>
       </main>
+
+      {showPhysicalSubmitConfirm && pr && (
+        <div className="fixed inset-0 z-[160] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm print:hidden" role="presentation">
+          <section role="dialog" aria-modal="true" aria-labelledby="physical-submit-title" className="w-full max-w-md overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl">
+            <div className="h-1.5 bg-gradient-to-r from-[#4D002C] via-[#F5AB26] to-[#7B0046]" />
+            <div className="p-5 sm:p-6">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-[#7B0046]"><AlertCircle className="h-5 w-5" /></div>
+                <div className="min-w-0 flex-1"><h2 id="physical-submit-title" className="text-base font-bold text-[#4D002C]">Confirm Physical Submission</h2><p className="mt-1 break-all font-mono text-[11px] text-stone-500">{pr.pr_no}</p></div>
+                <button type="button" onClick={() => setShowPhysicalSubmitConfirm(false)} className="rounded-lg p-1 text-stone-400 hover:bg-stone-100 hover:text-stone-700" aria-label="Close confirmation"><XCircle className="h-5 w-5" /></button>
+              </div>
+              <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/80 p-3.5 text-sm text-amber-950">Have you printed, signed, and physically submitted this PR and its required supporting documents to the Procurement Office?</div>
+              <p className="mt-3 text-xs leading-relaxed text-stone-600">Confirm only after handing in the printed documents. This will make the PR visible to the Procurement Office at Stage 0; Stage 1 begins only when staff confirms receipt.</p>
+              <div className="mt-5 flex flex-col-reverse gap-2 border-t border-stone-100 pt-4 sm:flex-row sm:justify-end">
+                <button type="button" onClick={() => setShowPhysicalSubmitConfirm(false)} className="min-h-10 rounded-xl border border-stone-300 bg-white px-4 text-xs font-semibold text-stone-700 hover:bg-stone-50">Not Yet</button>
+                <button type="button" onClick={() => void confirmPhysicalSubmission()} disabled={submittingPhysical} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#7B0046] px-4 text-xs font-bold text-white hover:bg-[#610037] disabled:opacity-60">{submittingPhysical ? "Confirming..." : "Yes, I Submitted the PR"}</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
