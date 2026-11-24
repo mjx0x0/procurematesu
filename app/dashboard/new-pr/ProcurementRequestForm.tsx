@@ -96,7 +96,7 @@ export default function ProcurementRequestForm() {
       }
       setLoading(false);
     })();
-  }, [router]);
+  }, [router, searchParams]);
 
   useEffect(() => {
     if (!searchParams) return;
@@ -235,20 +235,7 @@ export default function ProcurementRequestForm() {
                   <p className="mt-1 text-[11px] sm:text-sm leading-relaxed text-stone-700">
                     When you have printed, signed, and physically handed the form to the Procurement Office, open the draft and use the separate physical-submission confirmation.
                   </p>
-                  <label className="mt-3 flex items-start gap-2.5 sm:gap-3 cursor-pointer select-none bg-amber-100/50 hover:bg-amber-100/80 transition-colors p-2.5 sm:p-3 rounded-lg border border-amber-200">
-                    <input
-                      type="checkbox"
-                      checked={physicalSubmissionAcknowledged}
-                      onChange={(e) => {
-                        setPhysicalSubmissionAcknowledged(e.target.checked);
-                        if (e.target.checked && error?.includes("physical submission requirement")) setError(null);
-                      }}
-                      className="mt-0.5 h-4 w-4 accent-[#7B0046] cursor-pointer shrink-0"
-                    />
-                    <span className="text-[11px] sm:text-xs font-bold leading-5 text-[#4D002C]">
-                      I understand that online submission does not replace physical submission, and I will print and physically submit my PR and required supporting documents to the Procurement Office.
-                    </span>
-                  </label>
+
                 </div>
               </div>
 
