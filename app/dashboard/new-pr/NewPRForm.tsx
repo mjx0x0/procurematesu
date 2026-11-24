@@ -637,7 +637,7 @@ export default function NewPRForm() {
               ) : (
                 <>
                   <Save className="h-5 w-5 text-amber-300" />
-                  Submit Purchase Request
+                  Create Purchase Request
                 </>
               )}
             </button>
