@@ -196,7 +196,7 @@ export default function AdminDashboard() {
             <h1 className="text-xl sm:text-[1.7rem] md:text-[1.85rem] font-semibold tracking-[-0.035em] leading-tight text-[#4D002C]">Admin Dashboard</h1>
             <p className="mt-1 text-xs text-stone-600 sm:text-sm">Manage purchase requests, staff access, and procurement inquiries from one workspace.</p>
           </div>
-          <button type="button" onClick={manualRefresh} disabled={refreshing} className="inline-flex min-h-9 items-center justify-center gap-2 self-start rounded-lg border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700 transition hover:bg-stone-50 disabled:opacity-60 sm:self-auto">
+          <button type="button" onClick={manualRefresh} disabled={refreshing} className="inline-flex min-h-9 items-center justify-center gap-2 self-start rounded-lg border border-[#7B0046]/35 bg-white px-3 text-xs font-semibold text-[#7B0046] shadow-xs transition hover:bg-[#FDF2F7] hover:border-[#7B0046] disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30 sm:self-auto">
             <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} /> Refresh overview
           </button>
         </div>
