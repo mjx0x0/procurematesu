@@ -135,7 +135,7 @@ export default function PurchaseRequestsPage() {
     const total = prs.length;
     const drafts = prs.filter((p) => p.current_stage === "draft").length;
     const approved = prs.filter((p) => isApprovedStage(p.current_stage) && p.current_stage !== "completed").length;
-    const underReview = prs.filter((p) => p.current_stage !== "draft" && !isApprovedStage(p.current_stage) && !TERMINAL_STAGES.includes(p.current_stage)).length;
+    const underReview = prs.filter((p) => !(p.current_stage === "draft" && !p.physical_submitted_at) && !isApprovedStage(p.current_stage) && !TERMINAL_STAGES.includes(p.current_stage)).length;
     const completed = prs.filter((p) => p.current_stage === "completed").length;
     return { total, drafts, approved, underReview, completed };
   }, [prs]);
@@ -144,13 +144,13 @@ export default function PurchaseRequestsPage() {
     const q = query.trim().toLowerCase();
     return prs.filter((pr) => {
       // Filter by tab
-      if (stageFilter === "draft" && pr.current_stage !== "draft") {
+      if (stageFilter === "draft" && (pr.current_stage !== "draft" || Boolean(pr.physical_submitted_at))) {
         return false;
       }
       if (stageFilter === "approved" && (!isApprovedStage(pr.current_stage) || pr.current_stage === "completed")) {
         return false;
       }
-      if (stageFilter === "under_review" && (pr.current_stage === "draft" || isApprovedStage(pr.current_stage) || TERMINAL_STAGES.includes(pr.current_stage))) {
+      if (stageFilter === "under_review" && ((pr.current_stage === "draft" && !pr.physical_submitted_at) || isApprovedStage(pr.current_stage) || TERMINAL_STAGES.includes(pr.current_stage))) {
         return false;
       }
       if (stageFilter === "completed" && pr.current_stage !== "completed") {
@@ -351,7 +351,7 @@ export default function PurchaseRequestsPage() {
                             )}`}
                           >
                             {stageNum && stageNum > 0 ? `Stage ${stageNum} · ` : ""}
-                            {statusLabel(pr.current_stage)}
+                            {pr.current_stage === "draft" && pr.physical_submitted_at ? "Awaiting Physical Receipt" : statusLabel(pr.current_stage)}
                           </span>
                           <span className="text-[11px] text-stone-400 font-medium">
                             · {new Date(pr.created_at).toLocaleDateString("en-PH", {
