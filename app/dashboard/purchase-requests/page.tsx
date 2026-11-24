@@ -133,7 +133,7 @@ export default function PurchaseRequestsPage() {
 
   const counts = useMemo(() => {
     const total = prs.length;
-    const drafts = prs.filter((p) => p.current_stage === "draft").length;
+    const drafts = prs.filter((p) => p.current_stage === "draft" && !p.physical_submitted_at).length;
     const approved = prs.filter((p) => isApprovedStage(p.current_stage) && p.current_stage !== "completed").length;
     const underReview = prs.filter((p) => !(p.current_stage === "draft" && !p.physical_submitted_at) && !isApprovedStage(p.current_stage) && !TERMINAL_STAGES.includes(p.current_stage)).length;
     const completed = prs.filter((p) => p.current_stage === "completed").length;
