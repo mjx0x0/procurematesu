@@ -76,6 +76,7 @@ export async function DELETE(req: NextRequest) {
       .eq('pr_no', prNo)
       .eq('user_id', user.id)
       .eq('current_stage', 'draft')
+      .is('physical_submitted_at', null)
       .select('pr_no');
 
     if (deleteError) {
@@ -85,7 +86,7 @@ export async function DELETE(req: NextRequest) {
     if (!deletedRows?.length) {
       const { data: existing } = await admin
         .from('purchase_requests')
-        .select('user_id,current_stage')
+        .select('user_id,current_stage,physical_submitted_at')
         .eq('pr_no', prNo)
         .maybeSingle();
       if (!existing || existing.user_id !== user.id) {
