@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { type LucideIcon } from "lucide-react";
+import { type LucideIcon, Menu } from "lucide-react";
 import { MsuLogo } from "@/components/msu-logo";
 
 interface SystemPageHeaderProps {
@@ -60,8 +60,16 @@ export function SystemPageHeader({
             : "sticky top-0 z-50 h-[68px] shrink-0 border-b border-stone-200 bg-white/95 shadow-xs backdrop-blur-md sm:h-[72px]"
       }
     >
-      <div className={`flex h-full w-full items-center justify-between gap-3 px-4 pl-14 sm:px-6 sm:pl-6 lg:px-8`}>
+      <div className={`flex h-full w-full items-center justify-between gap-3 px-3 sm:px-6 lg:px-8`}>
         <div className={`flex min-w-0 items-center gap-3`}>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event("open-app-navigation"))}
+            aria-label="Open navigation menu"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#F5AB26]/30 bg-[#5B0035] text-white shadow-sm transition hover:bg-[#6B0040] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5AB26] lg:hidden"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
           {brandLogo ? (
             brandWordmark ? (
               <MsuLogo size={38} className="shrink-0" />
