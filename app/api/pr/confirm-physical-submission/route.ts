@@ -3,6 +3,11 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function POST(req: NextRequest) {
   try {
+    const origin = req.headers.get('origin');
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+    if (origin && host && new URL(origin).host.split(':')[0] !== host.split(':')[0]) {
+      return NextResponse.json({ error: 'Invalid request origin.' }, { status: 403, headers: { 'Cache-Control': 'no-store' } });
+    }
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) return NextResponse.json({ error: 'Authentication required.' }, { status: 401, headers: { 'Cache-Control': 'no-store' } });
