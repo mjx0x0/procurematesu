@@ -85,7 +85,8 @@ export default function AdminReportsPage() {
       for (let offset = 0; offset < 100000; offset += pageSize) {
         const { data, error: queryError } = await supabase
           .from("purchase_requests")
-          .select("pr_no,purpose,department,total,current_stage,created_at,updated_at")
+          .select("pr_no,purpose,department,total,current_stage,created_at,updated_at,physical_submitted_at")
+          .or("current_stage.neq.draft,physical_submitted_at.not.is.null")
           .order("created_at", { ascending: false })
           .range(offset, offset + pageSize - 1);
 
