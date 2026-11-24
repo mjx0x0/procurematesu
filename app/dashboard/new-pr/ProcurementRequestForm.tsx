@@ -231,12 +231,9 @@ export default function ProcurementRequestForm() {
               {/* Physical Submission Notice */}
               <div className="rounded-xl border-2 border-amber-300/80 bg-[#FFFDF7] p-3 sm:p-5 shadow-sm">
                 <div className="min-w-0">
-                  <h2 className="text-[13px] sm:text-sm font-black text-[#4D002C] tracking-tight uppercase">Draft preparation</h2>
+                  <h2 className="text-[13px] sm:text-sm font-black text-[#4D002C] tracking-tight uppercase">Physical Submission Reminder</h2>
                   <p className="mt-1.5 text-[11px] sm:text-sm leading-relaxed text-stone-700">
-                    Creating a PR online only saves a private draft. Print, sign, and submit it with the required documents to the Procurement Office.
-                  </p>
-                  <p className="mt-1 text-[11px] sm:text-sm leading-relaxed text-stone-700">
-                    After handing it in, open the draft and confirm physical submission so the Procurement Office can record it.
+                    Creating this PR online only saves a draft. Please print, sign, and submit it with the required documents to the Procurement Office, then confirm physical submission from the PR details page.
                   </p>
 
                 </div>
