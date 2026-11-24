@@ -166,7 +166,7 @@ export default function AdminPurchaseRequestsPage() {
 
   const currentStage = (pr: PR | null) => pr ? STAGES.find((s) => s.key === pr.current_stage) : null;
   const currentIndex = (pr: PR | null) => pr ? STAGES.findIndex((s) => s.key === pr.current_stage) : -1;
-  const nextStage = (pr: PR) => { if (pr.current_stage === "draft") return STAGES[0] || null; const i = currentIndex(pr); return i >= 0 && i < STAGES.length - 1 ? STAGES[i + 1] : null; };
+  const nextStage = (pr: PR) => { const i = currentIndex(pr); return i >= 0 && i < STAGES.length - 1 ? STAGES[i + 1] : null; };
   const openDetails = async (pr: PR) => { setSelectedPR(pr); setHistory([]); setShowDetails(true); await loadHistory(pr.pr_no); };
   const openAction = (type: "complete" | "remark" | "reject", targetPR?: PR) => {
     if (targetPR) setSelectedPR(targetPR);
@@ -645,13 +645,13 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                   <div className="admin-pr-stage-summary flex items-center gap-3.5 min-w-0">
                     <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-[#7B0046] text-white shadow-xs border border-[#630038]">
                       <span className="font-mono font-bold text-base sm:text-lg leading-none tracking-tight">
-                        {detailStage?.number ? detailStage.number : "PR"}
+                        {detailStage ? detailStage.number : "PR"}
                       </span>
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 bg-stone-200/60 px-2 py-0.5 rounded">
-                          Current Stage {detailStage?.number || ""}
+                          Current Stage {detailStage?.number ?? ""}
                         </span>
                       </div>
                       <p className="text-sm sm:text-base font-bold text-stone-900 truncate mt-1">
