@@ -87,6 +87,18 @@ export async function POST(req: NextRequest) {
     const db = createSupabaseAdminClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
+    const { data: targetPR, error: targetPRError } = await db
+      .from('purchase_requests')
+      .select('current_stage,physical_submitted_at')
+      .eq('pr_no', prNo)
+      .maybeSingle();
+    if (targetPRError || !targetPR) {
+      return NextResponse.json({ error: 'Purchase Request not found.' }, { status: 404, headers: JSON_HEADERS });
+    }
+    if (targetPR.current_stage === 'draft' && !targetPR.physical_submitted_at) {
+      return NextResponse.json({ error: 'This Purchase Request has not been declared physically submitted and is not yet available for Procurement Office processing.' }, { status: 404, headers: JSON_HEADERS });
+    }
+
     const { data, error } = await db.rpc('process_purchase_request_action', {
       p_pr_no: prNo,
       p_action: action,
