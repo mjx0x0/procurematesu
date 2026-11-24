@@ -44,6 +44,11 @@ export default function AppSidebar({ mode, collapsed, onToggleCollapsed }: AppSi
   const [currentUser, setCurrentUser] = useState<any>(null);
   const router = useRouter();
   useEffect(() => { let cancelled = false; supabase.auth.getUser().then(({ data: { user } }) => { if (!cancelled) setCurrentUser(user); }); return () => { cancelled = true; }; }, []);
+  useEffect(() => {
+    const openMobileNavigation = () => setMobileOpen(true);
+    window.addEventListener("open-app-navigation", openMobileNavigation);
+    return () => window.removeEventListener("open-app-navigation", openMobileNavigation);
+  }, []);
   const displayName = currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split("@")[0] || "Signed-in user";
   const handleLogout = async () => { await supabase.auth.signOut(); router.replace("/"); };
   const items = mode === "admin" ? adminItems : userItems;
@@ -100,9 +105,6 @@ export default function AppSidebar({ mode, collapsed, onToggleCollapsed }: AppSi
         </div>
       </aside>
 
-      <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation menu" className="fixed left-3 top-3 z-[75] flex h-10 w-10 items-center justify-center rounded-xl border border-[#F5AB26]/30 bg-[#5B0035] text-white shadow-lg lg:hidden">
-        <Menu className="h-5 w-5" />
-      </button>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-[100] lg:hidden">
