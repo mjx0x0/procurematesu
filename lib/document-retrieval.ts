@@ -263,7 +263,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         if (asksHistoricalVectorQuestion && !['RA 9184', 'IRR 2016', 'IRR'].includes(documentName)) continue;
         if (asksRa9184Definition && !['RA 9184', 'GPPB Circular No. 01-2025'].includes(documentName)) continue;
         if ((asksCurrentLawStatus || asksCurrentGoverningProcurementLaw) && isLegacy && documentName !== 'GPPB Circular No. 01-2025') continue;
-        if (isLegacy && !asksAboutLegacyRules(query)) continue;
+        if (isLegacy && !asksAboutLegacyRules(query) && !asksRa9184Ra12009Comparison) continue;
         const is2014LguManualContent = /Local Government Units Procurement Manual|Manual of Procedures for the Procurement of Goods and Services under RA No.?\s*9184/i.test(text);
         if (is2014LguManualContent && !asksAboutLegacyRules(query)) continue;
         if (asksSvpDetails && documentName === 'Implementing Rules and Regulations of RA 12009'
