@@ -115,24 +115,43 @@ function takeCompleteSentences(value: string, maxChars = 900): string {
   return selected.join(' ').trim() || normalized;
 }
 
+type ChatGenerationResult = {
+  text: string;
+  provider: 'groq' | 'gemini' | 'none';
+  model: string | null;
+  fallbackReason: string | null;
+};
+
 async function callGeminiWithFallback(
   prompt: string,
   systemInstruction?: string,
   temperature: number = 0.2
-): Promise<string> {
+): Promise<ChatGenerationResult> {
   // Groq is the primary provider; Gemini is the fallback when Groq is unavailable
   // or returns an answer that appears to have been cut off.
   const groqResponse = await callGroq(prompt, systemInstruction, temperature, {
     maxOutputTokens: 2400,
     timeoutMs: 10000,
   });
-  if (groqResponse && !isLikelyIncompleteResponse(groqResponse)) return groqResponse;
+  if (groqResponse && !isLikelyIncompleteResponse(groqResponse)) {
+    return {
+      text: groqResponse,
+      provider: 'groq',
+      model: process.env.GROQ_CHAT_MODEL || 'openai/gpt-oss-120b',
+      fallbackReason: null,
+    };
+  }
   if (groqResponse) {
     console.warn('[Chat AI] Groq response looked incomplete; trying Gemini fallback.');
   }
 
+  const groqFallbackReason = groqResponse
+    ? 'groq_response_incomplete'
+    : 'groq_unavailable_or_failed';
   const client = getGenAI();
-  if (!client) return '';
+  if (!client) {
+    return { text: '', provider: 'none', model: null, fallbackReason: groqFallbackReason };
+  }
 
   const modelsToTry = [
     { model: 'gemini-3.1-flash-lite', maxOutputTokens: 2400 },
@@ -164,7 +183,14 @@ async function callGeminiWithFallback(
         console.warn(`[Gemini fallback] ${attempt.model} produced a possibly incomplete response; trying the next option.`);
         continue;
       }
-      if (text) return text;
+      if (text) {
+        return {
+          text,
+          provider: 'gemini',
+          model: attempt.model,
+          fallbackReason: groqFallbackReason,
+        };
+      }
     } catch (err: any) {
       if (timeoutId) clearTimeout(timeoutId);
       if (err?.message !== 'TIMEOUT') {
@@ -175,7 +201,7 @@ async function callGeminiWithFallback(
     }
   }
 
-  return '';
+  return { text: '', provider: 'none', model: null, fallbackReason: groqFallbackReason };
 }
 
 // ============================================================
@@ -852,6 +878,12 @@ export async function POST(req: NextRequest) {
       }>;
     } | null = null;
     let answerType = 'not_applicable';
+    let generationMetadata: ChatGenerationResult = {
+      text: '',
+      provider: 'none',
+      model: null,
+      fallbackReason: null,
+    };
 
     // Source-sensitive policy questions must bypass slot-filling first. This
     // prevents long legal prompts containing words like "supplier", "price",
@@ -1096,13 +1128,18 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
           responseText = conceptualFollowUpAnswer;
           answerType = 'deterministic_conceptual_follow_up';
         } else {
-          const aiResponse = (!retrievedDocs.trim() && requiresVerifiedEvidence)
-            ? ''
+          generationMetadata = (!retrievedDocs.trim() && requiresVerifiedEvidence)
+            ? {
+                text: '',
+                provider: 'none',
+                model: null,
+                fallbackReason: 'verified_evidence_missing',
+              }
             : await callGeminiWithFallback(userPrompt, systemPrompt, 0.2);
 
-          if (aiResponse) {
-            responseText = aiResponse;
-            answerType = 'llm_generated';
+          if (generationMetadata.text) {
+            responseText = generationMetadata.text;
+            answerType = generationMetadata.provider;
           } else {
             // Fallback to offline knowledge engine grounded in retrieved chunks
             responseText = generateOfflineProcurementResponse(trimmedMsg, retrievedDocs, sourcesList, conversationContext);
