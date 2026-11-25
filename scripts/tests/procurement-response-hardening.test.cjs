@@ -179,7 +179,8 @@ test('least-expensive supplier submission question is routed to SVP Section 34, 
 test('RA law comparison recognizes both statutory numbers and their official titles', () => {
   const chunks = [
     { document_name: 'RA 9184', chunk_text: 'Republic Act No. 9184, otherwise known as the Government Procurement Reform Act.' },
-    { document_name: 'RA 12009 (New)', chunk_text: 'Section 1. Short Title. This Act shall be known as the New Government Procurement Act.' },
+    { document_name: 'RA 12009 (New)', chunk_text: 'AN ACT REVISING REPUBLIC ACT NO. 9184, OTHERWISE KNOWN AS THE “GOVERNMENT PROCUREMENT REFORM ACT”. Section 1. Short Title. This Act shall be known as the “New Government Procurement Act”.' },
+    { document_name: 'RA 12009 (New)', chunk_text: 'SEC. 115. Repealing Clause. — Republic Act No. 9184, otherwise known as the “Government Procurement Reform Act”, and Commonwealth Act No. 138 are hereby repealed.' },
     { document_name: 'GPPB Circular No. 01-2025', metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/10/GPPB-Resolution-No.-05-2025.pdf' }, chunk_text: 'Section 4.2 RA No. 12009 Section 115 expressly repealed RA No. 9184. Section 5.1 RA No. 9184 and its IRR remain applicable to procurement projects published before the effectivity of the IRR of RA No. 12009 on 25 February 2025.' }
   ];
   for (const q of [
@@ -200,7 +201,8 @@ test('RA 9184 versus RA 12009 comparison is evidence-gated and explains transiti
   assert.equal(isHighRiskProcurementQuestion(q), true);
   const chunks = [
     { document_name: 'RA 9184', chunk_text: 'Republic Act No. 9184, otherwise known as the Government Procurement Reform Act.' },
-    { document_name: 'RA 12009 (New)', chunk_text: 'Section 1. Short Title. This Act shall be known as the New Government Procurement Act.' },
+    { document_name: 'RA 12009 (New)', chunk_text: 'AN ACT REVISING REPUBLIC ACT NO. 9184, OTHERWISE KNOWN AS THE “GOVERNMENT PROCUREMENT REFORM ACT”. Section 1. Short Title. This Act shall be known as the “New Government Procurement Act”.' },
+    { document_name: 'RA 12009 (New)', chunk_text: 'SEC. 115. Repealing Clause. — Republic Act No. 9184, otherwise known as the “Government Procurement Reform Act”, and Commonwealth Act No. 138 are hereby repealed.' },
     { document_name: 'GPPB Circular No. 01-2025', metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/10/GPPB-Resolution-No.-05-2025.pdf' }, chunk_text: 'Section 4.2 RA No. 12009 Section 115 expressly repealed RA No. 9184. Section 5.1 RA No. 9184 and its IRR remain applicable to procurement projects published before the effectivity of the IRR of RA No. 12009 on 25 February 2025.' }
   ];
   const answer = buildHighRiskProcurementResponse(q, chunks);
