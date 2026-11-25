@@ -1197,7 +1197,7 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
             session_id: currentSessionId,
             sender: 'ai',
             content: responseText,
-            ...(isAdmin && ragasCapture
+            ...(profile.role === 'end_user' && ragasCapture
               ? {
                   metadata: {
                     ragas_capture: {
