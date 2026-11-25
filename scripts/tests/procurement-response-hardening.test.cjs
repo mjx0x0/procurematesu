@@ -176,6 +176,25 @@ test('least-expensive supplier submission question is routed to SVP Section 34, 
 });
 
 
+test('RA law comparison recognizes both statutory numbers and their official titles', () => {
+  const chunks = [
+    { document_name: 'RA 9184', chunk_text: 'Republic Act No. 9184, otherwise known as the Government Procurement Reform Act.' },
+    { document_name: 'RA 12009 (New)', chunk_text: 'Section 1. Short Title. This Act shall be known as the New Government Procurement Act.' },
+    { document_name: 'GPPB Circular No. 01-2025', metadata: { source_url: 'https://www.gppb.gov.ph/wp-content/uploads/2025/10/GPPB-Resolution-No.-05-2025.pdf' }, chunk_text: 'Section 4.2 RA No. 12009 Section 115 expressly repealed RA No. 9184. Section 5.1 RA No. 9184 and its IRR remain applicable to procurement projects published before the effectivity of the IRR of RA No. 12009 on 25 February 2025.' }
+  ];
+  for (const q of [
+    'What is the difference between RA 9184 and RA 12009?',
+    'Can you compare the Government Procurement Reform Act and the New Government Procurement Act?'
+  ]) {
+    assert.equal(isHighRiskProcurementQuestion(q), true, q);
+    const answer = buildHighRiskProcurementResponse(q, chunks);
+    assert.match(answer, /Government Procurement Reform Act/);
+    assert.match(answer, /New Government Procurement Act/);
+    assert.match(answer, /transition rule/i);
+    assert.match(answer, /25 February 2025/);
+  }
+});
+
 test('RA 9184 versus RA 12009 comparison is evidence-gated and explains transition scope', () => {
   const q = 'What is the difference between RA 9184 and RA 12009?';
   assert.equal(isHighRiskProcurementQuestion(q), true);
