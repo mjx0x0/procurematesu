@@ -109,7 +109,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:procurement|pmo|pro|opisina ng pagkuha)\b/i.test(query) &&
     !/\b(?:phone|telephone|mobile|contact number|number to call)\b/i.test(query);
   const asksPmoDirectorDirectory = asksPmoDirectorContact || asksPmoDirectorIdentity;
-  const asksRa9184Ra12009Comparison = /\\b(?:RA|Republic Act)\\b/i.test(query) && /\\b9184\\b/i.test(query) && /\\b12009\\b/i.test(query) && /\\b(?:difference|differ|compare|comparison|versus|vs\\.?|between)\\b/i.test(query);\n  const asksRa9184Definition =
+    const asksRa9184Ra12009Comparison = /\b(?:RA|Republic Act)\b/i.test(query) && /\b9184\b/i.test(query) && /\b12009\b/i.test(query) && /\b(?:difference|differ|compare|comparison|versus|vs\.?|between)\b/i.test(query);
+  const asksRa9184Definition =
     /\b(?:what is|what was|define|definition|meaning of|ano ang|ano ba ang|ano itong)\b/i.test(query) &&
     /\b(?:RA\s*\.?\s*(?:No\.?\s*)?9184|Republic Act\s+No\.?\s*9184)\b/i.test(query) &&
     !/\b(?:section|article|threshold|posting|quotation|procedure|requirement|penalty|amendment|current|currently|still|in force|governing|applicable)\b/i.test(query);
@@ -794,8 +795,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
           if (asksRa9184Ra12009Comparison) {
             if (documentName === 'RA 9184' && /Government Procurement Reform Act/i.test(text)) score += 12000;
-            if (documentName === 'RA 12009 (New)' && /Section 1\\.\\s*Short Title|New Government Procurement Act/i.test(text)) score += 12000;
-            if (documentName === 'GPPB Circular No. 01-2025' && /Section 4\\.2|Section 5\\.1|25 February 2025/i.test(text)) score += 12000;
+            if (documentName === 'RA 12009 (New)' && /Section 1\.\s*Short Title|New Government Procurement Act/i.test(text)) score += 12000;
+            if (documentName === 'GPPB Circular No. 01-2025' && /Section 4\.2|Section 5\.1|25 February 2025/i.test(text)) score += 12000;
             if (documentName === 'Implementing Rules and Regulations of RA 12009' && /Section 115/i.test(text)) score += 6000;
           }
           if (asksPrPpmpComparison) {
