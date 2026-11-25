@@ -869,7 +869,7 @@ export async function POST(req: NextRequest) {
       question: string;
       retrieval_query: string;
       retrieved_chunks: Array<{
-        id?: string;
+        id?: string | number;
         document_name: string;
         document_type: string;
         chunk_text: string;
