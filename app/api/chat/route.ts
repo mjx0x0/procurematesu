@@ -837,6 +837,21 @@ export async function POST(req: NextRequest) {
     let updatedState = { ...currentState };
     let inquiryType = 'general';
     let citedSources: string[] = [];
+    let ragasCapture: {
+      schema_version: 1;
+      captured_at: string;
+      question: string;
+      retrieval_query: string;
+      retrieved_chunks: Array<{
+        id?: string;
+        document_name: string;
+        document_type: string;
+        chunk_text: string;
+        metadata?: Record<string, unknown>;
+        source_type: string;
+      }>;
+    } | null = null;
+    let answerType = 'not_applicable';
 
     // Source-sensitive policy questions must bypass slot-filling first. This
     // prevents long legal prompts containing words like "supplier", "price",
