@@ -837,6 +837,22 @@ export async function POST(req: NextRequest) {
     let updatedState = { ...currentState };
     let inquiryType = 'general';
     let citedSources: string[] = [];
+    // Capture only actual retrieval-path turns for RAGAS. References are curated
+    // separately from authoritative procurement sources during evaluation.
+    let ragasCapture: {
+      schema_version: 1;
+      captured_at: string;
+      question: string;
+      retrieval_query: string;
+      retrieved_chunks: Array<{
+        id?: string | number;
+        document_name: string;
+        document_type: string;
+        chunk_text: string;
+        metadata?: Record<string, unknown>;
+        source_type: string;
+      }>;
+    } | null = null;
 
     // Source-sensitive policy questions must bypass slot-filling first. This
     // prevents long legal prompts containing words like "supplier", "price",
@@ -982,6 +998,20 @@ export async function POST(req: NextRequest) {
           inquiryType = 'procurement_guidance';
           const retrievalQuery = buildContextualProcurementQuery(trimmedMsg, conversationContext);
           const retrieval = await retrieveDocumentChunks(retrievalQuery, 6);
+          ragasCapture = {
+            schema_version: 1,
+            captured_at: new Date().toISOString(),
+            question: trimmedMsg,
+            retrieval_query: retrievalQuery,
+            retrieved_chunks: retrieval.chunks.map((chunk) => ({
+              id: chunk.id,
+              document_name: chunk.document_name,
+              document_type: chunk.document_type,
+              chunk_text: chunk.chunk_text,
+              metadata: chunk.metadata,
+              source_type: chunk.source_type,
+            })),
+          };
         const retrievedDocs = retrieval.formattedContext;
         const sourcesList = retrieval.sources.map(normalizeSourceLabel);
         citedSources = sourcesList;
@@ -1123,7 +1153,22 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
 
         await supabase.from('chat_messages').insert([
           { session_id: currentSessionId, sender: 'user', content: trimmedMsg },
-          { session_id: currentSessionId, sender: 'ai', content: responseText },
+          {
+            session_id: currentSessionId,
+            sender: 'ai',
+            content: responseText,
+            ...(profile.role === 'end_user' && ragasCapture
+              ? {
+                  metadata: {
+                    ragas_capture: {
+                      ...ragasCapture,
+                      response: responseText,
+                      answer_type: 'retrieval_path',
+                    },
+                  },
+                }
+              : {}),
+          },
         ]);
 
         // /api/chat/send owns inquiry logging because it has already authenticated
