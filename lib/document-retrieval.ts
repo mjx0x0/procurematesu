@@ -109,7 +109,10 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:procurement|pmo|pro|opisina ng pagkuha)\b/i.test(query) &&
     !/\b(?:phone|telephone|mobile|contact number|number to call)\b/i.test(query);
   const asksPmoDirectorDirectory = asksPmoDirectorContact || asksPmoDirectorIdentity;
-    const asksRa9184Ra12009Comparison = /\b(?:RA|Republic Act)\b/i.test(query) && /\b9184\b/i.test(query) && /\b12009\b/i.test(query) && /\b(?:difference|differ|compare|comparison|versus|vs\.?|between)\b/i.test(query);
+    const asksRa9184Ra12009Comparison =
+    /\b(?:RA\s*\.?\s*(?:No\.?\s*)?9184|Republic Act\s+(?:No\.?\s*)?9184|Government Procurement Reform Act)\b/i.test(query) &&
+    /\b(?:RA\s*\.?\s*(?:No\.?\s*)?12009|Republic Act\s+(?:No\.?\s*)?12009|New Government Procurement Act)\b/i.test(query) &&
+    /\b(?:difference|differ|compare|comparison|versus|vs\.?|between)\b/i.test(query);
   const asksRa9184Definition =
     /\b(?:what is|what was|define|definition|meaning of|ano ang|ano ba ang|ano itong)\b/i.test(query) &&
     /\b(?:RA\s*\.?\s*(?:No\.?\s*)?9184|Republic Act\s+No\.?\s*9184)\b/i.test(query) &&
@@ -339,6 +342,25 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           /\b(sequence|workflow|process|steps|review|reviewing|approval|approving|offices|procedure|after|receives?|received|receipt|what happens)\b/i.test(query) &&
           /\b(msu|gensan|university|pmo|procurement)\b/i.test(query))
         || asksPmoReceiptQuestion;
+
+      if (asksRa9184Ra12009Comparison) {
+        // Explicit predecessor/current-law comparisons need all three authoritative
+        // sources. Do not rely on vector ranking to surface the old statute and
+        // the consolidated transition circular together.
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'RA 9184')
+            .ilike('chunk_text', '%Government Procurement Reform Act%')
+            .limit(8),
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'RA 12009 (New)')
+            .ilike('chunk_text', '%New Government Procurement Act%')
+            .limit(8),
+          supabase.from('document_chunks').select(selectedColumns)
+            .eq('document_name', 'GPPB Circular No. 01-2025')
+            .limit(12)
+        );
+      }
 
       if (asksCurrentLawStatus) {
         searches.push(
