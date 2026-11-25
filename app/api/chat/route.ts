@@ -1193,7 +1193,25 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
 
         await supabase.from('chat_messages').insert([
           { session_id: currentSessionId, sender: 'user', content: trimmedMsg },
-          { session_id: currentSessionId, sender: 'ai', content: responseText },
+          {
+            session_id: currentSessionId,
+            sender: 'ai',
+            content: responseText,
+            ...(isAdmin && ragasCapture
+              ? {
+                  metadata: {
+                    ragas_capture: {
+                      ...ragasCapture,
+                      response: responseText,
+                      answer_type: answerType,
+                      generation_provider: generationMetadata.provider,
+                      generation_model: generationMetadata.model,
+                      generation_fallback_reason: generationMetadata.fallbackReason,
+                    },
+                  },
+                }
+              : {}),
+          },
         ]);
 
         // /api/chat/send owns inquiry logging because it has already authenticated
