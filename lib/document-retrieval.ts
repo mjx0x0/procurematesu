@@ -651,6 +651,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
         searches.push(
           supabase.from('document_chunks').select(selectedColumns).eq('document_name', 'RA 9184').ilike('chunk_text', '%Government Procurement Reform Act%').limit(6),
           supabase.from('document_chunks').select(selectedColumns).eq('document_name', 'RA 12009 (New)').ilike('chunk_text', '%New Government Procurement Act%').limit(8),
+          supabase.from('document_chunks').select(selectedColumns).eq('document_name', 'RA 12009 (New)').ilike('chunk_text', '%SEC. 115. Repealing Clause%').limit(4),
           supabase.from('document_chunks').select(selectedColumns).eq('document_name', 'GPPB Circular No. 01-2025').limit(10),
           supabase.from('document_chunks').select(selectedColumns).eq('document_name', 'Implementing Rules and Regulations of RA 12009').ilike('chunk_text', '%Section 115%').limit(4)
         );
