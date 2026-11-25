@@ -997,6 +997,20 @@ export async function POST(req: NextRequest) {
           inquiryType = 'procurement_guidance';
           const retrievalQuery = buildContextualProcurementQuery(trimmedMsg, conversationContext);
           const retrieval = await retrieveDocumentChunks(retrievalQuery, 6);
+          ragasCapture = {
+            schema_version: 1,
+            captured_at: new Date().toISOString(),
+            question: trimmedMsg,
+            retrieval_query: retrievalQuery,
+            retrieved_chunks: retrieval.chunks.map((chunk) => ({
+              id: chunk.id,
+              document_name: chunk.document_name,
+              document_type: chunk.document_type,
+              chunk_text: chunk.chunk_text,
+              metadata: chunk.metadata,
+              source_type: chunk.source_type,
+            })),
+          };
         const retrievedDocs = retrieval.formattedContext;
         const sourcesList = retrieval.sources.map(normalizeSourceLabel);
         citedSources = sourcesList;
@@ -1075,10 +1089,12 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
         const conceptualFollowUpAnswer = buildOfflineConceptualFollowUpAnswer(trimmedMsg, conversationContext);
         if (verifiedAnswer) {
           responseText = verifiedAnswer;
+          answerType = 'deterministic_verified';
         } else if (conceptualFollowUpAnswer) {
           // Resolve short conceptual follow-ups deterministically so a model cannot
           // drift to a different procurement topic or omit the core comparison.
           responseText = conceptualFollowUpAnswer;
+          answerType = 'deterministic_conceptual_follow_up';
         } else {
           const aiResponse = (!retrievedDocs.trim() && requiresVerifiedEvidence)
             ? ''
@@ -1086,9 +1102,11 @@ Please provide a clear, accurate, grounded response adhering strictly to the ver
 
           if (aiResponse) {
             responseText = aiResponse;
+            answerType = 'llm_generated';
           } else {
             // Fallback to offline knowledge engine grounded in retrieved chunks
             responseText = generateOfflineProcurementResponse(trimmedMsg, retrievedDocs, sourcesList, conversationContext);
+            answerType = 'offline_fallback';
           }
         }
         }
