@@ -740,7 +740,8 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           // 2016 IRR can support the answer. Current RA 12009 excerpts are excluded
           // even when they mention the predecessor law.
           if (asksHistoricalRa9184 && !['RA 9184', 'IRR 2016', 'IRR'].includes(documentName)) continue;
-          if (asksRa9184Definition && !['RA 9184', 'GPPB Circular No. 01-2025'].includes(documentName)) continue;\n          if (asksRa9184Ra12009Comparison && !['RA 9184', 'RA 12009 (New)', 'GPPB Circular No. 01-2025', 'Implementing Rules and Regulations of RA 12009'].includes(documentName)) continue;
+          if (asksRa9184Definition && !['RA 9184', 'GPPB Circular No. 01-2025'].includes(documentName)) continue;
+          if (asksRa9184Ra12009Comparison && !['RA 9184', 'RA 12009 (New)', 'GPPB Circular No. 01-2025', 'Implementing Rules and Regulations of RA 12009'].includes(documentName)) continue;
 
           // A current-law status question must be anchored in the official 2025
           // transition circular, not diluted by the historical RA 9184/2016 IRR chunks.
