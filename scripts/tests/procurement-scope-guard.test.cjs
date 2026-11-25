@@ -237,3 +237,12 @@ test('full Republic Act names for supported procurement laws pass the procuremen
   );
   assert.equal(hasUnsupportedLawReference('What is Republic Act No. 11032?'), true);
 });
+
+
+test('Republic Act Number wording is recognized for supported procurement laws', () => {
+  for (const message of ['What is Republic Act Number 12009?', 'Explain Republic Act Number 9184.', 'Does Republic Act Number 12009 govern procurement?']) {
+    assert.deepEqual(getProcurementScopeDecision(message), { allowed: true, reason: 'procurement' }, message);
+    assert.equal(hasUnsupportedLawReference(message), false, message);
+  }
+  assert.equal(hasUnsupportedLawReference('Republic Act Number 11032'), true);
+});
