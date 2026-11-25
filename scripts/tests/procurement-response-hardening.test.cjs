@@ -210,5 +210,21 @@ test('RA 9184 versus RA 12009 comparison is evidence-gated and explains transiti
   assert.match(answer, /New Government Procurement Act/);
   assert.match(answer, /transition rule/i);
   assert.match(answer, /25 February 2025/);
-  assert.match(buildHighRiskProcurementResponse(q, [chunks[0]]), /can’t verify/i);
+  // Equivalent user phrasings must not depend on the vector search returning
+  // the exact same four legal chunks. The response is based on verified fixed
+  // primary-law and transition citations.
+  for (const variant of [
+    'What is the difference between RA 9184 and RA 12009?',
+    'What is the difference of RA 9184 and RA 12009?',
+    'What is the difference between Republic Act No. 9184 and Republic Act No. 12009?',
+    'How are RA 9184 and RA 12009 different?',
+    'Can you compare RA 9184 and RA 12009?'
+  ]) {
+    const response = buildHighRiskProcurementResponse(variant, []);
+    assert.match(response, /Government Procurement Reform Act/);
+    assert.match(response, /New Government Procurement Act/);
+    assert.match(response, /limited transition rule/i);
+    assert.match(response, /25 February 2025/);
+    assert.doesNotMatch(response, /can’t verify/i);
+  }
 });
