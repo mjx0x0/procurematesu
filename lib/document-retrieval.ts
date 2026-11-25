@@ -820,6 +820,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           if (asksRa9184Ra12009Comparison) {
             if (documentName === 'RA 9184' && /Government Procurement Reform Act/i.test(text)) score += 12000;
             if (documentName === 'RA 12009 (New)' && /Section 1\.\s*Short Title|New Government Procurement Act/i.test(text)) score += 12000;
+            if (documentName === 'RA 12009 (New)' && /(?:Section|SEC\.)\s*115[\s\S]{0,240}Republic Act No\.? 9184[\s\S]{0,220}are hereby repealed/i.test(text)) score += 12000;
             if (documentName === 'GPPB Circular No. 01-2025' && /Section 4\.2|Section 5\.1|25 February 2025/i.test(text)) score += 12000;
             if (documentName === 'Implementing Rules and Regulations of RA 12009' && /Section 115/i.test(text)) score += 6000;
           }
