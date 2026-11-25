@@ -109,7 +109,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
     /\b(?:procurement|pmo|pro|opisina ng pagkuha)\b/i.test(query) &&
     !/\b(?:phone|telephone|mobile|contact number|number to call)\b/i.test(query);
   const asksPmoDirectorDirectory = asksPmoDirectorContact || asksPmoDirectorIdentity;
-  const asksRa9184Definition =
+  const asksRa9184Ra12009Comparison = /\\b(?:RA|Republic Act)\\b/i.test(query) && /\\b9184\\b/i.test(query) && /\\b12009\\b/i.test(query) && /\\b(?:difference|differ|compare|comparison|versus|vs\\.?|between)\\b/i.test(query);\n  const asksRa9184Definition =
     /\b(?:what is|what was|define|definition|meaning of|ano ang|ano ba ang|ano itong)\b/i.test(query) &&
     /\b(?:RA\s*\.?\s*(?:No\.?\s*)?9184|Republic Act\s+No\.?\s*9184)\b/i.test(query) &&
     !/\b(?:section|article|threshold|posting|quotation|procedure|requirement|penalty|amendment|current|currently|still|in force|governing|applicable)\b/i.test(query);
@@ -624,6 +624,15 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
       // A plain "What is RA 9184?" question needs the Act's own title plus
       // the official transition circular, not a current-law excerpt that merely
       // mentions the repealed statute.
+      if (asksRa9184Ra12009Comparison) {
+        searches.push(
+          supabase.from('document_chunks').select(selectedColumns).eq('document_name', 'RA 9184').ilike('chunk_text', '%Government Procurement Reform Act%').limit(6),
+          supabase.from('document_chunks').select(selectedColumns).eq('document_name', 'RA 12009 (New)').ilike('chunk_text', '%New Government Procurement Act%').limit(8),
+          supabase.from('document_chunks').select(selectedColumns).eq('document_name', 'GPPB Circular No. 01-2025').limit(10),
+          supabase.from('document_chunks').select(selectedColumns).eq('document_name', 'Implementing Rules and Regulations of RA 12009').ilike('chunk_text', '%Section 115%').limit(4)
+        );
+      }
+
       if (asksRa9184Definition) {
         searches.push(
           supabase.from('document_chunks').select(selectedColumns)
@@ -730,7 +739,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           // 2016 IRR can support the answer. Current RA 12009 excerpts are excluded
           // even when they mention the predecessor law.
           if (asksHistoricalRa9184 && !['RA 9184', 'IRR 2016', 'IRR'].includes(documentName)) continue;
-          if (asksRa9184Definition && !['RA 9184', 'GPPB Circular No. 01-2025'].includes(documentName)) continue;
+          if (asksRa9184Definition && !['RA 9184', 'GPPB Circular No. 01-2025'].includes(documentName)) continue;\n          if (asksRa9184Ra12009Comparison && !['RA 9184', 'RA 12009 (New)', 'GPPB Circular No. 01-2025', 'Implementing Rules and Regulations of RA 12009'].includes(documentName)) continue;
 
           // A current-law status question must be anchored in the official 2025
           // transition circular, not diluted by the historical RA 9184/2016 IRR chunks.
@@ -783,6 +792,12 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
           const asksInstitutional = /\b(msu|gensan|university|pmo|pro|procurement office|department|chancellor|budget office|purchase request|pr|workflow|process|approval|logbook|director|contact|office)\b/i.test(query);
           if (asksLegal && isCurrentProcurementLawSource(identity)) score += 24;
           if (asksInstitutional && isPMOProcedureSource(identity)) score += 18;
+          if (asksRa9184Ra12009Comparison) {
+            if (documentName === 'RA 9184' && /Government Procurement Reform Act/i.test(text)) score += 12000;
+            if (documentName === 'RA 12009 (New)' && /Section 1\\.\\s*Short Title|New Government Procurement Act/i.test(text)) score += 12000;
+            if (documentName === 'GPPB Circular No. 01-2025' && /Section 4\\.2|Section 5\\.1|25 February 2025/i.test(text)) score += 12000;
+            if (documentName === 'Implementing Rules and Regulations of RA 12009' && /Section 115/i.test(text)) score += 6000;
+          }
           if (asksPrPpmpComparison) {
             if (documentName === 'Implementing Rules and Regulations of RA 12009' &&
               /PPMP|Project Procurement Management Plan|Annual Procurement Plan|procurement planning/i.test(text)) score += 180;
@@ -868,7 +883,7 @@ export async function retrieveDocumentChunks(query: string, limit: number = 6): 
   // The documentary answer is intentionally cross-source: retain the six
   // Circular chunks plus enough Section 34 IRR chunks to verify threshold,
   // quotations, posting, and the no-quotation exception independently.
-  const resultLimit = (asksBacFunctions || asksNoSvpQuotation || asksCurrentLawStatus || asksCurrentGoverningProcurementLaw || asksLowestQuotationAward || asksPrPpmpComparison || asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
+  const resultLimit = (asksRa9184Ra12009Comparison || asksBacFunctions || asksNoSvpQuotation || asksCurrentLawStatus || asksCurrentGoverningProcurementLaw || asksLowestQuotationAward || asksPrPpmpComparison || asksPrRequirements || asksPrItemPreparation || asksPrValidationFailure || asksPpmpApp || asksRa12009Title || asksCurrentGoverningProcurementLaw || asksPmoDefinition || asksPmoApprovalTimeLimit || asksPmoPrWorkflow || asksPmoPrNumber || asksTemporaryPmoLocation || asksSvpCompetitiveComparison || asksLowestQuotationAward || asksCircular06Coverage)
     ? Math.max(limit, 12)
     : asksSvpDocumentaryRequirements
     ? Math.max(limit, 16)
