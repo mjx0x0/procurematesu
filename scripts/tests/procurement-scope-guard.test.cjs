@@ -214,3 +214,26 @@ test('plain-language requesting-department PR preparation questions pass the pro
     assert.deepEqual(getProcurementScopeDecision(message), { allowed: true, reason: 'procurement' }, message);
   }
 });
+
+
+test('full Republic Act names for supported procurement laws pass the procurement scope gate', () => {
+  for (const message of [
+    'What is Republic Act No. 12009?',
+    'What is Republic Act 12009?',
+    'Explain Republic Act No. 9184.',
+    'Does Republic Act No. 12009 govern procurement?',
+    'What is R.A. No. 12009?',
+  ]) {
+    assert.deepEqual(
+      getProcurementScopeDecision(message),
+      { allowed: true, reason: 'procurement' },
+      message
+    );
+  }
+
+  assert.deepEqual(
+    getProcurementScopeDecision('What is Republic Act No. 11032?'),
+    { allowed: false, reason: 'off_topic' }
+  );
+  assert.equal(hasUnsupportedLawReference('What is Republic Act No. 11032?'), true);
+});
