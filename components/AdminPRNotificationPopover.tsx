@@ -282,11 +282,12 @@ export default function AdminPRNotificationPopover() {
   };
 
   const openNotification = async (item: AdminNotification) => {
-    const updated = await markRead(item);
-    if (!updated) return;
+    if (busyIds.includes(item.id)) return;
+    // Navigation must not depend on the read-status update succeeding.
+    if (!item.is_read) void markRead(item);
     setOpen(false);
     setToast(null);
-    router.push(getDestination(item));
+    window.location.assign(getDestination(item));
   };
 
   const openLatestFromToast = async () => {
@@ -346,7 +347,7 @@ export default function AdminPRNotificationPopover() {
       {open && (
         <>
           <button type="button" aria-label="Close notifications" onClick={() => setOpen(false)} className="fixed inset-0 z-[65] cursor-default bg-stone-950/20 backdrop-blur-[2px] sm:hidden" />
-          <section role="dialog" aria-label="Admin notification center" className="fixed left-3 right-3 top-[68px] z-[70] mx-auto flex max-h-[min(650px,calc(100svh-84px))] w-auto max-w-md flex-col overflow-hidden rounded-[20px] border border-stone-200/90 bg-white shadow-[0_22px_60px_rgba(45,0,26,0.2)] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-[430px] sm:max-w-[calc(100vw-2rem)]">
+          <section role="dialog" aria-label="Admin notification center" className="fixed left-3 right-3 top-[68px] z-[70] mx-auto flex max-h-[min(650px,calc(100svh-84px))] w-auto max-w-md flex-col overflow-hidden rounded-[20px] border border-stone-200/90 bg-white shadow-[0_22px_60px_rgba(45,0,26,0.2)] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-[410px] sm:max-w-[calc(100vw-2rem)]">
             <header className="border-b border-stone-100 bg-white px-4 pb-3 pt-4 sm:px-5">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
@@ -354,12 +355,12 @@ export default function AdminPRNotificationPopover() {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-[15px] font-extrabold tracking-[-0.02em] text-[#4D002C]">Notifications</h2>
-                      {unread > 0 && <span className="rounded-full bg-[#7B0046] px-2.5 py-1 text-[9px] font-bold text-white">{unread} unread</span>}
+
                     </div>
-                    <p className="mt-0.5 text-[10px] text-stone-500">{connection === "live" ? "Live updates · Saved to your account" : connection === "offline" ? "Saved notifications · Live updates unavailable" : "Connecting to notifications…"}</p>
+                    <p className="mt-0.5 text-[10px] text-stone-500">Stay updated on procurement activities</p>
                   </div>
                 </div>
-                {unread > 0 && <button type="button" onClick={() => void markAllRead()} className="shrink-0 rounded-lg px-2 py-1.5 text-[10px] font-bold text-[#7B0046] transition hover:bg-[#FDF2F7] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]"><span className="inline-flex items-center gap-1"><CheckCheck className="h-3 w-3" />Mark all read</span></button>}
+
               </div>
             </header>
             <nav aria-label="Filter notifications" className="flex items-center gap-5 border-b border-stone-100 px-4 sm:px-5">
