@@ -432,9 +432,6 @@ export default function PRDetailPage() {
         {pr.current_stage !== "draft" && <aside className="pr-timeline min-w-0 w-full max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-stone-200 bg-gradient-to-b from-white to-[#FCF9FB] p-4 shadow-[0_8px_24px_rgba(77,0,44,0.06)] sm:p-5 xl:sticky xl:top-5 xl:max-h-[calc(100vh-2.5rem)] print:hidden">
           <div className="flex min-w-0 items-center justify-between gap-3 border-b border-stone-200/80 pb-4 mb-4">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#7B0046] text-white shadow-sm">
-                <Clock className="h-5 w-5" />
-              </div>
               <div>
                 <h3 className="text-base font-bold tracking-tight text-[#4D002C]">Processing Timeline</h3>
                 <p className="text-[11px] leading-relaxed text-stone-500">Official log of completed procurement stages and office remarks</p>
