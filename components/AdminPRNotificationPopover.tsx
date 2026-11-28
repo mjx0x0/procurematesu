@@ -367,13 +367,13 @@ export default function AdminPRNotificationPopover() {
               <button type="button" onClick={() => setFilter("unread")} aria-pressed={filter === "unread"} className={"relative py-3 text-[11px] font-semibold transition " + (filter === "unread" ? "text-[#7B0046]" : "text-stone-500 hover:text-stone-800")}>Unread <span className="ml-1 text-[10px] tabular-nums">{unread}</span>{filter === "unread" && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-[#7B0046]" />}</button>
             </nav>
             {error && <p role="alert" className="border-b border-red-100 bg-red-50 px-4 py-2 text-[10px] text-red-700">{error}</p>}
-            <div className="min-h-0 flex-1 divide-y divide-stone-100 overflow-y-auto overscroll-contain">
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain bg-stone-50/60 p-3">
               {loading ? <div className="px-5 py-12 text-center text-xs text-stone-500">Loading notifications…</div> : visibleItems.length === 0 ? (
                 <div className="px-5 py-12 text-center"><span className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 text-stone-400"><Bell className="h-5 w-5" /></span><p className="mt-3 text-xs font-bold text-stone-800">{filter === "unread" ? "No unread notifications" : "You’re all caught up"}</p><p className="mt-1 text-[10px] text-stone-500">{filter === "unread" ? "You have read all your notifications." : "New requests, registrations, and procurement updates will appear here."}</p></div>
               ) : visibleItems.map((item) => (
-                <article key={item.id} className={"px-4 py-3.5 transition-colors sm:px-5 " + (item.is_read ? "bg-white hover:bg-stone-50/60" : "bg-[#FFFAFC] hover:bg-[#FFF5F9]")}>
+                <article key={item.id} className={"rounded-xl border px-3.5 py-3 transition-all sm:px-4 " + (item.is_read ? "border-stone-200 bg-white hover:border-stone-300 hover:shadow-sm" : "border-[#EAD3DF] bg-[#FFFAFC] hover:border-[#D9B5C8] hover:shadow-sm")}>
                   <div className="flex min-w-0 items-start gap-3">
-                    <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/[0.07] text-[#7B0046]">{getIcon(item.type)}</span>
+                    <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F7EAF1] text-[#7B0046]">{getIcon(item.type)}</span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <button type="button" onClick={() => void openNotification(item)} className="min-w-0 text-left text-[12px] font-bold leading-snug text-[#4D002C] hover:text-[#7B0046] focus:outline-none focus-visible:underline">{item.title}</button>
