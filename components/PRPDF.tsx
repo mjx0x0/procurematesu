@@ -594,6 +594,8 @@ export default function PRPDF({ pr = {}, items = [] }: PRPDFProps) {
               <View style={styles.sigFieldRow}>
                 <Text style={styles.sigFieldLabel}>Prepared By</Text>
                 <Text style={styles.sigFieldValue}>{safePr.prepared_by || ""}</Text>
+              </View>
+              <View style={styles.sigFieldRow}>
                 <Text style={styles.sigFieldLabel}>Printed Name</Text>
                 <Text style={styles.sigFieldValue}>
                   {(safePr.printed_name && safePr.printed_name.includes("@")
