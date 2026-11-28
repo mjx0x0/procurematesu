@@ -299,9 +299,9 @@ export default function PRDetailPage() {
       </div>
 
       <main className="mx-auto w-full max-w-none px-4 py-5 sm:px-6 lg:px-8 print:max-w-none print:w-full print:px-0 print:py-0">
-        <div className="mb-5 flex flex-col justify-between gap-4 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:flex-row xl:items-center print:hidden">
-          <div className="min-w-0 flex-1 space-y-2.5">
-            <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative mb-5 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 print:hidden">
+          <div className="min-w-0 space-y-2.5">
+            <div className="flex items-center gap-3 flex-wrap pr-14">
               <p className="text-[22px] font-semibold leading-tight tracking-[-0.025em] text-[#4D002C] font-mono sm:text-2xl">
                 {pr.pr_no}
               </p>
@@ -337,7 +337,7 @@ export default function PRDetailPage() {
               </div>
             )}
           </div>
-          <div ref={actionsMenuRef} className="relative shrink-0 print:hidden">
+          <div ref={actionsMenuRef} className="absolute right-4 top-4 z-20 print:hidden sm:right-5 sm:top-5">
             <button
               type="button"
               aria-label="Purchase request actions"
@@ -349,21 +349,21 @@ export default function PRDetailPage() {
               <MoreVertical className="h-5 w-5" />
             </button>
             {actionsMenuOpen && (
-              <div role="menu" aria-label="Purchase request actions" className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 overflow-hidden rounded-xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_32px_rgba(77,0,44,0.16)]">
+              <div role="menu" aria-label="Purchase request actions" className="absolute right-0 top-[calc(100%+8px)] z-50 grid w-64 gap-2 overflow-hidden rounded-xl border border-stone-200 bg-white p-2 shadow-[0_12px_32px_rgba(77,0,44,0.16)]">
                 {pr.current_stage === "draft" && !pr.physical_submitted_at && (
-                  <Link role="menuitem" href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} onClick={() => setActionsMenuOpen(false)} className="flex min-h-10 items-center gap-2.5 rounded-lg px-3 text-left text-xs font-semibold text-stone-700 transition hover:bg-[#FDF2F7] hover:text-[#7B0046]">
+                  <Link role="menuitem" href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} onClick={() => setActionsMenuOpen(false)} className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#7B0046]/35 bg-white px-3 text-center text-xs font-semibold text-[#7B0046] shadow-xs transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30">
                     <FileCheck className="h-4 w-4 text-[#7B0046]" /> Edit Draft
                   </Link>
                 )}
                 {pr.current_stage === "draft" && !pr.physical_submitted_at && (
-                  <button role="menuitem" type="button" onClick={() => { setActionsMenuOpen(false); setShowPhysicalSubmitConfirm(true); }} disabled={submittingPhysical} className="flex min-h-10 w-full items-center gap-2.5 rounded-lg px-3 text-left text-xs font-semibold text-stone-700 transition hover:bg-[#FDF2F7] hover:text-[#7B0046] disabled:opacity-60">
+                  <button role="menuitem" type="button" onClick={() => { setActionsMenuOpen(false); setShowPhysicalSubmitConfirm(true); }} disabled={submittingPhysical} className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#7B0046]/35 bg-white px-3 py-2 text-center text-xs font-semibold leading-tight text-[#7B0046] shadow-xs transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30 disabled:opacity-60">
                     <CheckCircle className="h-4 w-4 text-[#7B0046]" /> {submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}
                   </button>
                 )}
-                <button role="menuitem" type="button" onClick={() => { setActionsMenuOpen(false); window.print(); }} className="flex min-h-10 w-full items-center gap-2.5 rounded-lg px-3 text-left text-xs font-semibold text-stone-700 transition hover:bg-[#FDF2F7] hover:text-[#7B0046]">
+                <button role="menuitem" type="button" onClick={() => { setActionsMenuOpen(false); window.print(); }} className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#7B0046]/35 bg-white px-3 text-center text-xs font-semibold text-[#7B0046] shadow-xs transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30">
                   <Printer className="h-4 w-4 text-[#7B0046]" /> Print Form
                 </button>
-                <div role="none" className="px-1 py-1 [&>button]:!min-h-10 [&>button]:!w-full [&>button]:!justify-start [&>button]:!rounded-lg [&>button]:!border-0 [&>button]:!bg-transparent [&>button]:!px-2 [&>button]:!text-xs [&>button]:!font-semibold [&>button]:!text-stone-700 [&>button]:!shadow-none [&>button]:hover:!bg-[#FDF2F7] [&>button]:hover:!text-[#7B0046]">
+                <div role="none">
                   <PRDownloadButton pr={pr} items={items} />
                 </div>
               </div>
