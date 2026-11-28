@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { Bell, BellRing, Clock, FileText, Hash, Mail, MailOpen, MessageSquare, Trash2, UserRoundPlus } from "lucide-react";
+import { Bell, BellRing, CheckCheck, Clock, FileText, Hash, Mail, MailOpen, MessageSquare, Trash2, UserRoundPlus } from "lucide-react";
 
 const ADMIN_NOTIFICATION_TYPES = [
   "pr_created",
@@ -226,6 +226,27 @@ export default function AdminPRNotificationPopover() {
     await updateReadState(item, !item.is_read);
   };
 
+  const markAllRead = async () => {
+    const adminId = adminIdRef.current;
+    if (!adminId || unread === 0) return;
+
+    const { error: updateError } = await supabase
+      .from("notifications")
+      .update({ is_read: true })
+      .eq("user_id", adminId)
+      .eq("is_read", false)
+      .in("type", [...ADMIN_NOTIFICATION_TYPES]);
+
+    if (updateError) {
+      console.error("Unable to mark all admin notifications as read:", updateError);
+      setError("Unable to mark notifications as read. Please try again.");
+      return;
+    }
+
+    setItems((current) => current.map((item) => ({ ...item, is_read: true })));
+    setError(null);
+  };
+
   const deleteNotification = async (item: AdminNotification) => {
     const adminId = adminIdRef.current;
     if (!adminId || busyIds.includes(item.id)) return;
@@ -327,7 +348,7 @@ export default function AdminPRNotificationPopover() {
       {open && (
         <>
           <button type="button" aria-label="Close notifications" onClick={() => setOpen(false)} className="fixed inset-0 z-[65] cursor-default bg-stone-950/20 backdrop-blur-[2px] sm:hidden" />
-          <section role="dialog" aria-label="Admin notification center" className="fixed left-3 right-3 top-[68px] z-[70] mx-auto flex max-h-[min(650px,calc(100svh-84px))] w-auto max-w-md flex-col overflow-hidden rounded-[20px] border border-stone-200/90 bg-white shadow-[0_22px_60px_rgba(45,0,26,0.2)] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-[410px] sm:max-w-[calc(100vw-2rem)]">
+          <section role="dialog" aria-label="Admin notification center" className="fixed left-3 right-3 top-[68px] z-[70] mx-auto flex max-h-[min(650px,calc(100svh-84px))] w-auto max-w-md flex-col overflow-hidden rounded-[20px] border border-stone-200/90 bg-white shadow-[0_22px_60px_rgba(45,0,26,0.2)] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-[430px] sm:max-w-[calc(100vw-2rem)]">
             <header className="border-b border-stone-100 bg-white px-4 pb-3 pt-4 sm:px-5">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
@@ -335,12 +356,12 @@ export default function AdminPRNotificationPopover() {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-[15px] font-extrabold tracking-[-0.02em] text-[#4D002C]">Notifications</h2>
-
+                      {unread > 0 && <span className="rounded-full bg-[#7B0046] px-2.5 py-1 text-[9px] font-bold text-white">{unread} unread</span>}
                     </div>
                     <p className="mt-0.5 text-[10px] text-stone-500">Stay updated on procurement activities</p>
                   </div>
                 </div>
-
+                {unread > 0 && <button type="button" onClick={() => void markAllRead()} className="shrink-0 rounded-lg px-2 py-1.5 text-[10px] font-bold text-[#7B0046] transition hover:bg-[#FDF2F7] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]"><span className="inline-flex items-center gap-1"><CheckCheck className="h-3 w-3" />Mark all as read</span></button>}
               </div>
             </header>
             <nav aria-label="Filter notifications" className="flex items-center gap-5 border-b border-stone-100 px-4 sm:px-5">
