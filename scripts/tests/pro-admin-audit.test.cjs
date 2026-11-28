@@ -13,7 +13,7 @@ test("PR stage API derives actor identity from the authenticated session", () =>
 });
 
 test("database audit function validates an active administrator and snapshots the name", () => {
-  const migration = read("supabase/migrations/20261128170000_add_procurement_stage_actor_audit.sql");
+  const migration = read("supabase/migrations/20261128081121_add_procurement_stage_actor_audit.sql");
   assert.match(migration, /updated_by uuid REFERENCES public\.users\(id\) ON DELETE SET NULL/);
   assert.match(migration, /updated_by_name text/);
   assert.match(migration, /role = 'admin'[\s\S]*status = 'approved'[\s\S]*is_active = true/);
