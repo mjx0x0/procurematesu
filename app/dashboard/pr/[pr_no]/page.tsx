@@ -279,7 +279,7 @@ export default function PRDetailPage() {
       </div>
 
       <main className="mx-auto w-full max-w-none px-4 py-5 sm:px-6 lg:px-8 print:max-w-none print:w-full print:px-0 print:py-0">
-        <div className="mb-5 flex flex-col justify-between gap-3 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:flex-row xl:items-center print:hidden">
+        <div className="mb-5 flex flex-col justify-between gap-3 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:flex-row xl:items-start print:hidden">
           <div className="min-w-0 flex-1 space-y-2.5">
             <div className="flex items-center gap-3 flex-wrap">
               <p className="text-[22px] font-semibold leading-tight tracking-[-0.025em] text-[#4D002C] font-mono sm:text-2xl">{pr.pr_no}</p>
@@ -302,15 +302,15 @@ export default function PRDetailPage() {
               </div>
             )}
           </div>
-          <div className="grid w-full grid-cols-2 gap-2 xl:w-[440px] xl:shrink-0 print:hidden">
+          <div className="grid w-full grid-cols-2 content-start items-start gap-2 xl:w-[440px] xl:shrink-0 print:hidden">
             {pr.current_stage === "draft" && !pr.physical_submitted_at && (
-              <Link href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} className="inline-flex min-h-9 w-full items-center justify-center rounded-lg border border-[#7B0046]/30 bg-white px-2.5 py-2 text-center text-[11px] font-semibold leading-tight text-[#7B0046] transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30">Edit Draft</Link>
+              <Link href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} className="inline-flex h-9 w-full items-center justify-center rounded-lg border border-[#7B0046]/30 bg-white px-2 py-1.5 text-center text-[10px] font-medium leading-tight text-[#7B0046] transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30">Edit Draft</Link>
             )}
             {pr.current_stage === "draft" && !pr.physical_submitted_at && (
               <button type="button" onClick={() => setShowPhysicalSubmitConfirm(true)} disabled={submittingPhysical} className="inline-flex min-h-9 w-full items-center justify-center rounded-lg border border-[#7B0046]/30 bg-white px-2.5 py-2 text-center text-[11px] font-semibold leading-tight text-[#7B0046] transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30 disabled:opacity-60">{submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}</button>
             )}
-            <button type="button" onClick={() => window.print()} className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-[#7B0046]/30 bg-white px-2.5 py-2 text-center text-[11px] font-semibold leading-tight text-[#7B0046] transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30"><Printer className="h-3.5 w-3.5 shrink-0" /><span>Print Form</span></button>
-            <div className="w-full [&>button]:!min-h-9 [&>button]:!h-9 [&>button]:!rounded-lg [&>button]:!px-2.5 [&>button]:!py-2 [&>button]:!text-[11px] [&>button]:!font-semibold [&>button]:!shadow-none [&>button]:!border-[#7B0046]/30 [&>button_svg]:!h-3.5 [&>button_svg]:!w-3.5"><PRDownloadButton pr={pr} items={items} /></div>
+            <button type="button" onClick={() => window.print()} className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-[#7B0046]/30 bg-white px-2 py-1.5 text-center text-[10px] font-medium leading-tight text-[#7B0046] transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30"><Printer className="h-3.5 w-3.5 shrink-0" /><span>Print Form</span></button>
+            <div className="w-full [&>button]:!h-9 [&>button]:!min-h-9 [&>button]:!rounded-lg [&>button]:!px-2 [&>button]:!py-1.5 [&>button]:!text-[10px] [&>button]:!font-medium [&>button]:!leading-tight [&>button]:!shadow-none [&>button]:!border-[#7B0046]/30 [&>button_svg]:!h-3.5 [&>button_svg]:!w-3.5 [&>button]:!gap-1.5 [&>button]:!whitespace-nowrap"><PRDownloadButton pr={pr} items={items} /></div>
           </div>
         </div>
 
