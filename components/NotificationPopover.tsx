@@ -16,7 +16,7 @@ import {
 interface Notification {
   id: string;
   pr_no: string | null;
-  type: "info" | "update" | "remark" | "rejected";
+  type: "info" | "update" | "remark" | "rejected" | "pr_message_reply";
   title: string;
   message: string;
   is_read: boolean;
@@ -137,6 +137,7 @@ export function NotificationPopover({ variant = "default" }: { variant?: "defaul
       case "rejected":
         return <XCircle className="h-4 w-4" />;
       case "remark":
+      case "pr_message_reply":
         return <MessageSquareText className="h-4 w-4" />;
       default:
         return <Bell className="h-4 w-4" />;
