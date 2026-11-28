@@ -702,7 +702,6 @@ export default function ProcurementRequestForm() {
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-[#4D002C]">Double-check your Purchase Request</h3>
-                    <p className="text-xs text-stone-500 mt-0.5">Please verify the details below before saving your draft.</p>
                   </div>
                 </div>
                 <button
