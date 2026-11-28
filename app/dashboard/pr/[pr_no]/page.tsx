@@ -77,7 +77,12 @@ export default function PRDetailPage() {
   const [printedNameMessage, setPrintedNameMessage] = useState<string | null>(null);
   const [submittingPhysical, setSubmittingPhysical] = useState(false);
   const [showPhysicalSubmitConfirm, setShowPhysicalSubmitConfirm] = useState(false);
-  const [physicalSubmissionMessage, setPhysicalSubmissionMessage] = useState<string | null>(null);\n  const [messages, setMessages] = useState<PRMessage[]>([]);\n  const [newMessage, setNewMessage] = useState("");\n  const [loadingMessages, setLoadingMessages] = useState(false);\n  const [sendingMessage, setSendingMessage] = useState(false);\n  const [messageFeedback, setMessageFeedback] = useState<string | null>(null);
+  const [physicalSubmissionMessage, setPhysicalSubmissionMessage] = useState<string | null>(null);
+  const [messages, setMessages] = useState<PRMessage[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [messageFeedback, setMessageFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
