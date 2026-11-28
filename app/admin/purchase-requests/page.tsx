@@ -856,15 +856,30 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                     const isCurrent = selectedPR.current_stage === stage.key;
                     const isCompleted = selectedPR.current_stage === "completed" || (!isCurrent && detailIndex > index) || !!recorded;
                     const state = isCurrent ? "current" : isCompleted ? "completed" : "pending";
+                    const isNextStage = state === "pending" && nextStage(selectedPR)?.key === stage.key;
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={stage.key}
-                        className={`rounded-xl border p-3 transition-colors ${
+                        disabled={!isNextStage}
+                        aria-label={isNextStage ? `Advance to Stage ${stage.number}: ${stage.label}` : `Stage ${stage.number}: ${stage.label} — ${state}`}
+                        onClick={() => {
+                          if (!isNextStage) return;
+                          if (selectedPR.current_stage === "pr_pre_numbering") {
+                            setOfficialPrInput(selectedPR.pr_no.includes("TEMP") ? "" : selectedPR.pr_no);
+                            setShowOfficialPrModal(true);
+                          } else {
+                            openAction("complete");
+                          }
+                        }}
+                        className={`w-full rounded-xl border p-3 text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/40 ${
                           state === "current"
                             ? "border-stone-300 bg-stone-50 shadow-2xs ring-1 ring-stone-900/5"
                             : state === "completed"
                             ? "border-stone-200/80 bg-white"
-                            : "border-stone-200/50 bg-stone-50/30"
+                            : isNextStage
+                            ? "border-[#7B0046]/30 bg-[#FFF9FC] cursor-pointer hover:border-[#7B0046]/60 hover:bg-[#FCF2F7] hover:shadow-sm"
+                            : "border-stone-200/50 bg-stone-50/30 cursor-not-allowed"
                         }`}
                       >
                         <div className="flex items-start gap-3">
@@ -902,7 +917,8 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                           </div>
                           {state === "current" && <ChevronRight className="h-4 w-4 text-stone-400 shrink-0 mt-1" />}
                         </div>
-                      </div>
+                        {isNextStage && <span className="mt-2 inline-flex items-center gap-1.5 pl-10 text-[10px] font-bold text-[#7B0046]"><ChevronRight className="h-3 w-3" /> Click to advance · confirmation required</span>}
+                      </button>
                     );
                   })}
                 </div>
