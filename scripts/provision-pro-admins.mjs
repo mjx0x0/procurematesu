@@ -73,7 +73,7 @@ for (let number = 1; number <= 10; number += 1) {
       email,
       password: temporaryPassword,
       email_confirm: true,
-      user_metadata: { full_name: fullName },
+      user_metadata: { full_name: fullName, department: "Procurement Office" },
       app_metadata: { role: "admin", account_type: "procurement_personnel" },
     });
     if (error || !data.user) throw new Error(`Unable to create ${email}: ${error?.message || "No user returned"}`);
@@ -82,7 +82,7 @@ for (let number = 1; number <= 10; number += 1) {
   } else {
     const { data, error } = await supabase.auth.admin.updateUserById(authUser.id, {
       email_confirm: true,
-      user_metadata: { ...(authUser.user_metadata || {}), full_name: fullName },
+      user_metadata: { ...(authUser.user_metadata || {}), full_name: fullName, department: "Procurement Office" },
       app_metadata: { ...(authUser.app_metadata || {}), role: "admin", account_type: "procurement_personnel" },
     });
     if (error || !data.user) throw new Error(`Unable to update Auth metadata for ${email}: ${error?.message || "No user returned"}`);
@@ -93,6 +93,7 @@ for (let number = 1; number <= 10; number += 1) {
     id: authUser.id,
     email,
     full_name: fullName,
+    department: "Procurement Office",
     role: "admin",
     is_active: true,
     status: "approved",
