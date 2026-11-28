@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
@@ -8,7 +8,7 @@ import PRDownloadButton from "@/components/PRDownloadButton";
 import LoadingScreen from "@/components/LoadingScreen";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, getFormDisplayPrNumber } from "@/lib/procurement-process";
-import { AlertCircle, Building2, Calendar, CheckCircle, Clock, FileCheck, MessageSquare, MoreVertical, Printer, Send, XCircle } from "lucide-react";
+import { AlertCircle, Building2, Calendar, CheckCircle, Clock, FileCheck, MessageSquare, Printer, Send, XCircle } from "lucide-react";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -299,75 +299,38 @@ export default function PRDetailPage() {
       </div>
 
       <main className="mx-auto w-full max-w-none px-4 py-5 sm:px-6 lg:px-8 print:max-w-none print:w-full print:px-0 print:py-0">
-        <div className="relative mb-5 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 print:hidden">
-          <div className="min-w-0 space-y-2.5">
-            <div className="flex items-center gap-3 flex-wrap pr-14">
-              <p className="text-[22px] font-semibold leading-tight tracking-[-0.025em] text-[#4D002C] font-mono sm:text-2xl">
-                {pr.pr_no}
-              </p>
+        <div className="mb-5 flex flex-col justify-between gap-3 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:flex-row xl:items-center print:hidden">
+          <div className="min-w-0 flex-1 space-y-2.5">
+            <div className="flex items-center gap-3 flex-wrap">
+              <p className="text-[22px] font-semibold leading-tight tracking-[-0.025em] text-[#4D002C] font-mono sm:text-2xl">{pr.pr_no}</p>
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${statusClass(pr.current_stage)}`}>
                 <span className="h-1.5 w-1.5 rounded-full bg-current" />
                 {pr.current_stage === "draft" && pr.physical_submitted_at ? "Awaiting Physical Receipt" : statusLabel(pr.current_stage)}
               </span>
             </div>
             <div className="flex items-center gap-x-4 gap-y-1.5 text-xs text-stone-600 font-medium flex-wrap">
-              <span className="inline-flex items-center gap-1.5">
-                <Building2 className="h-3.5 w-3.5 text-stone-400" />
-                <span>Department: <strong className="text-stone-800 font-semibold">{pr.department}</strong></span>
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Calendar className="h-3.5 w-3.5 text-stone-400" />
-                <span>Created on {new Date(pr.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-              </span>
-              {totalAmount > 0 && (
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="text-stone-400 font-mono font-bold">₱</span>
-                  <span>Total: <strong className="text-[#4D002C] font-bold">₱{totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
-                </span>
-              )}
+              <span className="inline-flex items-center gap-1.5"><Building2 className="h-3.5 w-3.5 text-stone-400" /><span>Department: <strong className="text-stone-800 font-semibold">{pr.department}</strong></span></span>
+              <span className="inline-flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5 text-stone-400" /><span>Created on {new Date(pr.created_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}</span></span>
+              {totalAmount > 0 && <span className="inline-flex items-center gap-1.5"><span className="text-stone-400 font-mono font-bold">₱</span><span>Total: <strong className="text-[#4D002C] font-bold">₱{totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span></span>}
             </div>
             {pr.pr_no?.includes("TEMP") && (
               <div className="pt-1">
-                <div className="bg-amber-50/80 border border-amber-200/90 text-amber-950 p-3 sm:p-3.5 rounded-xl text-xs flex items-start gap-2.5 leading-relaxed">
+                <div className="bg-amber-50/80 border border-amber-200/90 text-amber-950 p-3 rounded-xl text-xs flex items-start gap-2.5 leading-relaxed">
                   <AlertCircle className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
-                  <p>
-                    <strong className="font-bold text-amber-900">Temporary Tracking Number:</strong> This request is currently assigned a temporary PR number (<code>{pr.pr_no}</code>). The official university PR control number will be assigned by the Procurement Office at <strong className="font-bold text-amber-900">Step 4 (Pre-Numbering and Control of PRs)</strong> and will update automatically here.
-                  </p>
+                  <p><strong className="font-bold text-amber-900">Temporary Tracking Number:</strong> This request is currently assigned a temporary PR number (<code>{pr.pr_no}</code>). The official university PR control number will be assigned by the Procurement Office at <strong className="font-bold text-amber-900">Step 4 (Pre-Numbering and Control of PRs)</strong> and will update automatically here.</p>
                 </div>
               </div>
             )}
           </div>
-          <div ref={actionsMenuRef} className="absolute right-4 top-4 z-20 print:hidden sm:right-5 sm:top-5">
-            <button
-              type="button"
-              aria-label="Purchase request actions"
-              aria-haspopup="menu"
-              aria-expanded={actionsMenuOpen}
-              onClick={() => setActionsMenuOpen((open) => !open)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#7B0046]/25 bg-white text-[#7B0046] shadow-sm transition hover:border-[#7B0046]/50 hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30"
-            >
-              <MoreVertical className="h-5 w-5" />
-            </button>
-            {actionsMenuOpen && (
-              <div role="menu" aria-label="Purchase request actions" className="absolute right-0 top-[calc(100%+8px)] z-50 grid w-64 gap-2 overflow-hidden rounded-xl border border-stone-200 bg-white p-2 shadow-[0_12px_32px_rgba(77,0,44,0.16)]">
-                {pr.current_stage === "draft" && !pr.physical_submitted_at && (
-                  <Link role="menuitem" href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} onClick={() => setActionsMenuOpen(false)} className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#7B0046]/35 bg-white px-3 text-center text-xs font-semibold text-[#7B0046] shadow-xs transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30">
-                    <FileCheck className="h-4 w-4 text-[#7B0046]" /> Edit Draft
-                  </Link>
-                )}
-                {pr.current_stage === "draft" && !pr.physical_submitted_at && (
-                  <button role="menuitem" type="button" onClick={() => { setActionsMenuOpen(false); setShowPhysicalSubmitConfirm(true); }} disabled={submittingPhysical} className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#7B0046]/35 bg-white px-3 py-2 text-center text-xs font-semibold leading-tight text-[#7B0046] shadow-xs transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30 disabled:opacity-60">
-                    <CheckCircle className="h-4 w-4 text-[#7B0046]" /> {submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}
-                  </button>
-                )}
-                <button role="menuitem" type="button" onClick={() => { setActionsMenuOpen(false); window.print(); }} className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#7B0046]/35 bg-white px-3 text-center text-xs font-semibold text-[#7B0046] shadow-xs transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30">
-                  <Printer className="h-4 w-4 text-[#7B0046]" /> Print Form
-                </button>
-                <div role="none">
-                  <PRDownloadButton pr={pr} items={items} />
-                </div>
-              </div>
+          <div className="grid w-full grid-cols-2 gap-2 xl:w-[440px] xl:shrink-0 print:hidden">
+            {pr.current_stage === "draft" && !pr.physical_submitted_at && (
+              <Link href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} className="inline-flex min-h-9 w-full items-center justify-center rounded-lg border border-[#7B0046]/30 bg-white px-2.5 py-2 text-center text-[11px] font-semibold leading-tight text-[#7B0046] transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30">Edit Draft</Link>
             )}
+            {pr.current_stage === "draft" && !pr.physical_submitted_at && (
+              <button type="button" onClick={() => setShowPhysicalSubmitConfirm(true)} disabled={submittingPhysical} className="inline-flex min-h-9 w-full items-center justify-center rounded-lg border border-[#7B0046]/30 bg-white px-2.5 py-2 text-center text-[11px] font-semibold leading-tight text-[#7B0046] transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30 disabled:opacity-60">{submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}</button>
+            )}
+            <button type="button" onClick={() => window.print()} className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-[#7B0046]/30 bg-white px-2.5 py-2 text-center text-[11px] font-semibold leading-tight text-[#7B0046] transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30"><Printer className="h-3.5 w-3.5 shrink-0" /><span>Print Form</span></button>
+            <div className="w-full [&>button]:!min-h-9 [&>button]:!h-9 [&>button]:!rounded-lg [&>button]:!px-2.5 [&>button]:!py-2 [&>button]:!text-[11px] [&>button]:!font-semibold [&>button]:!shadow-none [&>button]:!border-[#7B0046]/30 [&>button_svg]:!h-3.5 [&>button_svg]:!w-3.5"><PRDownloadButton pr={pr} items={items} /></div>
           </div>
         </div>
 
