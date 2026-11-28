@@ -36,6 +36,8 @@ interface Stage {
   remarks?: string | null;
   status?: string;
   assigned_to?: string | null;
+  updated_by?: string | null;
+  updated_by_name?: string | null;
   completed_at: string;
 }
 
@@ -456,6 +458,7 @@ export default function PRDetailPage() {
                             <span className="min-w-0 whitespace-normal break-words">Completed · {new Date(event.completed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} at {new Date(event.completed_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</span>
                           </div>
                         )}
+                        {event?.updated_by_name && <p className="text-[11px] font-semibold text-[#7B0046]">Updated by: {event.updated_by_name}</p>}
                       </div>
 
                       {event?.remarks || event?.notes ? (
@@ -481,6 +484,7 @@ export default function PRDetailPage() {
                                     <span className="max-w-full whitespace-normal break-words text-[10px] font-mono text-stone-400">
                                       {new Date(remark.completed_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })} {new Date(remark.completed_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                                     </span>
+                                    {remark.updated_by_name && <span className="text-[10px] font-semibold text-[#7B0046]">Updated by: {remark.updated_by_name}</span>}
                                   </div>
                                 </div>
                               </div>
