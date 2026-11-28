@@ -78,6 +78,7 @@ export default function PRDetailPage() {
   const [submittingPhysical, setSubmittingPhysical] = useState(false);
   const [showPhysicalSubmitConfirm, setShowPhysicalSubmitConfirm] = useState(false);
   const [physicalSubmissionMessage, setPhysicalSubmissionMessage] = useState<string | null>(null);
+  const [messages, setMessages] = useState<PRMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
