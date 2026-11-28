@@ -31,6 +31,7 @@ const emptyItem = (): Item => ({
 
 const STANDARD_UNITS = [
   { value: "pcs", label: "pcs (Pieces)" },
+  { value: "pax", label: "pax (Persons)" },
   { value: "unit", label: "unit (Units)" },
   { value: "set", label: "set (Sets)" },
   { value: "box", label: "box (Boxes)" },
