@@ -38,6 +38,10 @@ interface StageHistory {
 
 const STAGES = PROCUREMENT_STAGES;
 const LABELS: Record<string, string> = { ...PROCUREMENT_STAGE_LABELS, draft: "Draft", rejected: "Rejected", cancelled: "Cancelled", completed: "Completed" };
+const historyStageTitle = (entry: StageHistory) => {
+  const stage = STAGES.find((candidate) => candidate.key === entry.stage_key);
+  return stage ? `Stage ${stage.number}: ${stage.label}` : entry.stage_name || LABELS[entry.stage_key] || entry.stage_key;
+};
 const COLORS: Record<string, string> = {
   receipt_of_pr: "bg-amber-100 text-amber-700", ppmp_app_verification: "bg-yellow-100 text-yellow-700",
   pmo_director_validation: "bg-blue-100 text-blue-700", pr_pre_numbering: "bg-indigo-100 text-indigo-700",
@@ -842,7 +846,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                       <div key={`${h.stage_key}-${h.completed_at}-${i}`} className="border border-stone-200/80 rounded-lg p-3 bg-stone-50/30">
                         <div className="flex justify-between gap-3">
                           <div>
-                            <p className="font-semibold text-xs text-stone-800">{h.stage_name || LABELS[h.stage_key] || h.stage_key}</p>
+                            <p className="font-semibold text-xs text-stone-800">{historyStageTitle(h)}</p>
                             <p className="text-[10px] text-stone-400 mt-1">{h.completed_at ? new Date(h.completed_at).toLocaleString("en-PH") : ""}</p>
                             {h.updated_by_name && <p className="mt-1 text-[10px] font-semibold text-[#7B0046]">Updated by: {h.updated_by_name}</p>}
                           </div>
