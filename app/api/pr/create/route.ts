@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     // This endpoint uses service-role writes; enforce account approval here.
     const { data: profile, error: profileError } = await admin
       .from('users')
-      .select('role,status,is_active')
+      .select('role,status,is_active,full_name')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -73,7 +73,6 @@ export async function POST(req: NextRequest) {
     const designation = typeof body?.designation === 'string' && body.designation.trim() ? body.designation.trim() : null;
     const rawItems = Array.isArray(body?.items) ? body.items : [];
 
-    if (!printedName) printedName = (user.user_metadata?.full_name || '').trim();
     if (!department) return NextResponse.json({ error: 'Please enter your department.' }, { status: 400, headers: JSON_HEADERS });
     if (!purpose) return NextResponse.json({ error: 'Please enter the purpose for this purchase request.' }, { status: 400, headers: JSON_HEADERS });
     if (!printedName || printedName.includes('@')) {
@@ -200,9 +199,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to save the complete Purchase Request. Please retry.' }, { status: 500, headers: JSON_HEADERS });
     }
 
-    await admin.auth.admin.updateUserById(user.id, {
-      user_metadata: { full_name: printedName },
-    }).catch(() => {});
+    const preparedBy = typeof profile.full_name === 'string' && !profile.full_name.includes('@')
+      ? profile.full_name.trim()
+      : '';
+    const { error: preparedByError } = await admin
+      .from('purchase_requests')
+      .update({ prepared_by: preparedBy || null })
+      .eq('pr_no', result.pr.pr_no);
+    if (preparedByError) {
+      console.error('[PR Create API] Unable to save Prepared By account name:', preparedByError.message);
+      return NextResponse.json({ error: 'The PR was created, but its Prepared By name could not be saved. Please contact the administrator before printing.' }, { status: 500, headers: JSON_HEADERS });
+    }
 
     return NextResponse.json({
       success: true,
