@@ -1,7 +1,7 @@
 export type PRValidationErrors = Record<string, string>;
 
 const COMMON_UNITS = new Set([
-  'pc', 'pcs', 'piece', 'pieces', 'unit', 'units', 'set', 'sets', 'box', 'boxes', 'ream', 'reams',
+  'pc', 'pcs', 'piece', 'pieces', 'pax', 'unit', 'units', 'set', 'sets', 'box', 'boxes', 'ream', 'reams',
   'bottle', 'bottles', 'pack', 'packs', 'pair', 'pairs', 'roll', 'rolls', 'lot', 'lots', 'kg', 'g',
   'mg', 'l', 'liter', 'liters', 'ml', 'meter', 'meters', 'cm', 'mm', 'dozen', 'dozens', 'bundle',
   'bundles', 'kit', 'kits', 'hour', 'hours', 'day', 'days', 'month', 'months', 'year', 'years',
