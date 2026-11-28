@@ -6,7 +6,8 @@
     "start": "next start",
     "lint": "eslint .",
     "test:procurement": "node --test scripts/tests/procurement-response-hardening.test.cjs scripts/tests/chat-source-references.test.cjs scripts/tests/procurement-definitions.test.cjs scripts/tests/chat-conversation-context.test.cjs scripts/tests/chat-intent.test.cjs scripts/tests/pr-draft-handoff.test.cjs scripts/tests/chat-response-format.test.cjs scripts/tests/procurement-answer-guards.test.cjs scripts/tests/procurement-issuance-intents.test.cjs scripts/tests/procurement-accuracy-matrix.test.cjs scripts/tests/procurement-office-location.test.cjs scripts/tests/procurement-scope-guard.test.cjs scripts/tests/system-branding.test.cjs scripts/tests/procurement-workflow-hardening.test.cjs scripts/tests/pr-validation-evidence.test.cjs scripts/tests/chat-language.test.cjs",
-    "ingest:gppb-circular-06-2026": "node scripts/ingest-gppb-circular-06-2026.js"
+    "ingest:gppb-circular-06-2026": "node scripts/ingest-gppb-circular-06-2026.js",
+    "provision:pro-admins": "node scripts/provision-pro-admins.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.21.0",
