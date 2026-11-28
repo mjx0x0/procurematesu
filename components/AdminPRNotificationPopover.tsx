@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { Bell, BellRing, CheckCheck, Clock, FileText, Hash, Mail, MailOpen, Trash2, UserRoundPlus } from "lucide-react";
+import { Bell, BellRing, CheckCheck, Clock, FileText, Hash, Mail, MailOpen, MessageSquare, Trash2, UserRoundPlus } from "lucide-react";
 
 const ADMIN_NOTIFICATION_TYPES = [
   "pr_created",
@@ -11,6 +11,7 @@ const ADMIN_NOTIFICATION_TYPES = [
   "user_registered",
   "pr_stage_changed",
   "pr_number_assigned",
+  "pr_message_received",
 ] as const;
 
 interface AdminNotification {
@@ -41,7 +42,7 @@ function getDestination(item: AdminNotification) {
 
 function getIcon(type: string) {
   if (type === "user_registered") return <UserRoundPlus className="h-4 w-4" />;
-  if (type === "pr_number_assigned") return <Hash className="h-4 w-4" />;
+  if (type === "pr_number_assigned") return <Hash className="h-4 w-4" />;\n  if (type === "pr_message_received") return <MessageSquare className="h-4 w-4" />;
   return <FileText className="h-4 w-4" />;
 }
 
