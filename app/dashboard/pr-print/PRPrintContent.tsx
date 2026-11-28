@@ -29,7 +29,6 @@ interface PRData {
   alobs_no?: string;
   alobs_date?: string;
   printed_name?: string;
-  prepared_by?: string | null;
   designation?: string;
   approved_by?: string;
   approved_by_designation?: string;
@@ -95,7 +94,6 @@ export default function PRPrintContent() {
               pr_date: formattedDate,
               current_stage: prRecord.current_stage,
               printed_name: prRecord.printed_name || "",
-              prepared_by: prRecord.prepared_by || "",
               designation: prRecord.designation || "",
               items: (itemRecords || []).map((it) => ({
                 item_description: it.item_description,
@@ -374,10 +372,6 @@ export default function PRPrintContent() {
                 <div className="flex">
                   <span className="w-24 text-stone-700">Signature</span>
                   <span className="flex-1"></span>
-                </div>
-                <div className="flex">
-                  <span className="w-24 text-stone-700">Prepared By</span>
-                  <span className="font-bold uppercase flex-1">{data.prepared_by || ""}</span>
                 </div>
                 <div className="flex">
                   <span className="w-24 text-stone-700">Printed Name</span>
