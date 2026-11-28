@@ -62,7 +62,8 @@ export default function ProcurementRequestForm() {
   const [showReview, setShowReview] = useState(false);
   const [createdPRNo, setCreatedPRNo] = useState<string | null>(null);
   const [editingPrNo, setEditingPrNo] = useState<string | null>(null);
-  const [form, setForm] = useState({ purpose: "", department: "", section: "", requested_by_designation: "" });\n  const [customDepartmentMode, setCustomDepartmentMode] = useState(false);
+  const [form, setForm] = useState({ purpose: "", department: "", section: "", requested_by_designation: "" });
+  const [customDepartmentMode, setCustomDepartmentMode] = useState(false);
   const [items, setItems] = useState<Item[]>([emptyItem()]);
   const [specGuideCategory, setSpecGuideCategory] = useState("office");
   const [openSpecGuideId, setOpenSpecGuideId] = useState<string | null>(null);
