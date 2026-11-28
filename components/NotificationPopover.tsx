@@ -174,7 +174,7 @@ export function NotificationPopover({ variant = "default" }: { variant?: "defaul
       {open && (
         <>
           <button type="button" aria-label="Close notifications" onClick={() => setOpen(false)} className="fixed inset-0 z-[65] cursor-default bg-stone-950/20 backdrop-blur-[2px] sm:hidden" />
-          <section role="dialog" aria-label="Notification center" className="fixed left-3 right-3 top-[68px] z-[70] mx-auto flex max-h-[min(650px,calc(100svh-84px))] w-auto max-w-md flex-col overflow-hidden rounded-[20px] border border-stone-200/90 bg-white shadow-[0_22px_60px_rgba(45,0,26,0.2)] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-[410px] sm:max-w-[calc(100vw-2rem)]">
+          <section role="dialog" aria-label="Notification center" className="fixed left-3 right-3 top-[68px] z-[70] mx-auto flex max-h-[min(650px,calc(100svh-84px))] w-auto max-w-md flex-col overflow-hidden rounded-[20px] border border-stone-200/90 bg-white shadow-[0_22px_60px_rgba(45,0,26,0.2)] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-[430px] sm:max-w-[calc(100vw-2rem)]">
             <header className="border-b border-stone-100 bg-white px-4 pb-3 pt-4 sm:px-5">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
@@ -194,7 +194,7 @@ export function NotificationPopover({ variant = "default" }: { variant?: "defaul
               <button type="button" onClick={() => setFilter("all")} aria-pressed={filter === "all"} className={"relative py-3 text-[11px] font-semibold transition " + (filter === "all" ? "text-[#7B0046]" : "text-stone-500 hover:text-stone-800")}>All <span className="ml-1 text-[10px] tabular-nums">{items.length}</span>{filter === "all" && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-[#7B0046]" />}</button>
               <button type="button" onClick={() => setFilter("unread")} aria-pressed={filter === "unread"} className={"relative py-3 text-[11px] font-semibold transition " + (filter === "unread" ? "text-[#7B0046]" : "text-stone-500 hover:text-stone-800")}>Unread <span className="ml-1 text-[10px] tabular-nums">{unread}</span>{filter === "unread" && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-[#7B0046]" />}</button>
             </nav>
-            <div className="min-h-0 flex-1 divide-y divide-stone-100 overflow-y-auto overscroll-contain">
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain bg-stone-50/60 p-3">
               {loading && items.length === 0 ? (
                 <div className="px-5 py-12 text-center text-xs text-stone-500"><div className="mx-auto mb-2.5 h-5 w-5 animate-spin rounded-full border-2 border-[#7B0046] border-t-transparent" />Loading notifications…</div>
               ) : error ? (
@@ -202,9 +202,9 @@ export function NotificationPopover({ variant = "default" }: { variant?: "defaul
               ) : visibleItems.length === 0 ? (
                 <div className="px-5 py-12 text-center"><span className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 text-stone-400"><Bell className="h-5 w-5" /></span><p className="mt-3 text-xs font-bold text-stone-800">{filter === "unread" ? "No unread notifications" : "You’re all caught up"}</p><p className="mt-1 text-[10px] text-stone-500">{filter === "unread" ? "You have read all your notifications." : "New procurement updates and remarks will appear here."}</p></div>
               ) : visibleItems.map((item) => (
-                <article key={item.id} className={`px-4 py-3.5 transition-colors sm:px-5 ${item.is_read ? "bg-white hover:bg-stone-50/60" : "bg-[#FFFAFC] hover:bg-[#FFF5F9]"}`}>
+                <article key={item.id} className={`rounded-xl border px-3.5 py-3 transition-all sm:px-4 ${item.is_read ? "border-stone-200 bg-white hover:border-stone-300 hover:shadow-sm" : "border-[#EAD3DF] bg-[#FFFAFC] hover:border-[#D9B5C8] hover:shadow-sm"}`}>
                   <div className="flex min-w-0 items-start gap-3">
-                    <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.type === "rejected" ? "bg-red-50 text-red-600" : item.type === "remark" ? "bg-amber-50 text-amber-700" : "bg-[#7B0046]/[0.07] text-[#7B0046]"}`}>{iconFor(item.type)}</span>
+                    <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.type === "rejected" ? "bg-red-50 text-red-600" : item.type === "remark" ? "bg-amber-50 text-amber-700" : "bg-[#F7EAF1] text-[#7B0046]"}`}>{iconFor(item.type)}</span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <h4 className="text-[12px] font-bold leading-snug text-[#4D002C]">{item.title}</h4>
