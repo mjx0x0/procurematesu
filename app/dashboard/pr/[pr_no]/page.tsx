@@ -112,6 +112,8 @@ export default function PRDetailPage() {
         if (!prData) { setError("Purchase request not found"); return; }
         setPr(prData);
         setPrintedName(String(prData.printed_name || ""));
+        // Load the saved conversation using the resolved PR number (including renamed temporary PRs).
+        await loadMessages(targetPrNo);
         const [{ data: itemData }, { data: stageData }] = await Promise.all([
           supabase.from("pr_items").select("*").eq("pr_no", targetPrNo).order("created_at", { ascending: true }),
           supabase.from("pr_stages_completed").select("*").eq("pr_no", targetPrNo).order("completed_at", { ascending: true }),
