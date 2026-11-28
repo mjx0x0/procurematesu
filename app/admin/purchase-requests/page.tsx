@@ -778,6 +778,15 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                       <FileText className="h-4 w-4 text-stone-600" />
                       <span>View Full PR Form</span>
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById("admin-pr-messages")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                      className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg bg-[#FCF2F7] hover:bg-[#F7E6EF] text-[#7B0046] text-xs font-semibold border border-[#EAD3DF] transition-all active:scale-98"
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      <span>View Messages</span>
+                      {prMessages.length > 0 && <span className="inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-[#7B0046] px-1.5 text-[10px] font-bold text-white">{prMessages.length}</span>}
+                    </button>
 
                     {!["completed", "rejected", "cancelled"].includes(selectedPR.current_stage) && (
                       <button
@@ -886,7 +895,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
               </div>
 
               {/* End-user communication */}
-              <section className="overflow-hidden rounded-xl border border-[#7B0046]/15 bg-white shadow-xs">
+              <section id="admin-pr-messages" className="overflow-hidden rounded-xl border border-[#7B0046]/15 bg-white shadow-xs">
                 <div className="flex items-center gap-3 border-b border-stone-100 bg-[#FCF8FA] px-4 py-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046]"><MessageSquare className="h-4 w-4" /></div>
                   <div><h4 className="text-sm font-bold text-[#4D002C]">End-user Messages</h4><p className="text-[10px] text-stone-500">Conversation for this Purchase Request</p></div>
