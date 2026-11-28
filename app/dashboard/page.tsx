@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 
 import { Chatbot } from "@/components/chatbot/Chatbot";
-import { NotificationPopover } from "@/components/NotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
 
 import { supabase } from "@/lib/supabase/client";
@@ -141,9 +140,7 @@ export default function DashboardPage() {
         roleLabel={isAdmin ? "Administrator" : "Requisitioner"}
         showAdminPortal={isAdmin}
         containerClassName="max-w-[1220px] px-3.5 sm:px-7 lg:px-8"
-      >
-        <NotificationPopover variant="workspace" />
-      </SystemPageHeader>
+      />
 
       <main className="mx-auto w-full max-w-[1220px] px-3.5 py-4 sm:px-7 sm:py-7 lg:px-8">
         <section className="pt-1 pb-1 sm:pt-2 sm:pb-2">
