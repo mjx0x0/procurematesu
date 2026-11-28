@@ -37,5 +37,6 @@ test("provisioning script creates the ten predefined PRO Admin identities withou
   assert.match(script, /crypto\.randomBytes\(24\)/);
   assert.match(script, /auth\.admin\.createUser/);
   assert.match(script, /auth\.admin\.updateUserById/);
+  assert.match(script, /authUser\.app_metadata\?\.account_type !== "procurement_personnel"/);
   assert.doesNotMatch(script, /updateUserById\([\s\S]{0,300}password:/);
 });
