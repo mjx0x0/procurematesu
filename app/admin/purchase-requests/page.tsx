@@ -87,6 +87,7 @@ export default function AdminPurchaseRequestsPage() {
   const [temporaryPrInput, setTemporaryPrInput] = useState("");
   const [showOfficialPrModal, setShowOfficialPrModal] = useState(false);
   const [approvalGroupFilter, setApprovalGroupFilter] = useState<"all" | "approved" | "drafts">("all");
+  const openedNotificationPrRef = useRef<string | null>(null);
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const requestedStatus = params.get("status");
@@ -217,6 +218,19 @@ export default function AdminPurchaseRequestsPage() {
     setSelectedPR(pr); setHistory([]); setPrMessages([]); setAdminMessage(""); setPrMessageFeedback(null); setShowDetails(true);
     await Promise.all([loadHistory(pr.pr_no), loadPRMessages(pr.pr_no)]);
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedPrNo = params.get("openPr");
+    if (!requestedPrNo || loading || openedNotificationPrRef.current === requestedPrNo) return;
+    const matchingPR = prs.find((pr) => pr.pr_no === requestedPrNo);
+    if (!matchingPR) return;
+    openedNotificationPrRef.current = requestedPrNo;
+    params.delete("openPr");
+    const query = params.toString();
+    window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : ""));
+    void openDetails(matchingPR);
+  }, [prs, loading]);
   const openAction = (type: "complete" | "remark" | "reject", targetPR?: PR) => {
     if (targetPR) setSelectedPR(targetPR);
     setAction(type);
