@@ -58,7 +58,6 @@ export default function ProcurementRequestForm() {
   const [submitting, setSubmitting] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
-  const [preparedBy, setPreparedBy] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showReview, setShowReview] = useState(false);
   const [createdPRNo, setCreatedPRNo] = useState<string | null>(null);
@@ -78,9 +77,6 @@ export default function ProcurementRequestForm() {
       }
       if (!user) { router.push("/"); return; }
       setUserId(user.id);
-      const { data: accountProfile } = await supabase.from("users").select("full_name").eq("id", user.id).maybeSingle();
-      const accountName = String(accountProfile?.full_name || user.user_metadata?.full_name || "").trim();
-      setPreparedBy(accountName && !accountName.includes("@") ? accountName : "");
       setUserName("");
       const editNo = searchParams?.get("edit");
       if (editNo) {
@@ -553,11 +549,6 @@ export default function ProcurementRequestForm() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-3 rounded-xl border border-stone-200 bg-[#FFFEFC] p-3.5 sm:p-5">
-                    <div className="space-y-1.5">
-                      <label htmlFor="pr-prepared-by" className="block text-sm font-bold text-stone-800">Prepared By</label>
-                      <input id="pr-prepared-by" value={preparedBy} readOnly className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-200 bg-stone-100 text-stone-600" />
-                      <p className="text-[11px] text-stone-500">Automatically taken from your signed-in account.</p>
-                    </div>
                     <label htmlFor="pr-requested-by" className="block text-sm font-bold text-stone-800">
                       Requested By <span className="text-[#9E1A1D]">*</span>
                     </label>
@@ -663,7 +654,6 @@ export default function ProcurementRequestForm() {
                   <ReviewField label="Department" value={form.department} />
                   <ReviewField label="Section" value={form.section || "—"} />
                   <ReviewField label="Purpose" value={form.purpose} />
-                  <ReviewField label="Prepared By" value={preparedBy || "—"} />
                   <ReviewField label="Requested By" value={userName} />
                 </div>
 
