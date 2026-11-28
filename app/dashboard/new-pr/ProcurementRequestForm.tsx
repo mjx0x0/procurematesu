@@ -64,6 +64,8 @@ export default function ProcurementRequestForm() {
   const [editingPrNo, setEditingPrNo] = useState<string | null>(null);
   const [form, setForm] = useState({ purpose: "", department: "", section: "", requested_by_designation: "" });
   const [customDepartmentMode, setCustomDepartmentMode] = useState(false);
+  const [departmentSearch, setDepartmentSearch] = useState("");
+  const [departmentDropdownOpen, setDepartmentDropdownOpen] = useState(false);
   const [items, setItems] = useState<Item[]>([emptyItem()]);
   const [specGuideCategory, setSpecGuideCategory] = useState("office");
   const [openSpecGuideId, setOpenSpecGuideId] = useState<string | null>(null);
@@ -258,28 +260,75 @@ export default function ProcurementRequestForm() {
                     <label htmlFor="pr-dept" className="block text-sm font-bold text-stone-800">
                       Department / College / Office <span className="text-[#9E1A1D]">*</span>
                     </label>
-                    <select
-                      id="pr-dept"
-                      value={MSU_DEPARTMENTS.includes(form.department) ? form.department : (customDepartmentMode || form.department ? "__custom__" : "")}
-                      onChange={(e) => {
-                        if (e.target.value === "__custom__") {
-                          setCustomDepartmentMode(true);
-                          setForm((current) => ({ ...current, department: "" }));
-                        } else {
+                    <div className="relative">
+                      <input
+                        id="pr-dept"
+                        type="text"
+                        role="combobox"
+                        aria-autocomplete="list"
+                        aria-expanded={departmentDropdownOpen}
+                        aria-controls="pr-department-options"
+                        value={customDepartmentMode ? departmentSearch : (departmentSearch || form.department)}
+                        onFocus={() => {
                           setCustomDepartmentMode(false);
-                          setForm((current) => ({ ...current, department: e.target.value }));
-                        }
-                      }}
-                      required
-                      className="w-full h-12 px-4 text-sm rounded-xl border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
-                    >
-                      <option value="" disabled>Select your department, college, or office</option>
-                      {MSU_DEPARTMENTS.map((department) => (
-                        <option key={department} value={department}>{department}</option>
-                      ))}
-                      <option value="__custom__">Other / Not Listed — enter manually</option>
-                    </select>
-                    {(customDepartmentMode || (!!form.department && !MSU_DEPARTMENTS.includes(form.department))) && (
+                          setDepartmentSearch("");
+                          setDepartmentDropdownOpen(true);
+                        }}
+                        onChange={(e) => {
+                          setCustomDepartmentMode(false);
+                          setDepartmentSearch(e.target.value);
+                          setDepartmentDropdownOpen(true);
+                          setForm((current) => ({ ...current, department: "" }));
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape") setDepartmentDropdownOpen(false);
+                          if (e.key === "Enter" && departmentDropdownOpen) e.preventDefault();
+                        }}
+                        placeholder="Search your department, college, or office…"
+                        autoComplete="off"
+                        required={!customDepartmentMode}
+                        className="w-full h-12 px-4 text-sm rounded-xl border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
+                      />
+                      {departmentDropdownOpen && !customDepartmentMode && (
+                        <div id="pr-department-options" role="listbox" className="absolute z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-stone-200 bg-white p-1.5 shadow-xl">
+                          {MSU_DEPARTMENTS.filter((department) => department.toLowerCase().includes(departmentSearch.trim().toLowerCase())).map((department) => (
+                            <button
+                              key={department}
+                              type="button"
+                              role="option"
+                              aria-selected={form.department === department}
+                              onClick={() => {
+                                setForm((current) => ({ ...current, department }));
+                                setDepartmentSearch("");
+                                setDepartmentDropdownOpen(false);
+                                setCustomDepartmentMode(false);
+                              }}
+                              className={`w-full rounded-lg px-3 py-2.5 text-left text-sm transition hover:bg-[#FCF2F7] hover:text-[#7B0046] ${form.department === department ? "bg-[#FCF2F7] font-semibold text-[#7B0046]" : "text-stone-700"}`}
+                            >
+                              {department}
+                            </button>
+                          ))}
+                          {MSU_DEPARTMENTS.filter((department) => department.toLowerCase().includes(departmentSearch.trim().toLowerCase())).length === 0 && (
+                            <p className="px-3 py-3 text-xs text-stone-500">No matching office found. Choose the manual entry option below.</p>
+                          )}
+                          <div className="mt-1 border-t border-stone-100 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCustomDepartmentMode(true);
+                                setDepartmentSearch("");
+                                setDepartmentDropdownOpen(false);
+                                setForm((current) => ({ ...current, department: "" }));
+                              }}
+                              className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-[#7B0046] hover:bg-[#FCF2F7]"
+                            >
+                              + Other / Not Listed — enter manually
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {customDepartmentMode && (
                       <div className="mt-2 space-y-1.5 rounded-xl border border-[#7B0046]/15 bg-[#FCF8FA] p-3">
                         <label htmlFor="pr-custom-dept" className="block text-xs font-bold text-[#4D002C]">Enter Department / College / Office</label>
                         <input
@@ -293,11 +342,12 @@ export default function ProcurementRequestForm() {
                           required
                           className="w-full h-11 px-3.5 text-sm rounded-lg border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
                         />
+                        <button type="button" onClick={() => { setCustomDepartmentMode(false); setDepartmentDropdownOpen(true); setDepartmentSearch(""); setForm((current) => ({ ...current, department: "" })); }} className="text-[11px] font-semibold text-[#7B0046] hover:underline">Choose from listed offices instead</button>
                         <p className="text-[11px] text-stone-500">Enter the official name of your unit. This will be saved with your Purchase Request.</p>
                       </div>
                     )}
                     <p className="text-[11px] text-stone-500">
-                      Select from the MSU-Gensan list, or choose <span className="font-semibold text-[#7B0046]">Other / Not Listed</span> to enter your office manually.
+                      Type to search the MSU-Gensan offices, select a match, or choose <span className="font-semibold text-[#7B0046]">Other / Not Listed</span> to enter your office manually.
                     </p>
                   </div>
                   <div className="space-y-1.5">
