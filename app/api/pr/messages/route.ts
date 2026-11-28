@@ -29,7 +29,7 @@ async function getContext() {
 }
 
 async function validatePR(db: any, userId: string, role: string, prNo: string) {
-  const { data: pr, error } = await db.from('purchase_requests').select('pr_no,user_id').eq('pr_no', prNo).maybeSingle();
+  const { data: pr, error } = await db.from('purchase_requests').select('pr_no,user_id,department,printed_name').eq('pr_no', prNo).maybeSingle();
   if (error || !pr) return { error: NextResponse.json({ error: 'Purchase Request not found.' }, { status: 404, headers: HEADERS }) };
   if (role !== 'admin' && pr.user_id !== userId) {
     return { error: NextResponse.json({ error: 'You can only access messages for your own Purchase Requests.' }, { status: 403, headers: HEADERS }) };
@@ -91,6 +91,38 @@ export async function POST(req: NextRequest) {
       console.error('[pr-messages] Insert failed:', error.message);
       return NextResponse.json({ error: 'Unable to send your message. Please try again.' }, { status: 500, headers: HEADERS });
     }
+
+    // Notify every active, approved PRO administrator when an end user sends a message.
+    // Replies from admins do not generate another admin notification.
+    if (context.profile.role === 'end_user') {
+      const { data: admins, error: adminsError } = await context.db
+        .from('users')
+        .select('id')
+        .eq('role', 'admin')
+        .eq('status', 'approved')
+        .eq('is_active', true);
+
+      if (adminsError) {
+        console.error('[pr-messages] Unable to load PRO admins for notification:', adminsError.message);
+      } else if (admins?.length) {
+        const requester = String(access.pr.printed_name || senderName).trim();
+        const department = String(access.pr.department || 'a university office').trim();
+        const { error: notificationError } = await context.db.from('notifications').insert(
+          admins.map((admin: { id: string }) => ({
+            user_id: admin.id,
+            pr_no: prNo,
+            type: 'pr_message_received',
+            title: 'New Message from End User',
+            message: requester + ' sent a message about PR ' + prNo + ' (' + department + ').',
+            is_read: false,
+          }))
+        );
+        if (notificationError) {
+          console.error('[pr-messages] Message saved but admin notification creation failed:', notificationError.message);
+        }
+      }
+    }
+
     return NextResponse.json({ success: true, message: data }, { status: 201, headers: HEADERS });
   } catch (error) {
     console.error('[pr-messages] POST failed:', error);
