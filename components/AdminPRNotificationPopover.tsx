@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { Bell, BellRing, CheckCheck, Clock, FileText, Hash, Mail, MailOpen, MessageSquare, Trash2, UserRoundPlus } from "lucide-react";
+import { Bell, BellRing, Clock, FileText, Hash, Mail, MailOpen, MessageSquare, Trash2, UserRoundPlus } from "lucide-react";
 
 const ADMIN_NOTIFICATION_TYPES = [
   "pr_created",
@@ -48,7 +47,6 @@ function getIcon(type: string) {
 }
 
 export default function AdminPRNotificationPopover() {
-  const router = useRouter();
   const rootRef = useRef<HTMLDivElement>(null);
   const toastTimerRef = useRef<number | null>(null);
   const adminIdRef = useRef<string | null>(null);
@@ -261,25 +259,7 @@ export default function AdminPRNotificationPopover() {
     setBusyIds((current) => current.filter((id) => id !== item.id));
   };
 
-  const markAllRead = async () => {
-    const adminId = adminIdRef.current;
-    if (!adminId || unread === 0) return;
 
-    const { error: updateError } = await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("user_id", adminId)
-      .eq("is_read", false)
-      .in("type", [...ADMIN_NOTIFICATION_TYPES]);
-
-    if (updateError) {
-      console.error("Unable to mark all admin notifications as read:", updateError);
-      setError("Unable to mark notifications as viewed. Please try again.");
-      return;
-    }
-
-    setItems((current) => current.map((item) => ({ ...item, is_read: true })));
-  };
 
   const openNotification = async (item: AdminNotification) => {
     if (busyIds.includes(item.id)) return;
