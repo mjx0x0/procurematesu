@@ -62,7 +62,7 @@ export default function ProcurementRequestForm() {
   const [showReview, setShowReview] = useState(false);
   const [createdPRNo, setCreatedPRNo] = useState<string | null>(null);
   const [editingPrNo, setEditingPrNo] = useState<string | null>(null);
-  const [form, setForm] = useState({ purpose: "", department: "", section: "", requested_by_designation: "" });
+  const [form, setForm] = useState({ purpose: "", department: "", section: "", requested_by_designation: "" });\n  const [customDepartmentMode, setCustomDepartmentMode] = useState(false);
   const [items, setItems] = useState<Item[]>([emptyItem()]);
   const [specGuideCategory, setSpecGuideCategory] = useState("office");
   const [openSpecGuideId, setOpenSpecGuideId] = useState<string | null>(null);
@@ -257,25 +257,46 @@ export default function ProcurementRequestForm() {
                     <label htmlFor="pr-dept" className="block text-sm font-bold text-stone-800">
                       Department / College / Office <span className="text-[#9E1A1D]">*</span>
                     </label>
-                    <input
+                    <select
                       id="pr-dept"
-                      type="text"
-                      list="msu-office-options"
-                      value={form.department}
-                      onChange={(e) => setForm({ ...form, department: e.target.value })}
-                      placeholder="Search or type your college, institute, or office"
-                      autoComplete="off"
+                      value={MSU_DEPARTMENTS.includes(form.department) ? form.department : (customDepartmentMode || form.department ? "__custom__" : "")}
+                      onChange={(e) => {
+                        if (e.target.value === "__custom__") {
+                          setCustomDepartmentMode(true);
+                          setForm((current) => ({ ...current, department: "" }));
+                        } else {
+                          setCustomDepartmentMode(false);
+                          setForm((current) => ({ ...current, department: e.target.value }));
+                        }
+                      }}
                       required
-                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
-                    />
-                    <datalist id="msu-office-options">
+                      className="w-full h-12 px-4 text-sm rounded-xl border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
+                    >
+                      <option value="" disabled>Select your department, college, or office</option>
                       {MSU_DEPARTMENTS.map((department) => (
-                        <option key={department} value={department} />
+                        <option key={department} value={department}>{department}</option>
                       ))}
-                    </datalist>
-
+                      <option value="__custom__">Other / Not Listed — enter manually</option>
+                    </select>
+                    {(customDepartmentMode || (!!form.department && !MSU_DEPARTMENTS.includes(form.department))) && (
+                      <div className="mt-2 space-y-1.5 rounded-xl border border-[#7B0046]/15 bg-[#FCF8FA] p-3">
+                        <label htmlFor="pr-custom-dept" className="block text-xs font-bold text-[#4D002C]">Enter Department / College / Office</label>
+                        <input
+                          id="pr-custom-dept"
+                          type="text"
+                          value={form.department}
+                          onChange={(e) => setForm((current) => ({ ...current, department: e.target.value }))}
+                          placeholder="Type your official department, college, or office name"
+                          maxLength={160}
+                          autoComplete="organization"
+                          required
+                          className="w-full h-11 px-3.5 text-sm rounded-lg border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
+                        />
+                        <p className="text-[11px] text-stone-500">Enter the official name of your unit. This will be saved with your Purchase Request.</p>
+                      </div>
+                    )}
                     <p className="text-[11px] text-stone-500">
-                      Start typing to search all listed MSU-General Santos colleges and offices. You may enter your official unit name if it is not listed.
+                      Select from the MSU-Gensan list, or choose <span className="font-semibold text-[#7B0046]">Other / Not Listed</span> to enter your office manually.
                     </p>
                   </div>
                   <div className="space-y-1.5">
