@@ -24,6 +24,6 @@ export async function GET(request: Request) {
   const { data: items, error: itemsError } = await supabase.from("pr_items").select("*").eq("pr_no", prNo).order("created_at", { ascending: true });
   if (itemsError) return NextResponse.json({ error: "Unable to load Purchase Request items." }, { status: 500 });
 
-  const { data: history } = await supabase.from("pr_stages_completed").select("stage_name,stage_key,completed_at,remarks,status").eq("pr_no", prNo).order("completed_at", { ascending: true });
+  const { data: history } = await supabase.from("pr_stages_completed").select("stage_name,stage_key,completed_at,remarks,status,updated_by,updated_by_name").eq("pr_no", prNo).order("completed_at", { ascending: true });
   return NextResponse.json({ pr, items: items || [], history: history || [] }, { headers: { "Cache-Control": "no-store" } });
 }
