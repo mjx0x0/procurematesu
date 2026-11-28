@@ -55,7 +55,21 @@ on:
       - "app/dashboard/purchase-requests/page.tsx"
       - "app/loading.tsx"
       - "scripts/tests/system-branding.test.cjs"
-      - "scripts/tests/procurement-workflow-hardening.test.cjs"
+      - "app/api/admin/complete-stage/route.ts"
+      - "app/admin/purchase-requests/page.tsx"
+      - "app/api/admin/pr-details/route.ts"
+      - "app/dashboard/pr/[pr_no]/page.tsx"
+      - "scripts/provision-pro-admins.mjs"
+      - "scripts/tests/pro-admin-audit.test.cjs"
+      - "supabase/migrations/*_add_procurement_stage_actor_audit.sql"
+      - "scripts/tests/procurement-workflow-hardening.test.cjs scripts/tests/pro-admin-audit.test.cjs"
+      - "app/api/admin/complete-stage/route.ts"
+      - "app/admin/purchase-requests/page.tsx"
+      - "app/api/admin/pr-details/route.ts"
+      - "app/dashboard/pr/[pr_no]/page.tsx"
+      - "scripts/provision-pro-admins.mjs"
+      - "scripts/tests/pro-admin-audit.test.cjs"
+      - "supabase/migrations/*_add_procurement_stage_actor_audit.sql"
   pull_request:
     branches: [master]
     paths:
