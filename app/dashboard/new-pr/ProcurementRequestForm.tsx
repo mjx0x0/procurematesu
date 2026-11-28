@@ -343,8 +343,7 @@ export default function ProcurementRequestForm() {
                           className="w-full h-11 px-3.5 text-sm rounded-lg border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all"
                         />
                         <button type="button" onClick={() => { setCustomDepartmentMode(false); setDepartmentDropdownOpen(true); setDepartmentSearch(""); setForm((current) => ({ ...current, department: "" })); }} className="text-[11px] font-semibold text-[#7B0046] hover:underline">Choose from listed offices instead</button>
-                        <p className="text-[11px] text-stone-500">Enter the official name of your unit. This will be saved with your Purchase Request.</p>
-                      </div>
+                          </div>
                     )}
                     <p className="text-[11px] text-stone-500">
                       Type to search the MSU-Gensan offices, select a match, or choose <span className="font-semibold text-[#7B0046]">Other / Not Listed</span> to enter your office manually.
@@ -362,7 +361,6 @@ export default function ProcurementRequestForm() {
                       placeholder="e.g., IT Support Section, Science Laboratory"
                       className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
                     />
-                    <p className="text-[11px] text-stone-500">Leave blank if not applicable.</p>
                   </div>
                 </div>
 
@@ -379,7 +377,6 @@ export default function ProcurementRequestForm() {
                     required
                     className="w-full min-h-[115px] p-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs resize-y leading-relaxed"
                   />
-                  <p className="text-[11px] text-stone-500">Provide an accurate justification and intended use for the requested items.</p>
                 </div>
               </div>
 
@@ -632,7 +629,6 @@ export default function ProcurementRequestForm() {
                       placeholder="Enter the full name of the person requesting the items"
                       className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
                     />
-                    <p className="text-[11px] text-stone-500">Enter the requester’s full name as it should appear on the printed PR. This is separate from the signed-in account.</p>
                     
                     <div className="pt-2 space-y-1.5">
                       <label htmlFor="pr-designation" className="block text-sm font-semibold text-stone-700">
@@ -657,9 +653,6 @@ export default function ProcurementRequestForm() {
                         <div className="text-[11px] text-[#7B0046] font-semibold mt-1">Mindanao State University - General Santos</div>
                       </div>
                     </div>
-                    <p className="text-[11px] text-stone-500 mt-3">
-                      Institutional approving authority as defined by University policy. This is automatically set.
-                    </p>
                   </div>
                 </div>
               </div>
