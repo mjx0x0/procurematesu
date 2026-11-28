@@ -136,6 +136,12 @@ export async function POST(req: NextRequest) {
           .eq('id', completedEntry.id);
         if (attributionError) {
           console.error('[complete-stage] Unable to save completed-stage actor attribution:', attributionError.message);
+        } else if (Array.isArray(data.stageHistory)) {
+          data.stageHistory = data.stageHistory.map((entry: Record<string, unknown>) =>
+            entry.stage_key === targetPR.current_stage && entry.status === 'completed'
+              ? { ...entry, updated_by: user.id, updated_by_name: profile.full_name }
+              : entry
+          );
         }
       }
     }
