@@ -58,6 +58,7 @@ export default function ProcurementRequestForm() {
   const [submitting, setSubmitting] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
+  const [preparedBy, setPreparedBy] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showReview, setShowReview] = useState(false);
   const [createdPRNo, setCreatedPRNo] = useState<string | null>(null);
@@ -78,8 +79,10 @@ export default function ProcurementRequestForm() {
       }
       if (!user) { router.push("/"); return; }
       setUserId(user.id);
-      const name = user.user_metadata?.full_name || "";
-      setUserName(name && !name.includes("@") ? name : "");
+      const { data: accountProfile } = await supabase.from("users").select("full_name").eq("id", user.id).maybeSingle();
+      const accountName = String(accountProfile?.full_name || user.user_metadata?.full_name || "").trim();
+      setPreparedBy(accountName && !accountName.includes("@") ? accountName : "");
+      setUserName("");
       const editNo = searchParams?.get("edit");
       if (editNo) {
         const { data: draft } = await supabase.from("purchase_requests").select("*").eq("pr_no", editNo).eq("user_id", user.id).maybeSingle();
@@ -93,7 +96,7 @@ export default function ProcurementRequestForm() {
           setEditingPrNo(editNo);
           setForm({ purpose: draft.purpose || "", department: draft.department || "", section: draft.section || "", requested_by_designation: draft.designation || "" });
           setDepartmentOther(!MSU_DEPARTMENTS.includes(draft.department || ""));
-          setUserName(draft.printed_name || name || "");
+          setUserName(draft.printed_name || "");
           setItems((draftItems || []).map((item: any, index: number) => ({ id: String(item.id || index), description: item.item_description || "", qty: Number(item.quantity || 1), unit: item.unit || "pcs", unit_cost: Number(item.unit_cost || 0), total_cost: Number(item.total_cost || 0) })));
         }
       }
@@ -176,7 +179,6 @@ export default function ProcurementRequestForm() {
     reviewConfirmedRef.current = false;
     setSubmitting(true); setError(null);
     try {
-      await supabase.auth.updateUser({ data: { full_name: userName.trim() } }).catch(() => {});
       const validItems = items.filter(item => item.description.trim()).map(item => {
         const q = Number(item.qty) || 1;
         const c = Number(item.unit_cost) || 0;
@@ -262,53 +264,25 @@ export default function ProcurementRequestForm() {
                     <label htmlFor="pr-dept" className="block text-sm font-bold text-stone-800">
                       Department / College / Office <span className="text-[#9E1A1D]">*</span>
                     </label>
-                    <select
+                    <input
                       id="pr-dept"
-                      value={departmentOther ? "__other__" : form.department}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === "__other__") {
-                          setDepartmentOther(true);
-                          setForm({ ...form, department: "" });
-                        } else {
-                          setDepartmentOther(false);
-                          setForm({ ...form, department: value });
-                        }
-                      }}
+                      type="text"
+                      list="msu-office-options"
+                      value={form.department}
+                      onChange={(e) => { setDepartmentOther(false); setForm({ ...form, department: e.target.value }); }}
+                      placeholder="Search or type your college, institute, or office"
+                      autoComplete="off"
                       required
-                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs cursor-pointer"
-                    >
-                      <option value="" disabled>
-                        Select your college, institute, or office
-                      </option>
+                      className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white text-stone-800 focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
+                    />
+                    <datalist id="msu-office-options">
                       {MSU_DEPARTMENTS.map((department) => (
-                        <option key={department} value={department}>
-                          {department}
-                        </option>
+                        <option key={department} value={department} />
                       ))}
-                      <option value="__other__">Others — My office is not listed</option>
-                    </select>
-
-                    {departmentOther && (
-                      <div className="mt-2.5">
-                        <input
-                          id="pr-dept-other"
-                          type="text"
-                          value={form.department}
-                          onChange={(e) => setForm({ ...form, department: e.target.value })}
-                          placeholder="Enter your official office, department, or unit"
-                          required
-                          autoFocus
-                          className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
-                        />
-                        <p className="mt-1 text-[11px] text-stone-500">
-                          Enter the official name of your MSU-General Santos office, department, or unit.
-                        </p>
-                      </div>
-                    )}
+                    </datalist>
 
                     <p className="text-[11px] text-stone-500">
-                      Select your official MSU-General Santos college or institute. Choose <strong>Others</strong> if your office or unit is not listed.
+                      Start typing to search all listed MSU-General Santos colleges and offices. You may enter your official unit name if it is not listed.
                     </p>
                   </div>
                   <div className="space-y-1.5">
@@ -582,6 +556,11 @@ export default function ProcurementRequestForm() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-3 rounded-xl border border-stone-200 bg-[#FFFEFC] p-3.5 sm:p-5">
+                    <div className="space-y-1.5">
+                      <label htmlFor="pr-prepared-by" className="block text-sm font-bold text-stone-800">Prepared By</label>
+                      <input id="pr-prepared-by" value={preparedBy} readOnly className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-200 bg-stone-100 text-stone-600" />
+                      <p className="text-[11px] text-stone-500">Automatically taken from your signed-in account.</p>
+                    </div>
                     <label htmlFor="pr-requested-by" className="block text-sm font-bold text-stone-800">
                       Requested By <span className="text-[#9E1A1D]">*</span>
                     </label>
@@ -590,10 +569,10 @@ export default function ProcurementRequestForm() {
                       required
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Full legal name"
+                      placeholder="Enter the full name of the person requesting the items"
                       className="w-full h-12 px-4 text-base sm:text-sm rounded-xl border border-stone-300 bg-white focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/15 transition-all shadow-xs"
                     />
-                    <p className="text-[11px] text-stone-500">Enter your name as it should appear on the printed PR.</p>
+                    <p className="text-[11px] text-stone-500">Enter the requester’s full name as it should appear on the printed PR. This is separate from the signed-in account.</p>
                     
                     <div className="pt-2 space-y-1.5">
                       <label htmlFor="pr-designation" className="block text-sm font-semibold text-stone-700">
@@ -687,6 +666,7 @@ export default function ProcurementRequestForm() {
                   <ReviewField label="Department" value={form.department} />
                   <ReviewField label="Section" value={form.section || "—"} />
                   <ReviewField label="Purpose" value={form.purpose} />
+                  <ReviewField label="Prepared By" value={preparedBy || "—"} />
                   <ReviewField label="Requested By" value={userName} />
                 </div>
 
