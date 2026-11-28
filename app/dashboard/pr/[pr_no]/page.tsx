@@ -78,27 +78,6 @@ export default function PRDetailPage() {
   const [submittingPhysical, setSubmittingPhysical] = useState(false);
   const [showPhysicalSubmitConfirm, setShowPhysicalSubmitConfirm] = useState(false);
   const [physicalSubmissionMessage, setPhysicalSubmissionMessage] = useState<string | null>(null);
-  const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
-  const actionsMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!actionsMenuOpen) return;
-    const handlePointerDown = (event: MouseEvent) => {
-      if (actionsMenuRef.current && !actionsMenuRef.current.contains(event.target as Node)) {
-        setActionsMenuOpen(false);
-      }
-    };
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setActionsMenuOpen(false);
-    };
-    document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [actionsMenuOpen]);
-  const [messages, setMessages] = useState<PRMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
