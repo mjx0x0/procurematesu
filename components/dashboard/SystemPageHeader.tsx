@@ -3,6 +3,7 @@
 import { type ReactNode } from "react";
 import { type LucideIcon, Menu } from "lucide-react";
 import { MsuLogo } from "@/components/msu-logo";
+import { NotificationPopover } from "@/components/NotificationPopover";
 
 interface SystemPageHeaderProps {
   titlePrimary?: string;
@@ -134,6 +135,9 @@ export function SystemPageHeader({
         </div>
         <div className={`flex shrink-0 items-center justify-end gap-2 sm:gap-3`}>
           {children && <div className={`flex shrink-0 items-center gap-2 sm:gap-3`}>{children}</div>}
+          {roleLabel !== "Administrator" && roleLabel !== "Admin" && (
+            <NotificationPopover variant={brandLogo && brandWordmark ? "workspace" : "default"} />
+          )}
 
 
         </div>
