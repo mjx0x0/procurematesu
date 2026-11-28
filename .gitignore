@@ -31,6 +31,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# Local one-time account provisioning output (contains temporary passwords)
+/pro-admin-initial-credentials.json
+
 # env files (can opt-in for committing if needed)
 .env*.local
 .env
