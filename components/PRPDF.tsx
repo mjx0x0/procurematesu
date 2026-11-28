@@ -385,6 +385,7 @@ interface PRPDFProps {
     total?: number;
     current_stage?: string;
     printed_name?: string;
+    prepared_by?: string | null;
     designation?: string | null;
     pr_date?: string;
     sai_no?: string | null;
@@ -591,6 +592,8 @@ export default function PRPDF({ pr = {}, items = [] }: PRPDFProps) {
                 <Text style={styles.sigFieldValue}> </Text>
               </View>
               <View style={styles.sigFieldRow}>
+                <Text style={styles.sigFieldLabel}>Prepared By</Text>
+                <Text style={styles.sigFieldValue}>{safePr.prepared_by || ""}</Text>
                 <Text style={styles.sigFieldLabel}>Printed Name</Text>
                 <Text style={styles.sigFieldValue}>
                   {(safePr.printed_name && safePr.printed_name.includes("@")
