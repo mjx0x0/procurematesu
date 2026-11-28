@@ -819,7 +819,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                               </span>
                             </div>
                             <p className={`text-xs font-semibold mt-0.5 ${state === "current" ? "text-stone-900" : "text-stone-700"}`}>{stage.label}</p>
-                            {recorded?.updated_by_name && (
+                            {state === "completed" && recorded?.updated_by_name && (
                               <p className="mt-1 text-[10px] font-semibold text-[#7B0046]">
                                 Updated by: {recorded.updated_by_name}
                               </p>
