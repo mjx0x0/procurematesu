@@ -42,7 +42,8 @@ function getDestination(item: AdminNotification) {
 
 function getIcon(type: string) {
   if (type === "user_registered") return <UserRoundPlus className="h-4 w-4" />;
-  if (type === "pr_number_assigned") return <Hash className="h-4 w-4" />;\n  if (type === "pr_message_received") return <MessageSquare className="h-4 w-4" />;
+  if (type === "pr_number_assigned") return <Hash className="h-4 w-4" />;
+  if (type === "pr_message_received") return <MessageSquare className="h-4 w-4" />
   return <FileText className="h-4 w-4" />;
 }
 
