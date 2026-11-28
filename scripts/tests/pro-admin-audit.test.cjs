@@ -32,8 +32,8 @@ test("both administrator and end-user PR timelines display recorded personnel at
 test("provisioning script creates the ten predefined PRO Admin identities without resetting existing passwords", () => {
   const script = read("scripts/provision-pro-admins.mjs");
   assert.match(script, /number <= 10/);
-  assert.match(script, /procurement\\\$\{number\}@msugensan\.edu\.ph/);
-  assert.match(script, /PRO Admin \\$\{number\}/);
+  assert.ok(script.includes("`procurement${number}@msugensan.edu.ph`"));
+  assert.ok(script.includes("`PRO Admin ${number}`"));
   assert.match(script, /crypto\.randomBytes\(24\)/);
   assert.match(script, /auth\.admin\.createUser/);
   assert.match(script, /auth\.admin\.updateUserById/);
