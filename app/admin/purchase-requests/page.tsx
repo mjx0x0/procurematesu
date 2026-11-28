@@ -21,6 +21,7 @@ interface PR {
   department: string;
   user_id: string;
   printed_name: string;
+  prepared_by?: string | null;
   pr_date: string;
   physical_submitted_at?: string | null;
   physical_received_at?: string | null;
@@ -619,6 +620,12 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                   <span><b>Department:</b> {selectedPR.department || "—"}</span>
                   <span>•</span>
                   <span><b>Total:</b> ₱{Number(selectedPR.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  {selectedPR.prepared_by && (
+                    <>
+                      <span>•</span>
+                      <span><b>Prepared By:</b> {selectedPR.prepared_by}</span>
+                    </>
+                  )}
                   {selectedPR.printed_name && (
                     <>
                       <span>•</span>
