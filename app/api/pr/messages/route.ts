@@ -121,6 +121,18 @@ export async function POST(req: NextRequest) {
           console.error('[pr-messages] Message saved but admin notification creation failed:', notificationError.message);
         }
       }
+    } else if (context.profile.role === 'admin') {
+      const { error: notificationError } = await context.db.from('notifications').insert({
+        user_id: access.pr.user_id,
+        pr_no: prNo,
+        type: 'pr_message_reply',
+        title: 'New Reply from Procurement Office',
+        message: senderName + ' from the Procurement Office replied to your message about PR ' + prNo + '.',
+        is_read: false,
+      });
+      if (notificationError) {
+        console.error('[pr-messages] Reply saved but end-user notification creation failed:', notificationError.message);
+      }
     }
 
     return NextResponse.json({ success: true, message: data }, { status: 201, headers: HEADERS });
