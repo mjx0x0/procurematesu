@@ -268,7 +268,7 @@ export default function ProcurementRequestForm() {
                         aria-autocomplete="list"
                         aria-expanded={departmentDropdownOpen}
                         aria-controls="pr-department-options"
-                        value={customDepartmentMode ? departmentSearch : (departmentSearch || form.department)}
+                        value={departmentDropdownOpen ? departmentSearch : form.department}
                         onFocus={() => {
                           setCustomDepartmentMode(false);
                           setDepartmentSearch("");
