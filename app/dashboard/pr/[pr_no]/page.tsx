@@ -17,7 +17,6 @@ interface PurchaseRequest {
   current_stage: string;
   department: string;
   printed_name: string;
-  prepared_by?: string | null;
   designation: string;
   section: string | null;
   pr_date: string;
@@ -345,10 +344,6 @@ export default function PRDetailPage() {
             <div className="grid grid-cols-12 min-h-[96px] text-xs">
               <div className="col-span-6 border-r-2 border-black p-3 flex flex-col justify-end">
                 <div className="mb-2">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="w-24 shrink-0">Prepared By</span>
-                    <span className="font-bold uppercase">{pr.prepared_by || ""}</span>
-                  </div>
                   <div className="flex items-center gap-2">
                     <span className="w-24 shrink-0">Printed Name</span>
                     {pr.current_stage === "draft" ? (
