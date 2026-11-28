@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     const { data: profile, error: profileError } = await authClient
       .from('users')
-      .select('role,status,is_active')
+      .select('role,status,is_active,full_name')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -101,6 +101,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await db.rpc('process_purchase_request_action', {
       p_pr_no: prNo,
+      p_actor_id: user.id,
       p_action: action,
       p_new_stage: action === 'complete' ? newStatus : null,
       p_remarks: remarks,
