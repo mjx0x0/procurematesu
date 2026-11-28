@@ -36,7 +36,7 @@ function formatTime(isoString: string) {
 
 function getDestination(item: AdminNotification) {
   if (item.type === "user_registered") return "/admin/users";
-  if (item.pr_no) return "/admin/purchase-requests?search=" + encodeURIComponent(item.pr_no);
+  if (item.pr_no) return "/admin/purchase-requests?openPr=" + encodeURIComponent(item.pr_no);
   return "/admin/purchase-requests";
 }
 
