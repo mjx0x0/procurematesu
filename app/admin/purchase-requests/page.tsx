@@ -32,6 +32,8 @@ interface StageHistory {
   completed_at: string;
   remarks?: string;
   status?: string;
+  updated_by?: string | null;
+  updated_by_name?: string | null;
 }
 
 const STAGES = PROCUREMENT_STAGES;
@@ -98,7 +100,7 @@ export default function AdminPurchaseRequestsPage() {
   };
   const manualRefresh = async () => { if (refreshing) return; setRefreshing(true); try { await loadData(); showFeedback("success", "List refreshed", "Purchase request records are up to date."); } catch (refreshError) { showFeedback("error", "Refresh failed", refreshError instanceof Error ? refreshError.message : "Unable to refresh purchase requests."); } finally { setRefreshing(false); } };
   const loadHistory = async (prNo: string) => {
-    const { data, error } = await supabase.from("pr_stages_completed").select("stage_name,stage_key,completed_at,remarks,status").eq("pr_no", prNo).order("completed_at", { ascending: true });
+    const { data, error } = await supabase.from("pr_stages_completed").select("stage_name,stage_key,completed_at,remarks,status,updated_by,updated_by_name").eq("pr_no", prNo).order("completed_at", { ascending: true });
     if (error) { console.error("Failed to load stage history:", error); setHistory([]); } else setHistory((data || []) as StageHistory[]);
   };
 
@@ -842,6 +844,7 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                           <div>
                             <p className="font-semibold text-xs text-stone-800">{h.stage_name || LABELS[h.stage_key] || h.stage_key}</p>
                             <p className="text-[10px] text-stone-400 mt-1">{h.completed_at ? new Date(h.completed_at).toLocaleString("en-PH") : ""}</p>
+                            {h.updated_by_name && <p className="mt-1 text-[10px] font-semibold text-[#7B0046]">Updated by: {h.updated_by_name}</p>}
                           </div>
                           <span
                             className={`text-[9px] px-2 py-0.5 rounded-md font-semibold h-fit border ${
