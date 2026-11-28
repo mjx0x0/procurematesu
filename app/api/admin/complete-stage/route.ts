@@ -114,6 +114,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: mapped.message }, { status: mapped.status, headers: JSON_HEADERS });
     }
 
+    // Attribute a completed stage to the administrator who completed it, not
+    // to the administrator who previously advanced the PR into that stage.
+    if (action === 'complete' && targetPR.current_stage !== 'draft') {
+      const { data: completedEntry, error: historyLookupError } = await db
+        .from('pr_stages_completed')
+        .select('id')
+        .eq('pr_no', typeof data.updatedPR?.pr_no === 'string' ? data.updatedPR.pr_no : prNo)
+        .eq('stage_key', targetPR.current_stage)
+        .eq('status', 'completed')
+        .order('completed_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (historyLookupError) {
+        console.error('[complete-stage] Unable to locate completed stage history for actor attribution:', historyLookupError.message);
+      } else if (completedEntry?.id) {
+        const { error: attributionError } = await db
+          .from('pr_stages_completed')
+          .update({ updated_by: user.id, updated_by_name: profile.full_name })
+          .eq('id', completedEntry.id);
+        if (attributionError) {
+          console.error('[complete-stage] Unable to save completed-stage actor attribution:', attributionError.message);
+        }
+      }
+    }
+
     return NextResponse.json({ success: true, ...data }, { headers: JSON_HEADERS });
   } catch (error) {
     console.error('[complete-stage] Unexpected API error:', error);
