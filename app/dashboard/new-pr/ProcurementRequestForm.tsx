@@ -64,7 +64,6 @@ export default function ProcurementRequestForm() {
   const [createdPRNo, setCreatedPRNo] = useState<string | null>(null);
   const [editingPrNo, setEditingPrNo] = useState<string | null>(null);
   const [form, setForm] = useState({ purpose: "", department: "", section: "", requested_by_designation: "" });
-  const [departmentOther, setDepartmentOther] = useState(false);
   const [items, setItems] = useState<Item[]>([emptyItem()]);
   const [specGuideCategory, setSpecGuideCategory] = useState("office");
   const [openSpecGuideId, setOpenSpecGuideId] = useState<string | null>(null);
@@ -95,7 +94,6 @@ export default function ProcurementRequestForm() {
           const { data: draftItems } = await supabase.from("pr_items").select("*").eq("pr_no", editNo).order("created_at", { ascending: true });
           setEditingPrNo(editNo);
           setForm({ purpose: draft.purpose || "", department: draft.department || "", section: draft.section || "", requested_by_designation: draft.designation || "" });
-          setDepartmentOther(!MSU_DEPARTMENTS.includes(draft.department || ""));
           setUserName(draft.printed_name || "");
           setItems((draftItems || []).map((item: any, index: number) => ({ id: String(item.id || index), description: item.item_description || "", qty: Number(item.quantity || 1), unit: item.unit || "pcs", unit_cost: Number(item.unit_cost || 0), total_cost: Number(item.total_cost || 0) })));
         }
@@ -118,7 +116,6 @@ export default function ProcurementRequestForm() {
         department: draft.department,
         purpose: draft.purpose,
       }));
-      setDepartmentOther(!MSU_DEPARTMENTS.includes(draft.department));
       setItems(draft.items.map((item, index) => ({
         id: `chatbot-draft-${Date.now()}-${index}`,
         description: item.item_description,
@@ -269,7 +266,7 @@ export default function ProcurementRequestForm() {
                       type="text"
                       list="msu-office-options"
                       value={form.department}
-                      onChange={(e) => { setDepartmentOther(false); setForm({ ...form, department: e.target.value }); }}
+                      onChange={(e) => setForm({ ...form, department: e.target.value })}
                       placeholder="Search or type your college, institute, or office"
                       autoComplete="off"
                       required
