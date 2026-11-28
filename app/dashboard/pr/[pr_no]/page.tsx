@@ -8,7 +8,7 @@ import PRDownloadButton from "@/components/PRDownloadButton";
 import LoadingScreen from "@/components/LoadingScreen";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, getFormDisplayPrNumber } from "@/lib/procurement-process";
-import { AlertCircle, Building2, Calendar, CheckCircle, Clock, FileCheck, MessageSquare, Printer, XCircle } from "lucide-react";
+import { AlertCircle, Building2, Calendar, CheckCircle, Clock, FileCheck, MessageSquare, Printer, Send, XCircle } from "lucide-react";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -58,6 +58,10 @@ interface TimelineGroup {
   stage?: Stage;
   remarks: Stage[];
 }
+interface PRMessage {
+  id: string; sender_id: string; sender_name: string;
+  sender_role: "end_user" | "admin"; message: string; created_at: string;
+}
 
 export default function PRDetailPage() {
   const router = useRouter();
@@ -73,7 +77,7 @@ export default function PRDetailPage() {
   const [printedNameMessage, setPrintedNameMessage] = useState<string | null>(null);
   const [submittingPhysical, setSubmittingPhysical] = useState(false);
   const [showPhysicalSubmitConfirm, setShowPhysicalSubmitConfirm] = useState(false);
-  const [physicalSubmissionMessage, setPhysicalSubmissionMessage] = useState<string | null>(null);
+  const [physicalSubmissionMessage, setPhysicalSubmissionMessage] = useState<string | null>(null);\n  const [messages, setMessages] = useState<PRMessage[]>([]);\n  const [newMessage, setNewMessage] = useState("");\n  const [loadingMessages, setLoadingMessages] = useState(false);\n  const [sendingMessage, setSendingMessage] = useState(false);\n  const [messageFeedback, setMessageFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -118,6 +122,39 @@ export default function PRDetailPage() {
     };
     load();
   }, [prNo, router]);
+
+  const loadMessages = async (targetPrNo: string) => {
+    setLoadingMessages(true);
+    try {
+      const response = await fetch(`/api/pr/messages?prNo=${encodeURIComponent(targetPrNo)}`, { credentials: "include", cache: "no-store" });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Unable to load messages.");
+      setMessages(Array.isArray(result.messages) ? result.messages : []);
+    } catch (loadError) {
+      console.error("Unable to load PR messages:", loadError);
+      setMessageFeedback(loadError instanceof Error ? loadError.message : "Unable to load messages.");
+    } finally { setLoadingMessages(false); }
+  };
+
+  const sendMessage = async () => {
+    const message = newMessage.trim();
+    if (!pr || !message || sendingMessage) return;
+    setSendingMessage(true); setMessageFeedback(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch("/api/pr/messages", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json", ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+        body: JSON.stringify({ prNo: pr.pr_no, message }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Unable to send message.");
+      setMessages((current) => [...current, result.message]); setNewMessage("");
+      setMessageFeedback("Message sent to the Procurement Office.");
+    } catch (sendError) {
+      setMessageFeedback(sendError instanceof Error ? sendError.message : "Unable to send message.");
+    } finally { setSendingMessage(false); }
+  };
 
   const savePrintedName = async () => {
     if (!pr || pr.current_stage !== "draft" || savingPrintedName) return;
@@ -288,7 +325,7 @@ export default function PRDetailPage() {
           <p className="mt-1 text-xs leading-relaxed">{pr.physical_submitted_at ? "You have declared that the printed PR was physically submitted. The Procurement Office must confirm actual receipt before Stage 1 tracking begins." : "This PR is still your private draft. You can edit and print it, but it is not yet visible in the Procurement Office logbook and no processing timeline is active."}</p>
           {physicalSubmissionMessage && <p role="status" className="mt-2 text-xs font-semibold">{physicalSubmissionMessage}</p>}
         </section>}
-        <div className={pr.current_stage === "draft" ? "grid min-w-0 grid-cols-1" : "grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start 2xl:grid-cols-[minmax(0,1fr)_360px]"}>
+        <div className={pr.current_stage === "draft" ? "grid min-w-0 grid-cols-1" : "grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_380px] xl:items-start 2xl:grid-cols-[minmax(0,1fr)_400px]"}>
           <div className="min-w-0 space-y-4">
         {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-medium text-red-700">{error}</div>}
 
@@ -387,10 +424,10 @@ export default function PRDetailPage() {
         </section>
 <div className="text-xs text-stone-500 flex items-center gap-2 print:hidden"><FileCheck className="h-4 w-4" />The Download PR Form button generates only the official Purchase Request form as a PDF.</div>
           </div>
-        {pr.current_stage !== "draft" && <aside className="pr-timeline min-w-0 w-full max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-stone-200/90 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sm:p-5 xl:sticky xl:top-5 xl:max-h-[calc(100vh-2.5rem)] print:hidden">
-          <div className="flex min-w-0 flex-col items-start gap-3 border-b border-stone-200/80 pb-4 mb-4">
+        {pr.current_stage !== "draft" && <aside className="pr-timeline min-w-0 w-full max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-stone-200 bg-gradient-to-b from-white to-[#FCF9FB] p-4 shadow-[0_8px_24px_rgba(77,0,44,0.06)] sm:p-5 xl:sticky xl:top-5 xl:max-h-[calc(100vh-2.5rem)] print:hidden">
+          <div className="flex min-w-0 items-center justify-between gap-3 border-b border-stone-200/80 pb-4 mb-4">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046] border border-[#7B0046]/15">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#7B0046] text-white shadow-sm">
                 <Clock className="h-5 w-5" />
               </div>
               <div>
@@ -398,12 +435,12 @@ export default function PRDetailPage() {
                 <p className="text-[11px] leading-relaxed text-stone-500">Official log of completed procurement stages and office remarks</p>
               </div>
             </div>
-            <div className="inline-flex max-w-full items-center gap-1.5 self-start rounded-full border border-stone-200 bg-stone-50 px-3 py-1 text-xs font-semibold text-stone-600">
+            <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#7B0046]/15 bg-[#7B0046]/5 px-3 py-1.5 text-[11px] font-semibold text-[#7B0046]">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               <span>{timelineGroups.length} recorded milestone{timelineGroups.length === 1 ? "" : "s"}</span>
             </div>
           </div>
-          <div className="mb-4 min-w-0 w-full rounded-xl border border-[#7B0046]/15 bg-[#FCF7FA] p-3">
+          <div className="mb-4 min-w-0 w-full rounded-2xl border border-[#7B0046]/15 bg-white p-4 shadow-[0_2px_8px_rgba(77,0,44,0.04)]">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500">Current stage</span>
               <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusClass(pr.current_stage)}`}>{statusLabel(pr.current_stage)}</span>
@@ -426,7 +463,7 @@ export default function PRDetailPage() {
               <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">Milestones will appear here automatically as your purchase request progresses through the procurement workflow.</p>
             </div>
           ) : (
-            <div className="relative min-w-0 space-y-3 pl-7 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-0.5 before:bg-stone-200">
+            <div className="relative min-w-0 space-y-3 pl-6 before:absolute before:left-[10px] before:top-3 before:bottom-3 before:w-0.5 before:rounded-full before:bg-gradient-to-b before:from-emerald-300 before:via-stone-200 before:to-stone-100">
               {timelineGroups.map((group) => {
                 const event = group.stage;
                 const stageBadgeLabel = group.stageNumber === 0 
@@ -442,10 +479,10 @@ export default function PRDetailPage() {
                       <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-emerald-50 text-emerald-600" />
                     </div>
 
-                    <article className="min-w-0 w-full rounded-xl border border-stone-200/90 bg-[#FFFEFC] p-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-colors hover:border-stone-300 sm:p-4">
+                    <article className="min-w-0 w-full rounded-2xl border border-stone-200 bg-white p-3.5 shadow-[0_2px_8px_rgba(0,0,0,0.035)] transition-all hover:border-[#7B0046]/25 hover:shadow-[0_4px_12px_rgba(77,0,44,0.06)] sm:p-4">
                       <div className="flex min-w-0 flex-col items-start gap-2">
                         <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono font-bold text-[#7B0046] bg-[#7B0046]/8 border border-[#7B0046]/15">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold text-[#7B0046] bg-[#F8EDF3] border border-[#EAD3DF]">
                             {stageBadgeLabel}
                           </span>
                           <h4 className="min-w-0 max-w-full break-words text-sm font-semibold leading-snug text-stone-900">
@@ -453,7 +490,7 @@ export default function PRDetailPage() {
                           </h4>
                         </div>
                         {event && (
-                          <div className="inline-flex w-full min-w-0 items-start gap-1.5 rounded-lg border border-emerald-200/80 bg-emerald-50 px-2.5 py-2 text-[11px] font-medium leading-relaxed text-emerald-700">
+                          <div className="inline-flex w-full min-w-0 items-start gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50/80 px-3 py-2.5 text-[11px] font-semibold leading-relaxed text-emerald-800">
                             <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
                             <span className="min-w-0 whitespace-normal break-words">Completed · {new Date(event.completed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} at {new Date(event.completed_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</span>
                           </div>
@@ -498,6 +535,30 @@ export default function PRDetailPage() {
               })}
             </div>
           )}
+          <section className="mt-5 overflow-hidden rounded-2xl border border-[#7B0046]/15 bg-white shadow-[0_3px_12px_rgba(77,0,44,0.05)]">
+            <div className="flex items-center gap-3 border-b border-stone-100 bg-[#FCF8FA] px-4 py-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046]"><MessageSquare className="h-4 w-4" /></div>
+              <div className="min-w-0"><h4 className="text-sm font-bold text-[#4D002C]">Message Procurement</h4><p className="text-[10px] text-stone-500">Send a question or additional remark about this PR</p></div>
+            </div>
+            <div className="max-h-64 space-y-3 overflow-y-auto bg-stone-50/50 p-3">
+              {loadingMessages ? <p className="py-5 text-center text-xs text-stone-500">Loading conversation…</p> : messages.length === 0 ? (
+                <div className="py-5 text-center"><MessageSquare className="mx-auto mb-2 h-6 w-6 text-stone-300" /><p className="text-xs font-semibold text-stone-600">No messages yet</p><p className="mt-1 text-[10px] text-stone-500">Your messages and Procurement Office replies will appear here.</p></div>
+              ) : messages.map((message) => (
+                <div key={message.id} className={`flex ${message.sender_role === "end_user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-[90%] rounded-2xl px-3 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] ${message.sender_role === "end_user" ? "rounded-br-md bg-[#7B0046] text-white" : "rounded-bl-md border border-stone-200 bg-white text-stone-800"}`}>
+                    <p className={`mb-1 text-[10px] font-bold ${message.sender_role === "end_user" ? "text-white/75" : "text-[#7B0046]"}`}>{message.sender_role === "end_user" ? "You" : "Procurement Office"}</p>
+                    <p className="whitespace-pre-wrap break-words text-xs leading-relaxed">{message.message}</p>
+                    <p className={`mt-1.5 text-right text-[9px] ${message.sender_role === "end_user" ? "text-white/65" : "text-stone-400"}`}>{new Date(message.created_at).toLocaleString("en-PH", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <form onSubmit={(event) => { event.preventDefault(); void sendMessage(); }} className="space-y-2 border-t border-stone-100 p-3">
+              <textarea value={newMessage} onChange={(event) => setNewMessage(event.target.value)} maxLength={2000} rows={3} placeholder="Write your message or remark…" className="w-full resize-y rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs text-stone-800 outline-none transition focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/10" />
+              <div className="flex items-center justify-between gap-2"><span className="text-[10px] text-stone-400">{newMessage.length}/2,000</span><button type="submit" disabled={!newMessage.trim() || sendingMessage} className="inline-flex items-center gap-2 rounded-xl bg-[#7B0046] px-3.5 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#610037] disabled:cursor-not-allowed disabled:opacity-45"><Send className="h-3.5 w-3.5" />{sendingMessage ? "Sending…" : "Send message"}</button></div>
+              {messageFeedback && <p role="status" className="text-[10px] text-stone-500">{messageFeedback}</p>}
+            </form>
+          </section>
         </aside>}
         </div>
       </main>
