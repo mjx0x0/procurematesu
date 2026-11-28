@@ -57,6 +57,10 @@ for (let number = 1; number <= 10; number += 1) {
   const email = `procurement${number}@msugensan.edu.ph`;
   const fullName = `PRO Admin ${number}`;
   let authUser = authUsers.find((candidate) => candidate.email?.toLowerCase() === email);
+
+  if (authUser && authUser.app_metadata?.account_type !== "procurement_personnel") {
+    throw new Error(`The Auth account ${email} already exists but is not marked as a provisioned Procurement Office account. No role changes were made; review it manually.`);
+  }
   const { data: profile, error: profileError } = await supabase.from("users")
     .select("id,email,full_name,role,status,is_active")
     .eq("email", email)
