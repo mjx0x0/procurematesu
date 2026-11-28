@@ -221,15 +221,51 @@ export default function AdminPurchaseRequestsPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const requestedPrNo = params.get("openPr");
+    const requestedPrNo = params.get("openPr")?.trim();
     if (!requestedPrNo || loading || openedNotificationPrRef.current === requestedPrNo) return;
-    const matchingPR = prs.find((pr) => pr.pr_no === requestedPrNo);
-    if (!matchingPR) return;
+
     openedNotificationPrRef.current = requestedPrNo;
     params.delete("openPr");
     const query = params.toString();
     window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : ""));
-    void openDetails(matchingPR);
+
+    const openRequestedPR = async () => {
+      const matchingPR = prs.find(
+        (pr) => pr.pr_no.trim().toLowerCase() === requestedPrNo.toLowerCase()
+      );
+      if (matchingPR) {
+        await openDetails(matchingPR);
+        return;
+      }
+
+      // The normal admin list intentionally omits unsubmitted drafts. Fetch the
+      // notification target directly so valid PR links still open their details.
+      const { data, error } = await supabase
+        .from("purchase_requests")
+        .select("*")
+        .eq("pr_no", requestedPrNo)
+        .maybeSingle();
+
+      if (error || !data) {
+        console.error("Unable to open PR from notification:", error);
+        setSearchTerm(requestedPrNo);
+        showFeedback(
+          "error",
+          "Purchase Request Not Found",
+          "The request linked to this notification could not be loaded. Check its PR number or refresh the list."
+        );
+        return;
+      }
+
+      const requestedPR = data as PR;
+      setPrs((current) => current.some((pr) => pr.pr_no === requestedPR.pr_no)
+        ? current
+        : [requestedPR, ...current]
+      );
+      await openDetails(requestedPR);
+    };
+
+    void openRequestedPR();
   }, [prs, loading]);
   const openAction = (type: "complete" | "remark" | "reject", targetPR?: PR) => {
     if (targetPR) setSelectedPR(targetPR);
