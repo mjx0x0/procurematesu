@@ -10,7 +10,7 @@ import AdminPRFullFormModal from "@/components/AdminPRFullFormModal";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import AdminPRNotificationPopover from "@/components/AdminPRNotificationPopover";
 import LoadingScreen from "@/components/LoadingScreen";
-import { Check, CheckCircle, ChevronRight, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Trash2, User, X, XCircle, AlertCircle } from "lucide-react";
+import { Check, CheckCircle, ChevronRight, Eye, FileCheck, FileText, Loader2, MessageSquare, RefreshCw, Search, Send, Trash2, User, X, XCircle, AlertCircle } from "lucide-react";
 
 interface PR {
   pr_no: string;
@@ -26,6 +26,10 @@ interface PR {
   physical_submitted_at?: string | null;
   physical_received_at?: string | null;
   [key: string]: unknown;
+}
+interface PRMessage {
+  id: string; sender_id: string; sender_name: string;
+  sender_role: "end_user" | "admin"; message: string; created_at: string;
 }
 interface StageHistory {
   stage_name: string;
@@ -66,7 +70,7 @@ export default function AdminPurchaseRequestsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [selectedPR, setSelectedPR] = useState<PR | null>(null);
-  const [history, setHistory] = useState<StageHistory[]>([]);
+  const [history, setHistory] = useState<StageHistory[]>([]);\n  const [prMessages, setPrMessages] = useState<PRMessage[]>([]);\n  const [adminMessage, setAdminMessage] = useState("");\n  const [loadingPrMessages, setLoadingPrMessages] = useState(false);\n  const [sendingPrMessage, setSendingPrMessage] = useState(false);\n  const [prMessageFeedback, setPrMessageFeedback] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [fullPrNo, setFullPrNo] = useState<string | null>(null);
   const [action, setAction] = useState<"complete" | "remark" | "reject" | null>(null);
@@ -174,7 +178,40 @@ export default function AdminPurchaseRequestsPage() {
   const currentStage = (pr: PR | null) => pr ? STAGES.find((s) => s.key === pr.current_stage) : null;
   const currentIndex = (pr: PR | null) => pr ? STAGES.findIndex((s) => s.key === pr.current_stage) : -1;
   const nextStage = (pr: PR) => { const i = currentIndex(pr); return i >= 0 && i < STAGES.length - 1 ? STAGES[i + 1] : null; };
-  const openDetails = async (pr: PR) => { setSelectedPR(pr); setHistory([]); setShowDetails(true); await loadHistory(pr.pr_no); };
+  const loadPRMessages = async (prNo: string) => {
+    setLoadingPrMessages(true);
+    try {
+      const response = await fetch(`/api/pr/messages?prNo=${encodeURIComponent(prNo)}`, { credentials: "include", cache: "no-store" });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Unable to load messages.");
+      setPrMessages(Array.isArray(result.messages) ? result.messages : []);
+    } catch (error) {
+      console.error("Unable to load PR conversation:", error);
+      setPrMessageFeedback(error instanceof Error ? error.message : "Unable to load messages.");
+    } finally { setLoadingPrMessages(false); }
+  };
+  const sendPRMessage = async () => {
+    if (!selectedPR || !adminMessage.trim() || sendingPrMessage) return;
+    setSendingPrMessage(true); setPrMessageFeedback(null);
+    try {
+      const response = await fetch("/api/pr/messages", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prNo: selectedPR.pr_no, message: adminMessage.trim() }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Unable to send reply.");
+      setPrMessages((current) => [...current, result.message]);
+      setAdminMessage("");
+      setPrMessageFeedback("Reply sent to the end user.");
+    } catch (error) {
+      setPrMessageFeedback(error instanceof Error ? error.message : "Unable to send reply.");
+    } finally { setSendingPrMessage(false); }
+  };
+  const openDetails = async (pr: PR) => {
+    setSelectedPR(pr); setHistory([]); setPrMessages([]); setAdminMessage(""); setPrMessageFeedback(null); setShowDetails(true);
+    await Promise.all([loadHistory(pr.pr_no), loadPRMessages(pr.pr_no)]);
+  };
   const openAction = (type: "complete" | "remark" | "reject", targetPR?: PR) => {
     if (targetPR) setSelectedPR(targetPR);
     setAction(type);
@@ -842,6 +879,33 @@ if (loading) return <LoadingScreen label="Loading purchase requests..." />;
                   })}
                 </div>
               </div>
+
+              {/* End-user communication */}
+              <section className="overflow-hidden rounded-xl border border-[#7B0046]/15 bg-white shadow-xs">
+                <div className="flex items-center gap-3 border-b border-stone-100 bg-[#FCF8FA] px-4 py-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#7B0046]/10 text-[#7B0046]"><MessageSquare className="h-4 w-4" /></div>
+                  <div><h4 className="text-sm font-bold text-[#4D002C]">End-user Messages</h4><p className="text-[10px] text-stone-500">Conversation for this Purchase Request</p></div>
+                  <span className="ml-auto rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-[#7B0046] border border-[#7B0046]/15">{prMessages.length} messages</span>
+                </div>
+                <div className="max-h-64 space-y-3 overflow-y-auto bg-stone-50/50 p-3">
+                  {loadingPrMessages ? <p className="py-5 text-center text-xs text-stone-500">Loading conversation…</p> : prMessages.length === 0 ? (
+                    <div className="py-5 text-center"><MessageSquare className="mx-auto mb-2 h-6 w-6 text-stone-300" /><p className="text-xs font-semibold text-stone-600">No messages from this end user yet</p></div>
+                  ) : prMessages.map((message) => (
+                    <div key={message.id} className={`flex ${message.sender_role === "admin" ? "justify-end" : "justify-start"}`}>
+                      <div className={`max-w-[88%] rounded-2xl px-3 py-2.5 ${message.sender_role === "admin" ? "rounded-br-md bg-[#7B0046] text-white" : "rounded-bl-md border border-stone-200 bg-white text-stone-800"}`}>
+                        <p className={`mb-1 text-[10px] font-bold ${message.sender_role === "admin" ? "text-white/75" : "text-[#7B0046]"}`}>{message.sender_role === "admin" ? message.sender_name : message.sender_name + " · End User"}</p>
+                        <p className="whitespace-pre-wrap break-words text-xs leading-relaxed">{message.message}</p>
+                        <p className={`mt-1.5 text-right text-[9px] ${message.sender_role === "admin" ? "text-white/65" : "text-stone-400"}`}>{new Date(message.created_at).toLocaleString("en-PH", { dateStyle: "medium", timeStyle: "short" })}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <form onSubmit={(event) => { event.preventDefault(); void sendPRMessage(); }} className="space-y-2 border-t border-stone-100 p-3">
+                  <textarea value={adminMessage} onChange={(event) => setAdminMessage(event.target.value)} maxLength={2000} rows={2} placeholder="Reply to the end user…" className="w-full resize-y rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs text-stone-800 outline-none focus:border-[#7B0046] focus:ring-2 focus:ring-[#7B0046]/10" />
+                  <div className="flex items-center justify-between gap-2"><span className="text-[10px] text-stone-400">{adminMessage.length}/2,000</span><button type="submit" disabled={!adminMessage.trim() || sendingPrMessage} className="inline-flex items-center gap-2 rounded-xl bg-[#7B0046] px-3.5 py-2 text-xs font-bold text-white hover:bg-[#610037] disabled:cursor-not-allowed disabled:opacity-45"><Send className="h-3.5 w-3.5" />{sendingPrMessage ? "Sending…" : "Send reply"}</button></div>
+                  {prMessageFeedback && <p role="status" className="text-[10px] text-stone-500">{prMessageFeedback}</p>}
+                </form>
+              </section>
 
               {/* Purpose */}
               <div className="bg-stone-50/70 rounded-xl p-3.5 border border-stone-200/80">
