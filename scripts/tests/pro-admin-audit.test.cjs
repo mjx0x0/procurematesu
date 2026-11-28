@@ -40,3 +40,10 @@ test("provisioning script creates the ten predefined PRO Admin identities withou
   assert.match(script, /authUser\.app_metadata\?\.account_type !== "procurement_personnel"/);
   assert.doesNotMatch(script, /updateUserById\([\s\S]{0,300}password:/);
 });
+
+test("official PR number assignment derives actor identity from the authenticated session", () => {
+  const route = read("app/api/admin/assign-official-pr/route.ts");
+  assert.match(route, /authClient\\.auth\\.getUser\\(\\)/);
+  assert.match(route, /p_actor_id:\\s*user\\.id/);
+  assert.doesNotMatch(route, /body\\??\\.updatedBy|body\\??\\.personnelName/);
+});
