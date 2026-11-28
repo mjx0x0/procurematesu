@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
@@ -8,7 +8,7 @@ import PRDownloadButton from "@/components/PRDownloadButton";
 import LoadingScreen from "@/components/LoadingScreen";
 import { SystemPageHeader } from "@/components/dashboard/SystemPageHeader";
 import { PROCUREMENT_STAGES, PROCUREMENT_STAGE_LABELS, getFormDisplayPrNumber } from "@/lib/procurement-process";
-import { AlertCircle, Building2, Calendar, CheckCircle, Clock, FileCheck, MessageSquare, Printer, Send, XCircle } from "lucide-react";
+import { AlertCircle, Building2, Calendar, CheckCircle, Clock, FileCheck, MessageSquare, MoreVertical, Printer, Send, XCircle } from "lucide-react";
 
 interface PurchaseRequest {
   pr_no: string;
@@ -78,6 +78,26 @@ export default function PRDetailPage() {
   const [submittingPhysical, setSubmittingPhysical] = useState(false);
   const [showPhysicalSubmitConfirm, setShowPhysicalSubmitConfirm] = useState(false);
   const [physicalSubmissionMessage, setPhysicalSubmissionMessage] = useState<string | null>(null);
+  const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+  const actionsMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!actionsMenuOpen) return;
+    const handlePointerDown = (event: MouseEvent) => {
+      if (actionsMenuRef.current && !actionsMenuRef.current.contains(event.target as Node)) {
+        setActionsMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setActionsMenuOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [actionsMenuOpen]);
   const [messages, setMessages] = useState<PRMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -317,13 +337,37 @@ export default function PRDetailPage() {
               </div>
             )}
           </div>
-          <div className="grid w-full grid-cols-1 gap-2 sm:w-full sm:max-w-[520px] sm:grid-cols-2 sm:gap-2.5 lg:w-[520px] lg:shrink-0 print:hidden">
-            {pr.current_stage === "draft" && !pr.physical_submitted_at && <Link href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-[#7B0046]/35 bg-white px-3 text-center text-xs font-bold text-[#7B0046] shadow-xs transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30">Edit Draft</Link>}
-            {pr.current_stage === "draft" && !pr.physical_submitted_at && <button type="button" onClick={() => setShowPhysicalSubmitConfirm(true)} disabled={submittingPhysical} className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-[#7B0046]/35 bg-white px-3 text-center text-xs font-bold leading-tight text-[#7B0046] shadow-xs transition hover:border-[#7B0046] hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30 disabled:opacity-60">{submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}</button>}
-            <button type="button" onClick={() => window.print()} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#7B0046]/35 bg-white px-3 text-xs font-semibold text-[#7B0046] shadow-xs transition hover:bg-[#FDF2F7] hover:border-[#7B0046] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30">
-              <Printer className="h-4 w-4 shrink-0 text-stone-600" /><span>Print Form</span>
+          <div ref={actionsMenuRef} className="relative shrink-0 print:hidden">
+            <button
+              type="button"
+              aria-label="Purchase request actions"
+              aria-haspopup="menu"
+              aria-expanded={actionsMenuOpen}
+              onClick={() => setActionsMenuOpen((open) => !open)}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#7B0046]/25 bg-white text-[#7B0046] shadow-sm transition hover:border-[#7B0046]/50 hover:bg-[#FDF2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B0046]/30"
+            >
+              <MoreVertical className="h-5 w-5" />
             </button>
-            <div className="w-full [&>button]:min-h-11 [&>button]:w-full [&>button]:border [&>button]:border-[#7B0046]/35 [&>button]:!bg-white [&>button]:!text-[#7B0046] [&>button]:shadow-xs [&>button]:hover:!bg-[#FDF2F7] [&>button]:hover:!border-[#7B0046] [&>button_svg]:!text-[#7B0046]"><PRDownloadButton pr={pr} items={items} /></div>
+            {actionsMenuOpen && (
+              <div role="menu" aria-label="Purchase request actions" className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 overflow-hidden rounded-xl border border-stone-200 bg-white p-1.5 shadow-[0_12px_32px_rgba(77,0,44,0.16)]">
+                {pr.current_stage === "draft" && !pr.physical_submitted_at && (
+                  <Link role="menuitem" href={"/dashboard/new-pr?edit=" + encodeURIComponent(pr.pr_no)} onClick={() => setActionsMenuOpen(false)} className="flex min-h-10 items-center gap-2.5 rounded-lg px-3 text-left text-xs font-semibold text-stone-700 transition hover:bg-[#FDF2F7] hover:text-[#7B0046]">
+                    <FileCheck className="h-4 w-4 text-[#7B0046]" /> Edit Draft
+                  </Link>
+                )}
+                {pr.current_stage === "draft" && !pr.physical_submitted_at && (
+                  <button role="menuitem" type="button" onClick={() => { setActionsMenuOpen(false); setShowPhysicalSubmitConfirm(true); }} disabled={submittingPhysical} className="flex min-h-10 w-full items-center gap-2.5 rounded-lg px-3 text-left text-xs font-semibold text-stone-700 transition hover:bg-[#FDF2F7] hover:text-[#7B0046] disabled:opacity-60">
+                    <CheckCircle className="h-4 w-4 text-[#7B0046]" /> {submittingPhysical ? "Confirming..." : "I have submitted the PR physically"}
+                  </button>
+                )}
+                <button role="menuitem" type="button" onClick={() => { setActionsMenuOpen(false); window.print(); }} className="flex min-h-10 w-full items-center gap-2.5 rounded-lg px-3 text-left text-xs font-semibold text-stone-700 transition hover:bg-[#FDF2F7] hover:text-[#7B0046]">
+                  <Printer className="h-4 w-4 text-[#7B0046]" /> Print Form
+                </button>
+                <div role="none" className="px-1 py-1 [&>button]:!min-h-10 [&>button]:!w-full [&>button]:!justify-start [&>button]:!rounded-lg [&>button]:!border-0 [&>button]:!bg-transparent [&>button]:!px-2 [&>button]:!text-xs [&>button]:!font-semibold [&>button]:!text-stone-700 [&>button]:!shadow-none [&>button]:hover:!bg-[#FDF2F7] [&>button]:hover:!text-[#7B0046]">
+                  <PRDownloadButton pr={pr} items={items} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
