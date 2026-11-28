@@ -70,7 +70,12 @@ export default function AdminPurchaseRequestsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [selectedPR, setSelectedPR] = useState<PR | null>(null);
-  const [history, setHistory] = useState<StageHistory[]>([]);\n  const [prMessages, setPrMessages] = useState<PRMessage[]>([]);\n  const [adminMessage, setAdminMessage] = useState("");\n  const [loadingPrMessages, setLoadingPrMessages] = useState(false);\n  const [sendingPrMessage, setSendingPrMessage] = useState(false);\n  const [prMessageFeedback, setPrMessageFeedback] = useState<string | null>(null);
+  const [history, setHistory] = useState<StageHistory[]>([]);
+  const [prMessages, setPrMessages] = useState<PRMessage[]>([]);
+  const [adminMessage, setAdminMessage] = useState("");
+  const [loadingPrMessages, setLoadingPrMessages] = useState(false);
+  const [sendingPrMessage, setSendingPrMessage] = useState(false);
+  const [prMessageFeedback, setPrMessageFeedback] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [fullPrNo, setFullPrNo] = useState<string | null>(null);
   const [action, setAction] = useState<"complete" | "remark" | "reject" | null>(null);
